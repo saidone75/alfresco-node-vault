@@ -1,0 +1,77 @@
+spring:
+  output:
+    ansi:
+      enabled: always
+  application:
+    name: AlfrescoNodeVault
+  profiles:
+    active: dev
+  cloud:
+    compatibility-verifier:
+      enabled: false
+  activemq:
+    brokerUrl: ${ACTIVE_MQ_URL:tcp://localhost:61616}
+  jms:
+    cache:
+      enabled: false
+  data:
+    mongodb:
+      uri: mongodb://root:example@localhost:27017
+      database: vault
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger
+management:
+  security:
+    basic-auth:
+      username: admin
+      password: admin
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics"
+  endpoint:
+    health:
+      show-details: always
+content:
+  service:
+    url: ${ALFRESCO_BASE_PATH:http://localhost:8080}
+    security:
+      basicAuth:
+        username: ${ALFRESCO_USERNAME:admin}
+        password: ${ALFRESCO_PASSWORD:admin}
+    path: /alfresco/api/-default-/public/alfresco/versions/1
+search:
+  service:
+    path: /alfresco/api/-default-/public/search/versions/1
+application:
+  proxy:
+    port: 8088
+    target:
+      host: localhost
+      port: 8080
+    enabled: true
+  event-handler:
+    enabled: false
+  archiving-job:
+    cron-expression: 0 0/1 * * * ?
+    #query: TYPE:'cm:content' AND cm:created:[MIN TO NOW-10YEARS]
+    query: ISNOTNULL:'cm:name' AND TYPE:'cm:content' AND ASPECT:'anv:archive'
+    enabled: true
+  service:
+    alfresco:
+      include:
+        - allowableOperations
+        - association
+        - isLink
+        - isFavorite
+        - isLocked
+        - path
+        - permissions
+        - definition
+      permanently-delete-nodes: true
+      search-batch-size: 100
+  same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
+server:
+  port: 8086
