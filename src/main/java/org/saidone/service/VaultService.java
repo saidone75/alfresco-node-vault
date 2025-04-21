@@ -20,7 +20,7 @@ public class VaultService extends BaseComponent {
     private final GridFsRepositoryImpl gridFsRepository;
 
     public void archiveNode(String nodeId) {
-        log.debug("Archiving node: {}", nodeId);
+        log.debug("Archiving node => {}", nodeId);
         try {
             var node = alfrescoService.getNode(nodeId);
             mongoNodeRepository.save(new NodeWrapper(node));
@@ -30,10 +30,10 @@ public class VaultService extends BaseComponent {
         } catch (Exception e) {
             log.trace(e.getMessage(), e);
             // rollback
-            log.debug("Rollback required for node: {}", nodeId);
+            log.debug("Rollback required for node => {}", nodeId);
             mongoNodeRepository.deleteById(nodeId);
             gridFsRepository.deleteFileById(nodeId);
-            throw new ArchiveNodeException(String.format("Error archiving node %s: %s", nodeId, e.getMessage()));
+            throw new ArchiveNodeException(String.format("Error archiving node %s => %s", nodeId, e.getMessage()));
         }
     }
 
