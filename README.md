@@ -4,6 +4,8 @@ _"Who controls the past controls the future: who controls the present controls t
 
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+![Java CI](https://github.com/saidone75/alfresco-node-vault/actions/workflows/build.yml/badge.svg)
+![CodeQL](https://github.com/saidone75/alfresco-node-vault/actions/workflows/codeql.yml/badge.svg)
 
 A Spring Boot application designed for long-term storage of Alfresco nodes that no longer need to be kept online,
 helping to reduce the load on Alfresco's database and Solr indices.
