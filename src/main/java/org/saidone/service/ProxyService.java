@@ -46,6 +46,7 @@ public class ProxyService extends BaseComponent {
     private HttpProxyServer proxyServer;
 
     @PostConstruct
+    @Override
     public void init() {
         super.init();
         proxyServer = DefaultHttpProxyServer.bootstrap()
@@ -130,6 +131,7 @@ public class ProxyService extends BaseComponent {
     }
 
     @PreDestroy
+    @Override
     public void stop() {
         super.stop();
         if (proxyServer != null) {

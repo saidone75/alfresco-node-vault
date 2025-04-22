@@ -41,6 +41,7 @@ public class AlfrescoService extends BaseComponent {
     public static Node guestHome;
 
     @PostConstruct
+    @Override
     public void init() {
         super.init();
         guestHome = getGuestHome();
