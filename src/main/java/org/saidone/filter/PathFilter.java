@@ -46,10 +46,11 @@ public class PathFilter extends AbstractEventFilter {
 
     @Override
     public boolean test(RepoEvent<DataAttributes<Resource>> repoEvent) {
-        var node = Objects.requireNonNull(nodesApi.getNode(((NodeResource) repoEvent.getData().getResource()).getId(), List.of("path"), null, List.of("path")).getBody()).getEntry();
+        var nodeId = ((NodeResource) repoEvent.getData().getResource()).getId();
+        var node = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("path"), null, List.of("path")).getBody()).getEntry();
         var isInPath = StringUtils.isNotBlank(path) && node.getPath().getName().equals(path) ||
                 pathPattern != null && pathPattern.matcher(node.getPath().getName()).matches();
-        log.debug("Node {} is in path {} => {}", node.getId(), path, isInPath);
+        log.debug("Node {} is in path {} => {}", nodeId, path, isInPath);
         return isInPath;
     }
 

@@ -46,7 +46,7 @@ public class RecentlyProcessedFilter extends AbstractEventFilter {
         }
     }
 
-    @Scheduled(fixedDelay = 10 * 60 * 1000)
+    @Scheduled(fixedDelay = 5 * 60 * 1000)
     public void cleanRecentlyProcessedNodes() {
         recentlyProcessedNodes.entrySet().stream().filter(e -> (e.getValue() + threshold) < System.currentTimeMillis())
                 .forEach(e -> {
