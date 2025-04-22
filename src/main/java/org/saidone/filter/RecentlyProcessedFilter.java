@@ -7,7 +7,6 @@ import org.alfresco.repo.event.v1.model.DataAttributes;
 import org.alfresco.repo.event.v1.model.NodeResource;
 import org.alfresco.repo.event.v1.model.RepoEvent;
 import org.alfresco.repo.event.v1.model.Resource;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -20,10 +19,16 @@ import java.util.concurrent.ConcurrentHashMap;
 @Slf4j
 public class RecentlyProcessedFilter extends AbstractEventFilter {
 
-    @Value("${application.same-node-processing-threshold}")
     private long threshold;
-
     private static final ConcurrentHashMap<String, Long> recentlyProcessedNodes = new ConcurrentHashMap<>();
+
+    private RecentlyProcessedFilter(long threshold) {
+        this.threshold = threshold;
+    }
+
+    public static RecentlyProcessedFilter of(final long threshold) {
+        return new RecentlyProcessedFilter(threshold);
+    }
 
     @Override
     public boolean test(RepoEvent<DataAttributes<Resource>> repoEvent) {

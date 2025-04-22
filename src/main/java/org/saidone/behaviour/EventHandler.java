@@ -13,6 +13,7 @@ import org.saidone.model.alfresco.AlfrescoContentModel;
 import org.saidone.model.alfresco.AnvContentModel;
 import org.saidone.component.BaseComponent;
 import org.saidone.service.VaultService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 
@@ -24,8 +25,10 @@ import java.util.Set;
 @Slf4j
 public class EventHandler extends BaseComponent implements OnNodeCreatedEventHandler, OnNodeUpdatedEventHandler {
 
-    private final RecentlyProcessedFilter recentlyProcessedFilter;
     private final VaultService vaultService;
+
+    @Value("${application.same-node-processing-threshold}")
+    private static long threshold;
 
     @Override
     public void handleEvent(RepoEvent<DataAttributes<Resource>> event) {
@@ -42,7 +45,7 @@ public class EventHandler extends BaseComponent implements OnNodeCreatedEventHan
     public EventFilter getEventFilter() {
         return (NodeTypeFilter.of(AlfrescoContentModel.TYPE_CONTENT))
                 .and(AspectAddedFilter.of(AnvContentModel.ASP_ARCHIVE))
-                .and(recentlyProcessedFilter);
+                .and(RecentlyProcessedFilter.of(threshold));
     }
 
     @Override
