@@ -21,7 +21,7 @@ import org.saidone.exception.ApiExceptionError;
 import org.saidone.model.SystemSearchRequest;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -67,13 +67,49 @@ public class AlfrescoService extends BaseComponent {
     }
 
     @SneakyThrows
-    public InputStream getNodeContent(String nodeId) {
-        var nodeContent = nodesApi.getNodeContent(nodeId, true, null, null).getBody();
-        if (nodeContent == null) {
-            log.warn("Node content not found for node => {}", nodeId);
-            return null;
+    public File getNodeContent(String nodeId) {
+        final int CHUNK_SIZE = 8 * 1024 * 1024;
+        final int BUFFER_SIZE = 8192;
+
+        long offset = 0;
+        var tempFile = File.createTempFile("alfresco-content-", ".tmp");
+
+        try {
+            while (true) {
+                var range = String.format("bytes=%d-%d", offset, offset + CHUNK_SIZE - 1);
+                var nodeContent = nodesApi.getNodeContent(nodeId, false, null, range).getBody();
+                if (nodeContent == null) {
+                    if (offset == 0) {
+                        log.warn("Contenuto del nodo non trovato per nodeId => {}", nodeId);
+                        tempFile.delete();
+                        return null;
+                    }
+                    break;
+                }
+                try (var inputStream = nodeContent.getInputStream();
+                     var outputStream = new java.io.FileOutputStream(tempFile, true)) {
+
+                    byte[] buffer = new byte[BUFFER_SIZE];
+                    int bytesRead;
+                    long totalBytesRead = 0;
+
+                    while ((bytesRead = inputStream.read(buffer)) != -1) {
+                        outputStream.write(buffer, 0, bytesRead);
+                        totalBytesRead += bytesRead;
+                    }
+
+                    if (totalBytesRead < CHUNK_SIZE) {
+                        break;
+                    }
+                    offset += totalBytesRead;
+                }
+            }
+            return tempFile;
+        } catch (Exception e) {
+            log.error("Error retrieving node content => {}", nodeId, e);
+            tempFile.delete();
+            throw e;
         }
-        return nodeContent.getInputStream();
     }
 
     public void addAspects(String nodeId, List<String> additionalAspectNames) {

@@ -10,6 +10,8 @@ import org.saidone.repository.GridFsRepositoryImpl;
 import org.saidone.repository.MongoNodeRepository;
 import org.springframework.stereotype.Service;
 
+import java.io.FileInputStream;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -24,8 +26,10 @@ public class VaultService extends BaseComponent {
         try {
             var node = alfrescoService.getNode(nodeId);
             mongoNodeRepository.save(new NodeWrapper(node));
-            @Cleanup var is = alfrescoService.getNodeContent(nodeId);
+            var file = alfrescoService.getNodeContent(nodeId);
+            @Cleanup var is = new FileInputStream(file);
             gridFsRepository.saveFile(nodeId, is, node.getName(), node.getContent().getMimeType());
+            file.delete();
             alfrescoService.deleteNode(nodeId);
         } catch (Exception e) {
             log.trace(e.getMessage(), e);

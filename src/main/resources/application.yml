@@ -7,8 +7,19 @@ spring:
   profiles:
     active: dev
   cloud:
-    compatibility-verifier:
-      enabled: false
+    gateway:
+      routes:
+        - id: node_route
+          uri: http://localhost:8086
+          predicates:
+            - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}/content
+          filters:
+            - SetPath=/api/vault/nodes/{nodeId}/content
+            - AddRequestParameter=attachment,true
+        - id: default_route
+          uri: http://localhost:8080
+          predicates:
+            - Path=/**
   activemq:
     brokerUrl: ${ACTIVE_MQ_URL:tcp://localhost:61616}
   jms:
@@ -54,7 +65,7 @@ application:
     target:
       host: localhost
       port: 8080
-    enabled: true
+    enabled: false
   event-handler:
     enabled: false
   archiving-job:
