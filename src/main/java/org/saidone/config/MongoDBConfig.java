@@ -1,7 +1,6 @@
 package org.saidone.config;
 
-import com.mongodb.ConnectionString;
-import com.mongodb.MongoClientSettings;
+import com.mongodb.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import lombok.NonNull;
@@ -19,17 +18,30 @@ public class MongoDBConfig extends AbstractMongoClientConfiguration {
 
     @Value("${spring.data.mongodb.uri}")
     private String connectionString;
-
+    @Value("${spring.data.mongodb.auth-database}")
+    private String authDatabase;
     @Value("${spring.data.mongodb.database}")
     private String database;
+    @Value("${spring.data.mongodb.username}")
+    private String username;
+    @Value("${spring.data.mongodb.password}")
+    private String password;
 
     @Bean
     @NonNull
     public MongoClient mongoClient() {
         var pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
         var codecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), pojoCodecRegistry);
+        var serverApi = ServerApi.builder()
+                .version(ServerApiVersion.V1)
+                .build();
+        var credentials = MongoCredential.createCredential(username, authDatabase, password.toCharArray());
         return MongoClients.create(MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(connectionString))
+                .serverApi(serverApi)
+                .credential(credentials)
+                .retryWrites(true)
+                .writeConcern(WriteConcern.MAJORITY)
                 .codecRegistry(codecRegistry)
                 .build());
     }

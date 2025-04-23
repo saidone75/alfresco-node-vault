@@ -16,8 +16,11 @@ spring:
       enabled: false
   data:
     mongodb:
-      uri: mongodb://root:example@localhost:27017
+      uri: mongodb://localhost:27017
+      auth-database: admin
       database: vault
+      username: root
+      password: example
 springdoc:
   swagger-ui:
     enabled: true
