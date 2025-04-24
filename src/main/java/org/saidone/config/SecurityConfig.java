@@ -31,6 +31,7 @@ public class SecurityConfig {
                         .anyExchange().authenticated()
                 )
                 .httpBasic().and()
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();
     }
 
