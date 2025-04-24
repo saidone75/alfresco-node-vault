@@ -7,8 +7,28 @@ spring:
   profiles:
     active: dev
   cloud:
-    compatibility-verifier:
-      enabled: false
+    gateway:
+      routes:
+        - id: vault_node_route
+          uri: http://localhost:8086
+          predicates:
+            - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}
+            - Method=GET
+            - name: IsOnVaultPredicate
+          filters:
+            - SetPath=/api/vault/nodes/{nodeId}
+        - id: vault_node_content_route
+          uri: http://localhost:8086
+          predicates:
+            - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}/content
+            - Method=GET
+            - name: IsOnVaultPredicate
+          filters:
+            - SetPath=/api/vault/nodes/{nodeId}/content
+        - id: default_route
+          uri: ${ALFRESCO_BASE_PATH:http://localhost:8080}
+          predicates:
+            - Path=/**
   activemq:
     brokerUrl: ${ACTIVE_MQ_URL:tcp://localhost:61616}
   jms:
@@ -49,12 +69,6 @@ search:
   service:
     path: /alfresco/api/-default-/public/search/versions/1
 application:
-  proxy:
-    port: 8088
-    target:
-      host: localhost
-      port: 8080
-    enabled: true
   event-handler:
     enabled: false
   archiving-job:
@@ -75,6 +89,7 @@ application:
         - definition
       permanently-delete-nodes: true
       search-batch-size: 100
+      max-chunk-size-mib: 16
   same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
 server:
   port: 8086

@@ -7,6 +7,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.Node;
 import org.alfresco.core.model.NodeBodyUpdate;
@@ -19,13 +20,17 @@ import org.saidone.component.BaseComponent;
 import org.saidone.config.AlfrescoServiceConfig;
 import org.saidone.exception.ApiExceptionError;
 import org.saidone.model.SystemSearchRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.InputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -39,12 +44,17 @@ public class AlfrescoService extends BaseComponent {
     private final SearchApi searchApi;
 
     public static Node guestHome;
+    private static int parallelism;
+
+    @Value("${application.service.alfresco.max-chunk-size-mib}")
+    private int maxChunkSizeMib;
 
     @PostConstruct
     @Override
     public void init() {
         super.init();
         guestHome = getGuestHome();
+        parallelism = ForkJoinPool.commonPool().getParallelism();
     }
 
     private Node getGuestHome() {
@@ -67,13 +77,43 @@ public class AlfrescoService extends BaseComponent {
     }
 
     @SneakyThrows
-    public InputStream getNodeContent(String nodeId) {
-        var nodeContent = nodesApi.getNodeContent(nodeId, true, null, null).getBody();
-        if (nodeContent == null) {
-            log.warn("Node content not found for node => {}", nodeId);
-            return null;
+    public File getNodeContent(String nodeId) {
+        val availableMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory() + Runtime.getRuntime().freeMemory();
+        log.trace("Available memory => {} bytes", availableMemory);
+        val dynamicChunkSize = (int) Math.min((long) maxChunkSizeMib * 1024 * 1024, availableMemory / (2L * parallelism));
+        log.trace("Dynamic chunk size => {}", dynamicChunkSize);
+        var offset = 0L;
+        var tempFile = File.createTempFile("alfresco-content-", ".tmp");
+        try {
+            while (true) {
+                var range = String.format("bytes=%d-%d", offset, offset + dynamicChunkSize - 1);
+                log.trace("Range => {}", range);
+                var nodeContent = nodesApi.getNodeContent(nodeId, false, null, range).getBody();
+                if (nodeContent == null) {
+                    if (offset == 0) {
+                        log.warn("Content not found for node => {}", nodeId);
+                        Files.deleteIfExists(tempFile.toPath());
+                        return null;
+                    }
+                    break;
+                }
+                try (var inputStream = nodeContent.getInputStream();
+                     var outputStream = new FileOutputStream(tempFile, true)) {
+                    var chunk = inputStream.readAllBytes();
+                    log.trace("Read {} bytes", chunk.length);
+                    outputStream.write(chunk);
+                    if (chunk.length < dynamicChunkSize) {
+                        break;
+                    }
+                    offset += chunk.length;
+                }
+            }
+            return tempFile;
+        } catch (Exception e) {
+            log.error("Error retrieving content of node => {}", nodeId, e);
+            Files.deleteIfExists(tempFile.toPath());
+            throw e;
         }
-        return nodeContent.getInputStream();
     }
 
     public void addAspects(String nodeId, List<String> additionalAspectNames) {
@@ -99,12 +139,12 @@ public class AlfrescoService extends BaseComponent {
     }
 
     @SneakyThrows
-    public void processFromQuery(String query, Consumer<String> nodeProcessor) {
-        processFromQuery(query, null, nodeProcessor);
+    public void searchAndProcess(String query, Consumer<String> nodeProcessor) {
+        searchAndProcess(query, null, nodeProcessor);
     }
 
     @SneakyThrows
-    public void processFromQuery(String query, Integer pages, Consumer<String> nodeProcessor) {
+    public void searchAndProcess(String query, Integer pages, Consumer<String> nodeProcessor) {
         if (pages == null || pages < 1) {
             pages = Integer.MAX_VALUE;
         }
