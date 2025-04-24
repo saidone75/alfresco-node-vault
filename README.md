@@ -25,14 +25,13 @@ In some documented cases, repositories with hundreds of millions of nodes can re
 Many enterprises find themselves in a difficult position: business units demand that all documents remain accessible, while IT departments struggle with managing increasingly unresponsive Alfresco instances. The technical debt accumulates, making each upgrade more complex than the last. Site collections become sluggish, search operations time out, and what was once a highly efficient ECM solution becomes a burden on daily operations.
 
 ## The Solution: Alfresco Node Vault
-
-A Spring Boot application designed for long-term storage of Alfresco nodes that no longer need to be kept online, helping to reduce the load on Alfresco's database and Solr indices.
+A Spring Boot application designed for long-term storage of Alfresco nodes that no longer need to be kept online. Unlike traditional archiving solutions, Alfresco Node Vault completely removes nodes from Alfresco and its database, freeing resources while maintaining document accessibility.
 
 The application can archive nodes on-demand through a behavior or using a scheduled job.
 
 Nodes and binaries are archived on MongoDB with GridFS, ensuring efficient and scalable storage.
 
-The application can also act as a proxy to allow applications using REST APIs to retrieve nodes that no longer exist in Alfresco, ensuring operational continuity without the need to modify client applications.
+The application can also act as a proxy to allow applications using REST APIs to retrieve nodes that no longer exist in Alfresco, ensuring operational continuity without the need to modify legacy client applications.
 
 By implementing Alfresco Node Vault, organizations can:
 - Maintain high performance in their active Alfresco repository
@@ -42,7 +41,6 @@ By implementing Alfresco Node Vault, organizations can:
 - Simplify upgrade processes by reducing the volume of live data
 
 This approach bridges the gap between complete document purging (often unacceptable for business or compliance reasons) and the indefinite retention of all documents in the active repository (unsustainable from a performance perspective).
-
 
 ## Key Features
 - Clean and elegant code architecture
