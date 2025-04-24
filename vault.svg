@@ -1,0 +1,22 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <!-- Corpo della cassaforte -->
+    <rect x="30" y="30" width="140" height="140" rx="10" fill="#3B9FCF" stroke="#2A7BA0" stroke-width="4"/>
+
+    <!-- Porta -->
+    <rect x="50" y="50" width="100" height="100" rx="6" fill="#7AC043" stroke="#5A9833" stroke-width="3"/>
+
+    <!-- Manopola -->
+    <circle cx="100" cy="100" r="20" fill="#F68B1F" stroke="#C86F12" stroke-width="3"/>
+    <line x1="100" y1="80" x2="100" y2="120" stroke="#FDC300" stroke-width="2"/>
+    <line x1="80" y1="100" x2="120" y2="100" stroke="#FDC300" stroke-width="2"/>
+    <line x1="88" y1="88" x2="112" y2="112" stroke="#FDC300" stroke-width="2"/>
+    <line x1="112" y1="88" x2="88" y2="112" stroke="#FDC300" stroke-width="2"/>
+
+    <!-- Cerniere -->
+    <rect x="46" y="65" width="4" height="20" rx="1" fill="#FDC300" stroke="#C8A800" stroke-width="0.5"/>
+    <rect x="46" y="115" width="4" height="20" rx="1" fill="#FDC300" stroke="#C8A800" stroke-width="0.5"/>
+
+    <!-- Piedini -->
+    <rect x="40" y="170" width="20" height="10" fill="#2A7BA0"/>
+    <rect x="140" y="170" width="20" height="10" fill="#2A7BA0"/>
+</svg>
