@@ -15,7 +15,7 @@ spring:
             - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}/content
           filters:
             - SetPath=/api/vault/nodes/{nodeId}/content
-            - AddRequestParameter=attachment,true
+            - name: NodeContentFilter
         - id: default_route
           uri: http://localhost:8080
           predicates:

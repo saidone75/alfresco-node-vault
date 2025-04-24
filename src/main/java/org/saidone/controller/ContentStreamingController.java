@@ -25,15 +25,15 @@ public class ContentStreamingController {
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception ex) {
-        log.error("Error during streaming: {}", ex.getMessage(), ex);
+        log.error("Error during streaming => {}", ex.getMessage(), ex);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error during streaming: " + ex.getMessage());
+                .body("Error during streaming => " + ex.getMessage());
     }
 
     @ExceptionHandler(OutOfMemoryError.class)
     public ResponseEntity<String> handleOutOfMemoryError(OutOfMemoryError ex) {
-        log.error("Out of memory error during streaming: {}", ex.getMessage(), ex);
+        log.error("Out of memory error during streaming => {}", ex.getMessage(), ex);
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Server memory limit exceeded. Please try with a smaller file or contact administrator.");
@@ -75,7 +75,7 @@ public class ContentStreamingController {
                     .body(new InputStreamResource(contentStream));
 
         } catch (Exception e) {
-            log.error("Error streaming content for node {}: {}", nodeId, e.getMessage());
+            log.error("Error streaming content for node {} => {}", nodeId, e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }

@@ -25,7 +25,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.regex.Pattern;
 
-@Service
 @ConditionalOnProperty(name = "application.proxy.enabled", havingValue = "true")
 @RequiredArgsConstructor
 @Slf4j

@@ -3,8 +3,9 @@ package org.saidone.component;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.saidone.repository.MongoNodeRepository;
+import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
-import org.springframework.cloud.gateway.filter.GlobalFilter;
+import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -14,14 +15,31 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Component
-@RequiredArgsConstructor
 @Slf4j
-public class NodeContentFilter implements GlobalFilter {
+public class NodeContentFilter extends AbstractGatewayFilterFactory<NodeContentFilter.Config> {
 
     private final MongoNodeRepository mongoNodeRepository;
 
+    public NodeContentFilter(MongoNodeRepository mongoNodeRepository) {
+        super(Config.class);
+        this.mongoNodeRepository = mongoNodeRepository;
+    }
+
     @Override
-    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+    public Class<Config> getConfigClass() {
+        return Config.class;
+    }
+
+
+    @Override
+    public GatewayFilter apply(Config config) {
+        return (exchange, chain) -> {
+            return chain.filter(exchange)
+                    .then(filter(exchange, chain).then(Mono.fromRunnable(() -> {})));
+        };
+    }
+
+    private Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         String path = exchange.getRequest().getURI().getPath();
         Pattern nodeContentPattern = Pattern.compile(".*/nodes/(.{36})/content");
         Matcher matcher = nodeContentPattern.matcher(path);
@@ -64,4 +82,8 @@ public class NodeContentFilter implements GlobalFilter {
         // If pattern doesn't match, continue normally
         return chain.filter(exchange);
     }
+
+    public static class Config {
+    }
+
 }
