@@ -8,6 +8,7 @@ import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.Node;
 import org.alfresco.core.model.NodeBodyUpdate;
@@ -71,14 +72,17 @@ public class AlfrescoService extends BaseComponent {
 
     @SneakyThrows
     public File getNodeContent(String nodeId) {
-        final int CHUNK_SIZE = 8 * 1024 * 1024;
-
-        long offset = 0;
+        val CHUNK_SIZE = 8 * 1024 * 1024;
+        val availableMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory() + Runtime.getRuntime().freeMemory();
+        log.trace("Available memory => {} bytes ({} KiB)", availableMemory, availableMemory / 1024);
+        val dynamicChunkSize = (int) Math.min(CHUNK_SIZE, availableMemory / 16);
+        log.trace("Dynamic chunk size => {} bytes ({} KiB)", dynamicChunkSize, dynamicChunkSize / 1024);
+        var offset = 0L;
         var tempFile = File.createTempFile("alfresco-content-", ".tmp");
 
         try {
             while (true) {
-                var range = String.format("bytes=%d-%d", offset, offset + CHUNK_SIZE - 1);
+                var range = String.format("bytes=%d-%d", offset, offset + dynamicChunkSize - 1);
                 log.trace("Range => {}", range);
                 var nodeContent = nodesApi.getNodeContent(nodeId, false, null, range).getBody();
                 if (nodeContent == null) {
@@ -94,7 +98,7 @@ public class AlfrescoService extends BaseComponent {
                     var chunk = inputStream.readAllBytes();
                     log.trace("Read {} bytes", chunk.length);
                     outputStream.write(chunk);
-                    if (chunk.length < CHUNK_SIZE) {
+                    if (chunk.length < dynamicChunkSize) {
                         break;
                     }
                     offset += chunk.length;
