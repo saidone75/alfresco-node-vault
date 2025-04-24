@@ -75,12 +75,6 @@ search:
   service:
     path: /alfresco/api/-default-/public/search/versions/1
 application:
-  proxy:
-    port: 8088
-    target:
-      host: localhost
-      port: 8080
-    enabled: false
   event-handler:
     enabled: false
   archiving-job:

@@ -1,6 +1,5 @@
 package org.saidone.controller;
 
-import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.saidone.model.Entry;
@@ -12,8 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.InputStream;
 
 @RestController
 @RequestMapping("/api/vault")
@@ -41,43 +38,36 @@ public class ApiController {
     }
 
     @GetMapping("/nodes/{nodeId}/content")
-    public ResponseEntity<InputStreamResource> streamNodeContent(
+    public ResponseEntity<InputStreamResource> getNodeContent(
             @PathVariable String nodeId,
             @RequestParam(required = false, defaultValue = "true") boolean attachment) {
 
         log.debug("Streaming node content for node => {}", nodeId);
 
-        GridFSFile gridFSFile = gridFsRepositoryImpl.findFileById(nodeId);
+        var gridFSFile = gridFsRepositoryImpl.findFileById(nodeId);
         if (gridFSFile == null) {
             log.warn("Node not found in GridFS => {}", nodeId);
             return ResponseEntity.notFound().build();
         }
-
-        try {
-            var contentStream = gridFsRepositoryImpl.getFileContent(gridFSFile);
-            var headers = new HttpHeaders();
-            if (gridFSFile.getMetadata() != null && gridFSFile.getMetadata().containsKey("_contentType")) {
-                headers.setContentType(MediaType.parseMediaType(
-                        gridFSFile.getMetadata().getString("_contentType")));
-            }
-            if (gridFSFile.getLength() > 0) {
-                headers.setContentLength(gridFSFile.getLength());
-            }
-            if (attachment) {
-                headers.setContentDispositionFormData("attachment", gridFSFile.getFilename());
-            }
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(new InputStreamResource(contentStream));
-
-        } catch (Exception e) {
-            log.error("Error streaming content for node {} => {}", nodeId, e.getMessage());
-            return ResponseEntity.internalServerError().build();
+        var contentStream = gridFsRepositoryImpl.getFileContent(gridFSFile);
+        var headers = new HttpHeaders();
+        if (gridFSFile.getMetadata() != null && gridFSFile.getMetadata().containsKey("_contentType")) {
+            headers.setContentType(MediaType.parseMediaType(
+                    gridFSFile.getMetadata().getString("_contentType")));
         }
+        if (gridFSFile.getLength() > 0) {
+            headers.setContentLength(gridFSFile.getLength());
+        }
+        if (attachment) {
+            headers.setContentDispositionFormData("attachment", gridFSFile.getFilename());
+        }
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(new InputStreamResource(contentStream));
     }
 
     @GetMapping("/nodes/{nodeId}")
-    public ResponseEntity<?> getNodeInfo(@PathVariable String nodeId) {
+    public ResponseEntity<?> getNode(@PathVariable String nodeId) {
         var nodeOptional = mongoNodeRepository.findById(nodeId);
         if (nodeOptional.isPresent()) {
             var nodeWrapper = nodeOptional.get();

@@ -17,7 +17,7 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 @Configuration
 @ConfigurationProperties(prefix = "management.security.basic-auth")
 @Setter
-@EnableWebFluxSecurity // Utilizziamo WebFluxSecurity invece di EnableWebSecurity
+@EnableWebFluxSecurity
 public class SecurityConfig {
 
     private String username;
@@ -48,4 +48,5 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }
