@@ -3,6 +3,7 @@ package org.saidone.controller;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.saidone.model.Entry;
 import org.saidone.repository.GridFsRepositoryImpl;
 import org.saidone.repository.MongoNodeRepository;
 import org.springframework.core.io.InputStreamResource;
@@ -18,7 +19,7 @@ import java.io.InputStream;
 @RequestMapping("/api/vault")
 @RequiredArgsConstructor
 @Slf4j
-public class ContentStreamingController {
+public class ApiController {
 
     private final GridFsRepositoryImpl gridFsRepositoryImpl;
     private final MongoNodeRepository mongoNodeRepository;
@@ -53,23 +54,18 @@ public class ContentStreamingController {
         }
 
         try {
-            InputStream contentStream = gridFsRepositoryImpl.getFileContent(gridFSFile);
-
-            HttpHeaders headers = new HttpHeaders();
-
+            var contentStream = gridFsRepositoryImpl.getFileContent(gridFSFile);
+            var headers = new HttpHeaders();
             if (gridFSFile.getMetadata() != null && gridFSFile.getMetadata().containsKey("_contentType")) {
                 headers.setContentType(MediaType.parseMediaType(
                         gridFSFile.getMetadata().getString("_contentType")));
             }
-
             if (gridFSFile.getLength() > 0) {
                 headers.setContentLength(gridFSFile.getLength());
             }
-
             if (attachment) {
                 headers.setContentDispositionFormData("attachment", gridFSFile.getFilename());
             }
-
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(new InputStreamResource(contentStream));
@@ -85,7 +81,7 @@ public class ContentStreamingController {
         var nodeOptional = mongoNodeRepository.findById(nodeId);
         if (nodeOptional.isPresent()) {
             var nodeWrapper = nodeOptional.get();
-            return ResponseEntity.ok(nodeWrapper);
+            return ResponseEntity.ok(new Entry(nodeWrapper.getNode()));
         }
         return ResponseEntity.notFound().build();
     }

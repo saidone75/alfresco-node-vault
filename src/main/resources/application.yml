@@ -9,13 +9,28 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: node_route
+        - id: vault_node_route
+          uri: http://localhost:8086
+          predicates:
+            - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}
+            - name: IsOnVaultPredicate
+          filters:
+            - SetPath=/api/vault/nodes/{nodeId}
+        - id: alfresco_node_route
+          uri: http://localhost:8080
+          predicates:
+            - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}
+        - id: vault_node_content_route
           uri: http://localhost:8086
           predicates:
             - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}/content
+            - name: IsOnVaultPredicate
           filters:
             - SetPath=/api/vault/nodes/{nodeId}/content
-            - name: NodeContentFilter
+        - id: alfresco_node_content_route
+          uri: http://localhost:8080
+          predicates:
+            - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}/content
         - id: default_route
           uri: http://localhost:8080
           predicates:
