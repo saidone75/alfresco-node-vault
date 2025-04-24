@@ -17,6 +17,13 @@ Nodes and binaries are archived on MongoDB with GridFS.
 The application can also act as a proxy to allow applications using REST APIs to retrieve nodes that no longer exist in
 Alfresco.
 
+## Key Features
+- Clean and elegant code architecture
+- Minimal memory footprint
+- On-demand or scheduled archiving
+- MongoDB storage with GridFS
+- REST API proxy capabilities
+
 Pull requests are welcome!
 
 ## Build
