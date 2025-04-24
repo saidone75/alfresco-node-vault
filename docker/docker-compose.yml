@@ -1,6 +1,6 @@
 services:
   alfresco:
-    mem_limit: 1500m
+    mem_limit: 1536m
     build:
       context: .
       args:

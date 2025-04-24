@@ -46,8 +46,8 @@ public class AlfrescoService extends BaseComponent {
     public static Node guestHome;
     private static int parallelism;
 
-    @Value("${application.service.alfresco.max-chunk-size-mib}")
-    private int maxChunkSizeMib;
+    @Value("${application.service.alfresco.max-chunk-size-kib}")
+    private int maxChunkSizeKib;
 
     @PostConstruct
     @Override
@@ -80,7 +80,7 @@ public class AlfrescoService extends BaseComponent {
     public File getNodeContent(String nodeId) {
         val availableMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory() + Runtime.getRuntime().freeMemory();
         log.trace("Available memory => {} bytes", availableMemory);
-        val dynamicChunkSize = (int) Math.min((long) maxChunkSizeMib * 1024 * 1024, availableMemory / (2L * parallelism));
+        val dynamicChunkSize = (int) Math.min((long) maxChunkSizeKib * 1024, availableMemory / (2L * parallelism));
         log.trace("Dynamic chunk size => {}", dynamicChunkSize);
         var offset = 0L;
         var tempFile = File.createTempFile("alfresco-content-", ".tmp");
@@ -88,7 +88,7 @@ public class AlfrescoService extends BaseComponent {
             while (true) {
                 var range = String.format("bytes=%d-%d", offset, offset + dynamicChunkSize - 1);
                 log.trace("Range => {}", range);
-                var nodeContent = nodesApi.getNodeContent(nodeId, false, null, range).getBody();
+                var nodeContent = nodesApi.getNodeContent(nodeId, true, null, range).getBody();
                 if (nodeContent == null) {
                     if (offset == 0) {
                         log.warn("Content not found for node => {}", nodeId);

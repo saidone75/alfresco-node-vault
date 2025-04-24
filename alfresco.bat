@@ -50,6 +50,6 @@ EXIT /B 0
 EXIT /B 0
 :purge
     docker volume rm -f %VOLUME_PREFIX%-acs-volume
-    docker volume rm -f %VOLUME_PREFIX%-db-volume
+    docker volume rm -f %VOLUME_PREFIX%-postgres-volume
     docker volume rm -f %VOLUME_PREFIX%-ass-volume
     docker volume rm -f %VOLUME_PREFIX%-mongo-volume

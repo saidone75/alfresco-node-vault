@@ -5,6 +5,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.bson.Document;
+import org.saidone.model.MetadataKeys;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
@@ -15,6 +16,7 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.io.InputStream;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Repository
@@ -32,14 +34,12 @@ public class GridFsRepositoryImpl implements GridFsRepository {
     }
 
     @Override
-    public void saveFile(String uuid, InputStream fileStream, String fileName, String contentType) {
-        var metadata = new Document();
-        metadata.put("uuid", uuid);
+    public void saveFile(InputStream inputStream, String fileName, String contentType, Map<String, String> metadata) {
         gridFsTemplate.store(
-                fileStream,
+                inputStream,
                 fileName,
                 contentType,
-                metadata
+                new Document(metadata)
         );
     }
 

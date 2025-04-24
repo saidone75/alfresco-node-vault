@@ -3,10 +3,11 @@ package org.saidone.repository;
 import com.mongodb.client.gridfs.model.GridFSFile;
 
 import java.io.InputStream;
+import java.util.Map;
 
 public interface GridFsRepository {
 
-    void saveFile(String uuid, InputStream fileStream, String fileName, String contentType);
+    void saveFile(InputStream inputStream, String fileName, String contentType, Map<String, String> metadata);
 
     GridFSFile findFileById(String uuid);
 
