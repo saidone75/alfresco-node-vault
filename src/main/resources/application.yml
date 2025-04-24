@@ -17,10 +17,6 @@ spring:
             - name: IsOnVaultPredicate
           filters:
             - SetPath=/api/vault/nodes/{nodeId}
-        - id: alfresco_node_route
-          uri: ${ALFRESCO_BASE_PATH:http://localhost:8080}
-          predicates:
-            - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}
         - id: vault_node_content_route
           uri: http://localhost:8086
           predicates:
@@ -29,10 +25,6 @@ spring:
             - name: IsOnVaultPredicate
           filters:
             - SetPath=/api/vault/nodes/{nodeId}/content
-        - id: alfresco_node_content_route
-          uri: ${ALFRESCO_BASE_PATH:http://localhost:8080}
-          predicates:
-            - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}/content
         - id: default_route
           uri: ${ALFRESCO_BASE_PATH:http://localhost:8080}
           predicates:
