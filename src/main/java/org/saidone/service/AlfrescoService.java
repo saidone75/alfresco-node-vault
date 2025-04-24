@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import jakarta.annotation.PostConstruct;
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -22,8 +23,10 @@ import org.saidone.model.SystemSearchRequest;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -69,7 +72,6 @@ public class AlfrescoService extends BaseComponent {
     @SneakyThrows
     public File getNodeContent(String nodeId) {
         final int CHUNK_SIZE = 8 * 1024 * 1024;
-        final int BUFFER_SIZE = 8192;
 
         long offset = 0;
         var tempFile = File.createTempFile("alfresco-content-", ".tmp");
@@ -77,37 +79,31 @@ public class AlfrescoService extends BaseComponent {
         try {
             while (true) {
                 var range = String.format("bytes=%d-%d", offset, offset + CHUNK_SIZE - 1);
+                log.trace("Range => {}", range);
                 var nodeContent = nodesApi.getNodeContent(nodeId, false, null, range).getBody();
                 if (nodeContent == null) {
                     if (offset == 0) {
-                        log.warn("Contenuto del nodo non trovato per nodeId => {}", nodeId);
-                        tempFile.delete();
+                        log.warn("Content not found for node => {}", nodeId);
+                        Files.deleteIfExists(tempFile.toPath());
                         return null;
                     }
                     break;
                 }
                 try (var inputStream = nodeContent.getInputStream();
-                     var outputStream = new java.io.FileOutputStream(tempFile, true)) {
-
-                    byte[] buffer = new byte[BUFFER_SIZE];
-                    int bytesRead;
-                    long totalBytesRead = 0;
-
-                    while ((bytesRead = inputStream.read(buffer)) != -1) {
-                        outputStream.write(buffer, 0, bytesRead);
-                        totalBytesRead += bytesRead;
-                    }
-
-                    if (totalBytesRead < CHUNK_SIZE) {
+                     var outputStream = new FileOutputStream(tempFile, true)) {
+                    var chunk = inputStream.readAllBytes();
+                    log.trace("Read {} bytes", chunk.length);
+                    outputStream.write(chunk);
+                    if (chunk.length < CHUNK_SIZE) {
                         break;
                     }
-                    offset += totalBytesRead;
+                    offset += chunk.length;
                 }
             }
             return tempFile;
         } catch (Exception e) {
-            log.error("Error retrieving node content => {}", nodeId, e);
-            tempFile.delete();
+            log.error("Error retrieving content of node => {}", nodeId, e);
+            Files.deleteIfExists(tempFile.toPath());
             throw e;
         }
     }

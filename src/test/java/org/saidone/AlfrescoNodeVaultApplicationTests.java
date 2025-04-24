@@ -11,10 +11,9 @@ import org.saidone.job.NodeArchivingJob;
 import org.saidone.model.alfresco.AlfrescoContentModel;
 import org.saidone.model.alfresco.AnvContentModel;
 import org.saidone.service.AlfrescoService;
-import org.saidone.service.ProxyService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import utils.ResourceFileUtils;
 
 import java.io.File;
@@ -29,11 +28,10 @@ import java.util.stream.IntStream;
 @Slf4j
 class AlfrescoNodeVaultApplicationTests {
 
-    @MockBean
-    ProxyService proxyService;
-    @MockBean
+
+    @MockitoBean
     EventHandler eventHandler;
-    @MockBean
+    @MockitoBean
     NodeArchivingJob nodeArchivingJob;
 
     @Autowired
