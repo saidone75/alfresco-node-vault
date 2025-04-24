@@ -30,7 +30,7 @@ public class NodeArchivingJob extends BaseComponent {
     }
 
     private synchronized void doArchiveNodes() {
-        alfrescoService.processFromQuery(query, vaultService::archiveNode);
+        alfrescoService.searchAndProcess(query, vaultService::archiveNode);
     }
 
 }

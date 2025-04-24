@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import jakarta.annotation.PostConstruct;
-import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -140,12 +139,12 @@ public class AlfrescoService extends BaseComponent {
     }
 
     @SneakyThrows
-    public void processFromQuery(String query, Consumer<String> nodeProcessor) {
-        processFromQuery(query, null, nodeProcessor);
+    public void searchAndProcess(String query, Consumer<String> nodeProcessor) {
+        searchAndProcess(query, null, nodeProcessor);
     }
 
     @SneakyThrows
-    public void processFromQuery(String query, Integer pages, Consumer<String> nodeProcessor) {
+    public void searchAndProcess(String query, Integer pages, Consumer<String> nodeProcessor) {
         if (pages == null || pages < 1) {
             pages = Integer.MAX_VALUE;
         }

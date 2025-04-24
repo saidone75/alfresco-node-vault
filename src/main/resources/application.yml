@@ -95,7 +95,7 @@ application:
         - definition
       permanently-delete-nodes: true
       search-batch-size: 100
-      max-chunk-size-mib: 8
+      max-chunk-size-mib: 16
   same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
 server:
   port: 8086

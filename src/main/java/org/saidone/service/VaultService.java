@@ -11,6 +11,7 @@ import org.saidone.repository.MongoNodeRepository;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
+import java.nio.file.Files;
 
 @Service
 @RequiredArgsConstructor
@@ -29,7 +30,7 @@ public class VaultService extends BaseComponent {
             var file = alfrescoService.getNodeContent(nodeId);
             @Cleanup var is = new FileInputStream(file);
             gridFsRepository.saveFile(nodeId, is, node.getName(), node.getContent().getMimeType());
-            file.delete();
+            Files.deleteIfExists(file.toPath());
             alfrescoService.deleteNode(nodeId);
         } catch (Exception e) {
             log.trace(e.getMessage(), e);
