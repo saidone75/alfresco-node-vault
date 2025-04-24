@@ -45,7 +45,7 @@ class AlfrescoNodeVaultApplicationTests {
     @Test
     @SneakyThrows
     void archiveNodeTest() {
-        var file = ResourceFileUtils.getFileFromResource("sample.pdf");
+        var file = ResourceFileUtils.getFileFromResource("C:/Users/mmarini/Downloads/Software/apache-maven-3.9.9-bin.zip");
         var nodeBodyCreate = new NodeBodyCreate();
         nodeBodyCreate.setName(String.format("%s.pdf", faker.animal().name()));
         nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
@@ -56,11 +56,15 @@ class AlfrescoNodeVaultApplicationTests {
 
     @Test
     @SneakyThrows
-    void createNodesTest() {
+    void
+
+
+
+    createNodesTest() {
         IntStream.range(0, 100).parallel().forEach(i -> {
             var file = (File) null;
             try {
-                file = ResourceFileUtils.getFileFromResource("sample.pdf");
+                file = ResourceFileUtils.getFileFromResource("C:/Users/mmarini/Downloads/Software/apache-maven-3.9.9-bin.zip");
                 var nodeBodyCreate = new NodeBodyCreate();
                 nodeBodyCreate.setName(String.format("%s-%s-%s.pdf", UUID.randomUUID().toString().substring(0, 4), faker.animal().name(), UUID.randomUUID().toString().substring(0, 8)));
                 nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);

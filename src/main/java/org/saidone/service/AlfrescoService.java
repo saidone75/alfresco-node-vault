@@ -21,6 +21,7 @@ import org.saidone.component.BaseComponent;
 import org.saidone.config.AlfrescoServiceConfig;
 import org.saidone.exception.ApiExceptionError;
 import org.saidone.model.SystemSearchRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
@@ -30,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -43,12 +45,17 @@ public class AlfrescoService extends BaseComponent {
     private final SearchApi searchApi;
 
     public static Node guestHome;
+    private static int parallelism;
+
+    @Value("${application.service.alfresco.max-chunk-size-mib}")
+    private int maxChunkSizeMib;
 
     @PostConstruct
     @Override
     public void init() {
         super.init();
         guestHome = getGuestHome();
+        parallelism = ForkJoinPool.commonPool().getParallelism();
     }
 
     private Node getGuestHome() {
@@ -72,14 +79,12 @@ public class AlfrescoService extends BaseComponent {
 
     @SneakyThrows
     public File getNodeContent(String nodeId) {
-        val CHUNK_SIZE = 8 * 1024 * 1024;
         val availableMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory() + Runtime.getRuntime().freeMemory();
-        log.trace("Available memory => {} bytes ({} KiB)", availableMemory, availableMemory / 1024);
-        val dynamicChunkSize = (int) Math.min(CHUNK_SIZE, availableMemory / 16);
-        log.trace("Dynamic chunk size => {} bytes ({} KiB)", dynamicChunkSize, dynamicChunkSize / 1024);
+        log.trace("Available memory => {} bytes", availableMemory);
+        val dynamicChunkSize = (int) Math.min((long) maxChunkSizeMib * 1024 * 1024, availableMemory / (2L * parallelism));
+        log.trace("Dynamic chunk size => {}", dynamicChunkSize);
         var offset = 0L;
         var tempFile = File.createTempFile("alfresco-content-", ".tmp");
-
         try {
             while (true) {
                 var range = String.format("bytes=%d-%d", offset, offset + dynamicChunkSize - 1);
