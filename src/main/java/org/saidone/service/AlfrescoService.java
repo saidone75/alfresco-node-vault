@@ -101,6 +101,7 @@ public class AlfrescoService extends BaseComponent {
         val dynamicBufferSize = (int) Math.min((long) maxChunkSizeKib * 1024, availableMemory / (2L * parallelism));
         log.trace("Dynamic buffer size => {}", dynamicBufferSize);
 
+        // workaround for getting a true stream instead of nodesApi.getNodeContent()
         var url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
         var conn = (HttpURLConnection) url.openConnection();
         conn.setRequestProperty(HttpHeaderNames.AUTHORIZATION.toString(), basicAuth);
@@ -110,6 +111,7 @@ public class AlfrescoService extends BaseComponent {
         var tempFile = File.createTempFile("alfresco-content-", ".tmp");
 
         @Cleanup var out = new FileOutputStream(tempFile);
+
         byte[] buffer = new byte[dynamicBufferSize];
         int len;
         while ((len = in.read(buffer)) != -1) {
