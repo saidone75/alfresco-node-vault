@@ -47,9 +47,9 @@ public class VaultService extends BaseComponent {
                 var metadata = new HashMap<String, String>() {{
                     put(MetadataKeys.UUID, nodeId);
                 }};
-                if (Strings.isNotBlank(doubleCheckAlgorithm)) {
-                    metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, doubleCheckAlgorithm);
-                    metadata.put(MetadataKeys.CHECKSUM_VALUE, getDigest(file, doubleCheckAlgorithm));
+                if (Strings.isNotBlank(checksumAlgorithm)) {
+                    metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
+                    metadata.put(MetadataKeys.CHECKSUM_VALUE, getDigest(file, checksumAlgorithm));
                 }
                 gridFsRepository.saveFile(is, node.getName(), node.getContent().getMimeType(), metadata);
             }
