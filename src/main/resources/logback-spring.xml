@@ -46,6 +46,11 @@
             <appender-ref ref="FILE"/>
         </logger>
 
+        <logger name="org.saidone.service.VaultService" additivity="false" level="trace">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </logger>
+
         <logger name="org.saidone.filter" additivity="false" level="debug">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>

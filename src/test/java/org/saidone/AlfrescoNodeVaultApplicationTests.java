@@ -57,7 +57,7 @@ class AlfrescoNodeVaultApplicationTests {
     @Test
     @SneakyThrows
     void createNodesTest() {
-        IntStream.range(0, 100).parallel().forEach(i -> {
+        IntStream.range(0, 1000).parallel().forEach(i -> {
             var file = (File) null;
             try {
                 file = ResourceFileUtils.getFileFromResource("sample.pdf");
