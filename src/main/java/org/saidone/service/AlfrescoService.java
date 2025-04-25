@@ -29,6 +29,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -100,7 +101,7 @@ public class AlfrescoService extends BaseComponent {
         val dynamicBufferSize = (int) Math.min((long) maxChunkSizeKib * 1024, availableMemory / (2L * parallelism));
         log.trace("Dynamic buffer size => {}", dynamicBufferSize);
 
-        var url = new URL(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId));
+        var url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
         var conn = (HttpURLConnection) url.openConnection();
         conn.setRequestProperty(HttpHeaderNames.AUTHORIZATION.toString(), basicAuth);
 
