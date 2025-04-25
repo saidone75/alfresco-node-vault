@@ -3,7 +3,9 @@ package org.saidone.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
+import io.netty.handler.codec.http.HttpHeaderNames;
 import jakarta.annotation.PostConstruct;
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -25,9 +27,13 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ForkJoinPool;
@@ -43,6 +49,16 @@ public class AlfrescoService extends BaseComponent {
     private final NodesApi nodesApi;
     private final SearchApi searchApi;
 
+    @Value("${content.service.url}")
+    private String contentServiceUrl;
+    @Value("${content.service.path}")
+    private String contentServicePath;
+    @Value("${content.service.security.basicAuth.username}")
+    private String userName;
+    @Value("${content.service.security.basicAuth.password}")
+    private String password;
+
+    private static String basicAuth;
     public static Node guestHome;
     private static int parallelism;
 
@@ -53,6 +69,7 @@ public class AlfrescoService extends BaseComponent {
     @Override
     public void init() {
         super.init();
+        basicAuth = String.format("Basic %s", Base64.getEncoder().encodeToString((String.format("%s:%s", userName, password)).getBytes(StandardCharsets.UTF_8)));
         guestHome = getGuestHome();
         parallelism = ForkJoinPool.commonPool().getParallelism();
     }
@@ -80,40 +97,24 @@ public class AlfrescoService extends BaseComponent {
     public File getNodeContent(String nodeId) {
         val availableMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory() + Runtime.getRuntime().freeMemory();
         log.trace("Available memory => {} bytes", availableMemory);
-        val dynamicChunkSize = (int) Math.min((long) maxChunkSizeKib * 1024, availableMemory / (2L * parallelism));
-        log.trace("Dynamic chunk size => {}", dynamicChunkSize);
-        var offset = 0L;
+        val dynamicBufferSize = (int) Math.min((long) maxChunkSizeKib * 1024, availableMemory / (2L * parallelism));
+        log.trace("Dynamic buffer size => {}", dynamicBufferSize);
+
+        var url = new URL(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId));
+        var conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestProperty(HttpHeaderNames.AUTHORIZATION.toString(), basicAuth);
+
+        @Cleanup var in = conn.getInputStream();
+
         var tempFile = File.createTempFile("alfresco-content-", ".tmp");
-        try {
-            while (true) {
-                var range = String.format("bytes=%d-%d", offset, offset + dynamicChunkSize - 1);
-                log.trace("Range => {}", range);
-                var nodeContent = nodesApi.getNodeContent(nodeId, true, null, range).getBody();
-                if (nodeContent == null) {
-                    if (offset == 0) {
-                        log.warn("Content not found for node => {}", nodeId);
-                        Files.deleteIfExists(tempFile.toPath());
-                        return null;
-                    }
-                    break;
-                }
-                try (var inputStream = nodeContent.getInputStream();
-                     var outputStream = new FileOutputStream(tempFile, true)) {
-                    var chunk = inputStream.readAllBytes();
-                    log.trace("Read {} bytes", chunk.length);
-                    outputStream.write(chunk);
-                    if (chunk.length < dynamicChunkSize) {
-                        break;
-                    }
-                    offset += chunk.length;
-                }
-            }
-            return tempFile;
-        } catch (Exception e) {
-            log.error("Error retrieving content of node => {}", nodeId, e);
-            Files.deleteIfExists(tempFile.toPath());
-            throw e;
+
+        @Cleanup var out = new FileOutputStream(tempFile);
+        byte[] buffer = new byte[dynamicBufferSize];
+        int len;
+        while ((len = in.read(buffer)) != -1) {
+            out.write(buffer, 0, len);
         }
+        return tempFile;
     }
 
     public void addAspects(String nodeId, List<String> additionalAspectNames) {
