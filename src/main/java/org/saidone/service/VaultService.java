@@ -36,8 +36,8 @@ public class VaultService extends BaseComponent {
         log.debug("Archiving node => {}", nodeId);
         try {
             var node = alfrescoService.getNode(nodeId);
-            mongoNodeRepository.save(new NodeWrapper(node));
             var file = alfrescoService.getNodeContent(nodeId);
+            mongoNodeRepository.save(new NodeWrapper(node));
             try (var is = new FileInputStream(file)) {
                 var metadata = new HashMap<String, String>() {{
                     put(MetadataKeys.UUID, nodeId);
