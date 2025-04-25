@@ -5,7 +5,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.bson.Document;
-import org.saidone.model.MetadataKeys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
@@ -25,6 +25,9 @@ public class GridFsRepositoryImpl implements GridFsRepository {
     private final GridFsTemplate gridFsTemplate;
     private final GridFsOperations gridFsOperations;
     private final MongoTemplate mongoTemplate;
+
+    @Value("${application.service.vault.double-check-algorithm}")
+    private String doubleCheckAlgorithm;
 
     @PostConstruct
     public void init() {
@@ -61,6 +64,12 @@ public class GridFsRepositoryImpl implements GridFsRepository {
             return gridFsOperations.getResource(file).getInputStream();
         }
         return null;
+    }
+
+    public String calculateMd5(String uuid) {
+        var command = new Document("filemd5", findFileById(uuid).getId()).append("root", "fs");
+        var result = mongoTemplate.executeCommand(command);
+        return result.getString(doubleCheckAlgorithm.toLowerCase());
     }
 
 }

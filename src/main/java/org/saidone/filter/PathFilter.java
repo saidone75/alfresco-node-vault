@@ -7,7 +7,7 @@ import org.alfresco.repo.event.v1.model.DataAttributes;
 import org.alfresco.repo.event.v1.model.NodeResource;
 import org.alfresco.repo.event.v1.model.RepoEvent;
 import org.alfresco.repo.event.v1.model.Resource;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -48,7 +48,7 @@ public class PathFilter extends AbstractEventFilter {
     public boolean test(RepoEvent<DataAttributes<Resource>> repoEvent) {
         var nodeId = ((NodeResource) repoEvent.getData().getResource()).getId();
         var node = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("path"), null, List.of("path")).getBody()).getEntry();
-        var isInPath = StringUtils.isNotBlank(path) && node.getPath().getName().equals(path) ||
+        var isInPath = Strings.isNotBlank(path) && node.getPath().getName().equals(path) ||
                 pathPattern != null && pathPattern.matcher(node.getPath().getName()).matches();
         log.debug("Node {} is in path {} => {}", nodeId, path, isInPath);
         return isInPath;

@@ -1,5 +1,6 @@
 package org.saidone.service;
 
+import com.mongodb.client.MongoClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
@@ -28,12 +29,16 @@ public class VaultService extends BaseComponent {
     private final AlfrescoService alfrescoService;
     private final MongoNodeRepository mongoNodeRepository;
     private final GridFsRepositoryImpl gridFsRepository;
+    private final MongoClient mongoClient;
 
-    @Value("${application.service.vault.hash}")
-    private String hash;
+    @Value("${application.service.vault.hash-algorithm}")
+    private String checksumAlgorithm;
+
+    @Value("${application.service.vault.double-check-algorithm}")
+    private String doubleCheckAlgorithm;
 
     public void archiveNode(String nodeId) {
-        log.debug("Archiving node => {}", nodeId);
+        log.info("Archiving node => {}", nodeId);
         try {
             var node = alfrescoService.getNode(nodeId);
             var file = alfrescoService.getNodeContent(nodeId);
@@ -42,13 +47,14 @@ public class VaultService extends BaseComponent {
                 var metadata = new HashMap<String, String>() {{
                     put(MetadataKeys.UUID, nodeId);
                 }};
-                if (Strings.isNotBlank(hash)) {
-                    metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, hash);
-                    metadata.put(MetadataKeys.CHECKSUM_VALUE, getDigest(file, hash));
+                if (Strings.isNotBlank(doubleCheckAlgorithm)) {
+                    metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, doubleCheckAlgorithm);
+                    metadata.put(MetadataKeys.CHECKSUM_VALUE, getDigest(file, doubleCheckAlgorithm));
                 }
                 gridFsRepository.saveFile(is, node.getName(), node.getContent().getMimeType(), metadata);
             }
             Files.deleteIfExists(file.toPath());
+            if (Strings.isNotBlank(doubleCheckAlgorithm)) doubleCheck(nodeId);
             alfrescoService.deleteNode(nodeId);
         } catch (Exception e) {
             log.trace(e.getMessage(), e);
@@ -75,6 +81,31 @@ public class VaultService extends BaseComponent {
             sb.append(String.format("%02x", b));
         }
         return sb.toString();
+    }
+
+    public void doubleCheck(String nodeId) {
+        log.debug("Comparing {} digest for node => {}", doubleCheckAlgorithm, nodeId);
+        File file = null;
+        String alfrescoDigest;
+        String mongoDigest;
+        try {
+            file = alfrescoService.getNodeContent(nodeId);
+            alfrescoDigest = getDigest(file, doubleCheckAlgorithm);
+            mongoDigest = gridFsRepository.calculateMd5(nodeId);
+        } catch (IOException | NoSuchAlgorithmException e) {
+            throw new ArchiveNodeException("Cannot compute hashes");
+        } finally {
+            try {
+                if (file != null) Files.deleteIfExists(file.toPath());
+            } catch (IOException e) {
+                log.error(e.getMessage());
+            }
+        }
+        if (alfrescoDigest.equals(mongoDigest)) {
+            log.debug("Digest check passed for node => {}", nodeId);
+        } else {
+            throw new ArchiveNodeException("Hashes mismatch");
+        }
     }
 
 }

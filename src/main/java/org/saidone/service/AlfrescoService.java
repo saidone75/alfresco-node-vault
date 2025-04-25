@@ -27,13 +27,10 @@ import org.springframework.stereotype.Service;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
@@ -107,9 +104,7 @@ public class AlfrescoService extends BaseComponent {
         conn.setRequestProperty(HttpHeaderNames.AUTHORIZATION.toString(), basicAuth);
 
         @Cleanup var in = conn.getInputStream();
-
         var tempFile = File.createTempFile("alfresco-content-", ".tmp");
-
         @Cleanup var out = new FileOutputStream(tempFile);
 
         byte[] buffer = new byte[dynamicBufferSize];
