@@ -27,7 +27,7 @@ In some documented cases, repositories with hundreds of millions of nodes can re
 Many enterprises find themselves in a difficult position: business units demand that all documents remain accessible, while IT departments struggle with managing increasingly unresponsive Alfresco instances. The technical debt accumulates, making each upgrade more complex than the last. Site collections become sluggish, search operations time out, and what was once a highly efficient ECM solution becomes a burden on daily operations.
 
 ## The Solution: Alfresco Node Vault
-A Spring Boot application designed for long-term storage of Alfresco nodes that no longer need to be kept online. Unlike traditional archiving solutions, Alfresco Node Vault completely removes nodes from Alfresco and its database, freeing resources while maintaining document accessibility.
+A Spring Boot application designed for long-term storage of Alfresco nodes. Unlike traditional archiving solutions, Alfresco Node Vault completely removes nodes from Alfresco and its database, freeing resources while maintaining document accessibility.
 
 The application can archive nodes on-demand through a behavior or using a scheduled job.
 
