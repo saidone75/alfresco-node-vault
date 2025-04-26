@@ -1,6 +1,6 @@
 #!/bin/sh
 
-export COMPOSE_FILE_PATH="${PWD}/docker/docker-compose.yml"
+COMPOSE_FILE_PATH="${PWD}/docker/docker-compose.yml"
 VOLUME_PREFIX=anv
 
 start() {
