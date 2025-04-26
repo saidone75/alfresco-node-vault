@@ -1,6 +1,7 @@
 package org.saidone.controller;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.saidone.model.Entry;
 import org.saidone.repository.GridFsRepositoryImpl;
@@ -49,7 +50,7 @@ public class ApiController {
             log.warn("Node not found in GridFS => {}", nodeId);
             return ResponseEntity.notFound().build();
         }
-        var contentStream = gridFsRepositoryImpl.getFileContent(gridFSFile);
+
         var headers = new HttpHeaders();
         if (gridFSFile.getMetadata() != null && gridFSFile.getMetadata().containsKey("_contentType")) {
             headers.setContentType(MediaType.parseMediaType(
@@ -61,6 +62,9 @@ public class ApiController {
         if (attachment) {
             headers.setContentDispositionFormData("attachment", gridFSFile.getFilename());
         }
+
+        var contentStream = gridFsRepositoryImpl.getFileContent(gridFSFile);
+
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(new InputStreamResource(contentStream));
