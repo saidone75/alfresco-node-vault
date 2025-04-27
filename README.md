@@ -1,11 +1,8 @@
 # Alfresco Node Vault
 
-<p align="center" width="100%">
-    <img width="25%" src="vault.svg">
-</p>
+<img width="25%" src="vault.svg">
 
 _"Who controls the past controls the future: who controls the present controls the past."_
-
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![Java CI](https://github.com/saidone75/alfresco-node-vault/actions/workflows/build.yml/badge.svg)
