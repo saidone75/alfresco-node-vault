@@ -75,10 +75,11 @@ class AlfrescoNodeVaultApplicationTests {
     @Test
     @SneakyThrows
     void createNodesTest() {
-        IntStream.range(0, 1000).parallel().forEach(i -> {
+        IntStream.range(0, 10).parallel().forEach(i -> {
             var file = (File) null;
             try {
                 file = ResourceFileUtils.getFileFromResource("sample.pdf");
+                file = ResourceFileUtils.getFileFromResource("C:/Users/mmarini/Downloads/Software/emacs-29.1-installer.exe");
                 var nodeBodyCreate = new NodeBodyCreate();
                 nodeBodyCreate.setName(String.format("%s-%s-%s.pdf", UUID.randomUUID().toString().substring(0, 4), faker.animal().name(), UUID.randomUUID().toString().substring(0, 8)));
                 nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);

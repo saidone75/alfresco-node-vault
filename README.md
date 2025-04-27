@@ -75,6 +75,10 @@ Java and Maven required
 
 look at the `build.sh` or `build.bat` scripts for creating a convenient distribution package.
 
+## Architecture
+
+![Architecture](architecture.png)
+
 ## Application global config
 
 Global configuration is stored in `application.yml` file, the relevant parameters are:
