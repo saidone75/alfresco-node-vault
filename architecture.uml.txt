@@ -1,0 +1,30 @@
+@startuml
+actor Client
+
+package "Alfresco Content Services" {
+  [ACS] <--> [ActiveMQ]
+  [ACS] <--> [ACS REST APIs]
+}
+
+package "Alfresco Node Vault" {
+  [Behaviour] <-- [ActiveMQ]
+  [Behaviour] <--> [ACS REST APIs]
+  [Scheduled Job] <--> [ACS REST APIs]
+  [Scheduled Job] --> [MongoDB]
+  [Behaviour] --> [MongoDB]
+  [ANV REST APIs] <--> [MongoDB]
+  [Proxy]
+  [MongoDB] <--> [GridFS]
+}
+
+[Client] --> [ACS REST APIs] : Calls
+[Client] --> [ANV REST APIs] : Calls
+[Proxy] <--> [ACS REST APIs] : Intercepts
+[Proxy] <--> [ANV REST APIs] : Serves documents
+
+note right of [Proxy]
+Intercepts calls to Alfresco
+and serves documents from MongoDB
+if they are no longer present in Alfresco
+end note
+@enduml
