@@ -67,7 +67,7 @@ public class VaultService extends BaseComponent {
                 }};
                 if (Strings.isNotBlank(checksumAlgorithm)) {
                     metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
-                    metadata.put(MetadataKeys.CHECKSUM_VALUE, getDigest(file, checksumAlgorithm));
+                    metadata.put(MetadataKeys.CHECKSUM_VALUE, computeDigest(file, checksumAlgorithm));
                 }
                 gridFsRepository.saveFile(is, node.getName(), node.getContent().getMimeType(), metadata);
             }
@@ -84,7 +84,7 @@ public class VaultService extends BaseComponent {
         }
     }
 
-    public static String getDigest(File file, String hash) throws IOException, NoSuchAlgorithmException {
+    public static String computeDigest(File file, String hash) throws IOException, NoSuchAlgorithmException {
         var digest = MessageDigest.getInstance(hash);
         try (var fis = new FileInputStream(file)) {
             byte[] byteArray = new byte[8192];
@@ -108,7 +108,7 @@ public class VaultService extends BaseComponent {
         String mongoDigest;
         try {
             file = alfrescoService.getNodeContent(nodeId);
-            alfrescoDigest = getDigest(file, doubleCheckAlgorithm);
+            alfrescoDigest = computeDigest(file, doubleCheckAlgorithm);
             log.trace("Alfresco digest for node {} => {}", nodeId, alfrescoDigest);
             mongoDigest = gridFsRepository.calculateMd5(nodeId);
             log.trace("MongoDB digest for node {} => {}", nodeId, mongoDigest);
