@@ -19,12 +19,18 @@
 package org.saidone.service;
 
 import com.mongodb.client.MongoClient;
+import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.alfresco.core.model.Node;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
 import org.saidone.exception.ArchiveNodeException;
+import org.saidone.exception.NodeNotFoundOnVaultException;
+import org.saidone.exception.VaultException;
 import org.saidone.model.MetadataKeys;
+import org.saidone.model.NodeContent;
 import org.saidone.model.NodeWrapper;
 import org.saidone.repository.GridFsRepositoryImpl;
 import org.saidone.repository.MongoNodeRepository;
@@ -34,6 +40,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -82,6 +89,37 @@ public class VaultService extends BaseComponent {
             gridFsRepository.deleteFileById(nodeId);
             throw new ArchiveNodeException(String.format("Error archiving node %s => %s", nodeId, e.getMessage()));
         }
+    }
+
+    public Node getNode(String nodeId) {
+        val nodeOptional = mongoNodeRepository.findById(nodeId);
+        if (nodeOptional.isPresent()) {
+            val nodeWrapper = nodeOptional.get();
+            return nodeWrapper.getNode();
+        } else {
+            log.warn("Node {} not found in MongoDB", nodeId);
+            throw new NodeNotFoundOnVaultException(String.format("Node %s not found in MongoDB", nodeId));
+        }
+    }
+
+    public NodeContent getNodeContent(String nodeId) {
+        val gridFSFile = gridFsRepository.findFileById(nodeId);
+        if (gridFSFile == null) {
+            log.warn("Node {} not found in GridFS", nodeId);
+            throw new NodeNotFoundOnVaultException(String.format("Node %s not found in GridFS", nodeId));
+        }
+        var nodeContent = new NodeContent();
+        nodeContent.setFileName(gridFSFile.getFilename());
+        if (gridFSFile.getMetadata() != null && gridFSFile.getMetadata().containsKey("_contentType")) {
+            nodeContent.setContentType(gridFSFile.getMetadata().getString("_contentType"));
+        }
+        nodeContent.setLength(gridFSFile.getLength());
+        nodeContent.setContentStream(getFileContent(gridFSFile));
+        return nodeContent;
+    }
+
+    private InputStream getFileContent(GridFSFile gridFSFile) {
+        return gridFsRepository.getFileContent(gridFSFile);
     }
 
     public static String computeDigest(File file, String hash) throws IOException, NoSuchAlgorithmException {
