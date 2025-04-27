@@ -1,0 +1,4 @@
+application:
+  archiving-job:
+    cron-expression: ${ARCHIVING_JOB_CRON_EXPRESSION:0 0/1 * * * ?}
+    query: ${ARCHIVING_JOB_QUERY:ISNOTNULL:'cm:name' AND TYPE:'cm:content' AND ASPECT:'anv:archive'}
