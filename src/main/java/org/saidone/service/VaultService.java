@@ -114,12 +114,8 @@ public class VaultService extends BaseComponent {
             nodeContent.setContentType(gridFSFile.getMetadata().getString("_contentType"));
         }
         nodeContent.setLength(gridFSFile.getLength());
-        nodeContent.setContentStream(getFileContent(gridFSFile));
+        nodeContent.setContentStream(gridFsRepository.getFileContent(gridFSFile));
         return nodeContent;
-    }
-
-    private InputStream getFileContent(GridFSFile gridFSFile) {
-        return gridFsRepository.getFileContent(gridFSFile);
     }
 
     public static String computeDigest(File file, String hash) throws IOException, NoSuchAlgorithmException {
