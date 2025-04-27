@@ -1,30 +1,43 @@
 @startuml
-actor Client
+!include <C4/C4_Container>
+!include <C4/C4_Component>
 
-package "Alfresco Content Services" {
-  [ACS] <--> [ActiveMQ]
-  [ACS] <--> [ACS REST APIs]
+System_Boundary(anv, "Alfresco Node Vault") {
+  Component(anvProxy, "Proxy")
+  Component(anvRestApi, "REST API")
+  Component(anvBehaviour, "Behaviour")
+  Component(anvScheduledJob, "Scheduled job")
+  Component(anvService, "VaultService")
+  Component(as, "AlfrescoService")
+  ContainerDb(anvMongoDB, "Mongo DB")
 }
 
-package "Alfresco Node Vault" {
-  [Behaviour] <-- [ActiveMQ]
-  [Behaviour] <--> [ACS REST APIs]
-  [Scheduled Job] <--> [ACS REST APIs]
-  [Scheduled Job] --> [MongoDB]
-  [Behaviour] --> [MongoDB]
-  [ANV REST APIs] <--> [MongoDB]
-  [Proxy]
-  [MongoDB] <--> [GridFS]
-}
-
-[Client] --> [ACS REST APIs] : Calls
-[Client] --> [ANV REST APIs] : Calls
-[Proxy] <--> [ACS REST APIs] : Intercepts
-[Proxy] <--> [ANV REST APIs] : Serves documents
-
-note right of [Proxy]
+note right of [anvProxy]
 Intercepts calls to Alfresco
 and serves documents from MongoDB
 if they are no longer present in Alfresco
 end note
+
+System_Boundary(acs, "Alfresco Content Service") {
+  ContainerQueue(acsActiveMq, "Active MQ")
+  Component(acsRestApi, "REST API")
+}
+
+Rel_U(anvBehaviour, acsActiveMq, "uses")
+Rel_D(anvProxy, anvRestApi, "uses")
+Rel_R(anvProxy, acsRestApi, "uses")
+Rel_D(anvRestApi, anvService, "uses")
+Rel_D(anvBehaviour, anvService, "uses")
+Rel_D(anvScheduledJob, anvService, "uses")
+Rel_D(anvScheduledJob, as, "uses")
+BiRel_D(anvService, anvMongoDB, "reads/writes")
+Rel_R(anvService, as, "uses")
+Rel_R(as, acsRestApi, "uses")
+
+Component(client, "Client")
+
+Rel_D(client, anvProxy, "uses")
+Rel_D(client, anvRestApi, "uses")
+Rel_D(client, acsRestApi, "uses")
+
 @enduml
