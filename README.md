@@ -11,7 +11,7 @@ _"Who controls the past controls the future: who controls the present controls t
 
 ## The Long-term Document Management Challenge
 
-Over the years, many Alfresco implementations inevitably transform into increasingly slow and difficult-to-manage repositories. The primary cause is the progressive accumulation of millions of nodes that burden the database, slow down Solr queries, and compromise the overall performance of the system.
+Over the years, many Alfresco installations inevitably transform into increasingly slow and difficult-to-manage repositories. The primary cause is the progressive accumulation of millions of nodes that burden the database, slow down Solr queries, and compromise the overall performance of the system.
 
 This situation is particularly common in organizations where:
 
@@ -22,7 +22,7 @@ This situation is particularly common in organizations where:
 - Infrastructure costs continually increase to support ever-larger repositories
 - Maintenance operations (backup, indexing, upgrades) become progressively more complex and time-consuming
 
-In some documented cases, repositories with hundreds of millions of nodes can require days for complete reindexing operations, or weeks for migrations during version upgrades.
+Repositories with hundreds of millions of nodes can require days for complete reindexing operations, or weeks for migrations during version upgrades.
 
 Many enterprises find themselves in a difficult position: business units demand that all documents remain accessible, while IT departments struggle with managing increasingly unresponsive Alfresco instances. The technical debt accumulates, making each upgrade more complex than the last. Site collections become sluggish, search operations time out, and what was once a highly efficient ECM solution becomes a burden on daily operations.
 
@@ -34,6 +34,8 @@ The application can archive nodes on-demand through a behavior or using a schedu
 Nodes and binaries are archived on MongoDB with GridFS, ensuring efficient and scalable storage.
 
 The application can also act as a proxy to allow applications using REST APIs to retrieve nodes that no longer exist in Alfresco, ensuring operational continuity without the need to modify legacy client applications.
+
+Furthermore, documents can also be automatically restored in Alfresco if required.
 
 By implementing Alfresco Node Vault, organizations can:
 - Maintain high performance in their active Alfresco repository
