@@ -31,14 +31,12 @@ ARG GID=1010
 RUN apk add curl jq
 
 RUN addgroup --gid ${GID} -S spring && adduser --uid ${UID} -S spring -G spring
-RUN mkdir log
-RUN chown spring:spring log && chmod 770 log
 
 USER spring:spring
 ARG JAR_FILE=/application/target/anv.jar
 COPY --from=builder ${JAR_FILE} anv.jar
 
-ENV SPRING_PROFILES_ACTIVE dev
+ENV SPRING_PROFILES_ACTIVE docker
 ENV APPLICATION_BASE_URL http://127.0.0.1:10501
 ENV SHARED_FILES_PATH /tmp/anv
 ENV CONNECTION_TIMEOUT 10000
