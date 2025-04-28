@@ -75,7 +75,7 @@ application:
     cron-expression: ${ARCHIVING_JOB_CRON_EXPRESSION:0 0/1 * * * ?}
     #query: TYPE:'cm:content' AND cm:created:[MIN TO NOW-10YEARS]
     query: ${ARCHIVING_JOB_QUERY:TYPE:'cm:content' AND ASPECT:'anv:archive'}
-    enabled: ${ARCHIVING_JOB_ENABLED:false}
+    enabled: ${ARCHIVING_JOB_ENABLED:true}
   service:
     alfresco:
       include:
