@@ -20,6 +20,7 @@ package org.saidone.filter;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.alfresco.event.sdk.handling.filter.AbstractEventFilter;
 import org.alfresco.repo.event.v1.model.DataAttributes;
 import org.alfresco.repo.event.v1.model.NodeResource;
@@ -50,7 +51,7 @@ public class RecentlyProcessedFilter extends AbstractEventFilter {
 
     @Override
     public boolean test(RepoEvent<DataAttributes<Resource>> repoEvent) {
-        var nodeId = ((NodeResource) repoEvent.getData().getResource()).getId();
+        val nodeId = ((NodeResource) repoEvent.getData().getResource()).getId();
         if (!recentlyProcessedNodes.containsKey(nodeId) ||
                 (recentlyProcessedNodes.get(nodeId) != null &&
                         (System.currentTimeMillis() >= recentlyProcessedNodes.get(nodeId)))) {

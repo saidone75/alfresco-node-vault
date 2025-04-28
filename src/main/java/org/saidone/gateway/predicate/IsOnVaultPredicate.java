@@ -19,6 +19,7 @@
 package org.saidone.gateway.predicate;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.repository.MongoNodeRepository;
 import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory;
@@ -33,6 +34,7 @@ import java.util.regex.Pattern;
 public class IsOnVaultPredicate extends AbstractRoutePredicateFactory<IsOnVaultPredicate.Config> {
 
     private final MongoNodeRepository mongoNodeRepository;
+    private static final Pattern nodeContentPattern = Pattern.compile("^.*/nodes/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}).*$");
 
     public IsOnVaultPredicate(MongoNodeRepository mongoNodeRepository) {
         super(IsOnVaultPredicate.Config.class);
@@ -42,13 +44,12 @@ public class IsOnVaultPredicate extends AbstractRoutePredicateFactory<IsOnVaultP
     @Override
     public Predicate<ServerWebExchange> apply(Config config) {
         return exchange -> {
-            var path = exchange.getRequest().getURI().getPath();
-            var nodeContentPattern = Pattern.compile("^.*/nodes/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}).*$");
-            var matcher = nodeContentPattern.matcher(path);
+            val path = exchange.getRequest().getURI().getPath();
+            val matcher = nodeContentPattern.matcher(path);
             if (matcher.matches()) {
-                var nodeId = matcher.group(1);
-                log.debug("Detected node ID => {}", nodeId);
-                var isOnVault = mongoNodeRepository.findById(nodeId).isPresent();
+                val nodeId = matcher.group(1);
+                log.debug("Detected node ID: {}", nodeId);
+                val isOnVault = mongoNodeRepository.findById(nodeId).isPresent();
                 log.debug("Node {} {}found on the vault", nodeId, isOnVault ? Strings.EMPTY : "NOT ");
                 return isOnVault;
             }
