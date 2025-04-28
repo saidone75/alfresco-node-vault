@@ -20,6 +20,6 @@ package org.saidone.exception;
 
 public class NodeNotFoundOnVaultException extends VaultException {
     public NodeNotFoundOnVaultException(String message) {
-        super(message);
+        super(String.format("Node %s not found on the vault", message));
     }
 }

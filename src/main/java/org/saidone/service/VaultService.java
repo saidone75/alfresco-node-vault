@@ -94,16 +94,14 @@ public class VaultService extends BaseComponent {
             val nodeWrapper = nodeOptional.get();
             return nodeWrapper.getNode();
         } else {
-            log.warn("Node {} not found in MongoDB", nodeId);
-            throw new NodeNotFoundOnVaultException(String.format("Node %s not found in MongoDB", nodeId));
+            throw new NodeNotFoundOnVaultException(nodeId);
         }
     }
 
     public NodeContent getNodeContent(String nodeId) {
         val gridFSFile = gridFsRepository.findFileById(nodeId);
         if (gridFSFile == null) {
-            log.warn("Node {} not found in GridFS", nodeId);
-            throw new NodeNotFoundOnVaultException(String.format("Node %s not found in GridFS", nodeId));
+            throw new NodeNotFoundOnVaultException(nodeId);
         }
         val nodeContent = new NodeContent();
         nodeContent.setFileName(gridFSFile.getFilename());
@@ -126,7 +124,7 @@ public class VaultService extends BaseComponent {
         }
         byte[] bytes = digest.digest();
         val sb = new StringBuilder();
-        for (byte b: bytes) {
+        for (byte b : bytes) {
             sb.append(String.format("%02x", b));
         }
         return sb.toString();
