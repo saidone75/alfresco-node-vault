@@ -20,6 +20,7 @@ package org.saidone.behaviour;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.alfresco.event.sdk.handling.filter.AspectAddedFilter;
 import org.alfresco.event.sdk.handling.filter.EventFilter;
 import org.alfresco.event.sdk.handling.filter.NodeTypeFilter;
@@ -50,8 +51,8 @@ public class EventHandler extends BaseComponent implements OnNodeCreatedEventHan
 
     @Override
     public void handleEvent(RepoEvent<DataAttributes<Resource>> event) {
-        var nodeResource = (NodeResource) event.getData().getResource();
-        log.info("Archive request received for node => {}", nodeResource.getId());
+        val nodeResource = (NodeResource) event.getData().getResource();
+        log.info("Archive request received for node: {}", nodeResource.getId());
         try {
             vaultService.archiveNode(nodeResource.getId());
             log.info("Node {} successfully archived", nodeResource.getId());
