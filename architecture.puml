@@ -5,7 +5,7 @@
 System_Boundary(anv, "Alfresco Node Vault") {
   Component(anvProxy, "Proxy")
   Component(anvApi, "REST API")
-  Component(anvBehaviour, "Behaviour")
+  Component(anvHandler, "Event handler")
   Component(anvJob, "Scheduled job")
   Component(anvVault, "VaultService")
   Component(anvAlfresco, "AlfrescoService")
@@ -23,21 +23,21 @@ System_Boundary(acs, "Alfresco Content Service") {
   Component(acsApi, "REST API")
 }
 
-Rel_U(anvBehaviour, acsQueue, "uses")
-Rel_D(anvProxy, anvApi, "uses")
-Rel_R(anvProxy, acsApi, "uses")
-Rel_D(anvApi, anvVault, "uses")
-Rel_D(anvBehaviour, anvVault, "uses")
-Rel_D(anvJob, anvVault, "uses")
-Rel_D(anvJob, anvAlfresco, "uses")
-BiRel_D(anvVault, anvMongo, "reads/writes")
-Rel_R(anvVault, anvAlfresco, "uses")
-Rel_R(anvAlfresco, acsApi, "uses")
+Rel_D(acsQueue, anvHandler, "events")
+Rel_D(anvProxy, anvApi, "")
+Rel_R(anvProxy, acsApi, "")
+Rel_D(anvApi, anvVault, "")
+Rel_D(anvHandler, anvVault, "")
+Rel_D(anvJob, anvVault, "")
+Rel_D(anvJob, anvAlfresco, "")
+BiRel_D(anvVault, anvMongo, "rw")
+Rel_R(anvVault, anvAlfresco, "")
+Rel_R(anvAlfresco, acsApi, "")
 
 Component(client, "Client")
 
-Rel_D(client, anvProxy, "uses")
-Rel_D(client, anvApi, "uses")
-Rel_D(client, acsApi, "uses")
+Rel_D(client, anvProxy, "")
+Rel_D(client, anvApi, "")
+Rel_D(client, acsApi, "")
 
 @enduml
