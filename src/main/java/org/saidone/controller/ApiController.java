@@ -40,24 +40,24 @@ public class ApiController {
     private final VaultService vaultService;
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<String> handleException(Exception ex) {
-        log.error("Error during streaming => {}", ex.getMessage(), ex);
+    public ResponseEntity<String> handleException(Exception e) {
+        log.error("Error during streaming: {}", e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error during streaming => " + ex.getMessage());
+                .body("Error during streaming: " + e.getMessage());
     }
 
     @ExceptionHandler(NodeNotFoundOnVaultException.class)
-    public ResponseEntity<String> handleNodeNotFoundOnVaultException(NodeNotFoundOnVaultException ex) {
-        log.error(ex.getMessage(), ex);
+    public ResponseEntity<String> handleNodeNotFoundOnVaultException(NodeNotFoundOnVaultException e) {
+        log.error(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(ex.getMessage());
+                .body(e.getMessage());
     }
 
     @ExceptionHandler(OutOfMemoryError.class)
-    public ResponseEntity<String> handleOutOfMemoryError(OutOfMemoryError ex) {
-        log.error("Out of memory error during streaming => {}", ex.getMessage(), ex);
+    public ResponseEntity<String> handleOutOfMemoryError(OutOfMemoryError e) {
+        log.error("Out of memory error during streaming: {}", e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Server memory limit exceeded. Please try with a smaller file or contact administrator.");
@@ -68,7 +68,7 @@ public class ApiController {
             @PathVariable String nodeId,
             @RequestParam(required = false, defaultValue = "true") boolean attachment) {
 
-        log.debug("Streaming node content for node => {}", nodeId);
+        log.debug("Streaming node content for node: {}", nodeId);
 
         val nodeContent = vaultService.getNodeContent(nodeId);
 
