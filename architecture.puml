@@ -4,12 +4,12 @@
 
 System_Boundary(anv, "Alfresco Node Vault") {
   Component(anvProxy, "Proxy")
-  Component(anvRestApi, "REST API")
+  Component(anvApi, "REST API")
   Component(anvBehaviour, "Behaviour")
-  Component(anvScheduledJob, "Scheduled job")
-  Component(anvService, "VaultService")
-  Component(as, "AlfrescoService")
-  ContainerDb(anvMongoDB, "Mongo DB")
+  Component(anvJob, "Scheduled job")
+  Component(anvVault, "VaultService")
+  Component(anvAlfresco, "AlfrescoService")
+  ContainerDb(anvMongo, "Mongo DB")
 }
 
 note right of [anvProxy]
@@ -19,25 +19,25 @@ if they are no longer present in Alfresco
 end note
 
 System_Boundary(acs, "Alfresco Content Service") {
-  ContainerQueue(acsActiveMq, "Active MQ")
-  Component(acsRestApi, "REST API")
+  ContainerQueue(acsQueue, "Active MQ")
+  Component(acsApi, "REST API")
 }
 
-Rel_U(anvBehaviour, acsActiveMq, "uses")
-Rel_D(anvProxy, anvRestApi, "uses")
-Rel_R(anvProxy, acsRestApi, "uses")
-Rel_D(anvRestApi, anvService, "uses")
-Rel_D(anvBehaviour, anvService, "uses")
-Rel_D(anvScheduledJob, anvService, "uses")
-Rel_D(anvScheduledJob, as, "uses")
-BiRel_D(anvService, anvMongoDB, "reads/writes")
-Rel_R(anvService, as, "uses")
-Rel_R(as, acsRestApi, "uses")
+Rel_U(anvBehaviour, acsQueue, "uses")
+Rel_D(anvProxy, anvApi, "uses")
+Rel_R(anvProxy, acsApi, "uses")
+Rel_D(anvApi, anvVault, "uses")
+Rel_D(anvBehaviour, anvVault, "uses")
+Rel_D(anvJob, anvVault, "uses")
+Rel_D(anvJob, anvAlfresco, "uses")
+BiRel_D(anvVault, anvMongo, "reads/writes")
+Rel_R(anvVault, anvAlfresco, "uses")
+Rel_R(anvAlfresco, acsApi, "uses")
 
 Component(client, "Client")
 
 Rel_D(client, anvProxy, "uses")
-Rel_D(client, anvRestApi, "uses")
-Rel_D(client, acsRestApi, "uses")
+Rel_D(client, anvApi, "uses")
+Rel_D(client, acsApi, "uses")
 
 @enduml

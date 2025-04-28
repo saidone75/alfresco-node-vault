@@ -20,9 +20,10 @@ package org.saidone.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.model.Entry;
-import org.saidone.repository.GridFsRepositoryImpl;
-import org.saidone.repository.MongoNodeRepository;
+import org.saidone.service.VaultService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -36,8 +37,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 public class ApiController {
 
-    private final GridFsRepositoryImpl gridFsRepositoryImpl;
-    private final MongoNodeRepository mongoNodeRepository;
+    private final VaultService vaultService;
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<String> handleException(Exception ex) {
@@ -45,6 +45,14 @@ public class ApiController {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Error during streaming => " + ex.getMessage());
+    }
+
+    @ExceptionHandler(NodeNotFoundOnVaultException.class)
+    public ResponseEntity<String> handleNodeNotFoundOnVaultException(NodeNotFoundOnVaultException ex) {
+        log.error(ex.getMessage(), ex);
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND)
+                .body(ex.getMessage());
     }
 
     @ExceptionHandler(OutOfMemoryError.class)
@@ -62,39 +70,24 @@ public class ApiController {
 
         log.debug("Streaming node content for node => {}", nodeId);
 
-        var gridFSFile = gridFsRepositoryImpl.findFileById(nodeId);
-        if (gridFSFile == null) {
-            log.warn("Node not found in GridFS => {}", nodeId);
-            return ResponseEntity.notFound().build();
-        }
+        val nodeContent = vaultService.getNodeContent(nodeId);
 
         var headers = new HttpHeaders();
-        if (gridFSFile.getMetadata() != null && gridFSFile.getMetadata().containsKey("_contentType")) {
-            headers.setContentType(MediaType.parseMediaType(
-                    gridFSFile.getMetadata().getString("_contentType")));
-        }
-        if (gridFSFile.getLength() > 0) {
-            headers.setContentLength(gridFSFile.getLength());
-        }
+        headers.setContentType(MediaType.parseMediaType(nodeContent.getContentType()));
+        headers.setContentLength(nodeContent.getLength());
         if (attachment) {
-            headers.setContentDispositionFormData("attachment", gridFSFile.getFilename());
+            headers.setContentDispositionFormData("attachment", nodeContent.getFileName());
         }
-
-        var contentStream = gridFsRepositoryImpl.getFileContent(gridFSFile);
 
         return ResponseEntity.ok()
                 .headers(headers)
-                .body(new InputStreamResource(contentStream));
+                .body(new InputStreamResource(nodeContent.getContentStream()));
     }
 
     @GetMapping("/nodes/{nodeId}")
     public ResponseEntity<?> getNode(@PathVariable String nodeId) {
-        var nodeOptional = mongoNodeRepository.findById(nodeId);
-        if (nodeOptional.isPresent()) {
-            var nodeWrapper = nodeOptional.get();
-            return ResponseEntity.ok(new Entry(nodeWrapper.getNode()));
-        }
-        return ResponseEntity.notFound().build();
+        val node = vaultService.getNode(nodeId);
+        return ResponseEntity.ok(new Entry(node));
     }
 
 }
