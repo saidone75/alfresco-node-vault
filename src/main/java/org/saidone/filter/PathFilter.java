@@ -19,6 +19,7 @@
 package org.saidone.filter;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.event.sdk.handling.filter.AbstractEventFilter;
 import org.alfresco.repo.event.v1.model.DataAttributes;
@@ -64,9 +65,9 @@ public class PathFilter extends AbstractEventFilter {
 
     @Override
     public boolean test(RepoEvent<DataAttributes<Resource>> repoEvent) {
-        var nodeId = ((NodeResource) repoEvent.getData().getResource()).getId();
-        var node = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("path"), null, List.of("path")).getBody()).getEntry();
-        var isInPath = Strings.isNotBlank(path) && node.getPath().getName().equals(path) ||
+        val nodeId = ((NodeResource) repoEvent.getData().getResource()).getId();
+        val node = Objects.requireNonNull(nodesApi.getNode(nodeId, List.of("path"), null, List.of("path")).getBody()).getEntry();
+        val isInPath = Strings.isNotBlank(path) && node.getPath().getName().equals(path) ||
                 pathPattern != null && pathPattern.matcher(node.getPath().getName()).matches();
         log.debug("Node {} is in path {} => {}", nodeId, path, isInPath);
         return isInPath;
