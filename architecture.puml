@@ -2,6 +2,10 @@
 !include <C4/C4_Container>
 !include <C4/C4_Component>
 
+hide stereotype
+
+title Alfresco Node Vault
+
 System_Boundary(anv, "Alfresco Node Vault") {
   Component(anvProxy, "Proxy")
   Component(anvApi, "REST API")
