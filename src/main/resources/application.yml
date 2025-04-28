@@ -91,8 +91,8 @@ application:
       search-batch-size: 100
       max-chunk-size-kib: 1024
     vault:
-      hash-algorithm: SHA-256
-      double-check-algorithm: MD5
+      hash-algorithm: ${VAULT_HASH_ALGORITHM:SHA-256}
+      double-check: ${VAULT_DOUBLE_CHECK:true}
   same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
 server:
   port: 8086
