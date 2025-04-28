@@ -22,6 +22,7 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.val;
 import org.bson.Document;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
@@ -49,8 +50,8 @@ public class GridFsRepositoryImpl implements GridFsRepository {
 
     @PostConstruct
     public void init() {
-        var indexOps = mongoTemplate.indexOps("fs.files");
-        var index = new Index().on("metadata.uuid", Sort.Direction.ASC).named("metadata_uuid_index");
+        val indexOps = mongoTemplate.indexOps("fs.files");
+        val index = new Index().on("metadata.uuid", Sort.Direction.ASC).named("metadata_uuid_index");
         indexOps.ensureIndex(index);
     }
 
@@ -66,13 +67,13 @@ public class GridFsRepositoryImpl implements GridFsRepository {
 
     @Override
     public GridFSFile findFileById(String uuid) {
-        var query = new Query(Criteria.where("metadata.uuid").is(uuid));
+        val query = new Query(Criteria.where("metadata.uuid").is(uuid));
         return gridFsTemplate.findOne(query);
     }
 
     @Override
     public void deleteFileById(String uuid) {
-        var query = new Query(Criteria.where("metadata.uuid").is(uuid));
+        val query = new Query(Criteria.where("metadata.uuid").is(uuid));
         gridFsTemplate.delete(query);
     }
 
@@ -85,8 +86,8 @@ public class GridFsRepositoryImpl implements GridFsRepository {
     }
 
     public String calculateMd5(String uuid) {
-        var command = new Document("filemd5", findFileById(uuid).getId()).append("root", "fs");
-        var result = mongoTemplate.executeCommand(command);
+        val command = new Document("filemd5", findFileById(uuid).getId()).append("root", "fs");
+        val result = mongoTemplate.executeCommand(command);
         return result.getString(doubleCheckAlgorithm.toLowerCase());
     }
 

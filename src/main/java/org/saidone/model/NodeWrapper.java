@@ -29,6 +29,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.alfresco.core.model.Node;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
@@ -76,7 +77,7 @@ public class NodeWrapper {
     }
     
     private static ObjectMapper createObjectMapper() {
-        var mapper = new ObjectMapper();
+        val mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
         mapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);

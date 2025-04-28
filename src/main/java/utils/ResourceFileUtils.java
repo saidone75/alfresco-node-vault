@@ -21,6 +21,7 @@ package utils;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -39,15 +40,15 @@ public class ResourceFileUtils {
     @SneakyThrows
     public File getFileFromResource(String resourcePath, String destinationPath) {
         // first look into FS
-        var filePath = Path.of(resourcePath);
-        var file = filePath.toFile();
+        val filePath = Path.of(resourcePath);
+        val file = filePath.toFile();
         if (file.exists() && file.isFile()) {
             log.info("Found file as absolute path => {}", resourcePath);
             return file;
         } else {
             // look for it in the classpath (resources)
             log.info("Looking for resource in classpath => {}", resourcePath);
-            var is = Objects.requireNonNull(
+            val is = Objects.requireNonNull(
                     ResourceFileUtils.class.getClassLoader().getResourceAsStream(resourcePath),
                     "Resource not found in classpath => " + resourcePath
             );
@@ -59,7 +60,7 @@ public class ResourceFileUtils {
                 tempFile = Files.createTempFile("resource-", ".tmp").toFile();
             }
             tempFile.deleteOnExit();
-            try (var fos = new FileOutputStream(tempFile)) {
+            try (val fos = new FileOutputStream(tempFile)) {
                 is.transferTo(fos);
             }
             return tempFile;
