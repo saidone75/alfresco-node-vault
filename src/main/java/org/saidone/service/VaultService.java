@@ -55,8 +55,9 @@ public class VaultService extends BaseComponent {
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
 
-    @Value("${application.service.vault.double-check-algorithm}")
-    private String doubleCheckAlgorithm;
+    @Value("${application.service.vault.double-check}")
+    private boolean doubleCheck;
+    private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
 
     public void archiveNode(String nodeId) {
         log.info("Archiving node: {}", nodeId);
@@ -75,7 +76,7 @@ public class VaultService extends BaseComponent {
                 gridFsRepository.saveFile(is, node.getName(), node.getContent().getMimeType(), metadata);
             }
             Files.deleteIfExists(file.toPath());
-            if (Strings.isNotBlank(doubleCheckAlgorithm)) doubleCheck(nodeId);
+            if (doubleCheck) doubleCheck(nodeId);
             alfrescoService.deleteNode(nodeId);
         } catch (Exception e) {
             log.trace(e.getMessage(), e);
@@ -137,15 +138,15 @@ public class VaultService extends BaseComponent {
     }
 
     public void doubleCheck(String nodeId) {
-        log.debug("Comparing {} digest for node: {}", doubleCheckAlgorithm, nodeId);
+        log.debug("Comparing {} digest for node: {}", doubleCheck, nodeId);
         File file = null;
         String alfrescoDigest;
         String mongoDigest;
         try {
             file = alfrescoService.getNodeContent(nodeId);
-            alfrescoDigest = computeDigest(file, doubleCheckAlgorithm);
+            alfrescoDigest = computeDigest(file, DOUBLE_CHECK_ALGORITHM);
             log.trace("Alfresco digest for node {}: {}", nodeId, alfrescoDigest);
-            mongoDigest = gridFsRepository.computeDigest(nodeId, doubleCheckAlgorithm);
+            mongoDigest = gridFsRepository.computeDigest(nodeId, DOUBLE_CHECK_ALGORITHM);
             log.trace("MongoDB digest for node {}: {}", nodeId, mongoDigest);
         } catch (IOException | NoSuchAlgorithmException e) {
             throw new ArchiveNodeException("Cannot compute hashes");

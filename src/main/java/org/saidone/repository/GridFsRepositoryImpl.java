@@ -24,7 +24,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.bson.Document;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
@@ -44,9 +43,6 @@ public class GridFsRepositoryImpl implements GridFsRepository {
     private final GridFsTemplate gridFsTemplate;
     private final GridFsOperations gridFsOperations;
     private final MongoTemplate mongoTemplate;
-
-    @Value("${application.service.vault.double-check-algorithm}")
-    private String doubleCheckAlgorithm;
 
     @PostConstruct
     public void init() {
@@ -88,7 +84,7 @@ public class GridFsRepositoryImpl implements GridFsRepository {
     public String computeDigest(String uuid, String algorithm) {
         val command = new Document(String.format("file%s", algorithm.toLowerCase()), findFileById(uuid).getId()).append("root", "fs");
         val result = mongoTemplate.executeCommand(command);
-        return result.getString(doubleCheckAlgorithm.toLowerCase());
+        return result.getString(algorithm.toLowerCase());
     }
 
 }
