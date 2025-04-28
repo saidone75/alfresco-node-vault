@@ -41,6 +41,7 @@ import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.HexFormat;
 
 @Service
 @RequiredArgsConstructor
@@ -132,12 +133,7 @@ public class VaultService extends BaseComponent {
                 digest.update(byteArray, 0, bytesCount);
             }
         }
-        byte[] bytes = digest.digest();
-        val sb = new StringBuilder();
-        for (byte b : bytes) {
-            sb.append(String.format("%02x", b));
-        }
-        return sb.toString();
+        return HexFormat.of().formatHex(digest.digest());
     }
 
     public void doubleCheck(String nodeId) {
