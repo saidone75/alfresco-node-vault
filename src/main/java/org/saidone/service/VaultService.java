@@ -18,7 +18,6 @@
 
 package org.saidone.service;
 
-import com.mongodb.client.MongoClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -51,7 +50,6 @@ public class VaultService extends BaseComponent {
     private final AlfrescoService alfrescoService;
     private final MongoNodeRepository mongoNodeRepository;
     private final GridFsRepositoryImpl gridFsRepository;
-    private final MongoClient mongoClient;
 
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
@@ -88,14 +86,18 @@ public class VaultService extends BaseComponent {
         }
     }
 
-    public Node getNode(String nodeId) {
+    private NodeWrapper getNodeWrapper(String nodeId) {
         val nodeOptional = mongoNodeRepository.findById(nodeId);
         if (nodeOptional.isPresent()) {
             val nodeWrapper = nodeOptional.get();
-            return nodeWrapper.getNode();
+            return nodeWrapper;
         } else {
             throw new NodeNotFoundOnVaultException(nodeId);
         }
+    }
+
+    public Node getNode(String nodeId) {
+        return getNodeWrapper(nodeId).getNode();
     }
 
     public NodeContent getNodeContent(String nodeId) {
@@ -111,6 +113,14 @@ public class VaultService extends BaseComponent {
         nodeContent.setLength(gridFSFile.getLength());
         nodeContent.setContentStream(gridFsRepository.getFileContent(gridFSFile));
         return nodeContent;
+    }
+
+    public void restoreNode(String nodeId, boolean restorePermissions) {
+        val nodeWrapper = getNodeWrapper(nodeId);
+        val newNodeId = alfrescoService.restoreNode(nodeWrapper.getNode(), restorePermissions);
+        alfrescoService.restoreNodeContent(newNodeId, getNodeContent(nodeId));
+        nodeWrapper.setRestored(true);
+        mongoNodeRepository.save(nodeWrapper);
     }
 
     public static String computeDigest(File file, String hash) throws IOException, NoSuchAlgorithmException {

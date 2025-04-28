@@ -53,6 +53,7 @@ public class NodeWrapper {
     @Id
     private String id;
     private Instant archiveDate;
+    private boolean restored;
     private String nodeJson;
 
     public NodeWrapper(Node node) throws JsonProcessingException {

@@ -90,4 +90,12 @@ public class ApiController {
         return ResponseEntity.ok(new Entry(node));
     }
 
+    @PostMapping("/nodes/{nodeId}/restore")
+    public ResponseEntity<?> restoreNode(
+            @PathVariable String nodeId,
+            @RequestParam(required = false, defaultValue = "false") boolean restorePermissions) {
+        vaultService.restoreNode(nodeId, restorePermissions);
+        return ResponseEntity.ok().body(String.format("Node %s successfully restored.", nodeId));
+    }
+
 }
