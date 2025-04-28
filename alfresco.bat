@@ -1,7 +1,7 @@
 @ECHO OFF
 
-SET COMPOSE_FILE_PATH=%CD%\docker\docker-compose.yml
-SET ENV_FILE_PATH=%CD%\docker\.env
+SET COMPOSE_FILE_PATH=%CD%\docker-alfresco\docker-compose.yml
+SET ENV_FILE_PATH=%CD%\docker-alfresco\.env
 SET VOLUME_PREFIX=anv
 
 IF [%1]==[] (
@@ -33,6 +33,7 @@ echo "Usage: %0 {start|stop|purge|tail}"
 EXIT /B %ERRORLEVEL%
 
 :start
+    docker network create %VOLUME_PREFIX%-shared-network
     docker volume create %VOLUME_PREFIX%-acs-volume
     docker volume create %VOLUME_PREFIX%-postgres-volume
     docker volume create %VOLUME_PREFIX%-ass-volume

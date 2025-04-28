@@ -28,7 +28,7 @@ spring:
         - id: alfresco_default_route
           uri: ${ALFRESCO_BASE_PATH:http://localhost:8080}
           predicates:
-            - Path=/alfresco/**
+            - Path=/alfresco/**,/api-explorer/**
   activemq:
     brokerUrl: ${ACTIVE_MQ_URL:tcp://localhost:61616}
   jms:
@@ -36,7 +36,7 @@ spring:
       enabled: false
   data:
     mongodb:
-      uri: mongodb://localhost:27017
+      uri: ${MONGODB_URL:mongodb://localhost:27017}
       auth-database: admin
       database: vault
       username: root

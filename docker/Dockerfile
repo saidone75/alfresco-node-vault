@@ -1,10 +1,47 @@
-ARG ACS_IMAGE
-ARG ACS_VERSION
-FROM ${ACS_IMAGE}:${ACS_VERSION}
+# syntax=docker/dockerfile:1.2
 
-ARG TOMCAT_DIR=/usr/local/tomcat
+ARG MAVEN_VERSION=3-sapmachine-21
+ARG JAVA_VERSION=21-jre-headless-latest
 
-USER root
+FROM maven:${MAVEN_VERSION} as builder
 
-COPY model/anv-content-model.xml $TOMCAT_DIR/shared/classes/alfresco/extension/
-COPY model/anv-model-context.xml $TOMCAT_DIR/shared/classes/alfresco/extension/
+ENV MAVEN_CLI_OPTS="-s .m2/settings.xml -Dmaven.repo.local=.m2/repository --batch-mode"
+ENV MAVEN_OPTS="-client -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
+
+WORKDIR /application
+
+# Optimizing for dependencies cache
+
+COPY .m2/settings.xml ./.m2/settings.xml
+
+COPY pom.xml ./pom.xml
+
+RUN mvn $MAVEN_CLI_OPTS -e -B de.qaware.maven:go-offline-maven-plugin:resolve-dependencies
+
+# Building
+
+COPY ./ ./
+
+RUN mvn $MAVEN_CLI_OPTS install -DskipTests -Dlicense.skip=true
+
+FROM azul/zulu-openjdk-alpine:${JAVA_VERSION}
+ARG UID=1010
+ARG GID=1010
+
+RUN apk add curl jq
+
+RUN addgroup --gid ${GID} -S spring && adduser --uid ${UID} -S spring -G spring
+RUN mkdir log
+RUN chown spring:spring log && chmod 770 log
+
+USER spring:spring
+ARG JAR_FILE=/application/target/anv.jar
+COPY --from=builder ${JAR_FILE} anv.jar
+
+ENV SPRING_PROFILES_ACTIVE dev
+ENV APPLICATION_BASE_URL http://127.0.0.1:10501
+ENV SHARED_FILES_PATH /tmp/anv
+ENV CONNECTION_TIMEOUT 10000
+ENV READ_TIMEOUT 10000
+
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MinRAMPercentage=35", "-XX:MaxRAMPercentage=70", "-jar","/anv.jar"]
