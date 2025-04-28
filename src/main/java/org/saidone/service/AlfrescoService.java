@@ -98,7 +98,7 @@ public class AlfrescoService extends BaseComponent {
             log.warn(e.getMessage());
         }
         if (guestHomeNode != null) {
-            log.debug("Guest Home => {}", guestHomeNode.getId());
+            log.debug("Guest Home: {}", guestHomeNode.getId());
         } else {
             log.warn("Guest Home not found");
         }
@@ -112,20 +112,20 @@ public class AlfrescoService extends BaseComponent {
     @SneakyThrows
     public File getNodeContent(String nodeId) {
         val availableMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory() + Runtime.getRuntime().freeMemory();
-        log.trace("Available memory => {} bytes", availableMemory);
+        log.trace("Available memory: {} bytes", availableMemory);
         val dynamicBufferSize = (int) Math.min((long) maxChunkSizeKib * 1024, availableMemory / (2L * parallelism));
-        log.trace("Dynamic buffer size => {}", dynamicBufferSize);
+        log.trace("Dynamic buffer size: {}", dynamicBufferSize);
 
         // workaround for getting a true stream instead of nodesApi.getNodeContent()
-        var url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
-        var conn = (HttpURLConnection) url.openConnection();
+        val url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
+        val conn = (HttpURLConnection) url.openConnection();
         conn.setRequestProperty(HttpHeaderNames.AUTHORIZATION.toString(), basicAuth);
 
-        @Cleanup var in = conn.getInputStream();
-        var tempFile = File.createTempFile("alfresco-content-", ".tmp");
-        @Cleanup var out = new FileOutputStream(tempFile);
+        @Cleanup val in = conn.getInputStream();
+        val tempFile = File.createTempFile("alfresco-content-", ".tmp");
+        @Cleanup val out = new FileOutputStream(tempFile);
 
-        byte[] buffer = new byte[dynamicBufferSize];
+        val buffer = new byte[dynamicBufferSize];
         int len;
         while ((len = in.read(buffer)) != -1) {
             out.write(buffer, 0, len);
@@ -134,20 +134,20 @@ public class AlfrescoService extends BaseComponent {
     }
 
     public void addAspects(String nodeId, List<String> additionalAspectNames) {
-        var aspectNames = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getAspectNames();
+        val aspectNames = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getAspectNames();
         aspectNames.addAll(additionalAspectNames);
-        var nodeBodyUpdate = new NodeBodyUpdate();
+        val nodeBodyUpdate = new NodeBodyUpdate();
         nodeBodyUpdate.setAspectNames(aspectNames);
-        log.debug("Adding aspects => {}", additionalAspectNames);
+        log.debug("Adding aspects: {}", additionalAspectNames);
         nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
     }
 
     public void removeAspects(String nodeId, List<String> aspectsToRemove) {
-        var aspectNames = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getAspectNames();
+        val aspectNames = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getAspectNames();
         aspectNames.removeAll(aspectsToRemove);
-        var nodeBodyUpdate = new NodeBodyUpdate();
+        val nodeBodyUpdate = new NodeBodyUpdate();
         nodeBodyUpdate.setAspectNames(aspectNames);
-        log.debug("Removing aspects => {}", aspectsToRemove);
+        log.debug("Removing aspects: {}", aspectsToRemove);
         nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
     }
 
@@ -165,14 +165,14 @@ public class AlfrescoService extends BaseComponent {
         if (pages == null || pages < 1) {
             pages = Integer.MAX_VALUE;
         }
-        var searchRequest = new SystemSearchRequest();
+        val searchRequest = new SystemSearchRequest();
         searchRequest.setQuery(query);
         searchRequest.setSkipCount(0);
         searchRequest.setMaxItems(config.getSearchBatchSize());
         ResultSetPaging resultSetPaging;
-        var documentsProcessed = new AtomicInteger();
+        val documentsProcessed = new AtomicInteger();
         do {
-            log.debug("skipCount => {}", searchRequest.getSkipCount());
+            log.debug("Skip count: {}", searchRequest.getSkipCount());
             resultSetPaging = search(searchRequest);
             if (nodeProcessor != null) {
                 resultSetPaging.getList().getEntries().parallelStream().forEach(e -> {
@@ -187,15 +187,15 @@ public class AlfrescoService extends BaseComponent {
             searchRequest.setSkipCount(searchRequest.getSkipCount() + config.getSearchBatchSize());
             pages--;
         } while (resultSetPaging.getList().getPagination().isHasMoreItems() && pages > 0);
-        log.info("Documents archived => {}", documentsProcessed.get());
+        log.info("Documents archived: {}", documentsProcessed.get());
     }
 
     private ResultSetPaging search(SystemSearchRequest systemSearchRequest) {
-        var searchRequest = new SearchRequest();
-        var requestQuery = new RequestQuery();
+        val searchRequest = new SearchRequest();
+        val requestQuery = new RequestQuery();
         requestQuery.setLanguage(RequestQuery.LanguageEnum.AFTS);
         requestQuery.setQuery(systemSearchRequest.getQuery());
-        var paging = new RequestPagination();
+        val paging = new RequestPagination();
         paging.setMaxItems(systemSearchRequest.getMaxItems());
         paging.setSkipCount(systemSearchRequest.getSkipCount());
         searchRequest.setQuery(requestQuery);
@@ -205,11 +205,11 @@ public class AlfrescoService extends BaseComponent {
 
     @SneakyThrows
     public static String getErrorKey(FeignException e) {
-        var objectMapper = new ObjectMapper();
+        val objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
-        var charset = StandardCharsets.UTF_8;
-        var body = charset.decode(e.responseBody().orElse(ByteBuffer.allocate(0))).toString();
-        var apiExceptionError = objectMapper.readValue(body, ApiExceptionError.class);
+        val charset = StandardCharsets.UTF_8;
+        val body = charset.decode(e.responseBody().orElse(ByteBuffer.allocate(0))).toString();
+        val apiExceptionError = objectMapper.readValue(body, ApiExceptionError.class);
         return apiExceptionError.getErrorKey();
     }
 
