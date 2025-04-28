@@ -22,6 +22,7 @@ import com.mongodb.*;
 import com.mongodb.client.MongoClient;
 import com.mongodb.client.MongoClients;
 import lombok.NonNull;
+import lombok.val;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -48,12 +49,12 @@ public class MongoDBConfig extends AbstractMongoClientConfiguration {
     @Bean
     @NonNull
     public MongoClient mongoClient() {
-        var pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
-        var codecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), pojoCodecRegistry);
-        var serverApi = ServerApi.builder()
+        val pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
+        val codecRegistry = fromRegistries(MongoClientSettings.getDefaultCodecRegistry(), pojoCodecRegistry);
+        val serverApi = ServerApi.builder()
                 .version(ServerApiVersion.V1)
                 .build();
-        var credentials = MongoCredential.createCredential(username, authDatabase, password.toCharArray());
+        val credentials = MongoCredential.createCredential(username, authDatabase, password.toCharArray());
         return MongoClients.create(MongoClientSettings.builder()
                 .applyConnectionString(new ConnectionString(connectionString))
                 .serverApi(serverApi)
