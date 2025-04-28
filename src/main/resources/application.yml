@@ -92,6 +92,8 @@ application:
       max-chunk-size-kib: 1024
     vault:
       hash-algorithm: SHA-256
+      # Use this as a switch, only MD5 is currently supported by MongoDB as command
+      # https://www.mongodb.com/docs/manual/reference/command/filemd5/#mongodb-dbcommand-dbcmd.filemd5
       double-check-algorithm: MD5
   same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
 server:

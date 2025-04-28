@@ -75,7 +75,7 @@ public class ApiController {
     }
 
     @GetMapping("/nodes/{nodeId}/content")
-    @Operation(summary = "Get node content stream",
+    @Operation(summary = "Get node content",
             description = "Streams the content of the specified node. Set 'attachment' parameter to true for download as attachment.",
             parameters = {
                     @Parameter(name = "nodeId", description = "Identifier of the node", required = true, in = ParameterIn.PATH),

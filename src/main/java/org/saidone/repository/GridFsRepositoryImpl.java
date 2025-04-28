@@ -85,8 +85,8 @@ public class GridFsRepositoryImpl implements GridFsRepository {
         return null;
     }
 
-    public String calculateMd5(String uuid) {
-        val command = new Document("filemd5", findFileById(uuid).getId()).append("root", "fs");
+    public String computeDigest(String uuid, String algorithm) {
+        val command = new Document(String.format("file%s", algorithm.toLowerCase()), findFileById(uuid).getId()).append("root", "fs");
         val result = mongoTemplate.executeCommand(command);
         return result.getString(doubleCheckAlgorithm.toLowerCase());
     }

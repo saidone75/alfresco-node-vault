@@ -145,7 +145,7 @@ public class VaultService extends BaseComponent {
             file = alfrescoService.getNodeContent(nodeId);
             alfrescoDigest = computeDigest(file, doubleCheckAlgorithm);
             log.trace("Alfresco digest for node {}: {}", nodeId, alfrescoDigest);
-            mongoDigest = gridFsRepository.calculateMd5(nodeId);
+            mongoDigest = gridFsRepository.computeDigest(nodeId, doubleCheckAlgorithm);
             log.trace("MongoDB digest for node {}: {}", nodeId, mongoDigest);
         } catch (IOException | NoSuchAlgorithmException e) {
             throw new ArchiveNodeException("Cannot compute hashes");
