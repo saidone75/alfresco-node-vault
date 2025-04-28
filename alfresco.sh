@@ -1,19 +1,21 @@
 #!/bin/sh
 
-COMPOSE_FILE_PATH="${PWD}/docker/docker-compose.yml"
+COMPOSE_FILE_PATH="${PWD}/docker-alfresco/docker-compose.yml"
+ENV_FILE_PATH="${PWD}/docker-alfresco/.env"
 VOLUME_PREFIX=anv
 
 start() {
+    docker network create $VOLUME_PREFIX-shared-network 2> /dev/null
     docker volume create $VOLUME_PREFIX-acs-volume
     docker volume create $VOLUME_PREFIX-postgres-volume
     docker volume create $VOLUME_PREFIX-ass-volume
     docker volume create $VOLUME_PREFIX-mongo-volume
-    docker-compose -f "$COMPOSE_FILE_PATH" --env-file ./docker/.env up --build -d
+    docker-compose -f "$COMPOSE_FILE_PATH" --env-file "$ENV_FILE_PATH" up --build -d
 }
 
 down() {
     if [ -f "$COMPOSE_FILE_PATH" ]; then
-        docker-compose -f "$COMPOSE_FILE_PATH" --env-file ./docker/.env down
+        docker-compose -f "$COMPOSE_FILE_PATH" --env-file "$ENV_FILE_PATH" down
     fi
 }
 
@@ -25,11 +27,11 @@ purge() {
 }
 
 tail() {
-    docker-compose -f "$COMPOSE_FILE_PATH" --env-file ./docker/.env logs -f
+    docker-compose -f "$COMPOSE_FILE_PATH" --env-file "$ENV_FILE_PATH" logs -f
 }
 
 tail_all() {
-    docker-compose -f "$COMPOSE_FILE_PATH" --env-file ./docker/.env logs --tail="all"
+    docker-compose -f "$COMPOSE_FILE_PATH" --env-file "$ENV_FILE_PATH" logs --tail="all"
 }
 
 case "$1" in
