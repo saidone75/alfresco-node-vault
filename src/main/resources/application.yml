@@ -25,10 +25,10 @@ spring:
             - name: IsOnVaultPredicate
           filters:
             - SetPath=/api/vault/nodes/{nodeId}/content
-        - id: default_route
+        - id: alfresco_default_route
           uri: ${ALFRESCO_BASE_PATH:http://localhost:8080}
           predicates:
-            - Path=/**
+            - Path=/alfresco/**
   activemq:
     brokerUrl: ${ACTIVE_MQ_URL:tcp://localhost:61616}
   jms:

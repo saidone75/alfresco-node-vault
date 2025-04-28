@@ -30,7 +30,9 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.Node;
+import org.alfresco.core.model.NodeBodyCreate;
 import org.alfresco.core.model.NodeBodyUpdate;
+import org.alfresco.core.model.PermissionsBody;
 import org.alfresco.search.handler.SearchApi;
 import org.alfresco.search.model.RequestPagination;
 import org.alfresco.search.model.RequestQuery;
@@ -39,7 +41,9 @@ import org.alfresco.search.model.SearchRequest;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.AlfrescoServiceConfig;
 import org.saidone.exception.ApiExceptionError;
+import org.saidone.model.NodeContent;
 import org.saidone.model.SystemSearchRequest;
+import org.saidone.model.alfresco.AnvContentModel;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -153,6 +157,31 @@ public class AlfrescoService extends BaseComponent {
 
     public void deleteNode(String nodeId) {
         nodesApi.deleteNode(nodeId, config.isPermanentlyDeleteNodes());
+    }
+
+    @SneakyThrows
+    public String restoreNode(Node node, boolean restorePermissions) {
+        val nodeBodyCreate = new NodeBodyCreate();
+        nodeBodyCreate.setName(node.getName());
+        nodeBodyCreate.setNodeType(node.getNodeType());
+        val aspectNames = node.getAspectNames();
+        aspectNames.remove(AnvContentModel.ASP_ARCHIVE);
+        nodeBodyCreate.setAspectNames(aspectNames);
+        nodeBodyCreate.setProperties(node.getProperties());
+        if (restorePermissions) {
+            val permissionBody = new PermissionsBody();
+            permissionBody.setIsInheritanceEnabled(node.getPermissions().isIsInheritanceEnabled());
+            permissionBody.setLocallySet(node.getPermissions().getLocallySet());
+            nodeBodyCreate.setPermissions(permissionBody);
+        }
+        nodeBodyCreate.setDefinition(node.getDefinition());
+        return Objects.requireNonNull(nodesApi.createNode(node.getParentId(), nodeBodyCreate, true, null, null, null, null).getBody()).getEntry().getId();
+    }
+
+    @SneakyThrows
+    public void restoreNodeContent(String nodeId, NodeContent nodeContent) {
+        log.warn("This method will try to load the entire node content in memory");
+        nodesApi.updateNodeContent(nodeId, nodeContent.getContentStream().readAllBytes(), null, null, null, null, null);
     }
 
     @SneakyThrows
