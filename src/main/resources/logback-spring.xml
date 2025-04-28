@@ -72,6 +72,16 @@
         </root>
     </springProfile>
 
+    <springProfile name="docker">
+        <logger name="org.saidone" additivity="false" level="debug">
+            <appender-ref ref="CONSOLE"/>
+        </logger>
+
+        <root level="info">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+    </springProfile>
+
     <springProfile name="prod">
         <root level="info">
             <appender-ref ref="CONSOLE"/>
