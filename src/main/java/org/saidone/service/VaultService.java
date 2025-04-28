@@ -19,7 +19,6 @@
 package org.saidone.service;
 
 import com.mongodb.client.MongoClient;
-import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -28,7 +27,6 @@ import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
 import org.saidone.exception.ArchiveNodeException;
 import org.saidone.exception.NodeNotFoundOnVaultException;
-import org.saidone.exception.VaultException;
 import org.saidone.model.MetadataKeys;
 import org.saidone.model.NodeContent;
 import org.saidone.model.NodeWrapper;
@@ -40,7 +38,6 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -63,13 +60,13 @@ public class VaultService extends BaseComponent {
     private String doubleCheckAlgorithm;
 
     public void archiveNode(String nodeId) {
-        log.info("Archiving node => {}", nodeId);
+        log.info("Archiving node: {}", nodeId);
         try {
-            var node = alfrescoService.getNode(nodeId);
-            var file = alfrescoService.getNodeContent(nodeId);
+            val node = alfrescoService.getNode(nodeId);
+            val file = alfrescoService.getNodeContent(nodeId);
             mongoNodeRepository.save(new NodeWrapper(node));
-            try (var is = new FileInputStream(file)) {
-                var metadata = new HashMap<String, String>() {{
+            try (val is = new FileInputStream(file)) {
+                val metadata = new HashMap<String, String>() {{
                     put(MetadataKeys.UUID, nodeId);
                 }};
                 if (Strings.isNotBlank(checksumAlgorithm)) {
@@ -84,10 +81,10 @@ public class VaultService extends BaseComponent {
         } catch (Exception e) {
             log.trace(e.getMessage(), e);
             // rollback
-            log.debug("Rollback required for node => {}", nodeId);
+            log.debug("Rollback required for node: {}", nodeId);
             mongoNodeRepository.deleteById(nodeId);
             gridFsRepository.deleteFileById(nodeId);
-            throw new ArchiveNodeException(String.format("Error archiving node %s => %s", nodeId, e.getMessage()));
+            throw new ArchiveNodeException(String.format("Error archiving node %s: %s", nodeId, e.getMessage()));
         }
     }
 
@@ -108,7 +105,7 @@ public class VaultService extends BaseComponent {
             log.warn("Node {} not found in GridFS", nodeId);
             throw new NodeNotFoundOnVaultException(String.format("Node %s not found in GridFS", nodeId));
         }
-        var nodeContent = new NodeContent();
+        val nodeContent = new NodeContent();
         nodeContent.setFileName(gridFSFile.getFilename());
         if (gridFSFile.getMetadata() != null && gridFSFile.getMetadata().containsKey("_contentType")) {
             nodeContent.setContentType(gridFSFile.getMetadata().getString("_contentType"));
@@ -119,8 +116,8 @@ public class VaultService extends BaseComponent {
     }
 
     public static String computeDigest(File file, String hash) throws IOException, NoSuchAlgorithmException {
-        var digest = MessageDigest.getInstance(hash);
-        try (var fis = new FileInputStream(file)) {
+        val digest = MessageDigest.getInstance(hash);
+        try (val fis = new FileInputStream(file)) {
             byte[] byteArray = new byte[8192];
             int bytesCount;
             while ((bytesCount = fis.read(byteArray)) != -1) {
@@ -128,24 +125,24 @@ public class VaultService extends BaseComponent {
             }
         }
         byte[] bytes = digest.digest();
-        var sb = new StringBuilder();
-        for (byte b : bytes) {
+        val sb = new StringBuilder();
+        for (byte b: bytes) {
             sb.append(String.format("%02x", b));
         }
         return sb.toString();
     }
 
     public void doubleCheck(String nodeId) {
-        log.debug("Comparing {} digest for node => {}", doubleCheckAlgorithm, nodeId);
+        log.debug("Comparing {} digest for node: {}", doubleCheckAlgorithm, nodeId);
         File file = null;
         String alfrescoDigest;
         String mongoDigest;
         try {
             file = alfrescoService.getNodeContent(nodeId);
             alfrescoDigest = computeDigest(file, doubleCheckAlgorithm);
-            log.trace("Alfresco digest for node {} => {}", nodeId, alfrescoDigest);
+            log.trace("Alfresco digest for node {}: {}", nodeId, alfrescoDigest);
             mongoDigest = gridFsRepository.calculateMd5(nodeId);
-            log.trace("MongoDB digest for node {} => {}", nodeId, mongoDigest);
+            log.trace("MongoDB digest for node {}: {}", nodeId, mongoDigest);
         } catch (IOException | NoSuchAlgorithmException e) {
             throw new ArchiveNodeException("Cannot compute hashes");
         } finally {
@@ -156,7 +153,7 @@ public class VaultService extends BaseComponent {
             }
         }
         if (alfrescoDigest.equals(mongoDigest)) {
-            log.debug("Digest check passed for node => {}", nodeId);
+            log.debug("Digest check passed for node: {}", nodeId);
         } else {
             throw new ArchiveNodeException("Hashes mismatch");
         }
