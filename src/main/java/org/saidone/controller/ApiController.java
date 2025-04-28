@@ -72,7 +72,7 @@ public class ApiController {
 
         val nodeContent = vaultService.getNodeContent(nodeId);
 
-        var headers = new HttpHeaders();
+        val headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(nodeContent.getContentType()));
         headers.setContentLength(nodeContent.getLength());
         if (attachment) {
