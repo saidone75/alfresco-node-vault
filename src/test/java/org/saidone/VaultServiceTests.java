@@ -18,13 +18,12 @@
 
 package org.saidone;
 
-import com.github.javafaker.Faker;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeBodyCreate;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.saidone.behaviour.EventHandler;
 import org.saidone.exception.NodeNotOnVaultException;
 import org.saidone.job.NodeArchivingJob;
@@ -38,7 +37,6 @@ import utils.ResourceFileUtils;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.IntStream;
@@ -47,8 +45,9 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Slf4j
-class AlfrescoNodeVaultApplicationTests {
+class VaultServiceTests {
 
 
     @MockitoBean
@@ -65,16 +64,27 @@ class AlfrescoNodeVaultApplicationTests {
     @Autowired
     NodesApi nodesApi;
 
-    private final static Faker faker = new Faker(Locale.ENGLISH);
+    private static String parentId;
+
+    @BeforeEach
+    public void before() {
+        if (parentId == null) {
+            val nodeBodyCreate = new NodeBodyCreate();
+            nodeBodyCreate.setName(UUID.randomUUID().toString());
+            nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_FOLDER);
+            parentId = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry().getId();
+        }
+    }
 
     @Test
+    @Order(10)
     @SneakyThrows
     void archiveNodeTest() {
         val file = ResourceFileUtils.getFileFromResource("sample.pdf");
         val nodeBodyCreate = new NodeBodyCreate();
-        nodeBodyCreate.setName(String.format("%s.pdf", faker.animal().name()));
+        nodeBodyCreate.setName(String.format("%s.pdf", UUID.randomUUID()));
         nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
-        val node = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
+        val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
         nodesApi.updateNodeContent(node.getId(), Files.readAllBytes(file.toPath()), null, null, null, null, null);
         // save node on the vault
         assertDoesNotThrow(() -> vaultService.archiveNode(node.getId()));
@@ -83,19 +93,21 @@ class AlfrescoNodeVaultApplicationTests {
     }
 
     @Test
+    @Order(20)
     void nonExistentNodeTest() {
         assertThrows(NodeNotOnVaultException.class, () -> vaultService.getNode(UUID.randomUUID().toString()));
         assertThrows(NodeNotOnVaultException.class, () -> vaultService.archiveNode(UUID.randomUUID().toString()));
     }
 
     @Test
+    @Order(30)
     @SneakyThrows
     void restoreNodeTest() {
         val file = ResourceFileUtils.getFileFromResource("sample.pdf");
         val nodeBodyCreate = new NodeBodyCreate();
-        nodeBodyCreate.setName(String.format("%s.pdf", faker.animal().name()));
+        nodeBodyCreate.setName(String.format("%s.pdf", UUID.randomUUID()));
         nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
-        val node = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
+        val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
         nodesApi.updateNodeContent(node.getId(), Files.readAllBytes(file.toPath()), null, null, null, null, null);
         // save node on the vault
         assertDoesNotThrow(() -> vaultService.archiveNode(node.getId()));
@@ -106,16 +118,17 @@ class AlfrescoNodeVaultApplicationTests {
     }
 
     @Test
+    @Order(40)
     @SneakyThrows
     void archiveNodesTest() {
-        IntStream.range(0, 100).parallel().forEach(i -> {
+        IntStream.range(0, 64).parallel().forEach(i -> {
             var file = (File) null;
             try {
                 file = ResourceFileUtils.getFileFromResource("sample.pdf");
                 val nodeBodyCreate = new NodeBodyCreate();
-                nodeBodyCreate.setName(String.format("%s-%s-%s.pdf", UUID.randomUUID().toString().substring(0, 4), faker.animal().name(), UUID.randomUUID().toString().substring(0, 8)));
+                nodeBodyCreate.setName(String.format("%s.pdf", UUID.randomUUID()));
                 nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
-                val node = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
+                val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
                 nodesApi.updateNodeContent(node.getId(), Files.readAllBytes(file.toPath()), null, null, null, null, null);
                 // save node on the vault
                 assertDoesNotThrow(() -> vaultService.archiveNode(node.getId()));
@@ -125,6 +138,13 @@ class AlfrescoNodeVaultApplicationTests {
                 throw new RuntimeException(e);
             }
         });
+    }
+
+    @Test
+    @Order(100)
+    @SneakyThrows
+    public void cleanUp() {
+        nodesApi.deleteNode(parentId, true);
     }
 
 }
