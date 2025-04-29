@@ -84,8 +84,30 @@ public class ApiController {
                 .body("Server memory limit exceeded. Please try with a smaller file or contact administrator.");
     }
 
+    @GetMapping("/nodes/{nodeId}")
+    @Operation(
+            summary = "Get node metadata",
+            description = "Retrieves metadata of a specified node.",
+            parameters = {
+                    @Parameter(name = "nodeId", description = "Identifier of the node", required = true, in = ParameterIn.PATH)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Node metadata retrieved successfully",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = Entry.class))),
+                    @ApiResponse(responseCode = "404", description = "Node not found",
+                            content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content)
+            })
+    public ResponseEntity<?> getNode(@PathVariable String nodeId) {
+        val node = vaultService.getNode(nodeId);
+        return ResponseEntity.ok(new Entry(node));
+    }
+
     @GetMapping("/nodes/{nodeId}/content")
-    @Operation(summary = "Get node content",
+    @Operation(
+            summary = "Get node content",
             description = "Streams the content of the specified node. Set 'attachment' parameter to true for download as attachment.",
             parameters = {
                     @Parameter(name = "nodeId", description = "Identifier of the node", required = true, in = ParameterIn.PATH),
@@ -120,28 +142,9 @@ public class ApiController {
                 .body(new InputStreamResource(nodeContent.getContentStream()));
     }
 
-    @GetMapping("/nodes/{nodeId}")
-    @Operation(summary = "Get node metadata",
-            description = "Retrieves metadata of a specified node.",
-            parameters = {
-                    @Parameter(name = "nodeId", description = "Identifier of the node", required = true, in = ParameterIn.PATH)
-            },
-            responses = {
-                    @ApiResponse(responseCode = "200", description = "Node metadata retrieved successfully",
-                            content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = Entry.class))),
-                    @ApiResponse(responseCode = "404", description = "Node not found",
-                            content = @Content),
-                    @ApiResponse(responseCode = "500", description = "Internal server error",
-                            content = @Content)
-            })
-    public ResponseEntity<?> getNode(@PathVariable String nodeId) {
-        val node = vaultService.getNode(nodeId);
-        return ResponseEntity.ok(new Entry(node));
-    }
-
     @PostMapping("/nodes/{nodeId}/restore")
-    @Operation(summary = "Restore a node",
+    @Operation(
+            summary = "Restore a node",
             description = "Restores the specified node from the vault. Optionally restore permissions.",
             parameters = {
                     @Parameter(name = "nodeId", description = "Identifier of the node to restore", required = true, in = ParameterIn.PATH),
@@ -163,7 +166,8 @@ public class ApiController {
     }
 
     @PostMapping("/nodes/{nodeId}/archive")
-    @Operation(summary = "Archive a node",
+    @Operation(
+            summary = "Archive a node",
             description = "Archives the specified node in the vault.",
             parameters = {
                     @Parameter(name = "nodeId", description = "Identifier of the node to archive", required = true, in = ParameterIn.PATH)
