@@ -35,7 +35,7 @@
         </rollingPolicy>
     </appender>
 
-    <springProfile name="dev">
+    <springProfile name="dev|test">
         <logger name="org.saidone.service" additivity="false" level="debug">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
