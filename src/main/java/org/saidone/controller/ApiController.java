@@ -161,8 +161,8 @@ public class ApiController {
     public ResponseEntity<?> restoreNode(
             @PathVariable String nodeId,
             @RequestParam(required = false, defaultValue = "false") boolean restorePermissions) {
-        vaultService.restoreNode(nodeId, restorePermissions);
-        return ResponseEntity.ok().body(String.format("Node %s successfully restored.", nodeId));
+        val newNodeId = vaultService.restoreNode(nodeId, restorePermissions);
+        return ResponseEntity.ok().body(String.format("Node %s successfully restored as {}", nodeId, newNodeId));
     }
 
     @PostMapping("/nodes/{nodeId}/archive")

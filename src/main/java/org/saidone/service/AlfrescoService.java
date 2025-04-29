@@ -184,9 +184,9 @@ public class AlfrescoService extends BaseComponent {
 
     @SneakyThrows
     public void restoreNodeContent(String nodeId, NodeContent nodeContent) {
-        // workaround for nodesApi.updateNodeContent()
         val bytesSent = new AtomicLong(0);
         val lastLoggedPercentage = new AtomicInteger(0);
+        // workaround for nodesApi.updateNodeContent()
         webClient.put()
                 .uri(uriBuilder -> uriBuilder
                         .path("/nodes/{nodeId}/content")
