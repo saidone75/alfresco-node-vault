@@ -63,7 +63,8 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Minimal memory footprint
 - On-demand or scheduled archiving
 - MongoDB storage with GridFS
-- REST API proxy capabilities
+- REST API with proxy capabilities
+- Custom upload and download methods
 
 Pull requests are welcome!
 
