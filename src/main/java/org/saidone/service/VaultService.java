@@ -18,6 +18,7 @@
 
 package org.saidone.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -79,6 +80,8 @@ public class VaultService extends BaseComponent {
             Files.deleteIfExists(file.toPath());
             if (doubleCheck) doubleCheck(nodeId);
             alfrescoService.deleteNode(nodeId);
+        } catch (FeignException.NotFound e) {
+            throw new NodeNotOnVaultException(nodeId);
         } catch (Exception e) {
             log.trace(e.getMessage(), e);
             // rollback
