@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.exception.NodeNotOnVaultException;
+import org.saidone.exception.VaultException;
 import org.saidone.model.Entry;
 import org.saidone.service.VaultService;
 import org.springframework.core.io.InputStreamResource;
@@ -50,10 +51,19 @@ public class ApiController {
     @ExceptionHandler(Exception.class)
     @Operation(hidden = true)
     public ResponseEntity<String> handleException(Exception e) {
-        log.error("Error during streaming: {}", e.getMessage());
+        log.error(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(String.format("Error during streaming: %s", e.getMessage()));
+                .body(e.getMessage());
+    }
+
+    @ExceptionHandler(VaultException.class)
+    @Operation(hidden = true)
+    public ResponseEntity<String> handleVaultException(Exception e) {
+        log.error(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(e.getMessage());
     }
 
     @ExceptionHandler(NodeNotOnVaultException.class)
