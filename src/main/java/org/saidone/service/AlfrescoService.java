@@ -21,9 +21,7 @@ package org.saidone.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
-import io.netty.handler.codec.http.HttpHeaderNames;
 import jakarta.annotation.PostConstruct;
-import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -38,9 +36,6 @@ import org.alfresco.search.model.RequestPagination;
 import org.alfresco.search.model.RequestQuery;
 import org.alfresco.search.model.ResultSetPaging;
 import org.alfresco.search.model.SearchRequest;
-import org.apache.http.client.methods.HttpPut;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.AlfrescoServiceConfig;
 import org.saidone.exception.ApiExceptionError;
@@ -49,34 +44,27 @@ import org.saidone.model.NodeContent;
 import org.saidone.model.SystemSearchRequest;
 import org.saidone.model.alfresco.AnvContentModel;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.FileSystemResource;
-import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
 import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousFileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 @Service
@@ -100,10 +88,6 @@ public class AlfrescoService extends BaseComponent {
     private static String basicAuth;
     private static WebClient webClient;
     public static Node guestHome;
-    private static int parallelism;
-
-    @Value("${application.service.alfresco.max-chunk-size-kib}")
-    private int maxChunkSizeKib;
 
     @PostConstruct
     @Override
@@ -114,7 +98,6 @@ public class AlfrescoService extends BaseComponent {
         webClient = WebClient.builder()
                 .baseUrl(String.format("%s%s", contentServiceUrl, contentServicePath))
                 .build();
-        parallelism = ForkJoinPool.commonPool().getParallelism();
     }
 
     private Node getGuestHome() {
@@ -202,13 +185,28 @@ public class AlfrescoService extends BaseComponent {
     @SneakyThrows
     public void restoreNodeContent(String nodeId, NodeContent nodeContent) {
         // workaround for nodesApi.updateNodeContent()
+        val bytesSent = new AtomicLong(0);
+        val lastLoggedPercentage = new AtomicInteger(0);
         webClient.put()
                 .uri(uriBuilder -> uriBuilder
                         .path("/nodes/{nodeId}/content")
                         .build(nodeId))
                 .header(HttpHeaders.AUTHORIZATION, basicAuth)
                 .contentType(MediaType.valueOf(nodeContent.getContentType()))
-                .body(Mono.just(new InputStreamResource(nodeContent.getContentStream())), InputStreamResource.class)
+                .body(BodyInserters.fromDataBuffers(
+                        DataBufferUtils.readInputStream(nodeContent::getContentStream, DefaultDataBufferFactory.sharedInstance, 8192)
+                                .doOnNext(buffer -> {
+                                    val sent = bytesSent.addAndGet(buffer.readableByteCount());
+                                    if (nodeContent.getLength() > 0) {
+                                        val percentage = (int) ((double) sent / nodeContent.getLength() * 100);
+                                        if (sent == nodeContent.getLength() || percentage >= lastLoggedPercentage.get() + 10) {
+                                            lastLoggedPercentage.set((percentage / 10) * 10);
+                                            log.trace("Upload progress for node {}: {} bytes sent ({}% out of {} bytes)",
+                                                    nodeId, sent, percentage, nodeContent.getLength());
+                                        }
+                                    }
+                                })
+                ))
                 .retrieve()
                 .bodyToMono(String.class)
                 .doOnSuccess(log::debug)
