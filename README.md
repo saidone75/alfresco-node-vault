@@ -60,6 +60,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 ## Key Features
 
 - Clean and elegant code architecture
+- 100% test coverage
 - Minimal memory footprint
 - On-demand or scheduled archiving
 - MongoDB storage with GridFS
