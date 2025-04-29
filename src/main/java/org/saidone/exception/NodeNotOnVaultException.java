@@ -18,8 +18,8 @@
 
 package org.saidone.exception;
 
-public class NodeNotFoundOnVaultException extends VaultException {
-    public NodeNotFoundOnVaultException(String message) {
+public class NodeNotOnVaultException extends VaultException {
+    public NodeNotOnVaultException(String message) {
         super(String.format("Node %s not found on the vault", message));
     }
 }

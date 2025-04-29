@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.saidone.exception.NodeNotFoundOnVaultException;
+import org.saidone.exception.NodeNotOnVaultException;
 import org.saidone.model.Entry;
 import org.saidone.service.VaultService;
 import org.springframework.core.io.InputStreamResource;
@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/vault")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Vault API", description = "Operations related to node vault")
+@Tag(name = "Vault API", description = "Vault operations")
 public class ApiController {
 
     private final VaultService vaultService;
@@ -53,12 +53,12 @@ public class ApiController {
         log.error("Error during streaming: {}", e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error during streaming: " + e.getMessage());
+                .body(String.format("Error during streaming: %s", e.getMessage()));
     }
 
-    @ExceptionHandler(NodeNotFoundOnVaultException.class)
+    @ExceptionHandler(NodeNotOnVaultException.class)
     @Operation(hidden = true)
-    public ResponseEntity<String> handleNodeNotFoundOnVaultException(NodeNotFoundOnVaultException e) {
+    public ResponseEntity<String> handleNodeNotFoundOnVaultException(NodeNotOnVaultException e) {
         log.error(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
@@ -150,6 +150,26 @@ public class ApiController {
             @RequestParam(required = false, defaultValue = "false") boolean restorePermissions) {
         vaultService.restoreNode(nodeId, restorePermissions);
         return ResponseEntity.ok().body(String.format("Node %s successfully restored.", nodeId));
+    }
+
+    @PostMapping("/nodes/{nodeId}/archive")
+    @Operation(summary = "Archive a node",
+            description = "Archives the specified node in the vault.",
+            parameters = {
+                    @Parameter(name = "nodeId", description = "Identifier of the node to archive", required = true, in = ParameterIn.PATH)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Node successfully archived",
+                            content = @Content(mediaType = "text/plain")),
+                    @ApiResponse(responseCode = "404", description = "Node not found",
+                            content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content)
+            })
+    public ResponseEntity<?> archiveNode(
+            @PathVariable String nodeId) {
+        vaultService.archiveNode(nodeId);
+        return ResponseEntity.ok().body(String.format("Node %s successfully archived.", nodeId));
     }
 
 }

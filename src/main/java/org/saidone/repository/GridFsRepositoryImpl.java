@@ -81,7 +81,7 @@ public class GridFsRepositoryImpl implements GridFsRepository {
         return null;
     }
 
-    public String computeDigest(String uuid, String algorithm) {
+    public String computeHash(String uuid, String algorithm) {
         val command = new Document(String.format("file%s", algorithm.toLowerCase()), findFileById(uuid).getId()).append("root", "fs");
         val result = mongoTemplate.executeCommand(command);
         return result.getString(algorithm.toLowerCase());
