@@ -78,7 +78,7 @@ public class ApiController {
     @ExceptionHandler(OutOfMemoryError.class)
     @Operation(hidden = true)
     public ResponseEntity<String> handleOutOfMemoryError(OutOfMemoryError e) {
-        log.error("Out of memory error during streaming: {}", e.getMessage());
+        log.error(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Server memory limit exceeded. Please try with a smaller file or contact administrator.");
