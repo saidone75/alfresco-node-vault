@@ -67,6 +67,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
+/**
+ * Service class for interacting with Alfresco repository nodes and content.
+ * Provides methods to retrieve, update, delete, restore nodes and their content,
+ * as well as search and process nodes in Alfresco.
+ * <p>
+ * Uses Alfresco REST APIs via Feign clients and WebClient for content operations.
+ * </p>
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -89,6 +97,10 @@ public class AlfrescoService extends BaseComponent {
     private static WebClient webClient;
     public static Node guestHome;
 
+    /**
+     * Initializes the service, sets up basic authentication header,
+     * retrieves the "Guest Home" node, and configures the WebClient.
+     */
     @PostConstruct
     @Override
     public void init() {
@@ -100,6 +112,11 @@ public class AlfrescoService extends BaseComponent {
                 .build();
     }
 
+    /**
+     * Retrieves the "Guest Home" node from Alfresco repository.
+     *
+     * @return the Guest Home {@link Node} or null if not found
+     */
     private Node getGuestHome() {
         var guestHomeNode = (Node) null;
         try {
@@ -115,10 +132,24 @@ public class AlfrescoService extends BaseComponent {
         return guestHomeNode;
     }
 
+    /**
+     * Retrieves a node by its identifier.
+     *
+     * @param nodeId the identifier of the node to retrieve
+     * @return the {@link Node} object
+     * @throws VaultException if the node cannot be retrieved
+     */
     public Node getNode(String nodeId) {
         return Objects.requireNonNull(nodesApi.getNode(nodeId, config.getInclude(), null, null).getBody()).getEntry();
     }
 
+    /**
+     * Downloads the content of a node and writes it to a temporary file.
+     *
+     * @param nodeId the identifier of the node whose content is to be downloaded
+     * @return a {@link File} pointing to the temporary file containing the node content
+     * @throws VaultException if an error occurs during download or file creation
+     */
     public File getNodeContent(String nodeId) {
         try {
             val tempFilePath = Files.createTempFile("alfresco-content-", ".tmp");
@@ -141,6 +172,12 @@ public class AlfrescoService extends BaseComponent {
         }
     }
 
+    /**
+     * Adds additional aspects to a node.
+     *
+     * @param nodeId                the identifier of the node to update
+     * @param additionalAspectNames list of aspect names to add
+     */
     public void addAspects(String nodeId, List<String> additionalAspectNames) {
         val aspectNames = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getAspectNames();
         aspectNames.addAll(additionalAspectNames);
@@ -150,6 +187,12 @@ public class AlfrescoService extends BaseComponent {
         nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
     }
 
+    /**
+     * Removes specified aspects from a node.
+     *
+     * @param nodeId          the identifier of the node to update
+     * @param aspectsToRemove list of aspect names to remove
+     */
     public void removeAspects(String nodeId, List<String> aspectsToRemove) {
         val aspectNames = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getAspectNames();
         aspectNames.removeAll(aspectsToRemove);
@@ -159,10 +202,22 @@ public class AlfrescoService extends BaseComponent {
         nodesApi.updateNode(nodeId, nodeBodyUpdate, null, null);
     }
 
+    /**
+     * Deletes a node from the repository.
+     *
+     * @param nodeId the identifier of the node to delete
+     */
     public void deleteNode(String nodeId) {
         nodesApi.deleteNode(nodeId, config.isPermanentlyDeleteNodes());
     }
 
+    /**
+     * Restores a node by creating a new node with the same properties and optionally restoring permissions.
+     *
+     * @param node               the {@link Node} to restore
+     * @param restorePermissions if true, permissions will be restored on the new node
+     * @return the identifier of the newly created node
+     */
     @SneakyThrows
     public String restoreNode(Node node, boolean restorePermissions) {
         val nodeBodyCreate = new NodeBodyCreate();
@@ -182,6 +237,12 @@ public class AlfrescoService extends BaseComponent {
         return Objects.requireNonNull(nodesApi.createNode(node.getParentId(), nodeBodyCreate, true, null, null, null, null).getBody()).getEntry().getId();
     }
 
+    /**
+     * Restores the content of a node by uploading the provided content stream.
+     *
+     * @param nodeId      the identifier of the node to update content for
+     * @param nodeContent the {@link NodeContent} containing the content stream and metadata
+     */
     @SneakyThrows
     public void restoreNodeContent(String nodeId, NodeContent nodeContent) {
         val bytesSent = new AtomicLong(0);
@@ -214,11 +275,26 @@ public class AlfrescoService extends BaseComponent {
                 .subscribe();
     }
 
+    /**
+     * Executes a search query and processes each resulting node ID using the provided processor.
+     * Processes all pages of results.
+     *
+     * @param query         the search query string
+     * @param nodeProcessor a {@link Consumer} that processes node IDs
+     */
     @SneakyThrows
     public void searchAndProcess(String query, Consumer<String> nodeProcessor) {
         searchAndProcess(query, null, nodeProcessor);
     }
 
+    /**
+     * Executes a search query and processes each resulting node ID using the provided processor,
+     * limiting the number of pages processed.
+     *
+     * @param query         the search query string
+     * @param pages         maximum number of pages to process; if null or less than 1, all pages are processed
+     * @param nodeProcessor a {@link Consumer} that processes node IDs
+     */
     @SneakyThrows
     public void searchAndProcess(String query, Integer pages, Consumer<String> nodeProcessor) {
         if (pages == null || pages < 1) {
@@ -249,6 +325,12 @@ public class AlfrescoService extends BaseComponent {
         log.info("Documents archived: {}", documentsProcessed.get());
     }
 
+    /**
+     * Performs a search request using the Alfresco Search API.
+     *
+     * @param systemSearchRequest the search request parameters
+     * @return the {@link ResultSetPaging} containing search results
+     */
     private ResultSetPaging search(SystemSearchRequest systemSearchRequest) {
         val searchRequest = new SearchRequest();
         val requestQuery = new RequestQuery();
@@ -262,6 +344,12 @@ public class AlfrescoService extends BaseComponent {
         return searchApi.search(searchRequest).getBody();
     }
 
+    /**
+     * Extracts the error key from a FeignException response body.
+     *
+     * @param e the {@link FeignException} thrown by a Feign client
+     * @return the error key string extracted from the response
+     */
     @SneakyThrows
     public static String getErrorKey(FeignException e) {
         val objectMapper = new ObjectMapper();
