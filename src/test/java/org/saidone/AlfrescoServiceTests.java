@@ -40,6 +40,8 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -124,6 +126,20 @@ class AlfrescoServiceTests {
         assertTrue(alfrescoService.getNode(node.getId()).getAspectNames().contains(AlfrescoContentModel.ASP_EFFECTIVITY));
         assertDoesNotThrow(() -> alfrescoService.removeAspects(node.getId(), List.of(AlfrescoContentModel.ASP_EFFECTIVITY)));
         assertFalse(alfrescoService.getNode(node.getId()).getAspectNames().contains(AlfrescoContentModel.ASP_EFFECTIVITY));
+    }
+
+    @Test
+    @Order(50)
+    @SneakyThrows
+    public void searchAndProcessTest() {
+        val nodeBodyCreate = new NodeBodyCreate();
+        nodeBodyCreate.setName(String.format("%s.pdf", UUID.randomUUID()));
+        nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
+        val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
+        val result = new AtomicReference<String>();
+        val consumer = (Consumer<String>) result::set;
+        assertDoesNotThrow(() -> alfrescoService.searchAndProcess(String.format("=%s:'%s'", AlfrescoContentModel.PROP_NAME, node.getName()), consumer));
+        assertEquals(node.getId(), result.get());
     }
 
     @Test

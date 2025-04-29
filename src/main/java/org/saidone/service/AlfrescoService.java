@@ -322,7 +322,7 @@ public class AlfrescoService extends BaseComponent {
             searchRequest.setSkipCount(searchRequest.getSkipCount() + config.getSearchBatchSize());
             pages--;
         } while (resultSetPaging.getList().getPagination().isHasMoreItems() && pages > 0);
-        log.info("Documents archived: {}", documentsProcessed.get());
+        log.info("Documents processed: {}", documentsProcessed.get());
     }
 
     /**
