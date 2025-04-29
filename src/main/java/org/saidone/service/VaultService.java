@@ -72,8 +72,8 @@ public class VaultService extends BaseComponent {
      * Archives a node by its ID.
      * <p>
      * Retrieves the node and its content from Alfresco, saves metadata to MongoDB,
-     * stores the content in GridFS with checksum metadata, deletes the original content,
-     * optionally performs a double-check of the checksum, and finally deletes the node from Alfresco.
+     * stores the content in GridFS with checksum metadata, optionally performs a double-check
+     * of the checksum, and finally deletes the node from Alfresco.
      * </p>
      *
      * @param nodeId the ID of the node to archive
