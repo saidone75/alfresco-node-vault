@@ -18,6 +18,7 @@
 
 package org.saidone;
 
+import com.mongodb.client.MongoClient;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -31,7 +32,9 @@ import org.saidone.model.alfresco.AlfrescoContentModel;
 import org.saidone.service.AlfrescoService;
 import org.saidone.service.VaultService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import utils.ResourceFileUtils;
 
@@ -45,10 +48,10 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Slf4j
 class VaultServiceTests {
-
 
     @MockitoBean
     EventHandler eventHandler;
@@ -63,6 +66,12 @@ class VaultServiceTests {
 
     @Autowired
     NodesApi nodesApi;
+
+    @Autowired
+    private MongoClient mongoClient;
+
+    @Value("${spring.data.mongodb.database}")
+    private String database;
 
     private static String parentId;
 
@@ -145,6 +154,7 @@ class VaultServiceTests {
     @SneakyThrows
     public void cleanUp() {
         nodesApi.deleteNode(parentId, true);
+        mongoClient.getDatabase(database).drop();
     }
 
 }
