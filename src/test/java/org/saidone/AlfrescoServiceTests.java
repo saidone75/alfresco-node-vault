@@ -32,6 +32,7 @@ import org.saidone.service.AlfrescoService;
 import org.saidone.service.VaultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import utils.ResourceFileUtils;
 
@@ -43,6 +44,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Slf4j
 class AlfrescoServiceTests {
