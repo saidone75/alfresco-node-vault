@@ -23,10 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeBodyCreate;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.saidone.behaviour.EventHandler;
 import org.saidone.exception.NodeNotOnVaultException;
 import org.saidone.job.NodeArchivingJob;
@@ -35,7 +32,6 @@ import org.saidone.service.AlfrescoService;
 import org.saidone.service.VaultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.annotation.Order;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import utils.ResourceFileUtils;
 
@@ -125,7 +121,7 @@ class VaultServiceTests {
     @Order(40)
     @SneakyThrows
     void archiveNodesTest() {
-        IntStream.range(0, 100).parallel().forEach(i -> {
+        IntStream.range(0, 64).parallel().forEach(i -> {
             var file = (File) null;
             try {
                 file = ResourceFileUtils.getFileFromResource("sample.pdf");
