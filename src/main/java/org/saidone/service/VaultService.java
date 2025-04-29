@@ -45,6 +45,13 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.HexFormat;
 
+/**
+ * Service responsible for archiving, restoring, and managing nodes in the vault.
+ * <p>
+ * This service interacts with Alfresco to retrieve nodes and their content,
+ * stores node metadata in MongoDB, and stores node content in GridFS.
+ * </p>
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -61,6 +68,18 @@ public class VaultService extends BaseComponent {
     private boolean doubleCheck;
     private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
 
+    /**
+     * Archives a node by its ID.
+     * <p>
+     * Retrieves the node and its content from Alfresco, saves metadata to MongoDB,
+     * stores the content in GridFS with checksum metadata, deletes the original content,
+     * optionally performs a double-check of the checksum, and finally deletes the node from Alfresco.
+     * </p>
+     *
+     * @param nodeId the ID of the node to archive
+     * @throws NodeNotOnVaultException if the node is not found in Alfresco
+     * @throws VaultException          if any error occurs during archiving, including rollback
+     */
     public void archiveNode(String nodeId) {
         log.info("Archiving node: {}", nodeId);
         try {
@@ -92,6 +111,13 @@ public class VaultService extends BaseComponent {
         }
     }
 
+    /**
+     * Retrieves the wrapped node metadata from MongoDB by node ID.
+     *
+     * @param nodeId the ID of the node
+     * @return the NodeWrapper containing node metadata
+     * @throws NodeNotOnVaultException if the node is not found in the vault
+     */
     private NodeWrapper getNodeWrapper(String nodeId) {
         val nodeOptional = mongoNodeRepository.findById(nodeId);
         if (nodeOptional.isPresent()) {
@@ -102,10 +128,24 @@ public class VaultService extends BaseComponent {
         }
     }
 
+    /**
+     * Retrieves the node metadata by node ID.
+     *
+     * @param nodeId the ID of the node
+     * @return the Alfresco Node object
+     * @throws NodeNotOnVaultException if the node is not found in the vault
+     */
     public Node getNode(String nodeId) {
         return getNodeWrapper(nodeId).getNode();
     }
 
+    /**
+     * Retrieves the content of a node stored in GridFS by node ID.
+     *
+     * @param nodeId the ID of the node
+     * @return the NodeContent containing file name, content type, length, and content stream
+     * @throws NodeNotOnVaultException if the node content is not found in the vault
+     */
     public NodeContent getNodeContent(String nodeId) {
         val gridFSFile = gridFsRepository.findFileById(nodeId);
         if (gridFSFile == null) {
@@ -121,6 +161,18 @@ public class VaultService extends BaseComponent {
         return nodeContent;
     }
 
+    /**
+     * Restores a node from the vault back to Alfresco.
+     * <p>
+     * Restores node metadata and content, optionally restoring permissions,
+     * and marks the node as restored in MongoDB.
+     * </p>
+     *
+     * @param nodeId             the ID of the node to restore
+     * @param restorePermissions whether to restore permissions along with the node
+     * @return the new node ID assigned by Alfresco after restoration
+     * @throws NodeNotOnVaultException if the node is not found in the vault
+     */
     public String restoreNode(String nodeId, boolean restorePermissions) {
         val nodeWrapper = getNodeWrapper(nodeId);
         val newNodeId = alfrescoService.restoreNode(nodeWrapper.getNode(), restorePermissions);
@@ -130,6 +182,15 @@ public class VaultService extends BaseComponent {
         return newNodeId;
     }
 
+    /**
+     * Computes the hash checksum of a file using the specified algorithm.
+     *
+     * @param file the file to compute the hash for
+     * @param hash the name of the hash algorithm (e.g., "MD5", "SHA-256")
+     * @return the hexadecimal string representation of the computed hash
+     * @throws IOException              if an I/O error occurs reading the file
+     * @throws NoSuchAlgorithmException if the specified hash algorithm is not available
+     */
     public static String computeHash(File file, String hash) throws IOException, NoSuchAlgorithmException {
         val digest = MessageDigest.getInstance(hash);
         try (val fis = new FileInputStream(file)) {
@@ -142,6 +203,16 @@ public class VaultService extends BaseComponent {
         return HexFormat.of().formatHex(digest.digest());
     }
 
+    /**
+     * Performs a double-check by comparing the MD5 hash of the node content
+     * retrieved from Alfresco and the one computed on MongoDB.
+     * <p>
+     * Throws a {@link HashesMismatchException} if the hashes do not match.
+     * </p>
+     *
+     * @param nodeId the ID of the node to double-check
+     * @throws VaultException if hash computation fails or hashes mismatch
+     */
     public void doubleCheck(String nodeId) {
         log.debug("Comparing {} hashes for node: {}", DOUBLE_CHECK_ALGORITHM, nodeId);
         File file = null;
