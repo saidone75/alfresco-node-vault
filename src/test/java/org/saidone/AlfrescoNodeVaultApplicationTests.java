@@ -26,9 +26,9 @@ import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.NodeBodyCreate;
 import org.junit.jupiter.api.Test;
 import org.saidone.behaviour.EventHandler;
+import org.saidone.exception.NodeNotOnVaultException;
 import org.saidone.job.NodeArchivingJob;
 import org.saidone.model.alfresco.AlfrescoContentModel;
-import org.saidone.model.alfresco.AnvContentModel;
 import org.saidone.service.AlfrescoService;
 import org.saidone.service.VaultService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +38,13 @@ import utils.ResourceFileUtils;
 
 import java.io.File;
 import java.nio.file.Files;
-import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.IntStream;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Slf4j
@@ -75,9 +77,32 @@ class AlfrescoNodeVaultApplicationTests {
         val node = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
         nodesApi.updateNodeContent(node.getId(), Files.readAllBytes(file.toPath()), null, null, null, null, null);
         // save node on the vault
-        vaultService.archiveNode(node.getId());
+        assertDoesNotThrow(() -> vaultService.archiveNode(node.getId()));
         // check if node is on the vault
-        vaultService.getNode(node.getId());
+        assertDoesNotThrow(() -> vaultService.getNode(node.getId()));
+    }
+
+    @Test
+    void nonExistentNodeTest() {
+        assertThrows(NodeNotOnVaultException.class, () -> vaultService.getNode(UUID.randomUUID().toString()));
+        assertThrows(NodeNotOnVaultException.class, () -> vaultService.archiveNode(UUID.randomUUID().toString()));
+    }
+
+    @Test
+    @SneakyThrows
+    void restoreNodeTest() {
+        val file = ResourceFileUtils.getFileFromResource("sample.pdf");
+        val nodeBodyCreate = new NodeBodyCreate();
+        nodeBodyCreate.setName(String.format("%s.pdf", faker.animal().name()));
+        nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
+        val node = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
+        nodesApi.updateNodeContent(node.getId(), Files.readAllBytes(file.toPath()), null, null, null, null, null);
+        // save node on the vault
+        assertDoesNotThrow(() -> vaultService.archiveNode(node.getId()));
+        // restore node
+        val newNodeId = assertDoesNotThrow(() -> vaultService.restoreNode(node.getId(), false));
+        // check if node exists on Alfresco
+        assertDoesNotThrow(() -> alfrescoService.getNode(newNodeId));
     }
 
     @Test
@@ -93,9 +118,9 @@ class AlfrescoNodeVaultApplicationTests {
                 val node = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
                 nodesApi.updateNodeContent(node.getId(), Files.readAllBytes(file.toPath()), null, null, null, null, null);
                 // save node on the vault
-                vaultService.archiveNode(node.getId());
+                assertDoesNotThrow(() -> vaultService.archiveNode(node.getId()));
                 // check if node is on the vault
-                vaultService.getNode(node.getId());
+                assertDoesNotThrow(() -> vaultService.getNode(node.getId()));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

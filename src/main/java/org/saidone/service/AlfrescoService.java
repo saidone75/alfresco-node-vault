@@ -21,9 +21,7 @@ package org.saidone.service;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
-import io.netty.handler.codec.http.HttpHeaderNames;
 import jakarta.annotation.PostConstruct;
-import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -41,23 +39,32 @@ import org.alfresco.search.model.SearchRequest;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.AlfrescoServiceConfig;
 import org.saidone.exception.ApiExceptionError;
+import org.saidone.exception.VaultException;
 import org.saidone.model.NodeContent;
 import org.saidone.model.SystemSearchRequest;
 import org.saidone.model.alfresco.AnvContentModel;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.BodyInserters;
+import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.net.HttpURLConnection;
-import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.StandardOpenOption;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 @Service
@@ -79,11 +86,8 @@ public class AlfrescoService extends BaseComponent {
     private String password;
 
     private static String basicAuth;
+    private static WebClient webClient;
     public static Node guestHome;
-    private static int parallelism;
-
-    @Value("${application.service.alfresco.max-chunk-size-kib}")
-    private int maxChunkSizeKib;
 
     @PostConstruct
     @Override
@@ -91,7 +95,9 @@ public class AlfrescoService extends BaseComponent {
         super.init();
         basicAuth = String.format("Basic %s", Base64.getEncoder().encodeToString((String.format("%s:%s", userName, password)).getBytes(StandardCharsets.UTF_8)));
         guestHome = getGuestHome();
-        parallelism = ForkJoinPool.commonPool().getParallelism();
+        webClient = WebClient.builder()
+                .baseUrl(String.format("%s%s", contentServiceUrl, contentServicePath))
+                .build();
     }
 
     private Node getGuestHome() {
@@ -113,28 +119,26 @@ public class AlfrescoService extends BaseComponent {
         return Objects.requireNonNull(nodesApi.getNode(nodeId, config.getInclude(), null, null).getBody()).getEntry();
     }
 
-    @SneakyThrows
     public File getNodeContent(String nodeId) {
-        val availableMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory() + Runtime.getRuntime().freeMemory();
-        log.trace("Available memory: {} bytes", availableMemory);
-        val dynamicBufferSize = (int) Math.min((long) maxChunkSizeKib * 1024, availableMemory / (2L * parallelism));
-        log.trace("Dynamic buffer size: {}", dynamicBufferSize);
-
-        // workaround for getting a true stream instead of nodesApi.getNodeContent()
-        val url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
-        val conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestProperty(HttpHeaderNames.AUTHORIZATION.toString(), basicAuth);
-
-        @Cleanup val in = conn.getInputStream();
-        val tempFile = File.createTempFile("alfresco-content-", ".tmp");
-        @Cleanup val out = new FileOutputStream(tempFile);
-
-        val buffer = new byte[dynamicBufferSize];
-        int len;
-        while ((len = in.read(buffer)) != -1) {
-            out.write(buffer, 0, len);
+        try {
+            val tempFilePath = Files.createTempFile("alfresco-content-", ".tmp");
+            log.trace("Created temp file: {}", tempFilePath);
+            // workaround for nodesApi.getNodeContent()
+            val fileMono = webClient.get()
+                    .uri(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId))
+                    .header(HttpHeaders.AUTHORIZATION, basicAuth)
+                    .retrieve()
+                    .bodyToFlux(DataBuffer.class)
+                    .publishOn(Schedulers.boundedElastic())
+                    .transform(flux -> DataBufferUtils.write(flux, tempFilePath, StandardOpenOption.WRITE))
+                    .doOnComplete(() -> log.trace("Content written on file: {}", tempFilePath))
+                    .doOnError(e -> log.error("Error downloading node {}: {}", nodeId, e.getMessage()))
+                    .then(Mono.just(tempFilePath.toFile()));
+            return fileMono.block();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            throw new VaultException(e.getMessage());
         }
-        return tempFile;
     }
 
     public void addAspects(String nodeId, List<String> additionalAspectNames) {
@@ -180,8 +184,34 @@ public class AlfrescoService extends BaseComponent {
 
     @SneakyThrows
     public void restoreNodeContent(String nodeId, NodeContent nodeContent) {
-        log.warn("This method will try to load the entire node content in memory");
-        nodesApi.updateNodeContent(nodeId, nodeContent.getContentStream().readAllBytes(), null, null, null, null, null);
+        val bytesSent = new AtomicLong(0);
+        val lastLoggedPercentage = new AtomicInteger(0);
+        // workaround for nodesApi.updateNodeContent()
+        webClient.put()
+                .uri(uriBuilder -> uriBuilder
+                        .path("/nodes/{nodeId}/content")
+                        .build(nodeId))
+                .header(HttpHeaders.AUTHORIZATION, basicAuth)
+                .contentType(MediaType.valueOf(nodeContent.getContentType()))
+                .body(BodyInserters.fromDataBuffers(
+                        DataBufferUtils.readInputStream(nodeContent::getContentStream, DefaultDataBufferFactory.sharedInstance, 8192)
+                                .doOnNext(buffer -> {
+                                    val sent = bytesSent.addAndGet(buffer.readableByteCount());
+                                    if (nodeContent.getLength() > 0) {
+                                        val percentage = (int) ((double) sent / nodeContent.getLength() * 100);
+                                        if (sent == nodeContent.getLength() || percentage >= lastLoggedPercentage.get() + 10) {
+                                            lastLoggedPercentage.set((percentage / 10) * 10);
+                                            log.trace("Upload progress for node {}: {} bytes sent ({}% out of {} bytes)",
+                                                    nodeId, sent, percentage, nodeContent.getLength());
+                                        }
+                                    }
+                                })
+                ))
+                .retrieve()
+                .bodyToMono(String.class)
+                .doOnSuccess(log::debug)
+                .doOnError(error -> log.error(error.getMessage()))
+                .subscribe();
     }
 
     @SneakyThrows

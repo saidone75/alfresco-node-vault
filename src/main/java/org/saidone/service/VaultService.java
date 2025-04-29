@@ -121,12 +121,13 @@ public class VaultService extends BaseComponent {
         return nodeContent;
     }
 
-    public void restoreNode(String nodeId, boolean restorePermissions) {
+    public String restoreNode(String nodeId, boolean restorePermissions) {
         val nodeWrapper = getNodeWrapper(nodeId);
         val newNodeId = alfrescoService.restoreNode(nodeWrapper.getNode(), restorePermissions);
         alfrescoService.restoreNodeContent(newNodeId, getNodeContent(nodeId));
         nodeWrapper.setRestored(true);
         mongoNodeRepository.save(nodeWrapper);
+        return newNodeId;
     }
 
     public static String computeHash(File file, String hash) throws IOException, NoSuchAlgorithmException {
