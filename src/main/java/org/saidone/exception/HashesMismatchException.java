@@ -18,8 +18,12 @@
 
 package org.saidone.exception;
 
-public class ArchiveNodeException extends RuntimeException {
-    public ArchiveNodeException(String message) {
-        super(message);
+public class HashesMismatchException extends VaultException {
+    public HashesMismatchException(String alfrescoHash, String mongoHash) {
+        super("""
+                Hashes does not match:
+                Alfresco hash is %s
+                MongoDB  hash is %s
+                """.formatted(alfrescoHash, mongoHash));
     }
 }

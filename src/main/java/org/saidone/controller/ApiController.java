@@ -28,7 +28,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.saidone.exception.NodeNotFoundOnVaultException;
+import org.saidone.exception.NodeNotOnVaultException;
 import org.saidone.model.Entry;
 import org.saidone.service.VaultService;
 import org.springframework.core.io.InputStreamResource;
@@ -56,9 +56,9 @@ public class ApiController {
                 .body("Error during streaming: " + e.getMessage());
     }
 
-    @ExceptionHandler(NodeNotFoundOnVaultException.class)
+    @ExceptionHandler(NodeNotOnVaultException.class)
     @Operation(hidden = true)
-    public ResponseEntity<String> handleNodeNotFoundOnVaultException(NodeNotFoundOnVaultException e) {
+    public ResponseEntity<String> handleNodeNotFoundOnVaultException(NodeNotOnVaultException e) {
         log.error(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)

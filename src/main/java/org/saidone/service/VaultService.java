@@ -24,8 +24,9 @@ import lombok.val;
 import org.alfresco.core.model.Node;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
-import org.saidone.exception.ArchiveNodeException;
-import org.saidone.exception.NodeNotFoundOnVaultException;
+import org.saidone.exception.HashesMismatchException;
+import org.saidone.exception.NodeNotOnVaultException;
+import org.saidone.exception.VaultException;
 import org.saidone.model.MetadataKeys;
 import org.saidone.model.NodeContent;
 import org.saidone.model.NodeWrapper;
@@ -71,7 +72,7 @@ public class VaultService extends BaseComponent {
                 }};
                 if (Strings.isNotBlank(checksumAlgorithm)) {
                     metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
-                    metadata.put(MetadataKeys.CHECKSUM_VALUE, computeDigest(file, checksumAlgorithm));
+                    metadata.put(MetadataKeys.CHECKSUM_VALUE, computeHash(file, checksumAlgorithm));
                 }
                 gridFsRepository.saveFile(is, node.getName(), node.getContent().getMimeType(), metadata);
             }
@@ -84,7 +85,7 @@ public class VaultService extends BaseComponent {
             log.debug("Rollback required for node: {}", nodeId);
             mongoNodeRepository.deleteById(nodeId);
             gridFsRepository.deleteFileById(nodeId);
-            throw new ArchiveNodeException(String.format("Error archiving node %s: %s", nodeId, e.getMessage()));
+            throw new VaultException(String.format("Error archiving node %s: %s", nodeId, e.getMessage()));
         }
     }
 
@@ -94,7 +95,7 @@ public class VaultService extends BaseComponent {
             val nodeWrapper = nodeOptional.get();
             return nodeWrapper;
         } else {
-            throw new NodeNotFoundOnVaultException(nodeId);
+            throw new NodeNotOnVaultException(nodeId);
         }
     }
 
@@ -105,7 +106,7 @@ public class VaultService extends BaseComponent {
     public NodeContent getNodeContent(String nodeId) {
         val gridFSFile = gridFsRepository.findFileById(nodeId);
         if (gridFSFile == null) {
-            throw new NodeNotFoundOnVaultException(nodeId);
+            throw new NodeNotOnVaultException(nodeId);
         }
         val nodeContent = new NodeContent();
         nodeContent.setFileName(gridFSFile.getFilename());
@@ -125,7 +126,7 @@ public class VaultService extends BaseComponent {
         mongoNodeRepository.save(nodeWrapper);
     }
 
-    public static String computeDigest(File file, String hash) throws IOException, NoSuchAlgorithmException {
+    public static String computeHash(File file, String hash) throws IOException, NoSuchAlgorithmException {
         val digest = MessageDigest.getInstance(hash);
         try (val fis = new FileInputStream(file)) {
             byte[] byteArray = new byte[8192];
@@ -138,29 +139,27 @@ public class VaultService extends BaseComponent {
     }
 
     public void doubleCheck(String nodeId) {
-        log.debug("Comparing {} digest for node: {}", doubleCheck, nodeId);
+        log.debug("Comparing {} hashes for node: {}", DOUBLE_CHECK_ALGORITHM, nodeId);
         File file = null;
-        String alfrescoDigest;
-        String mongoDigest;
+        String alfrescoHash;
+        String mongoHash;
         try {
             file = alfrescoService.getNodeContent(nodeId);
-            alfrescoDigest = computeDigest(file, DOUBLE_CHECK_ALGORITHM);
-            log.trace("Alfresco digest for node {}: {}", nodeId, alfrescoDigest);
-            mongoDigest = gridFsRepository.computeDigest(nodeId, DOUBLE_CHECK_ALGORITHM);
-            log.trace("MongoDB digest for node {}: {}", nodeId, mongoDigest);
+            alfrescoHash = computeHash(file, DOUBLE_CHECK_ALGORITHM);
+            mongoHash = gridFsRepository.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
         } catch (IOException | NoSuchAlgorithmException e) {
-            throw new ArchiveNodeException("Cannot compute hashes");
+            throw new VaultException(String.format("Cannot compute hashes: %s", e.getMessage()));
         } finally {
             try {
                 if (file != null) Files.deleteIfExists(file.toPath());
             } catch (IOException e) {
-                log.error(e.getMessage());
+                log.warn(e.getMessage());
             }
         }
-        if (alfrescoDigest.equals(mongoDigest)) {
+        if (alfrescoHash.equals(mongoHash)) {
             log.debug("Digest check passed for node: {}", nodeId);
         } else {
-            throw new ArchiveNodeException("Hashes mismatch");
+            throw new HashesMismatchException(alfrescoHash, mongoHash);
         }
     }
 
