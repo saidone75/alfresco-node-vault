@@ -19,6 +19,7 @@
 package org.saidone;
 
 import com.mongodb.client.MongoClient;
+import feign.FeignException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -47,9 +48,11 @@ import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.regex.Pattern;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
@@ -84,6 +87,8 @@ class VaultApiControllerTests {
 
     private static String basicAuth;
     private static String parentId;
+    @Autowired
+    private AlfrescoService alfrescoService;
 
     @BeforeEach
     public void before(TestInfo testInfo) {
@@ -93,7 +98,7 @@ class VaultApiControllerTests {
             nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_FOLDER);
             parentId = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry().getId();
         }
-        basicAuth = String.format("Basic %s", Base64.getEncoder().encodeToString((String.format("%s:%s", userName, password)).getBytes(StandardCharsets.UTF_8)));
+        if (basicAuth == null) basicAuth = String.format("Basic %s", Base64.getEncoder().encodeToString((String.format("%s:%s", userName, password)).getBytes(StandardCharsets.UTF_8)));
         log.info("Running --> {}", testInfo.getDisplayName());
     }
 
@@ -108,9 +113,9 @@ class VaultApiControllerTests {
         return node;
     }
 
-    private <T> void performRequestAndAssert(HttpMethod method, String uri, Object[] uriVariables,
-                                             String requestBody, int expectedStatus, Class<T> responseType,
-                                             Consumer<T> bodyValidator) {
+    private <T> void performRequestAndProcess(HttpMethod method, String uri, Object[] uriVariables,
+                                              String requestBody, int expectedStatus, Class<T> responseType,
+                                              Consumer<T> bodyProcessor) {
         WebTestClient.RequestHeadersSpec<?> requestSpec;
         if (HttpMethod.GET.equals(method)) {
             requestSpec = webTestClient.get()
@@ -126,7 +131,7 @@ class VaultApiControllerTests {
                 .exchange()
                 .expectStatus().isEqualTo(expectedStatus)
                 .expectBody(responseType)
-                .value(bodyValidator);
+                .value(bodyProcessor);
     }
 
     @Test
@@ -134,10 +139,10 @@ class VaultApiControllerTests {
     @SneakyThrows
     void getNodeTest() {
         val nodeId = createNode().getId();
-        performRequestAndAssert(HttpMethod.GET, "/api/vault/nodes/{nodeId}", new Object[]{nodeId},
+        performRequestAndProcess(HttpMethod.GET, "/api/vault/nodes/{nodeId}", new Object[]{nodeId},
                 null, 404, String.class, body -> assertTrue(body.contains(nodeId)));
         vaultService.archiveNode(nodeId);
-        performRequestAndAssert(HttpMethod.GET, "/api/vault/nodes/{nodeId}", new Object[]{nodeId},
+        performRequestAndProcess(HttpMethod.GET, "/api/vault/nodes/{nodeId}", new Object[]{nodeId},
                 null, 200, String.class, body -> assertTrue(body.contains(nodeId)));
     }
 
@@ -146,10 +151,10 @@ class VaultApiControllerTests {
     @SneakyThrows
     void getNodeContentTest() {
         val nodeId = createNode().getId();
-        performRequestAndAssert(HttpMethod.GET, "/api/vault/nodes/{nodeId}/content", new Object[]{nodeId},
+        performRequestAndProcess(HttpMethod.GET, "/api/vault/nodes/{nodeId}/content", new Object[]{nodeId},
                 null, 404, String.class, body -> assertTrue(body.contains(nodeId)));
         vaultService.archiveNode(nodeId);
-        performRequestAndAssert(HttpMethod.GET, "/api/vault/nodes/{nodeId}/content", new Object[]{nodeId},
+        performRequestAndProcess(HttpMethod.GET, "/api/vault/nodes/{nodeId}/content", new Object[]{nodeId},
                 null, 200, byte[].class, body -> assertTrue(body.length > 0));
     }
 
@@ -158,12 +163,31 @@ class VaultApiControllerTests {
     @SneakyThrows
     void restoreNodeTest() {
         val nodeId = createNode().getId();
-        performRequestAndAssert(HttpMethod.POST, "/api/vault/nodes/{nodeId}/restore", new Object[]{nodeId},
+        performRequestAndProcess(HttpMethod.POST, "/api/vault/nodes/{nodeId}/restore", new Object[]{nodeId},
                 Strings.EMPTY, 404, String.class, body -> assertTrue(body.contains(nodeId)));
         vaultService.archiveNode(nodeId);
-        performRequestAndAssert(HttpMethod.POST, "/api/vault/nodes/{nodeId}/restore", new Object[]{nodeId},
+        val result = new AtomicReference<String>();
+        val consumer = (Consumer<String>) body -> {
+            var pattern = Pattern.compile("^.*([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}).*([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})$");
+            var matcher = pattern.matcher(body);
+            assertTrue(matcher.matches());
+            result.set(matcher.group(2));
+        };
+        performRequestAndProcess(HttpMethod.POST, "/api/vault/nodes/{nodeId}/restore", new Object[]{nodeId},
+                Strings.EMPTY, 200, String.class, consumer);
+        assertDoesNotThrow(() -> alfrescoService.getNode(result.get()));
+    }
+
+    @Test
+    @Order(40)
+    @SneakyThrows
+    void archiveNodeTest() {
+        val nodeId = createNode().getId();
+        performRequestAndProcess(HttpMethod.POST, "/api/vault/nodes/{nodeId}/archive", new Object[]{nodeId},
                 Strings.EMPTY, 200, String.class, body -> assertTrue(body.contains(nodeId)));
-        // TODO check if restored node exists on Alfresco
+        performRequestAndProcess(HttpMethod.POST, "/api/vault/nodes/{nodeId}/archive", new Object[]{nodeId},
+                Strings.EMPTY, 404, String.class, body -> assertTrue(body.contains(nodeId)));
+        assertThrows(FeignException.NotFound.class, () -> alfrescoService.getNode(nodeId));
     }
 
     @Test
