@@ -25,6 +25,7 @@ import lombok.val;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.Node;
 import org.alfresco.core.model.NodeBodyCreate;
+import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.*;
 import org.saidone.behaviour.EventHandler;
 import org.saidone.job.NodeArchivingJob;
@@ -35,6 +36,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -45,6 +47,7 @@ import java.nio.file.Files;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -105,32 +108,62 @@ class VaultApiControllerTests {
         return node;
     }
 
+    private <T> void performRequestAndAssert(HttpMethod method, String uri, Object[] uriVariables,
+                                             String requestBody, int expectedStatus, Class<T> responseType,
+                                             Consumer<T> bodyValidator) {
+        WebTestClient.RequestHeadersSpec<?> requestSpec;
+        if (HttpMethod.GET.equals(method)) {
+            requestSpec = webTestClient.get()
+                    .uri(uri, uriVariables);
+        } else if (HttpMethod.POST.equals(method)) {
+            requestSpec = webTestClient.post()
+                    .uri(uri, uriVariables)
+                    .bodyValue(requestBody);
+        } else {
+            throw new IllegalArgumentException("Unsupported HTTP method: " + method);
+        }
+        requestSpec.header(HttpHeaders.AUTHORIZATION, basicAuth)
+                .exchange()
+                .expectStatus().isEqualTo(expectedStatus)
+                .expectBody(responseType)
+                .value(bodyValidator);
+    }
+
     @Test
     @Order(10)
     @SneakyThrows
     void getNodeTest() {
         val nodeId = createNode().getId();
-        webTestClient.get()
-                .uri("/api/vault/nodes/{nodeId}", nodeId)
-                .header(HttpHeaders.AUTHORIZATION, basicAuth)
-                .exchange()
-                .expectStatus().isNotFound()
-                .expectBody(String.class)
-                .value(body -> assertTrue(body.contains(nodeId)));
+        performRequestAndAssert(HttpMethod.GET, "/api/vault/nodes/{nodeId}", new Object[]{nodeId},
+                null, 404, String.class, body -> assertTrue(body.contains(nodeId)));
         vaultService.archiveNode(nodeId);
-        webTestClient.get()
-                .uri("/api/vault/nodes/{nodeId}", nodeId)
-                .header(HttpHeaders.AUTHORIZATION, basicAuth)
-                .exchange()
-                .expectStatus().is2xxSuccessful()
-                .expectBody(String.class)
-                .value(body -> assertTrue(body.contains(nodeId)));
+        performRequestAndAssert(HttpMethod.GET, "/api/vault/nodes/{nodeId}", new Object[]{nodeId},
+                null, 200, String.class, body -> assertTrue(body.contains(nodeId)));
     }
 
     @Test
     @Order(10)
     @SneakyThrows
     void getNodeContentTest() {
+        val nodeId = createNode().getId();
+        performRequestAndAssert(HttpMethod.GET, "/api/vault/nodes/{nodeId}/content", new Object[]{nodeId},
+                null, 404, String.class, body -> assertTrue(body.contains(nodeId)));
+        vaultService.archiveNode(nodeId);
+        performRequestAndAssert(HttpMethod.GET, "/api/vault/nodes/{nodeId}/content", new Object[]{nodeId},
+                null, 200, byte[].class, body -> assertTrue(body.length > 0));
+    }
+
+    @Test
+    @Order(30)
+    @SneakyThrows
+    void restoreNodeTest() {
+        val nodeId = createNode().getId();
+        performRequestAndAssert(HttpMethod.POST, "/api/vault/nodes/{nodeId}/restore", new Object[]{nodeId},
+                Strings.EMPTY, 404, String.class, body -> assertTrue(body.contains(nodeId)));
+        vaultService.archiveNode(nodeId);
+        performRequestAndAssert(HttpMethod.POST, "/api/vault/nodes/{nodeId}/restore", new Object[]{nodeId},
+                Strings.EMPTY, 200, String.class, body -> assertTrue(body.contains(nodeId)));
+        // TODO check if restored node exists on Alfresco
     }
 
     @Test
