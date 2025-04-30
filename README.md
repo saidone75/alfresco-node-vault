@@ -58,14 +58,15 @@ This approach bridges the gap between complete document purging (often unaccepta
 and the indefinite retention of all documents in the active repository (unsustainable from a performance perspective).
 
 ## Key Features
-
-- Clean and elegant code architecture
+- Lean, elegant code architecture
+- Fully FOSS, released under an open license
 - 100% test coverage
 - Minimal memory footprint
-- On-demand or scheduled archiving
-- MongoDB storage with GridFS
-- REST API with proxy capabilities
 - Custom upload and download methods
+- On-demand or scheduled archiving
+- MongoDB storage via GridFS
+- REST API with proxy support
+- Engineered for flexibility and bespoke integrations
 
 Pull requests are welcome!
 
