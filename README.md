@@ -67,6 +67,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - MongoDB storage via GridFS
 - REST API with proxy support
 - Engineered for flexibility and bespoke integrations
+- No installation or changes required on Alfresco
 
 Pull requests are welcome!
 
