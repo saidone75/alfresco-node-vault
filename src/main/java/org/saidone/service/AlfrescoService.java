@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.FeignException;
 import jakarta.annotation.PostConstruct;
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -44,7 +45,6 @@ import org.saidone.model.NodeContent;
 import org.saidone.model.SystemSearchRequest;
 import org.saidone.model.alfresco.AnvContentModel;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.HttpHeaders;
@@ -52,17 +52,17 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.net.HttpURLConnection;
+import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.StandardOpenOption;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
@@ -95,7 +95,13 @@ public class AlfrescoService extends BaseComponent {
 
     private static String basicAuth;
     private static WebClient webClient;
+
     public static Node guestHome;
+
+    private static int parallelism;
+
+    @Value("${application.service.alfresco.max-chunk-size-kib}")
+    private int maxChunkSizeKib;
 
     /**
      * Initializes the service, sets up basic authentication header,
@@ -110,6 +116,7 @@ public class AlfrescoService extends BaseComponent {
         webClient = WebClient.builder()
                 .baseUrl(String.format("%s%s", contentServiceUrl, contentServicePath))
                 .build();
+        parallelism = ForkJoinPool.commonPool().getParallelism();
     }
 
     /**
@@ -150,30 +157,32 @@ public class AlfrescoService extends BaseComponent {
      * @return a {@link File} pointing to the temporary file containing the node content
      * @throws VaultException if an error occurs during download or file creation
      */
+    @SneakyThrows
     public File getNodeContent(String nodeId) {
-        try {
-            val tempFilePath = Files.createTempFile("alfresco-content-", ".tmp");
-            log.trace("Created temp file: {}", tempFilePath);
-            // workaround for nodesApi.getNodeContent()
-            val fileMono = webClient.get()
-                    .uri(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId))
-                    .header(HttpHeaders.AUTHORIZATION, basicAuth)
-                    .retrieve()
-                    .bodyToFlux(DataBuffer.class)
-                    .publishOn(Schedulers.boundedElastic())
-                    .transform(flux -> DataBufferUtils.write(flux, tempFilePath, StandardOpenOption.WRITE))
-                    .doOnComplete(() -> log.trace("Content written on file: {}", tempFilePath))
-                    .doOnError(e -> log.error("Error downloading node {}: {}", nodeId, e.getMessage()))
-                    .then(Mono.just(tempFilePath.toFile()));
-            return fileMono.block();
-        } catch (Exception e) {
-            log.error(e.getMessage());
-            throw new VaultException(e.getMessage());
+        val availableMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory() + Runtime.getRuntime().freeMemory();
+        log.trace("Available memory: {} bytes", availableMemory);
+        val dynamicBufferSize = (int) Math.min((long) maxChunkSizeKib * 1024, availableMemory / (2L * parallelism));
+        log.trace("Dynamic buffer size: {}", dynamicBufferSize);
+
+        // workaround for getting a true stream instead of nodesApi.getNodeContent()
+        val url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
+        val conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestProperty(HttpHeaders.AUTHORIZATION, basicAuth);
+
+        @Cleanup val in = conn.getInputStream();
+        val tempFile = File.createTempFile("alfresco-content-", ".tmp");
+        @Cleanup val out = new FileOutputStream(tempFile);
+
+        val buffer = new byte[dynamicBufferSize];
+        int len;
+        while ((len = in.read(buffer)) != -1) {
+            out.write(buffer, 0, len);
         }
+        return tempFile;
     }
 
     /**
-     * Adds additional aspects to a node.
+     * Adds aspects to a node.
      *
      * @param nodeId                the identifier of the node to update
      * @param additionalAspectNames list of aspect names to add
