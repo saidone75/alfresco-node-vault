@@ -44,7 +44,7 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Vault API", description = "Vault operations")
-public class ApiController {
+public class VaultApiController {
 
     private final VaultService vaultService;
 
