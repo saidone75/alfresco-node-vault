@@ -183,7 +183,7 @@ public class VaultService extends BaseComponent {
     }
 
     /**
-     * Computes the hash checksum of a file using the specified algorithm.
+     * Computes the hash of a file using the specified algorithm.
      *
      * @param file the file to compute the hash for
      * @param hash the name of the hash algorithm (e.g., "MD5", "SHA-256")
@@ -204,7 +204,7 @@ public class VaultService extends BaseComponent {
     }
 
     /**
-     * Performs a double-check by comparing the MD5 hash of the node content
+     * Performs double-check by comparing the MD5 hash of the node content
      * retrieved from Alfresco and the one computed on MongoDB.
      * <p>
      * Throws a {@link HashesMismatchException} if the hashes do not match.
