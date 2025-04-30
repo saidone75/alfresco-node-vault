@@ -67,13 +67,14 @@ class AlfrescoServiceTests {
     private static String parentId;
 
     @BeforeEach
-    public void before() {
+    public void before(TestInfo testInfo) {
         if (parentId == null) {
             val nodeBodyCreate = new NodeBodyCreate();
             nodeBodyCreate.setName(UUID.randomUUID().toString());
             nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_FOLDER);
             parentId = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry().getId();
         }
+        log.info("Running --> {}", testInfo.getDisplayName());
     }
 
     @Test
