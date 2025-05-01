@@ -1,6 +1,5 @@
 package org.saidone;
 
-import com.mongodb.client.MongoClient;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -16,7 +15,6 @@ import org.saidone.job.NodeArchivingJob;
 import org.saidone.model.alfresco.AlfrescoContentModel;
 import org.saidone.service.AlfrescoService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -40,15 +38,6 @@ public abstract class BaseTest {
 
     @Autowired
     protected NodesApi nodesApi;
-
-    @Autowired
-    protected MongoClient mongoClient;
-
-    @Autowired
-    private TestCleanupService testCleanupService;
-
-    @Value("${spring.data.mongodb.database}")
-    private String database;
 
     protected static String parentId;
     protected static final Faker faker = new Faker();
