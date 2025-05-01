@@ -45,6 +45,9 @@ public abstract class BaseTest {
     @Autowired
     protected MongoClient mongoClient;
 
+    @Autowired
+    private TestCleanupService testCleanupService;
+
     @Value("${spring.data.mongodb.database}")
     private String database;
 
@@ -59,14 +62,9 @@ public abstract class BaseTest {
             nodeBodyCreate.setName(String.format("%s_test", faker.animal().name()));
             nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_FOLDER);
             parentId = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry().getId();
+            TestCleanupService.setParentId(parentId);
         }
         log.info("Running --> {}", testInfo.getDisplayName());
-    }
-
-    @AfterAll
-    public void cleanUp() {
-        nodesApi.deleteNode(parentId, true);
-        mongoClient.getDatabase(database).drop();
     }
 
     private synchronized String generateName() {
