@@ -1,6 +1,6 @@
 # Alfresco Node Vault
 
-<img width="50%" src="images/vault.svg">
+<img width="42%" src="images/vault.svg">
 
 _"Who controls the past controls the future: who controls the present controls the past."_
 
