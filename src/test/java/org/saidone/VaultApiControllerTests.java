@@ -18,19 +18,12 @@
 
 package org.saidone;
 
-import com.mongodb.client.MongoClient;
 import feign.FeignException;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.alfresco.core.handler.NodesApi;
-import org.alfresco.core.model.Node;
-import org.alfresco.core.model.NodeBodyCreate;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.*;
-import org.saidone.behaviour.EventHandler;
-import org.saidone.job.NodeArchivingJob;
-import org.saidone.model.alfresco.AlfrescoContentModel;
 import org.saidone.service.AlfrescoService;
 import org.saidone.service.VaultService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,15 +32,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import utils.ResourceFileUtils;
 
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.util.Base64;
-import java.util.Objects;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.regex.Pattern;
@@ -57,67 +45,28 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
-class VaultApiControllerTests {
-
-    @MockitoBean
-    EventHandler eventHandler;
-    @MockitoBean
-    NodeArchivingJob nodeArchivingJob;
+class VaultApiControllerTests extends BaseTest {
 
     @Autowired
     VaultService vaultService;
-
-    @Autowired
-    NodesApi nodesApi;
-
-    @Autowired
-    private MongoClient mongoClient;
-
     @Autowired
     private WebTestClient webTestClient;
-
-    @Value("${spring.data.mongodb.database}")
-    private String database;
 
     @Value("${content.service.security.basicAuth.username}")
     private String userName;
     @Value("${content.service.security.basicAuth.password}")
     private String password;
-
     private static String basicAuth;
-    private static String parentId;
+
     @Autowired
     private AlfrescoService alfrescoService;
 
     @BeforeEach
     public void before(TestInfo testInfo) {
-        if (parentId == null) {
-            val nodeBodyCreate = new NodeBodyCreate();
-            nodeBodyCreate.setName(UUID.randomUUID().toString());
-            nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_FOLDER);
-            parentId = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry().getId();
-        }
+        super.before(testInfo);
         if (basicAuth == null) basicAuth = String.format("Basic %s", Base64.getEncoder().encodeToString((String.format("%s:%s", userName, password)).getBytes(StandardCharsets.UTF_8)));
         log.info("Running --> {}", testInfo.getDisplayName());
-    }
-
-    @AfterAll
-    public void cleanUp() {
-        nodesApi.deleteNode(parentId, true);
-        mongoClient.getDatabase(database).drop();
-    }
-
-    @SneakyThrows
-    private Node createNode() {
-        val file = ResourceFileUtils.getFileFromResource("sample.pdf");
-        val nodeBodyCreate = new NodeBodyCreate();
-        nodeBodyCreate.setName(String.format("%s.pdf", UUID.randomUUID()));
-        nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
-        val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
-        nodesApi.updateNodeContent(node.getId(), Files.readAllBytes(file.toPath()), null, null, null, null, null);
-        return node;
     }
 
     private <T> void performRequestAndProcess(HttpMethod method, String uri, Object[] uriVariables,
