@@ -48,13 +48,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -66,6 +66,7 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Service class for interacting with Alfresco repository nodes and content.
@@ -119,6 +120,14 @@ public class AlfrescoService extends BaseComponent {
         parallelism = ForkJoinPool.commonPool().getParallelism();
     }
 
+    private int getBufferSize() {
+        val availableMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory() + Runtime.getRuntime().freeMemory();
+        log.trace("Available memory: {} bytes", availableMemory);
+        val dynamicBufferSize = Math.min((long) maxChunkSizeKib * 1024, availableMemory / (2L * parallelism));
+        log.trace("Dynamic buffer size: {}", dynamicBufferSize);
+        return (int) dynamicBufferSize;
+    }
+
     /**
      * Retrieves the "Guest Home" node from Alfresco repository.
      *
@@ -159,24 +168,41 @@ public class AlfrescoService extends BaseComponent {
      */
     @SneakyThrows
     public File getNodeContent(String nodeId) {
-        val availableMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory() + Runtime.getRuntime().freeMemory();
-        log.trace("Available memory: {} bytes", availableMemory);
-        val dynamicBufferSize = (int) Math.min((long) maxChunkSizeKib * 1024, availableMemory / (2L * parallelism));
-        log.trace("Dynamic buffer size: {}", dynamicBufferSize);
+        val contentLength = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getContent().getSizeInBytes();
+        val dynamicBufferSize = getBufferSize();
+        var bytesReceived = 0L;
+        var lastLoggedPercentage = 0;
 
-        // workaround for getting a true stream instead of nodesApi.getNodeContent()
         val url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
         val conn = (HttpURLConnection) url.openConnection();
         conn.setRequestProperty(HttpHeaders.AUTHORIZATION, basicAuth);
 
-        @Cleanup val in = conn.getInputStream();
         val tempFile = File.createTempFile("alfresco-content-", ".tmp");
-        @Cleanup val out = new FileOutputStream(tempFile);
-
         val buffer = new byte[dynamicBufferSize];
         int len;
-        while ((len = in.read(buffer)) != -1) {
-            out.write(buffer, 0, len);
+
+        try (val is = conn.getInputStream();
+             val fos = new FileOutputStream(tempFile)) {
+            while ((len = is.read(buffer)) != -1) {
+                fos.write(buffer, 0, len);
+                bytesReceived += len;
+                if (contentLength > 0) {
+                    val percentage = (int) ((double) bytesReceived / contentLength * 100);
+                    if (bytesReceived == contentLength || percentage >= lastLoggedPercentage + 10) {
+                        lastLoggedPercentage = percentage;
+                        log.trace("Download progress for node {}: {} bytes sent ({}% out of {} bytes)",
+                                nodeId, bytesReceived, percentage, contentLength);
+                    }
+                }
+            }
+        }
+
+        val responseCode = conn.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            log.debug("Download completed successfully for node: {}", nodeId);
+        } else {
+            log.error("Failed to download content for node {} with HTTP status: {}", nodeId, responseCode);
+            throw new VaultException(String.format("Failed to download content for node %s with HTTP status: %d", nodeId, responseCode));
         }
         return tempFile;
     }
@@ -254,34 +280,44 @@ public class AlfrescoService extends BaseComponent {
      */
     @SneakyThrows
     public void restoreNodeContent(String nodeId, NodeContent nodeContent) {
-        val bytesSent = new AtomicLong(0);
-        val lastLoggedPercentage = new AtomicInteger(0);
-        // workaround for nodesApi.updateNodeContent()
-        webClient.put()
-                .uri(uriBuilder -> uriBuilder
-                        .path("/nodes/{nodeId}/content")
-                        .build(nodeId))
-                .header(HttpHeaders.AUTHORIZATION, basicAuth)
-                .contentType(MediaType.valueOf(nodeContent.getContentType()))
-                .body(BodyInserters.fromDataBuffers(
-                        DataBufferUtils.readInputStream(nodeContent::getContentStream, DefaultDataBufferFactory.sharedInstance, 8192)
-                                .doOnNext(buffer -> {
-                                    val sent = bytesSent.addAndGet(buffer.readableByteCount());
-                                    if (nodeContent.getLength() > 0) {
-                                        val percentage = (int) ((double) sent / nodeContent.getLength() * 100);
-                                        if (sent == nodeContent.getLength() || percentage >= lastLoggedPercentage.get() + 10) {
-                                            lastLoggedPercentage.set((percentage / 10) * 10);
-                                            log.trace("Upload progress for node {}: {} bytes sent ({}% out of {} bytes)",
-                                                    nodeId, sent, percentage, nodeContent.getLength());
-                                        }
-                                    }
-                                })
-                ))
-                .retrieve()
-                .bodyToMono(String.class)
-                .doOnSuccess(log::debug)
-                .doOnError(error -> log.error(error.getMessage()))
-                .subscribe();
+        val dynamicBufferSize = getBufferSize();
+        var bytesSent = 0L;
+        var lastLoggedPercentage = 0;
+
+        val url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
+        val conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod(HttpMethod.PUT.name());
+        conn.setDoOutput(true);
+        conn.setRequestProperty(HttpHeaders.AUTHORIZATION, basicAuth);
+        conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, nodeContent.getContentType());
+        conn.setChunkedStreamingMode(dynamicBufferSize);
+
+        val buffer = new byte[dynamicBufferSize];
+        int len;
+
+        try (val is = new BufferedInputStream(nodeContent.getContentStream(), dynamicBufferSize);
+             val os = new BufferedOutputStream(conn.getOutputStream(), dynamicBufferSize)) {
+            while ((len = is.read(buffer)) != -1) {
+                os.write(buffer, 0, len);
+                bytesSent += len;
+                if (nodeContent.getLength() > 0) {
+                    val percentage = (int) ((double) bytesSent / nodeContent.getLength() * 100);
+                    if (bytesSent == nodeContent.getLength() || percentage >= lastLoggedPercentage + 10) {
+                        lastLoggedPercentage = percentage;
+                        log.trace("Upload progress for node {}: {} bytes sent ({}% out of {} bytes)",
+                                nodeId, bytesSent, percentage, nodeContent.getLength());
+                    }
+                }
+            }
+        }
+
+        val responseCode = conn.getResponseCode();
+        if (responseCode == HttpURLConnection.HTTP_OK) {
+            log.debug("Upload completed successfully for node: {}", nodeId);
+        } else {
+            log.error("Failed to upload content for node {} with HTTP status: {}", nodeId, responseCode);
+            throw new VaultException(String.format("Failed to upload content for node %s with HTTP status: %d", nodeId, responseCode));
+        }
     }
 
     /**
