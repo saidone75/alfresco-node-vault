@@ -23,6 +23,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.handler.NodesApi;
+import org.alfresco.core.model.Node;
 import org.alfresco.core.model.NodeBodyCreate;
 import org.junit.jupiter.api.*;
 import org.saidone.behaviour.EventHandler;
@@ -36,6 +37,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import utils.ResourceFileUtils;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Objects;
@@ -67,24 +69,38 @@ class AlfrescoServiceTests {
     private static String parentId;
 
     @BeforeEach
-    public void before() {
+    public void before(TestInfo testInfo) {
         if (parentId == null) {
             val nodeBodyCreate = new NodeBodyCreate();
             nodeBodyCreate.setName(UUID.randomUUID().toString());
             nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_FOLDER);
             parentId = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry().getId();
         }
+        log.info("Running --> {}", testInfo.getDisplayName());
+    }
+
+    @SneakyThrows
+    public Node createNode(File file) {
+        val nodeBodyCreate = new NodeBodyCreate();
+        nodeBodyCreate.setName(String.format("%s.pdf", UUID.randomUUID()));
+        nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
+        val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
+        nodesApi.updateNodeContent(node.getId(), Files.readAllBytes(file.toPath()), null, null, null, null, null);
+        return node;
+    }
+
+    @SneakyThrows
+    public Node createNode() {
+        val file = ResourceFileUtils.getFileFromResource("sample.pdf");
+        return createNode(file);
     }
 
     @Test
     @Order(10)
     @SneakyThrows
     public void getNodeTest() {
-        val nodeBodyCreate = new NodeBodyCreate();
-        nodeBodyCreate.setName(String.format("%s.pdf", UUID.randomUUID()));
-        nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
-        val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
-        assertDoesNotThrow(() -> alfrescoService.getNode(node.getId()));
+        val nodeId = createNode().getId();
+        assertDoesNotThrow(() -> alfrescoService.getNode(nodeId));
     }
 
     @Test
@@ -92,12 +108,8 @@ class AlfrescoServiceTests {
     @SneakyThrows
     public void getNodeContentTest() {
         val file = ResourceFileUtils.getFileFromResource("sample.pdf");
-        val nodeBodyCreate = new NodeBodyCreate();
-        nodeBodyCreate.setName(String.format("%s.pdf", UUID.randomUUID()));
-        nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
-        val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
-        nodesApi.updateNodeContent(node.getId(), Files.readAllBytes(file.toPath()), null, null, null, null, null);
-        val contentFile = assertDoesNotThrow(() -> alfrescoService.getNodeContent(node.getId()));
+        val nodeId = createNode(file).getId();
+        val contentFile = assertDoesNotThrow(() -> alfrescoService.getNodeContent(nodeId));
         assertArrayEquals(Files.readAllBytes(file.toPath()), Files.readAllBytes(contentFile.toPath()));
         Files.deleteIfExists(contentFile.toPath());
     }
@@ -106,36 +118,27 @@ class AlfrescoServiceTests {
     @Order(30)
     @SneakyThrows
     public void deleteNodeTest() {
-        val nodeBodyCreate = new NodeBodyCreate();
-        nodeBodyCreate.setName(String.format("%s.pdf", UUID.randomUUID()));
-        nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
-        val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
-        assertDoesNotThrow(() -> alfrescoService.deleteNode(node.getId()));
-        assertThrows(FeignException.NotFound.class, () -> alfrescoService.getNode(node.getId()));
+        val nodeId = createNode().getId();
+        assertDoesNotThrow(() -> alfrescoService.deleteNode(nodeId));
+        assertThrows(FeignException.NotFound.class, () -> alfrescoService.getNode(nodeId));
     }
 
     @Test
     @Order(40)
     @SneakyThrows
     public void aspectsTest() {
-        val nodeBodyCreate = new NodeBodyCreate();
-        nodeBodyCreate.setName(String.format("%s.pdf", UUID.randomUUID()));
-        nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
-        val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
-        assertDoesNotThrow(() -> alfrescoService.addAspects(node.getId(), List.of(AlfrescoContentModel.ASP_EFFECTIVITY)));
-        assertTrue(alfrescoService.getNode(node.getId()).getAspectNames().contains(AlfrescoContentModel.ASP_EFFECTIVITY));
-        assertDoesNotThrow(() -> alfrescoService.removeAspects(node.getId(), List.of(AlfrescoContentModel.ASP_EFFECTIVITY)));
-        assertFalse(alfrescoService.getNode(node.getId()).getAspectNames().contains(AlfrescoContentModel.ASP_EFFECTIVITY));
+        val nodeId = createNode().getId();
+        assertDoesNotThrow(() -> alfrescoService.addAspects(nodeId, List.of(AlfrescoContentModel.ASP_EFFECTIVITY)));
+        assertTrue(alfrescoService.getNode(nodeId).getAspectNames().contains(AlfrescoContentModel.ASP_EFFECTIVITY));
+        assertDoesNotThrow(() -> alfrescoService.removeAspects(nodeId, List.of(AlfrescoContentModel.ASP_EFFECTIVITY)));
+        assertFalse(alfrescoService.getNode(nodeId).getAspectNames().contains(AlfrescoContentModel.ASP_EFFECTIVITY));
     }
 
     @Test
     @Order(50)
     @SneakyThrows
     public void searchAndProcessTest() {
-        val nodeBodyCreate = new NodeBodyCreate();
-        nodeBodyCreate.setName(String.format("%s.pdf", UUID.randomUUID()));
-        nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
-        val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
+        val node = createNode();
         val result = new AtomicReference<String>();
         val consumer = (Consumer<String>) result::set;
         assertDoesNotThrow(() -> alfrescoService.searchAndProcess(String.format("=%s:'%s'", AlfrescoContentModel.PROP_NAME, node.getName()), consumer));
@@ -146,7 +149,7 @@ class AlfrescoServiceTests {
     @Order(100)
     @SneakyThrows
     public void cleanUp() {
-       nodesApi.deleteNode(parentId, true);
+        nodesApi.deleteNode(parentId, true);
     }
 
 }

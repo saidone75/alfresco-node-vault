@@ -23,6 +23,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.handler.NodesApi;
+import org.alfresco.core.model.Node;
 import org.alfresco.core.model.NodeBodyCreate;
 import org.junit.jupiter.api.*;
 import org.saidone.behaviour.EventHandler;
@@ -76,29 +77,36 @@ class VaultServiceTests {
     private static String parentId;
 
     @BeforeEach
-    public void before() {
+    public void before(TestInfo testInfo) {
         if (parentId == null) {
             val nodeBodyCreate = new NodeBodyCreate();
             nodeBodyCreate.setName(UUID.randomUUID().toString());
             nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_FOLDER);
             parentId = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry().getId();
         }
+        log.info("Running --> {}", testInfo.getDisplayName());
     }
 
-    @Test
-    @Order(10)
     @SneakyThrows
-    void archiveNodeTest() {
+    public Node createNode() {
         val file = ResourceFileUtils.getFileFromResource("sample.pdf");
         val nodeBodyCreate = new NodeBodyCreate();
         nodeBodyCreate.setName(String.format("%s.pdf", UUID.randomUUID()));
         nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
         val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
         nodesApi.updateNodeContent(node.getId(), Files.readAllBytes(file.toPath()), null, null, null, null, null);
+        return node;
+    }
+
+    @Test
+    @Order(10)
+    @SneakyThrows
+    void archiveNodeTest() {
+        val nodeId = createNode().getId();
         // save node on the vault
-        assertDoesNotThrow(() -> vaultService.archiveNode(node.getId()));
+        assertDoesNotThrow(() -> vaultService.archiveNode(nodeId));
         // check if node is on the vault
-        assertDoesNotThrow(() -> vaultService.getNode(node.getId()));
+        assertDoesNotThrow(() -> vaultService.getNode(nodeId));
     }
 
     @Test
@@ -112,16 +120,11 @@ class VaultServiceTests {
     @Order(30)
     @SneakyThrows
     void restoreNodeTest() {
-        val file = ResourceFileUtils.getFileFromResource("sample.pdf");
-        val nodeBodyCreate = new NodeBodyCreate();
-        nodeBodyCreate.setName(String.format("%s.pdf", UUID.randomUUID()));
-        nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
-        val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
-        nodesApi.updateNodeContent(node.getId(), Files.readAllBytes(file.toPath()), null, null, null, null, null);
+        val nodeId = createNode().getId();
         // save node on the vault
-        assertDoesNotThrow(() -> vaultService.archiveNode(node.getId()));
+        assertDoesNotThrow(() -> vaultService.archiveNode(nodeId));
         // restore node
-        val newNodeId = assertDoesNotThrow(() -> vaultService.restoreNode(node.getId(), false));
+        val newNodeId = assertDoesNotThrow(() -> vaultService.restoreNode(nodeId, false));
         // check if node exists on Alfresco
         assertDoesNotThrow(() -> alfrescoService.getNode(newNodeId));
     }
@@ -133,16 +136,11 @@ class VaultServiceTests {
         IntStream.range(0, 64).parallel().forEach(i -> {
             var file = (File) null;
             try {
-                file = ResourceFileUtils.getFileFromResource("sample.pdf");
-                val nodeBodyCreate = new NodeBodyCreate();
-                nodeBodyCreate.setName(String.format("%s.pdf", UUID.randomUUID()));
-                nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
-                val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, null, null, null, null, null).getBody()).getEntry();
-                nodesApi.updateNodeContent(node.getId(), Files.readAllBytes(file.toPath()), null, null, null, null, null);
+                val nodeId = createNode().getId();
                 // save node on the vault
-                assertDoesNotThrow(() -> vaultService.archiveNode(node.getId()));
+                assertDoesNotThrow(() -> vaultService.archiveNode(nodeId));
                 // check if node is on the vault
-                assertDoesNotThrow(() -> vaultService.getNode(node.getId()));
+                assertDoesNotThrow(() -> vaultService.getNode(nodeId));
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

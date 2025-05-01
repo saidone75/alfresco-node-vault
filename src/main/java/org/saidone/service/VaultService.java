@@ -121,8 +121,7 @@ public class VaultService extends BaseComponent {
     private NodeWrapper getNodeWrapper(String nodeId) {
         val nodeOptional = mongoNodeRepository.findById(nodeId);
         if (nodeOptional.isPresent()) {
-            val nodeWrapper = nodeOptional.get();
-            return nodeWrapper;
+            return nodeOptional.get();
         } else {
             throw new NodeNotOnVaultException(nodeId);
         }
