@@ -40,6 +40,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.event.annotation.AfterTestClass;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import utils.ResourceFileUtils;
 
@@ -57,6 +58,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
 class VaultApiControllerTests {
 
@@ -100,6 +102,12 @@ class VaultApiControllerTests {
         }
         if (basicAuth == null) basicAuth = String.format("Basic %s", Base64.getEncoder().encodeToString((String.format("%s:%s", userName, password)).getBytes(StandardCharsets.UTF_8)));
         log.info("Running --> {}", testInfo.getDisplayName());
+    }
+
+    @AfterAll
+    public void cleanUp() {
+        nodesApi.deleteNode(parentId, true);
+        mongoClient.getDatabase(database).drop();
     }
 
     @SneakyThrows
@@ -188,14 +196,6 @@ class VaultApiControllerTests {
         performRequestAndProcess(HttpMethod.POST, "/api/vault/nodes/{nodeId}/archive", new Object[]{nodeId},
                 Strings.EMPTY, 404, String.class, body -> assertTrue(body.contains(nodeId)));
         assertThrows(FeignException.NotFound.class, () -> alfrescoService.getNode(nodeId));
-    }
-
-    @Test
-    @Order(100)
-    @SneakyThrows
-    public void cleanUp() {
-        nodesApi.deleteNode(parentId, true);
-        mongoClient.getDatabase(database).drop();
     }
 
 }

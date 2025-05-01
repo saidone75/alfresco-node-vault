@@ -35,6 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.event.annotation.AfterTestClass;
 import utils.ResourceFileUtils;
 
 import java.io.File;
@@ -50,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
 class AlfrescoServiceTests {
 
@@ -77,6 +79,11 @@ class AlfrescoServiceTests {
             parentId = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry().getId();
         }
         log.info("Running --> {}", testInfo.getDisplayName());
+    }
+
+    @AfterAll
+    public void after() {
+        nodesApi.deleteNode(parentId, true);
     }
 
     @SneakyThrows
@@ -143,13 +150,6 @@ class AlfrescoServiceTests {
         val consumer = (Consumer<String>) result::set;
         assertDoesNotThrow(() -> alfrescoService.searchAndProcess(String.format("=%s:'%s'", AlfrescoContentModel.PROP_NAME, node.getName()), consumer));
         assertEquals(node.getId(), result.get());
-    }
-
-    @Test
-    @Order(100)
-    @SneakyThrows
-    public void cleanUp() {
-        nodesApi.deleteNode(parentId, true);
     }
 
 }

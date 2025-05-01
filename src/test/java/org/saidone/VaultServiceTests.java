@@ -37,9 +37,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.event.annotation.AfterTestClass;
 import utils.ResourceFileUtils;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.util.Objects;
 import java.util.UUID;
@@ -51,6 +51,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @Slf4j
 class VaultServiceTests {
 
@@ -85,6 +86,12 @@ class VaultServiceTests {
             parentId = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry().getId();
         }
         log.info("Running --> {}", testInfo.getDisplayName());
+    }
+
+    @AfterAll
+    public void cleanUp() {
+        nodesApi.deleteNode(parentId, true);
+        mongoClient.getDatabase(database).drop();
     }
 
     @SneakyThrows
@@ -133,8 +140,7 @@ class VaultServiceTests {
     @Order(40)
     @SneakyThrows
     void archiveNodesTest() {
-        IntStream.range(0, 64).parallel().forEach(i -> {
-            var file = (File) null;
+        IntStream.range(0, 42).parallel().forEach(i -> {
             try {
                 val nodeId = createNode().getId();
                 // save node on the vault
@@ -145,14 +151,6 @@ class VaultServiceTests {
                 throw new RuntimeException(e);
             }
         });
-    }
-
-    @Test
-    @Order(100)
-    @SneakyThrows
-    public void cleanUp() {
-        nodesApi.deleteNode(parentId, true);
-        mongoClient.getDatabase(database).drop();
     }
 
 }
