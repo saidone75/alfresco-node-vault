@@ -40,7 +40,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.event.annotation.AfterTestClass;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import utils.ResourceFileUtils;
 
