@@ -1,6 +1,6 @@
 # Alfresco Node Vault
 
-<img width="50%" src="vault.svg">
+<img width="50%" src="images/vault.svg">
 
 _"Who controls the past controls the future: who controls the present controls the past."_
 
@@ -73,7 +73,7 @@ Pull requests are welcome!
 
 ## Architecture
 
-![Architecture](architecture.png)
+![Architecture](images/architecture.png)
 
 ## Application global config
 
