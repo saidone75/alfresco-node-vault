@@ -167,7 +167,6 @@ public class AlfrescoService extends BaseComponent {
     @SneakyThrows
     public File getNodeContent(String nodeId) {
         val contentLength = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getContent().getSizeInBytes();
-        val dynamicBufferSize = getBufferSize();
 
         var bytesReceived = 0L;
         var lastLoggedPercentage = 0;
@@ -177,7 +176,7 @@ public class AlfrescoService extends BaseComponent {
         conn.setRequestProperty(HttpHeaders.AUTHORIZATION, basicAuth);
 
         val tempFile = File.createTempFile("alfresco-content-", ".tmp");
-        val buffer = new byte[dynamicBufferSize];
+        val buffer = new byte[getBufferSize()];
         int len;
 
         try (val is = conn.getInputStream();
@@ -189,7 +188,7 @@ public class AlfrescoService extends BaseComponent {
                     val percentage = (int) ((double) bytesReceived / contentLength * 100);
                     if (bytesReceived == contentLength || percentage >= lastLoggedPercentage + 10) {
                         lastLoggedPercentage = percentage;
-                        log.trace("Download progress for node {}: {} bytes sent ({}% out of {} bytes)",
+                        log.trace("Download progress for node {}: {} bytes received ({}% out of {} bytes)",
                                 nodeId, bytesReceived, percentage, contentLength);
                     }
                 }
@@ -279,9 +278,10 @@ public class AlfrescoService extends BaseComponent {
      */
     @SneakyThrows
     public void restoreNodeContent(String nodeId, NodeContent nodeContent) {
-        val dynamicBufferSize = getBufferSize();
         var bytesSent = 0L;
         var lastLoggedPercentage = 0;
+
+        val dynamicBufferSize = getBufferSize();
 
         val url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
         val conn = (HttpURLConnection) url.openConnection();
@@ -294,8 +294,8 @@ public class AlfrescoService extends BaseComponent {
         val buffer = new byte[dynamicBufferSize];
         int len;
 
-        try (val is = new BufferedInputStream(nodeContent.getContentStream(), dynamicBufferSize);
-             val os = new BufferedOutputStream(conn.getOutputStream(), dynamicBufferSize)) {
+        try (val is = nodeContent.getContentStream();
+             val os = conn.getOutputStream()) {
             while ((len = is.read(buffer)) != -1) {
                 os.write(buffer, 0, len);
                 bytesSent += len;
