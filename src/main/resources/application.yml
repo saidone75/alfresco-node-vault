@@ -54,7 +54,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: "health,info,metrics"
+        include: "prometheus,health,info,metrics,env,loggers"
   endpoint:
     health:
       show-details: always
