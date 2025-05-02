@@ -91,6 +91,7 @@ application:
       permanently-delete-nodes: true
       search-batch-size: 100
       max-chunk-size-kib: 4096
+      min-chunk-size-kib: 4
     vault:
       hash-algorithm: ${VAULT_HASH_ALGORITHM:SHA-256}
       double-check: ${VAULT_DOUBLE_CHECK:true}
