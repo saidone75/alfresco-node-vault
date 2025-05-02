@@ -6,7 +6,7 @@ import io.micrometer.core.instrument.Tags;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
-//@Component
+@Component
 public class CustomMetrics {
 
     private final MeterRegistry meterRegistry;
