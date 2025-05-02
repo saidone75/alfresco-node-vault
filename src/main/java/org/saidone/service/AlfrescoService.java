@@ -91,14 +91,15 @@ public class AlfrescoService extends BaseComponent {
     private String password;
 
     private static String basicAuth;
-    private static WebClient webClient;
-
     public static Node guestHome;
 
     private static int parallelism;
 
     @Value("${application.service.alfresco.max-chunk-size-kib}")
     private int maxChunkSizeKib;
+
+    @Value("${application.service.alfresco.min-chunk-size-kib}")
+    private int minChunkSizeKib;
 
     /**
      * Initializes the service, sets up basic authentication header,
@@ -110,17 +111,18 @@ public class AlfrescoService extends BaseComponent {
         super.init();
         basicAuth = String.format("Basic %s", Base64.getEncoder().encodeToString((String.format("%s:%s", userName, password)).getBytes(StandardCharsets.UTF_8)));
         guestHome = getGuestHome();
-        webClient = WebClient.builder()
-                .baseUrl(String.format("%s%s", contentServiceUrl, contentServicePath))
-                .build();
         parallelism = ForkJoinPool.commonPool().getParallelism();
     }
 
     private int getBufferSize() {
         val availableMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory() + Runtime.getRuntime().freeMemory();
         log.trace("Available memory: {} bytes", availableMemory);
-        val dynamicBufferSize = Math.min((long) maxChunkSizeKib * 1024, availableMemory / (2L * parallelism));
+        val dynamicBufferSize = Math.min((long) maxChunkSizeKib * 1024, availableMemory / (4L * parallelism));
         log.trace("Dynamic buffer size: {}", dynamicBufferSize);
+        if (dynamicBufferSize < (long) minChunkSizeKib * 1024) {
+            log.error("Not enough memory to process content: {} bytes", dynamicBufferSize);
+            throw new VaultException(String.format("Not enough memory to process content: %d bytes", dynamicBufferSize));
+        }
         return (int) dynamicBufferSize;
     }
 
@@ -166,6 +168,7 @@ public class AlfrescoService extends BaseComponent {
     public File getNodeContent(String nodeId) {
         val contentLength = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getContent().getSizeInBytes();
         val dynamicBufferSize = getBufferSize();
+
         var bytesReceived = 0L;
         var lastLoggedPercentage = 0;
 
