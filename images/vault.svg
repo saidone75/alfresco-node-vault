@@ -3,19 +3,18 @@
     <rect x="160" y="180" width="20" height="10" rx="3" fill="#777"></rect>
     <rect x="30" y="20" width="160" height="160" rx="10" ry="10" fill="#555" stroke="#333" stroke-width="4"></rect>
     <rect x="50" y="40" width="120" height="120" rx="6" ry="6" fill="#777" stroke="#333" stroke-width="2"></rect>
-    <circle cx="110" cy="100" r="20" fill="#555"></circle>
     <g transform="translate(110,100) scale(0.4)">
-        <circle cx="0" cy="-30" r="10" fill="#f58220"></circle>
-        <circle cx="26" cy="-15" r="10" fill="#fdb813"></circle>
-        <circle cx="26" cy="15" r="10" fill="#bdd63d"></circle>
-        <circle cx="0" cy="30" r="10" fill="#00a651"></circle>
-        <circle cx="-26" cy="15" r="10" fill="#00b5e2"></circle>
-        <circle cx="-26" cy="-15" r="10" fill="#0071bc"></circle>
-        <circle cx="0" cy="0" r="10" fill="#ccc"></circle>
+        <circle cx="0" cy="-30" r="8" fill="#f58220"></circle>
+        <circle cx="26" cy="-15" r="8" fill="#fdb813"></circle>
+        <circle cx="26" cy="15" r="8" fill="#bdd63d"></circle>
+        <circle cx="0" cy="30" r="8" fill="#00a651"></circle>
+        <circle cx="-26" cy="15" r="8" fill="#00b5e2"></circle>
+        <circle cx="-26" cy="-15" r="8" fill="#0071bc"></circle>
+        <circle cx="0" cy="0" r="14" fill="#ccc"></circle>
     </g>
     <line x1="110" y1="80" x2="110" y2="120" stroke="#ccc" stroke-width="2"></line>
     <line x1="90" y1="100" x2="130" y2="100" stroke="#ccc" stroke-width="2"></line>
-    <circle cx="110" cy="100" r="20" fill="none" stroke="#222" stroke-width="2"></circle>
+    <circle cx="110" cy="100" r="20" fill="none" stroke="#ccc" stroke-width="2"></circle>
     <rect x="42" y="60" width="7" height="20" rx="2" fill="#777"></rect>
     <rect x="42" y="120" width="7" height="20" rx="2" fill="#777"></rect>
 </svg>
