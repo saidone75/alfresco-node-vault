@@ -32,6 +32,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
+import static org.springframework.security.config.Customizer.withDefaults;
+
 @Configuration
 @ConfigurationProperties(prefix = "management.security.basic-auth")
 @Setter
@@ -48,7 +50,7 @@ public class SecurityConfig {
                         .pathMatchers("/actuator/**").hasRole("ACTUATOR_ADMIN")
                         .anyExchange().authenticated()
                 )
-                .httpBasic().and()
+                .httpBasic(withDefaults())
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();
     }
