@@ -25,7 +25,7 @@ public class ProgressTrackingInputStream extends FilterInputStream {
         int b = super.read();
         if (b != -1) {
             bytesRead++;
-            logProgress();
+            if (log.isTraceEnabled()) logProgress();
         }
         return b;
     }
@@ -35,7 +35,7 @@ public class ProgressTrackingInputStream extends FilterInputStream {
         int bytes = super.read(b, off, len);
         if (bytes != -1) {
             bytesRead += bytes;
-            logProgress();
+            if (log.isTraceEnabled()) logProgress();
         }
         return bytes;
     }
@@ -45,7 +45,7 @@ public class ProgressTrackingInputStream extends FilterInputStream {
             int percentage = (int) ((double) bytesRead / contentLength * 100);
             if (bytesRead == contentLength || percentage >= lastLoggedPercentage + 10) {
                 lastLoggedPercentage = percentage;
-                log.info("Download progress for node {}: {} bytes read ({}% out of {} bytes)",
+                log.trace("Download progress for node {}: {} bytes read ({}% out of {} bytes)",
                         nodeId, bytesRead, percentage, contentLength);
             }
         }

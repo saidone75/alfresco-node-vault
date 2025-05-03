@@ -36,11 +36,6 @@
     </appender>
 
     <springProfile name="dev|test">
-        <logger name="org.saidone.service" additivity="false" level="debug">
-            <appender-ref ref="CONSOLE"/>
-            <appender-ref ref="FILE"/>
-        </logger>
-
         <logger name="org.saidone.service.AlfrescoService" additivity="false" level="trace">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
@@ -57,6 +52,11 @@
         </logger>
 
         <logger name="org.saidone.gateway.predicate" additivity="false" level="debug">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </logger>
+
+        <logger name="org.saidone.component.ProgressTrackingInputStream" additivity="false" level="trace">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
         </logger>
