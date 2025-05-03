@@ -77,7 +77,7 @@ public abstract class BaseTest {
 
     @SneakyThrows
     public Node createNode() {
-        val file = ResourceFileUtils.getFileFromResource("C:/Users/mmarini/Desktop/100MB.bin");
+        val file = ResourceFileUtils.getFileFromResource("sample.pdf");
         return createNode(file);
     }
 
