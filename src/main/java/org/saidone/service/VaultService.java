@@ -25,12 +25,11 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.Node;
 import org.apache.commons.io.input.TeeInputStream;
-import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
-import org.saidone.misc.ProgressTrackingInputStream;
 import org.saidone.exception.HashesMismatchException;
 import org.saidone.exception.NodeNotOnVaultException;
 import org.saidone.exception.VaultException;
+import org.saidone.misc.ProgressTrackingInputStream;
 import org.saidone.model.MetadataKeys;
 import org.saidone.model.NodeContent;
 import org.saidone.model.NodeWrapper;
@@ -39,7 +38,9 @@ import org.saidone.repository.MongoNodeRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -70,7 +71,6 @@ public class VaultService extends BaseComponent {
 
     @SneakyThrows
     private void archiveNodeContent(Node node, InputStream inputStream) {
-
         val digest = MessageDigest.getInstance(checksumAlgorithm);
         val hashOutputStream = new OutputStream() {
             @Override
@@ -213,20 +213,19 @@ public class VaultService extends BaseComponent {
     /**
      * Computes the hash of a file using the specified algorithm.
      *
-     * @param file the file to compute the hash for
+     * @param inputStream the inputStream to compute the hash for
      * @param hash the name of the hash algorithm (e.g., "MD5", "SHA-256")
      * @return the hexadecimal string representation of the computed hash
      * @throws IOException              if an I/O error occurs reading the file
      * @throws NoSuchAlgorithmException if the specified hash algorithm is not available
      */
-    public static String computeHash(InputStream file, String hash) throws IOException, NoSuchAlgorithmException {
+    public static String computeHash(InputStream inputStream, String hash) throws IOException, NoSuchAlgorithmException {
         val digest = MessageDigest.getInstance(hash);
         byte[] byteArray = new byte[8192];
         int bytesCount;
-        while ((bytesCount = file.read(byteArray)) != -1) {
+        while ((bytesCount = inputStream.read(byteArray)) != -1) {
             digest.update(byteArray, 0, bytesCount);
         }
-
         return HexFormat.of().formatHex(digest.digest());
     }
 
@@ -242,20 +241,16 @@ public class VaultService extends BaseComponent {
      */
     public void doubleCheck(String nodeId) {
         log.debug("Comparing {} hashes for node: {}", DOUBLE_CHECK_ALGORITHM, nodeId);
-        InputStream file = null;
-        String alfrescoHash;
-        String mongoHash;
-        try {
-            file = alfrescoService.getNodeContent(nodeId);
-            alfrescoHash = computeHash(file, DOUBLE_CHECK_ALGORITHM);
-            mongoHash = gridFsRepository.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
+        try (val nodeContentInputStream = alfrescoService.getNodeContent(nodeId)) {
+            val alfrescoHash = computeHash(nodeContentInputStream, DOUBLE_CHECK_ALGORITHM);
+            val mongoHash = gridFsRepository.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
+            if (alfrescoHash.equals(mongoHash)) {
+                log.debug("Digest check passed for node: {}", nodeId);
+            } else {
+                throw new HashesMismatchException(alfrescoHash, mongoHash);
+            }
         } catch (IOException | NoSuchAlgorithmException e) {
             throw new VaultException(String.format("Cannot compute hashes: %s", e.getMessage()));
-        }
-        if (alfrescoHash.equals(mongoHash)) {
-            log.debug("Digest check passed for node: {}", nodeId);
-        } else {
-            throw new HashesMismatchException(alfrescoHash, mongoHash);
         }
     }
 

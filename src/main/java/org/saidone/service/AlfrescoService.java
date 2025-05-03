@@ -48,9 +48,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.*;
+import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -159,7 +158,7 @@ public class AlfrescoService extends BaseComponent {
      * Downloads the content of a node and writes it to a temporary file.
      *
      * @param nodeId the identifier of the node whose content is to be downloaded
-     * @return a {@link File} pointing to the temporary file containing the node content
+     * @return an InputStream for the node content
      * @throws VaultException if an error occurs during download or file creation
      */
     @SneakyThrows
