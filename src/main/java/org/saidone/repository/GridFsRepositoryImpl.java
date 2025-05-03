@@ -29,6 +29,7 @@ import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Repository;
@@ -59,6 +60,14 @@ public class GridFsRepositoryImpl implements GridFsRepository {
                 contentType,
                 new Document(metadata)
         );
+    }
+
+    @Override
+    public void updateFileMetadata(String uuid, Map<String, String> metadata) {
+        val query = new Query(Criteria.where("metadata.uuid").is(uuid));
+        val update = new Update();
+        metadata.forEach((key, value) -> update.set(String.format("metadata.%s", key), value));
+        mongoTemplate.updateFirst(query, update, "fs.files");
     }
 
     @Override

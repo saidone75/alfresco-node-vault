@@ -19,15 +19,15 @@
 package org.saidone.service;
 
 import feign.FeignException;
-import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.Node;
 import org.apache.commons.io.input.TeeInputStream;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
-import org.saidone.component.ProgressTrackingInputStream;
+import org.saidone.misc.ProgressTrackingInputStream;
 import org.saidone.exception.HashesMismatchException;
 import org.saidone.exception.NodeNotOnVaultException;
 import org.saidone.exception.VaultException;
@@ -40,7 +40,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
-import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
@@ -69,13 +68,11 @@ public class VaultService extends BaseComponent {
     private boolean doubleCheck;
     private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
 
-    public static void processInputStream(InputStream inputStream, GridFsRepositoryImpl gridFsRepository)
-            throws IOException, NoSuchAlgorithmException {
-        // Inizializza MessageDigest per SHA-256
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+    @SneakyThrows
+    private void archiveNodeContent(Node node, InputStream inputStream) {
 
-        // OutputStream per aggiornare l'hash
-        OutputStream hashOutputStream = new OutputStream() {
+        val digest = MessageDigest.getInstance(checksumAlgorithm);
+        val hashOutputStream = new OutputStream() {
             @Override
             public void write(int b) {
                 digest.update((byte) b);
@@ -87,21 +84,24 @@ public class VaultService extends BaseComponent {
             }
         };
 
-        // Usa TeeInputStream per leggere e copiare simultaneamente
-        try (TeeInputStream teeStream = new TeeInputStream(inputStream, hashOutputStream, true)) {
-            // Carica su MongoDB GridFS
-            gridFsRepository.saveFile(teeStream, "file", "application/octet-stream", new HashMap<>());
+        try (val teeStream = new TeeInputStream(inputStream, hashOutputStream, true)) {
+            gridFsRepository.saveFile(
+                    teeStream,
+                    node.getName(),
+                    node.getContent().getMimeType(),
+                    new HashMap<>() {{
+                        put(MetadataKeys.UUID, node.getId());
+                    }});
         }
 
-        // Ottieni l'hash SHA-256
-        byte[] hash = digest.digest();
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : hash) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) hexString.append('0');
-            hexString.append(hex);
-        }
-        System.out.println("SHA-256: " + hexString.toString());
+        val hash = HexFormat.of().formatHex(digest.digest());
+        log.trace("{}: {}", checksumAlgorithm, hash);
+        gridFsRepository.updateFileMetadata(
+                node.getId(),
+                new HashMap<>() {{
+                    put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
+                    put(MetadataKeys.CHECKSUM_VALUE, hash);
+                }});
     }
 
     /**
@@ -120,12 +120,12 @@ public class VaultService extends BaseComponent {
         log.info("Archiving node: {}", nodeId);
         try {
             val node = alfrescoService.getNode(nodeId);
-            val inputStream = new ProgressTrackingInputStream(
+            val nodeContentInputStream = new ProgressTrackingInputStream(
                     alfrescoService.getNodeContent(nodeId),
                     nodeId,
                     node.getContent().getSizeInBytes());
             mongoNodeRepository.save(new NodeWrapper(node));
-            processInputStream(inputStream, gridFsRepository);
+            archiveNodeContent(node, nodeContentInputStream);
             if (doubleCheck) doubleCheck(nodeId);
             alfrescoService.deleteNode(nodeId);
         } catch (FeignException.NotFound e) {

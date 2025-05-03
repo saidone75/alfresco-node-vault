@@ -56,7 +56,12 @@
             <appender-ref ref="FILE"/>
         </logger>
 
-        <logger name="org.saidone.component.ProgressTrackingInputStream" additivity="false" level="trace">
+        <logger name="org.saidone.misc.ProgressTrackingInputStream" additivity="false" level="trace">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </logger>
+
+        <logger name="org.saidone.misc.ProgressTrackingOutputStream" additivity="false" level="trace">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
         </logger>

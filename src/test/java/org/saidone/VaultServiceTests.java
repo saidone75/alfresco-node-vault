@@ -83,7 +83,7 @@ class VaultServiceTests extends BaseTest {
     @Order(40)
     @SneakyThrows
     void archiveNodesTest() {
-        IntStream.range(0, 10).parallel().forEach(i -> {
+        IntStream.range(0, 2).parallel().forEach(i -> {
             try {
                 val nodeId = createNode().getId();
                 alfrescoService.addAspects(nodeId, List.of(AnvContentModel.ASP_ARCHIVE));

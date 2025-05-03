@@ -27,6 +27,8 @@ public interface GridFsRepository {
 
     void saveFile(InputStream inputStream, String fileName, String contentType, Map<String, String> metadata);
 
+    void updateFileMetadata(String uuid, Map<String, String> metadata);
+
     GridFSFile findFileById(String uuid);
 
     void deleteFileById(String uuid);

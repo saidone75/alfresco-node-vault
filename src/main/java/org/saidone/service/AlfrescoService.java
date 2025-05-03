@@ -40,6 +40,7 @@ import org.saidone.component.BaseComponent;
 import org.saidone.config.AlfrescoServiceConfig;
 import org.saidone.exception.ApiExceptionError;
 import org.saidone.exception.VaultException;
+import org.saidone.misc.ProgressTrackingOutputStream;
 import org.saidone.model.NodeContent;
 import org.saidone.model.SystemSearchRequest;
 import org.saidone.model.alfresco.AnvContentModel;
@@ -242,36 +243,17 @@ public class AlfrescoService extends BaseComponent {
      */
     @SneakyThrows
     public void restoreNodeContent(String nodeId, NodeContent nodeContent) {
-        var bytesSent = 0L;
-        var lastLoggedPercentage = 0;
-
-        val dynamicBufferSize = getBufferSize();
-
         val url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
         val conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod(HttpMethod.PUT.name());
         conn.setDoOutput(true);
         conn.setRequestProperty(HttpHeaders.AUTHORIZATION, basicAuth);
         conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, nodeContent.getContentType());
-        conn.setChunkedStreamingMode(dynamicBufferSize);
-
-        val buffer = new byte[dynamicBufferSize];
-        int len;
+        conn.setChunkedStreamingMode(getBufferSize());
 
         try (val is = nodeContent.getContentStream();
-             val os = conn.getOutputStream()) {
-            while ((len = is.read(buffer)) != -1) {
-                os.write(buffer, 0, len);
-                bytesSent += len;
-                if (nodeContent.getLength() > 0) {
-                    val percentage = (int) ((double) bytesSent / nodeContent.getLength() * 100);
-                    if (bytesSent == nodeContent.getLength() || percentage >= lastLoggedPercentage + 10) {
-                        lastLoggedPercentage = percentage;
-                        log.trace("Upload progress for node {}: {} bytes sent ({}% out of {} bytes)",
-                                nodeId, bytesSent, percentage, nodeContent.getLength());
-                    }
-                }
-            }
+             val os = new ProgressTrackingOutputStream(conn.getOutputStream(), nodeId, nodeContent.getLength())) {
+          is.transferTo(os);
         }
 
         val responseCode = conn.getResponseCode();
