@@ -19,7 +19,6 @@
 package org.saidone.service;
 
 import feign.FeignException;
-import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -46,9 +45,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.HexFormat;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Service responsible for archiving, restoring, and managing nodes in the vault.
@@ -73,13 +70,15 @@ public class VaultService extends BaseComponent {
     private boolean doubleCheck;
     private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
 
-    private static final ExecutorService EXECUTOR = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-
     @SneakyThrows
     private void archiveNodeContent(Node node, InputStream inputStream) {
+
         val inputStreams = InputStreamDuplicator.duplicateInputStream(inputStream);
+
         try (val contentInputStream = inputStreams[0];
              val checksumInputStream = inputStreams[1]) {
+
+            val executorService = Executors.newFixedThreadPool(2);
 
             val saveFileTask = CompletableFuture.runAsync(() -> {
                 try {
@@ -93,14 +92,15 @@ public class VaultService extends BaseComponent {
                 } catch (Exception e) {
                     throw new RuntimeException(e.getMessage(), e);
                 }
-            }, EXECUTOR);
+            }, executorService);
+
             val checksumTask = CompletableFuture.supplyAsync(() -> {
                 try {
                     return computeHash(checksumInputStream, checksumAlgorithm);
                 } catch (Exception e) {
                     throw new RuntimeException(e.getMessage(), e);
                 }
-            }, EXECUTOR);
+            }, executorService);
 
             try {
                 CompletableFuture.allOf(saveFileTask, checksumTask).join();
@@ -114,6 +114,8 @@ public class VaultService extends BaseComponent {
                         }});
             } catch (Exception e) {
                 throw new IOException(e.getMessage(), e);
+            } finally {
+                executorService.shutdown();
             }
         }
     }
@@ -265,21 +267,6 @@ public class VaultService extends BaseComponent {
             }
         } catch (IOException | NoSuchAlgorithmException e) {
             throw new VaultException(String.format("Cannot compute hashes: %s", e.getMessage()));
-        }
-    }
-
-    @PreDestroy
-    @Override
-    public void stop() {
-        super.init();
-        EXECUTOR.shutdown();
-        try {
-            if (!EXECUTOR.awaitTermination(60, TimeUnit.SECONDS)) {
-                EXECUTOR.shutdownNow();
-            }
-        } catch (InterruptedException e) {
-            EXECUTOR.shutdownNow();
-            Thread.currentThread().interrupt();
         }
     }
 
