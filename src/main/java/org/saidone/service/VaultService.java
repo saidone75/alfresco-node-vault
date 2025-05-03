@@ -19,12 +19,15 @@
 package org.saidone.service;
 
 import feign.FeignException;
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.Node;
+import org.apache.commons.io.input.TeeInputStream;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
+import org.saidone.component.ProgressTrackingInputStream;
 import org.saidone.exception.HashesMismatchException;
 import org.saidone.exception.NodeNotOnVaultException;
 import org.saidone.exception.VaultException;
@@ -36,9 +39,7 @@ import org.saidone.repository.MongoNodeRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -68,6 +69,41 @@ public class VaultService extends BaseComponent {
     private boolean doubleCheck;
     private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
 
+    public static void processInputStream(InputStream inputStream, GridFsRepositoryImpl gridFsRepository)
+            throws IOException, NoSuchAlgorithmException {
+        // Inizializza MessageDigest per SHA-256
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+
+        // OutputStream per aggiornare l'hash
+        OutputStream hashOutputStream = new OutputStream() {
+            @Override
+            public void write(int b) {
+                digest.update((byte) b);
+            }
+
+            @Override
+            public void write(byte[] b, int off, int len) {
+                digest.update(b, off, len);
+            }
+        };
+
+        // Usa TeeInputStream per leggere e copiare simultaneamente
+        try (TeeInputStream teeStream = new TeeInputStream(inputStream, hashOutputStream, true)) {
+            // Carica su MongoDB GridFS
+            gridFsRepository.saveFile(teeStream, "file", "application/octet-stream", new HashMap<>());
+        }
+
+        // Ottieni l'hash SHA-256
+        byte[] hash = digest.digest();
+        StringBuilder hexString = new StringBuilder();
+        for (byte b : hash) {
+            String hex = Integer.toHexString(0xff & b);
+            if (hex.length() == 1) hexString.append('0');
+            hexString.append(hex);
+        }
+        System.out.println("SHA-256: " + hexString.toString());
+    }
+
     /**
      * Archives a node by its ID.
      * <p>
@@ -84,19 +120,12 @@ public class VaultService extends BaseComponent {
         log.info("Archiving node: {}", nodeId);
         try {
             val node = alfrescoService.getNode(nodeId);
-            val file = alfrescoService.getNodeContent(nodeId);
+            val inputStream = new ProgressTrackingInputStream(
+                    alfrescoService.getNodeContent(nodeId),
+                    nodeId,
+                    node.getContent().getSizeInBytes());
             mongoNodeRepository.save(new NodeWrapper(node));
-            try (val is = new FileInputStream(file)) {
-                val metadata = new HashMap<String, String>() {{
-                    put(MetadataKeys.UUID, nodeId);
-                }};
-                if (Strings.isNotBlank(checksumAlgorithm)) {
-                    metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
-                    metadata.put(MetadataKeys.CHECKSUM_VALUE, computeHash(file, checksumAlgorithm));
-                }
-                gridFsRepository.saveFile(is, node.getName(), node.getContent().getMimeType(), metadata);
-            }
-            Files.deleteIfExists(file.toPath());
+            processInputStream(inputStream, gridFsRepository);
             if (doubleCheck) doubleCheck(nodeId);
             alfrescoService.deleteNode(nodeId);
         } catch (FeignException.NotFound e) {
@@ -190,15 +219,14 @@ public class VaultService extends BaseComponent {
      * @throws IOException              if an I/O error occurs reading the file
      * @throws NoSuchAlgorithmException if the specified hash algorithm is not available
      */
-    public static String computeHash(File file, String hash) throws IOException, NoSuchAlgorithmException {
+    public static String computeHash(InputStream file, String hash) throws IOException, NoSuchAlgorithmException {
         val digest = MessageDigest.getInstance(hash);
-        try (val fis = new FileInputStream(file)) {
-            byte[] byteArray = new byte[8192];
-            int bytesCount;
-            while ((bytesCount = fis.read(byteArray)) != -1) {
-                digest.update(byteArray, 0, bytesCount);
-            }
+        byte[] byteArray = new byte[8192];
+        int bytesCount;
+        while ((bytesCount = file.read(byteArray)) != -1) {
+            digest.update(byteArray, 0, bytesCount);
         }
+
         return HexFormat.of().formatHex(digest.digest());
     }
 
@@ -214,7 +242,7 @@ public class VaultService extends BaseComponent {
      */
     public void doubleCheck(String nodeId) {
         log.debug("Comparing {} hashes for node: {}", DOUBLE_CHECK_ALGORITHM, nodeId);
-        File file = null;
+        InputStream file = null;
         String alfrescoHash;
         String mongoHash;
         try {
@@ -223,12 +251,6 @@ public class VaultService extends BaseComponent {
             mongoHash = gridFsRepository.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
         } catch (IOException | NoSuchAlgorithmException e) {
             throw new VaultException(String.format("Cannot compute hashes: %s", e.getMessage()));
-        } finally {
-            try {
-                if (file != null) Files.deleteIfExists(file.toPath());
-            } catch (IOException e) {
-                log.warn(e.getMessage());
-            }
         }
         if (alfrescoHash.equals(mongoHash)) {
             log.debug("Digest check passed for node: {}", nodeId);

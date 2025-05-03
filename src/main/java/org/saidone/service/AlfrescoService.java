@@ -49,10 +49,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.ByteBuffer;
@@ -165,44 +162,11 @@ public class AlfrescoService extends BaseComponent {
      * @throws VaultException if an error occurs during download or file creation
      */
     @SneakyThrows
-    public File getNodeContent(String nodeId) {
-        val contentLength = Objects.requireNonNull(nodesApi.getNode(nodeId, null, null, null).getBody()).getEntry().getContent().getSizeInBytes();
-
-        var bytesReceived = 0L;
-        var lastLoggedPercentage = 0;
-
+    public InputStream getNodeContent(String nodeId) {
         val url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
         val conn = (HttpURLConnection) url.openConnection();
         conn.setRequestProperty(HttpHeaders.AUTHORIZATION, basicAuth);
-
-        val tempFile = File.createTempFile("alfresco-content-", ".tmp");
-        val buffer = new byte[getBufferSize()];
-        int len;
-
-        try (val is = conn.getInputStream();
-             val fos = new FileOutputStream(tempFile)) {
-            while ((len = is.read(buffer)) != -1) {
-                fos.write(buffer, 0, len);
-                bytesReceived += len;
-                if (contentLength > 0) {
-                    val percentage = (int) ((double) bytesReceived / contentLength * 100);
-                    if (bytesReceived == contentLength || percentage >= lastLoggedPercentage + 10) {
-                        lastLoggedPercentage = percentage;
-                        log.trace("Download progress for node {}: {} bytes received ({}% out of {} bytes)",
-                                nodeId, bytesReceived, percentage, contentLength);
-                    }
-                }
-            }
-        }
-
-        val responseCode = conn.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            log.debug("Download completed successfully for node: {}", nodeId);
-        } else {
-            log.error("Failed to download content for node {} with HTTP status: {}", nodeId, responseCode);
-            throw new VaultException(String.format("Failed to download content for node %s with HTTP status: %d", nodeId, responseCode));
-        }
-        return tempFile;
+        return conn.getInputStream();
     }
 
     /**

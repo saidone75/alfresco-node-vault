@@ -66,8 +66,7 @@ class AlfrescoServiceTests extends BaseTest {
         val file = ResourceFileUtils.getFileFromResource("sample.pdf");
         val nodeId = createNode(file).getId();
         val contentFile = assertDoesNotThrow(() -> alfrescoService.getNodeContent(nodeId));
-        assertArrayEquals(Files.readAllBytes(file.toPath()), Files.readAllBytes(contentFile.toPath()));
-        Files.deleteIfExists(contentFile.toPath());
+        assertArrayEquals(Files.readAllBytes(file.toPath()), contentFile.readAllBytes());
     }
 
     @Test

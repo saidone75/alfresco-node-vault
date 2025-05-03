@@ -94,7 +94,7 @@ application:
       min-chunk-size-kib: 4
     vault:
       hash-algorithm: ${VAULT_HASH_ALGORITHM:SHA-256}
-      double-check: ${VAULT_DOUBLE_CHECK:true}
+      double-check: ${VAULT_DOUBLE_CHECK:false}
   same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
 server:
   port: 8086
