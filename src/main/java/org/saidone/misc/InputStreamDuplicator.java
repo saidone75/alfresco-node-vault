@@ -29,14 +29,18 @@ import java.util.concurrent.CompletableFuture;
 public class InputStreamDuplicator {
 
     public static InputStream[] duplicate(InputStream inputStream) throws IOException {
-        val pipedIn1 = new PipedInputStream(8192);
-        val pipedIn2 = new PipedInputStream(8192);
+        return duplicate(inputStream, 8192);
+    }
+
+    public static InputStream[] duplicate(InputStream inputStream, int bufferSize) throws IOException {
+        val pipedIn1 = new PipedInputStream(bufferSize);
+        val pipedIn2 = new PipedInputStream(bufferSize);
         val pipedOut1 = new PipedOutputStream(pipedIn1);
         val pipedOut2 = new PipedOutputStream(pipedIn2);
 
         CompletableFuture.runAsync(() -> {
             try (inputStream; pipedOut1; pipedOut2) {
-                byte[] buffer = new byte[8192];
+                byte[] buffer = new byte[bufferSize];
                 int bytesRead;
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     pipedOut1.write(buffer, 0, bytesRead);
