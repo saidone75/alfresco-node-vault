@@ -78,20 +78,20 @@ public class VaultService extends BaseComponent {
      */
     @SneakyThrows
     private void archiveNodeContent(Node node, InputStream inputStream) {
-        try (val contentInputStream = new DigestInputStream(inputStream, checksumAlgorithm)) {
+        try (val digestInputStream = new DigestInputStream(inputStream, checksumAlgorithm)) {
             gridFsRepository.saveFile(
-                    contentInputStream,
+                    digestInputStream,
                     node.getName(),
                     node.getContent().getMimeType(),
                     new HashMap<>() {{
                         put(MetadataKeys.UUID, node.getId());
                     }});
-            log.trace("{}: {}", checksumAlgorithm, contentInputStream.getHash());
+            log.trace("{}: {}", checksumAlgorithm, digestInputStream.getHash());
             gridFsRepository.updateFileMetadata(
                     node.getId(),
                     new HashMap<>() {{
                         put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
-                        put(MetadataKeys.CHECKSUM_VALUE, contentInputStream.getHash());
+                        put(MetadataKeys.CHECKSUM_VALUE, digestInputStream.getHash());
                     }});
         }
     }
