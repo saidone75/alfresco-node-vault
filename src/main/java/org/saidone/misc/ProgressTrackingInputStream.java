@@ -40,7 +40,7 @@ public class ProgressTrackingInputStream extends FilterInputStream {
 
     @Override
     public int read() throws IOException {
-        int b = super.read();
+        int b = in.read();
         if (b != -1) {
             bytesRead++;
             if (log.isTraceEnabled()) logProgress();
@@ -50,7 +50,7 @@ public class ProgressTrackingInputStream extends FilterInputStream {
 
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
-        int bytes = super.read(b, off, len);
+        int bytes = in.read(b, off, len);
         if (bytes != -1) {
             bytesRead += bytes;
             if (log.isTraceEnabled()) logProgress();

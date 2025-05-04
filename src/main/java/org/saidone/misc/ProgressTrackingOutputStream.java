@@ -40,14 +40,14 @@ public class ProgressTrackingOutputStream extends FilterOutputStream {
 
     @Override
     public void write(int b) throws IOException {
-        super.write(b);
+        out.write(b);
         bytesWritten++;
         if (log.isTraceEnabled()) logProgress();
     }
 
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
-        super.write(b, off, len);
+        out.write(b, off, len);
         bytesWritten += len;
         if (log.isTraceEnabled()) logProgress();
     }

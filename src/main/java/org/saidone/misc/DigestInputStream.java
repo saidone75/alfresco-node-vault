@@ -18,58 +18,47 @@
 
 package org.saidone.misc;
 
-import lombok.extern.slf4j.Slf4j;
-
+import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
-@Slf4j
-public class DigestInputStream extends InputStream {
+public class DigestInputStream extends FilterInputStream {
 
-    private final InputStream inputStream;
     private final MessageDigest digest;
 
     public DigestInputStream(InputStream inputStream, String algorithm) throws NoSuchAlgorithmException {
-        this.inputStream = inputStream;
+        super(inputStream);
         this.digest = MessageDigest.getInstance(algorithm);
     }
 
     @Override
-    public int read() {
-        try {
-            int byteRead = inputStream.read();
-            if (byteRead != -1) {
-                digest.update((byte) byteRead);
-            }
-            return byteRead;
-        } catch (IOException e) {
-            return -1;
+    public int read() throws IOException {
+        int byteRead = in.read();
+        if (byteRead != -1) {
+            digest.update((byte) byteRead);
         }
+        return byteRead;
     }
 
     @Override
-    public int read(byte[] b, int off, int len) {
-        try {
-            int bytesRead = inputStream.read(b, off, len);
-            if (bytesRead != -1) {
-                digest.update(b, off, bytesRead);
-            }
-            return bytesRead;
-        } catch (IOException e) {
-            return -1;
+    public int read(byte[] b) throws IOException {
+        int bytesRead = in.read(b);
+        if (bytesRead != -1) {
+            digest.update(b, 0, bytesRead);
         }
+        return bytesRead;
     }
 
     @Override
-    public void close() {
-        try {
-            inputStream.close();
-        } catch (IOException e) {
-            log.warn(e.getMessage());
+    public int read(byte[] b, int off, int len) throws IOException {
+        int bytesRead = in.read(b, off, len);
+        if (bytesRead != -1) {
+            digest.update(b, off, bytesRead);
         }
+        return bytesRead;
     }
 
     public String getHash() {
