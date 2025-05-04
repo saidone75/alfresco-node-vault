@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   prometheus:
     image: prom/prometheus
@@ -8,7 +6,8 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
-
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   grafana:
     image: grafana/grafana
     container_name: grafana
