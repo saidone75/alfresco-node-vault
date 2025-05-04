@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package utils;
+package org.saidone.utils;
 
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
