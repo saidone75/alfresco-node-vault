@@ -150,13 +150,4 @@
         </plugins>
     </build>
 
-    <profiles>
-        <profile>
-            <id>qa</id>
-            <properties>
-                <test.groups>qa-tests</test.groups>
-            </properties>
-        </profile>
-    </profiles>
-
 </project>
