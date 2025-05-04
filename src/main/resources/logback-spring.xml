@@ -66,6 +66,11 @@
             <appender-ref ref="FILE"/>
         </logger>
 
+        <logger name="org.saidone.test" additivity="false" level="trace">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </logger>
+
         <logger name="org.alfresco.event.sdk.handling" additivity="false" level="info">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>

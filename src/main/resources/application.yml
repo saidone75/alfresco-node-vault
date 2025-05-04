@@ -94,7 +94,6 @@ application:
     vault:
       hash-algorithm: ${VAULT_HASH_ALGORITHM:SHA-256}
       double-check: ${VAULT_DOUBLE_CHECK:true}
-  buffer-size: 8192
   same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
 server:
   port: 8086

@@ -1,4 +1,4 @@
-package org.saidone;
+package org.saidone.test;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +21,12 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.saidone.utils.ResourceFileUtils;
 
 import java.io.File;
+import java.net.URL;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Objects;
+
+import org.apache.commons.io.FileUtils;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -42,6 +45,7 @@ public abstract class BaseTest {
     protected static String parentId;
     protected static final Faker faker = new Faker();
     private static final HashMap<String, Integer> names = new HashMap<>();
+    private static final HashMap<String, File> downloadedFiles = new HashMap<>();
 
     @BeforeEach
     public void before(TestInfo testInfo) {
@@ -79,6 +83,17 @@ public abstract class BaseTest {
     public Node createNode() {
         val file = ResourceFileUtils.getFileFromResource("sample.pdf");
         return createNode(file);
+    }
+
+    @SneakyThrows
+    public Node createNode(URL url) {
+        if (!downloadedFiles.containsKey(url.toString())) {
+            val tmpFile = File.createTempFile("anv-", ".tmp");
+            tmpFile.deleteOnExit();
+            FileUtils.copyURLToFile(url, tmpFile);
+            downloadedFiles.put(url.toString(), tmpFile);
+        }
+        return createNode(downloadedFiles.get(url.toString()));
     }
 
 }

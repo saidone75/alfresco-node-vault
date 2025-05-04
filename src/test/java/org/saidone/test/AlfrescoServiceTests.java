@@ -16,9 +16,10 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone;
+package org.saidone.test;
 
 import feign.FeignException;
+import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
@@ -65,8 +66,8 @@ class AlfrescoServiceTests extends BaseTest {
     public void getNodeContentTest() {
         val file = ResourceFileUtils.getFileFromResource("sample.pdf");
         val nodeId = createNode(file).getId();
-        val contentFile = assertDoesNotThrow(() -> alfrescoService.getNodeContent(nodeId));
-        assertArrayEquals(Files.readAllBytes(file.toPath()), contentFile.readAllBytes());
+        @Cleanup val inputStream = assertDoesNotThrow(() -> alfrescoService.getNodeContent(nodeId));
+        assertArrayEquals(Files.readAllBytes(file.toPath()), inputStream.readAllBytes());
     }
 
     @Test

@@ -28,7 +28,7 @@ import org.saidone.component.BaseComponent;
 import org.saidone.exception.HashesMismatchException;
 import org.saidone.exception.NodeNotOnVaultException;
 import org.saidone.exception.VaultException;
-import org.saidone.misc.InputStreamDuplicator;
+import org.saidone.misc.DigestInputStream;
 import org.saidone.misc.ProgressTrackingInputStream;
 import org.saidone.model.MetadataKeys;
 import org.saidone.model.NodeContent;
@@ -40,12 +40,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.security.MessageDigest;
+import java.io.OutputStream;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
-import java.util.HexFormat;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
 
 /**
  * Service responsible for archiving, restoring, and managing nodes in the vault.
@@ -68,71 +65,34 @@ public class VaultService extends BaseComponent {
     @Value("${application.service.vault.double-check}")
     private boolean doubleCheck;
 
-    @Value("${application.buffer-size}")
-    private int bufferSize;
-
     private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
 
     /**
-     * Archives the content of the given node by saving the content to GridFS
-     * and calculating its checksum concurrently.
-     * <p>
-     * This method duplicates the provided InputStream to perform both operations
-     * in parallel: storing the file content and computing the file's checksum.
-     * Once both operations complete, the file metadata is updated with the checksum
-     * information.
+     * Archives the content of the given node by saving the content stream into a GridFS repository
+     * with associated metadata. The input stream is wrapped in a DigestInputStream to compute a checksum
+     * using the configured checksum algorithm during the save operation. After saving, the method also
+     * updates the file metadata with the checksum algorithm and the computed checksum value.
      *
-     * @param node        the node containing metadata such as ID, name, and content information
-     * @param inputStream the input stream of the node's content to be archived
-     * @throws IOException if an error occurs during file storage or checksum computation
+     * @param node        the node whose content is to be archived
+     * @param inputStream the input stream of the node's content to be saved and checksummed
      */
     @SneakyThrows
     private void archiveNodeContent(Node node, InputStream inputStream) {
-
-        val inputStreams = InputStreamDuplicator.duplicate(inputStream, bufferSize);
-
-        try (val contentInputStream = inputStreams[0];
-             val checksumInputStream = inputStreams[1]) {
-
-            val executorService = Executors.newFixedThreadPool(2);
-
-            val saveFileTask = CompletableFuture.runAsync(() -> {
-                try {
-                    gridFsRepository.saveFile(
-                            contentInputStream,
-                            node.getName(),
-                            node.getContent().getMimeType(),
-                            new HashMap<>() {{
-                                put(MetadataKeys.UUID, node.getId());
-                            }});
-                } catch (Exception e) {
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }, executorService);
-
-            val checksumTask = CompletableFuture.supplyAsync(() -> {
-                try {
-                    return computeHash(checksumInputStream, checksumAlgorithm);
-                } catch (Exception e) {
-                    throw new RuntimeException(e.getMessage(), e);
-                }
-            }, executorService);
-
-            try {
-                CompletableFuture.allOf(saveFileTask, checksumTask).join();
-                val hash = checksumTask.get();
-                log.trace("{}: {}", checksumAlgorithm, hash);
-                gridFsRepository.updateFileMetadata(
-                        node.getId(),
-                        new HashMap<>() {{
-                            put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
-                            put(MetadataKeys.CHECKSUM_VALUE, hash);
-                        }});
-            } catch (Exception e) {
-                throw new IOException(e.getMessage(), e);
-            } finally {
-                executorService.shutdown();
-            }
+        try (val contentInputStream = new DigestInputStream(inputStream, checksumAlgorithm)) {
+            gridFsRepository.saveFile(
+                    contentInputStream,
+                    node.getName(),
+                    node.getContent().getMimeType(),
+                    new HashMap<>() {{
+                        put(MetadataKeys.UUID, node.getId());
+                    }});
+            log.trace("{}: {}", checksumAlgorithm, contentInputStream.getHash());
+            gridFsRepository.updateFileMetadata(
+                    node.getId(),
+                    new HashMap<>() {{
+                        put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
+                        put(MetadataKeys.CHECKSUM_VALUE, contentInputStream.getHash());
+                    }});
         }
     }
 
@@ -243,46 +203,28 @@ public class VaultService extends BaseComponent {
     }
 
     /**
-     * Computes the hexadecimal hash string of the data read from the given InputStream
-     * using the specified hashing algorithm.
-     *
-     * @param inputStream the InputStream to read data from; it will be read until EOF
-     * @param hash        the name of the hashing algorithm (e.g., "SHA-256", "MD5") to use
-     * @return a hexadecimal string representing the computed hash of the input data
-     * @throws IOException              if an I/O error occurs while reading from the input stream
-     * @throws NoSuchAlgorithmException if the specified hash algorithm is not available
-     */
-    public static String computeHash(InputStream inputStream, String hash) throws IOException, NoSuchAlgorithmException {
-        val digest = MessageDigest.getInstance(hash);
-        byte[] byteArray = new byte[8192];
-        int bytesCount;
-        while ((bytesCount = inputStream.read(byteArray)) != -1) {
-            digest.update(byteArray, 0, bytesCount);
-        }
-        return HexFormat.of().formatHex(digest.digest());
-    }
-
-    /**
-     * Compares the hash of the content of a node retrieved from Alfresco with the hash of the content stored in MongoDB.
+     * Performs a double check of content integrity for the node identified by {@code nodeId} by comparing hash digests.
      * <p>
-     * It computes the hash of the content streamed from Alfresco using a predefined algorithm, then fetches the corresponding
-     * hash from GridFS in MongoDB. If the hashes are equal, the check passes; otherwise, it throws a {@link HashesMismatchException}.
+     * It computes the hash of the node content retrieved from the Alfresco service using a digest input stream with the
+     * configured algorithm, then compares it against the hash computed from the corresponding MongoDB GridFS stored file.
+     * If the hashes match, the double check passes; otherwise, a {@link HashesMismatchException} is thrown.
      * <p>
-     * If there is an error during hash computation or I/O, a {@link VaultException} is thrown.
+     * Any {@link IOException} or {@link NoSuchAlgorithmException} encountered during the process will cause a
+     * {@link VaultException} to be thrown, wrapping the original error message.
      *
-     * @param nodeId the identifier of the node whose content hashes must be compared
-     * @throws HashesMismatchException if the hashes do not match
-     * @throws VaultException if an error occurs during hash computation or content retrieval
+     * @param nodeId the identifier of the node whose content hash is to be verified
+     * @throws HashesMismatchException if the computed hash from the content and the stored hash differ
+     * @throws VaultException          if there is an error accessing the content or computing the hash
      */
     public void doubleCheck(String nodeId) {
         log.debug("Comparing {} hashes for node: {}", DOUBLE_CHECK_ALGORITHM, nodeId);
-        try (val nodeContentInputStream = alfrescoService.getNodeContent(nodeId)) {
-            val alfrescoHash = computeHash(nodeContentInputStream, DOUBLE_CHECK_ALGORITHM);
+        try (val digestInputStream = new DigestInputStream(alfrescoService.getNodeContent(nodeId), DOUBLE_CHECK_ALGORITHM)) {
+            digestInputStream.transferTo(OutputStream.nullOutputStream());
             val mongoHash = gridFsRepository.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
-            if (alfrescoHash.equals(mongoHash)) {
+            if (digestInputStream.getHash().equals(mongoHash)) {
                 log.debug("Digest check passed for node: {}", nodeId);
             } else {
-                throw new HashesMismatchException(alfrescoHash, mongoHash);
+                throw new HashesMismatchException(digestInputStream.getHash(), mongoHash);
             }
         } catch (IOException | NoSuchAlgorithmException e) {
             throw new VaultException(String.format("Cannot compute hashes: %s", e.getMessage()));
