@@ -65,15 +65,31 @@ public class VaultService extends BaseComponent {
 
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
-
     @Value("${application.service.vault.double-check}")
     private boolean doubleCheck;
+
+    @Value("${application.buffer-size}")
+    private int bufferSize;
+
     private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
 
+    /**
+     * Archives the content of the given node by saving the content to GridFS
+     * and calculating its checksum concurrently.
+     * <p>
+     * This method duplicates the provided InputStream to perform both operations
+     * in parallel: storing the file content and computing the file's checksum.
+     * Once both operations complete, the file metadata is updated with the checksum
+     * information.
+     *
+     * @param node        the node containing metadata such as ID, name, and content information
+     * @param inputStream the input stream of the node's content to be archived
+     * @throws IOException if an error occurs during file storage or checksum computation
+     */
     @SneakyThrows
     private void archiveNodeContent(Node node, InputStream inputStream) {
 
-        val inputStreams = InputStreamDuplicator.duplicate(inputStream);
+        val inputStreams = InputStreamDuplicator.duplicate(inputStream, bufferSize);
 
         try (val contentInputStream = inputStreams[0];
              val checksumInputStream = inputStreams[1]) {
@@ -227,12 +243,13 @@ public class VaultService extends BaseComponent {
     }
 
     /**
-     * Computes the hash of a file using the specified algorithm.
+     * Computes the hexadecimal hash string of the data read from the given InputStream
+     * using the specified hashing algorithm.
      *
-     * @param inputStream the inputStream to compute the hash for
-     * @param hash        the name of the hash algorithm (e.g., "MD5", "SHA-256")
-     * @return the hexadecimal string representation of the computed hash
-     * @throws IOException              if an I/O error occurs reading the file
+     * @param inputStream the InputStream to read data from; it will be read until EOF
+     * @param hash        the name of the hashing algorithm (e.g., "SHA-256", "MD5") to use
+     * @return a hexadecimal string representing the computed hash of the input data
+     * @throws IOException              if an I/O error occurs while reading from the input stream
      * @throws NoSuchAlgorithmException if the specified hash algorithm is not available
      */
     public static String computeHash(InputStream inputStream, String hash) throws IOException, NoSuchAlgorithmException {
@@ -246,14 +263,16 @@ public class VaultService extends BaseComponent {
     }
 
     /**
-     * Performs double-check by comparing the MD5 hash of the node content
-     * retrieved from Alfresco and the one computed on MongoDB.
+     * Compares the hash of the content of a node retrieved from Alfresco with the hash of the content stored in MongoDB.
      * <p>
-     * Throws a {@link HashesMismatchException} if the hashes do not match.
-     * </p>
+     * It computes the hash of the content streamed from Alfresco using a predefined algorithm, then fetches the corresponding
+     * hash from GridFS in MongoDB. If the hashes are equal, the check passes; otherwise, it throws a {@link HashesMismatchException}.
+     * <p>
+     * If there is an error during hash computation or I/O, a {@link VaultException} is thrown.
      *
-     * @param nodeId the ID of the node to double-check
-     * @throws VaultException if hash computation fails or hashes mismatch
+     * @param nodeId the identifier of the node whose content hashes must be compared
+     * @throws HashesMismatchException if the hashes do not match
+     * @throws VaultException if an error occurs during hash computation or content retrieval
      */
     public void doubleCheck(String nodeId) {
         log.debug("Comparing {} hashes for node: {}", DOUBLE_CHECK_ALGORITHM, nodeId);
