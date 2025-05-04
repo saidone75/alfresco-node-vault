@@ -28,7 +28,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class InputStreamDuplicator {
 
-    public static InputStream[] duplicateInputStream(InputStream inputStream) throws IOException {
+    public static InputStream[] duplicate(InputStream inputStream) throws IOException {
         val pipedIn1 = new PipedInputStream(8192);
         val pipedIn2 = new PipedInputStream(8192);
         val pipedOut1 = new PipedOutputStream(pipedIn1);

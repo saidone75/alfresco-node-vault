@@ -73,7 +73,7 @@ public class VaultService extends BaseComponent {
     @SneakyThrows
     private void archiveNodeContent(Node node, InputStream inputStream) {
 
-        val inputStreams = InputStreamDuplicator.duplicateInputStream(inputStream);
+        val inputStreams = InputStreamDuplicator.duplicate(inputStream);
 
         try (val contentInputStream = inputStreams[0];
              val checksumInputStream = inputStreams[1]) {

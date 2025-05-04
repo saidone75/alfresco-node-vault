@@ -57,7 +57,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import java.util.Objects;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
@@ -90,14 +89,6 @@ public class AlfrescoService extends BaseComponent {
     private static String basicAuth;
     public static Node guestHome;
 
-    private static int parallelism;
-
-    @Value("${application.service.alfresco.max-chunk-size-kib}")
-    private int maxChunkSizeKib;
-
-    @Value("${application.service.alfresco.min-chunk-size-kib}")
-    private int minChunkSizeKib;
-
     /**
      * Initializes the service, sets up basic authentication header,
      * retrieves the "Guest Home" node, and configures the WebClient.
@@ -108,19 +99,6 @@ public class AlfrescoService extends BaseComponent {
         super.init();
         basicAuth = String.format("Basic %s", Base64.getEncoder().encodeToString((String.format("%s:%s", userName, password)).getBytes(StandardCharsets.UTF_8)));
         guestHome = getGuestHome();
-        parallelism = ForkJoinPool.commonPool().getParallelism();
-    }
-
-    private int getBufferSize() {
-        val availableMemory = Runtime.getRuntime().maxMemory() - Runtime.getRuntime().totalMemory() + Runtime.getRuntime().freeMemory();
-        log.trace("Available memory: {} bytes", availableMemory);
-        val dynamicBufferSize = Math.min((long) maxChunkSizeKib * 1024, availableMemory / (4L * parallelism));
-        log.trace("Dynamic buffer size: {}", dynamicBufferSize);
-        if (dynamicBufferSize < (long) minChunkSizeKib * 1024) {
-            log.error("Not enough memory to process content: {} bytes", dynamicBufferSize);
-            throw new VaultException(String.format("Not enough memory to process content: %d bytes", dynamicBufferSize));
-        }
-        return (int) dynamicBufferSize;
     }
 
     /**
@@ -248,7 +226,7 @@ public class AlfrescoService extends BaseComponent {
         conn.setDoOutput(true);
         conn.setRequestProperty(HttpHeaders.AUTHORIZATION, basicAuth);
         conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, nodeContent.getContentType());
-        conn.setChunkedStreamingMode(getBufferSize());
+        conn.setChunkedStreamingMode(8192);
 
         try (val is = nodeContent.getContentStream();
              val os = new ProgressTrackingOutputStream(conn.getOutputStream(), nodeId, nodeContent.getLength())) {
