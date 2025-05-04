@@ -86,6 +86,9 @@ public class AlfrescoService extends BaseComponent {
     @Value("${content.service.security.basicAuth.password}")
     private String password;
 
+    @Value("${application.service.alfresco.chunk-size}")
+    private int chunkSize;
+
     private static String basicAuth;
     public static Node guestHome;
 
@@ -226,7 +229,7 @@ public class AlfrescoService extends BaseComponent {
         conn.setDoOutput(true);
         conn.setRequestProperty(HttpHeaders.AUTHORIZATION, basicAuth);
         conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, nodeContent.getContentType());
-        conn.setChunkedStreamingMode(8192);
+        conn.setChunkedStreamingMode(chunkSize);
 
         try (val is = nodeContent.getContentStream();
              val os = new ProgressTrackingOutputStream(conn.getOutputStream(), nodeId, nodeContent.getLength())) {

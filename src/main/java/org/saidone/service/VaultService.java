@@ -65,15 +65,18 @@ public class VaultService extends BaseComponent {
 
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
-
     @Value("${application.service.vault.double-check}")
     private boolean doubleCheck;
+
+    @Value("${application.buffer-size}")
+    private int bufferSize;
+
     private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
 
     @SneakyThrows
     private void archiveNodeContent(Node node, InputStream inputStream) {
 
-        val inputStreams = InputStreamDuplicator.duplicate(inputStream);
+        val inputStreams = InputStreamDuplicator.duplicate(inputStream, bufferSize);
 
         try (val contentInputStream = inputStreams[0];
              val checksumInputStream = inputStreams[1]) {
