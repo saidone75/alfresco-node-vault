@@ -18,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import utils.ResourceFileUtils;
+import org.saidone.utils.ResourceFileUtils;
 
 import java.io.File;
 import java.nio.file.Files;
