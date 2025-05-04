@@ -11,6 +11,7 @@ import org.saidone.service.AlfrescoService;
 import org.saidone.service.VaultService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.net.URI;
@@ -30,7 +31,9 @@ class LoadTests extends BaseTest {
     @Autowired
     VaultService vaultService;
     @Autowired
-    private AlfrescoService alfrescoService;
+    AlfrescoService alfrescoService;
+    @Autowired
+    MongoTemplate mongoTemplate;
 
     @Test
     @Tag("load")
@@ -74,6 +77,9 @@ class LoadTests extends BaseTest {
 
         TimeUnit.HOURS.sleep(1);
         running.set(false);
+        TimeUnit.MINUTES.sleep(2);
+        val archivedNodesCount = mongoTemplate.getCollection("alf_node").countDocuments();
+        log.info("Nodes archived: {}", archivedNodesCount);
     }
 
 }
