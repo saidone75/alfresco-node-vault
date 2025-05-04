@@ -1,4 +1,4 @@
-package org.saidone;
+package org.saidone.test;
 
 import jakarta.annotation.PreDestroy;
 import lombok.Setter;

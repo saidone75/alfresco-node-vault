@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone;
+package org.saidone.test;
 
 import feign.FeignException;
 import lombok.Cleanup;

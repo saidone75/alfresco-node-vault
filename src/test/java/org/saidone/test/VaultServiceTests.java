@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone;
+package org.saidone.test;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
