@@ -18,6 +18,7 @@
 
 package org.saidone.misc;
 
+import lombok.experimental.UtilityClass;
 import lombok.val;
 
 import java.io.IOException;
@@ -26,12 +27,34 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Utility class providing methods to duplicate an InputStream into two identical InputStreams.
+ *
+ * The duplication is performed asynchronously by piping the data from the original InputStream
+ * into two separate PipedInputStreams, allowing concurrent reading from both duplicates.
+ */
+@UtilityClass
 public class InputStreamDuplicator {
 
+    /**
+     * Duplicates the given InputStream into two identical InputStreams using a default buffer size.
+     *
+     * @param inputStream the InputStream to duplicate
+     * @return an array of two InputStreams that provide identical data to the original
+     * @throws IOException if an I/O error occurs during the duplication setup
+     */
     public static InputStream[] duplicate(InputStream inputStream) throws IOException {
         return duplicate(inputStream, 8192);
     }
 
+    /**
+     * Duplicates the given InputStream into two identical InputStreams using the specified buffer size.
+     *
+     * @param inputStream the InputStream to duplicate
+     * @param bufferSize  the size of the buffer used for reading and writing data
+     * @return an array of two InputStreams that provide identical data to the original
+     * @throws IOException if an I/O error occurs during the duplication setup
+     */
     public static InputStream[] duplicate(InputStream inputStream, int bufferSize) throws IOException {
         val pipedIn1 = new PipedInputStream(bufferSize);
         val pipedIn2 = new PipedInputStream(bufferSize);
