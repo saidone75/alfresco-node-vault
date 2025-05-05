@@ -159,7 +159,11 @@ services:
     # extra_hosts:
     #   - "host.docker.internal:host-gateway"
   grafana:
-    image: ${GRAFANA_IMAGE}
+    build:
+      dockerfile: ./Dockerfile.grafana
+      context: .
+      args:
+        GRAFANA_IMAGE: ${GRAFANA_IMAGE}
     container_name: anv-grafana
     ports:
       - "4000:3000"

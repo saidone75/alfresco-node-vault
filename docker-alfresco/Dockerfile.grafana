@@ -1,13 +1,14 @@
-FROM GRAFANA_IMAGE
+ARG GRAFANA_IMAGE
+FROM ${GRAFANA_IMAGE}
 
 WORKDIR /etc/grafana
 
 COPY provisioning/ /etc/grafana/provisioning/
 COPY dashboards/ /var/lib/grafana/dashboards/
 
-RUN chown -R grafana:grafana /etc/grafana /var/lib/grafana
+USER root
+RUN chown -R grafana /etc/grafana /var/lib/grafana
 RUN chmod -R 755 /etc/grafana /var/lib/grafana
-
 EXPOSE 3000
 
 USER grafana
