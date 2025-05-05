@@ -2241,23 +2241,6 @@
       },
       {
         "current": {
-          "text": "",
-          "value": ""
-        },
-        "datasource": "anv-prometheus",
-        "definition": "label_values(hikaricp_connections{application=\"$application\"}, pool)",
-        "includeAll": false,
-        "label": "HikariCP-Pool",
-        "name": "hikaricp",
-        "options": [],
-        "query": "label_values(hikaricp_connections{application=\"$application\"}, pool)",
-        "refresh": 1,
-        "regex": "",
-        "sort": 1,
-        "type": "query"
-      },
-      {
-        "current": {
           "text": "All",
           "value": "$__all"
         },
@@ -2312,5 +2295,5 @@
   "timezone": "",
   "title": "Alfresco Node Vault Dashboard",
   "uid": "anv-dashboard",
-  "version": 3
+  "version": 4
 }
