@@ -153,14 +153,14 @@ services:
     image: ${PROMETHEUS_IMAGE}
     container_name: anv-prometheus
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./grafana/prometheus.yml:/etc/prometheus/prometheus.yml
     ports:
       - "9090:9090"
     # extra_hosts:
     #   - "host.docker.internal:host-gateway"
   grafana:
     build:
-      dockerfile: ./Dockerfile.grafana
+      dockerfile: grafana/Dockerfile.grafana
       context: .
       args:
         GRAFANA_IMAGE: ${GRAFANA_IMAGE}
@@ -174,8 +174,8 @@ services:
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
     volumes:
       - anv-grafana-volume:/var/lib/grafana
-      - ./provisioning:/etc/grafana/provisioning
-      - ./dashboards:/var/lib/grafana/dashboards
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
   nginx:
     image: ${NGINX_IMAGE}
     container_name: anv-nginx
