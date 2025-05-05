@@ -38,6 +38,7 @@ EXIT /B %ERRORLEVEL%
     docker volume create %VOLUME_PREFIX%-postgres-volume
     docker volume create %VOLUME_PREFIX%-ass-volume
     docker volume create %VOLUME_PREFIX%-mongo-volume
+    docker volume create %VOLUME_PREFIX%-grafana-volume
     echo %ENV_FILE_PATH%
     docker-compose -f "%COMPOSE_FILE_PATH%" --env-file "%ENV_FILE_PATH%" up --build -d
 EXIT /B 0
@@ -54,3 +55,4 @@ EXIT /B 0
     docker volume rm -f %VOLUME_PREFIX%-postgres-volume
     docker volume rm -f %VOLUME_PREFIX%-ass-volume
     docker volume rm -f %VOLUME_PREFIX%-mongo-volume
+    docker volume rm -f %VOLUME_PREFIX%-grafana-volume

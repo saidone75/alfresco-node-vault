@@ -1,0 +1,15 @@
+FROM GRAFANA_IMAGE
+
+WORKDIR /etc/grafana
+
+COPY provisioning/ /etc/grafana/provisioning/
+COPY dashboards/ /var/lib/grafana/dashboards/
+
+RUN chown -R grafana:grafana /etc/grafana /var/lib/grafana
+RUN chmod -R 755 /etc/grafana /var/lib/grafana
+
+EXPOSE 3000
+
+USER grafana
+ENTRYPOINT ["grafana-server"]
+CMD ["--homepath=/usr/share/grafana", "--config=/etc/grafana/grafana.ini"]
