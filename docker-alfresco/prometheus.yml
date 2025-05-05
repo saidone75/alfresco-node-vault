@@ -1,5 +1,3 @@
-# prometheus.yml
-# https://grafana.com/grafana/dashboards/19004-spring-boot-statistics/
 global:
   scrape_interval: 5s
 

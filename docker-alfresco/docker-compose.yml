@@ -2,10 +2,12 @@ services:
   alfresco:
     mem_limit: 1536m
     build:
+      dockerfile: ./Dockerfile.alfresco
       context: .
       args:
         ACS_IMAGE: ${ACS_IMAGE}
         ACS_VERSION: ${ACS_VERSION}
+    container_name: anv-alfresco
     environment:
       JAVA_TOOL_OPTIONS: "
             -Dencryption.keystore.type=JCEKS
@@ -62,6 +64,7 @@ services:
       - anv-acs-volume:/usr/local/tomcat/alf_data
   share:
     image: ${SHARE_IMAGE}:${SHARE_VERSION}
+    container_name: anv-share
     mem_limit: 512m
     environment:
       REPO_HOST: host.docker.internal
@@ -72,6 +75,7 @@ services:
       - default
   postgres:
     image: ${POSTGRES_IMAGE}:${POSTGRES_VERSION}
+    container_name: anv-postgres
     mem_limit: 512m
     environment:
       - POSTGRES_PASSWORD=alfresco
@@ -86,6 +90,7 @@ services:
       - anv-postgres-volume:/var/lib/postgresql/data
   solr6:
     image: ${ASS_IMAGE}:${ASS_VERSION}
+    container_name: anv-solr
     mem_limit: 1g
     environment:
       # Solr needs to know how to register itself with Alfresco
@@ -110,6 +115,7 @@ services:
       - anv-ass-volume:/opt/alfresco-search-services/data
   activemq:
     image: ${ACTIVEMQ_IMAGE}:${ACTIVEMQ_VERSION}
+    container_name: anv-activemq
     ports:
       - 8161:8161 # Web Console
       - 5672:5672 # AMQP
@@ -120,6 +126,7 @@ services:
       - anv-shared-network
   mongo:
     image: ${MONGO_IMAGE}
+    container_name: anv-mongo
     ports:
       - 27017:27017
     networks:
@@ -132,6 +139,7 @@ services:
       - anv-mongo-volume:/data/db
   mongo-express:
     image: ${MONGO_EXPRESS_IMAGE}
+    container_name: anv-mongo-express
     ports:
       - 8081:8081
     networks:
@@ -141,6 +149,40 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
       ME_CONFIG_BASICAUTH: "false"
+  prometheus:
+    image: ${PROMETHEUS_IMAGE}
+    container_name: anv-prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
+  grafana:
+    build:
+      dockerfile: ./Dockerfile.grafana
+      context: .
+      args:
+        GRAFANA_IMAGE: ${GRAFANA_IMAGE}
+    container_name: anv-grafana
+    ports:
+      - "4000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+    volumes:
+      - anv-grafana-volume:/var/lib/grafana
+      - ./provisioning:/etc/grafana/provisioning
+      - ./dashboards:/var/lib/grafana/dashboards
+  nginx:
+    image: ${NGINX_IMAGE}
+    container_name: anv-nginx
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
 volumes:
   anv-acs-volume:
     external: true
@@ -150,6 +192,8 @@ volumes:
     external: true
   anv-mongo-volume:
     external: true
+  anv-grafana-volume:
+    name: grafana-data
 networks:
   anv-shared-network:
     external: true
