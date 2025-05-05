@@ -28,7 +28,6 @@ import org.saidone.component.BaseComponent;
 import org.saidone.exception.HashesMismatchException;
 import org.saidone.exception.NodeNotOnVaultException;
 import org.saidone.exception.VaultException;
-import org.saidone.misc.DigestInputStream;
 import org.saidone.misc.ProgressTrackingInputStream;
 import org.saidone.model.MetadataKeys;
 import org.saidone.model.NodeContent;
@@ -41,8 +40,11 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.HexFormat;
 
 /**
  * Service responsible for archiving, restoring, and managing nodes in the vault.
@@ -78,7 +80,8 @@ public class VaultService extends BaseComponent {
      */
     @SneakyThrows
     private void archiveNodeContent(Node node, InputStream inputStream) {
-        try (val digestInputStream = new DigestInputStream(inputStream, checksumAlgorithm)) {
+        var digest = MessageDigest.getInstance(checksumAlgorithm);
+        try (val digestInputStream = new DigestInputStream(inputStream, digest)) {
             gridFsRepository.saveFile(
                     digestInputStream,
                     node.getName(),
@@ -86,12 +89,13 @@ public class VaultService extends BaseComponent {
                     new HashMap<>() {{
                         put(MetadataKeys.UUID, node.getId());
                     }});
-            log.trace("{}: {}", checksumAlgorithm, digestInputStream.getHash());
+            val hexDigest = HexFormat.of().formatHex(digest.digest());
+            log.trace("{}: {}", checksumAlgorithm, hexDigest);
             gridFsRepository.updateFileMetadata(
                     node.getId(),
                     new HashMap<>() {{
                         put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
-                        put(MetadataKeys.CHECKSUM_VALUE, digestInputStream.getHash());
+                        put(MetadataKeys.CHECKSUM_VALUE, hexDigest);
                     }});
         }
     }
@@ -218,13 +222,17 @@ public class VaultService extends BaseComponent {
      */
     public void doubleCheck(String nodeId) {
         log.debug("Comparing {} hashes for node: {}", DOUBLE_CHECK_ALGORITHM, nodeId);
-        try (val digestInputStream = new DigestInputStream(alfrescoService.getNodeContent(nodeId), DOUBLE_CHECK_ALGORITHM)) {
-            digestInputStream.transferTo(OutputStream.nullOutputStream());
-            val mongoHash = gridFsRepository.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
-            if (digestInputStream.getHash().equals(mongoHash)) {
-                log.debug("Digest check passed for node: {}", nodeId);
-            } else {
-                throw new HashesMismatchException(digestInputStream.getHash(), mongoHash);
+        try {
+            val digest = MessageDigest.getInstance(DOUBLE_CHECK_ALGORITHM);
+            try (val digestInputStream = new DigestInputStream(alfrescoService.getNodeContent(nodeId), digest)) {
+                digestInputStream.transferTo(OutputStream.nullOutputStream());
+                val hexDigest = HexFormat.of().formatHex(digest.digest());
+                val mongoHash = gridFsRepository.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
+                if (hexDigest.equals(mongoHash)) {
+                    log.debug("Digest check passed for node: {}", nodeId);
+                } else {
+                    throw new HashesMismatchException(hexDigest, mongoHash);
+                }
             }
         } catch (IOException | NoSuchAlgorithmException e) {
             throw new VaultException(String.format("Cannot compute hashes: %s", e.getMessage()));
