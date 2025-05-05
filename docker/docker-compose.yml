@@ -2,7 +2,7 @@ services:
   anv:
     image: anv:latest
     build:
-      dockerfile: ../Dockerfile
+      dockerfile: ../Dockerfile.vault
       context: ./
     environment:
       ALFRESCO_BASE_PATH: http://alfresco:8080
