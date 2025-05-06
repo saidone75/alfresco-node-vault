@@ -25,11 +25,11 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
-public class DigestInputStream extends FilterInputStream {
+public class AnvDigestInputStream extends FilterInputStream {
 
     private final MessageDigest digest;
 
-    public DigestInputStream(InputStream inputStream, String algorithm) throws NoSuchAlgorithmException {
+    public AnvDigestInputStream(InputStream inputStream, String algorithm) throws NoSuchAlgorithmException {
         super(inputStream);
         this.digest = MessageDigest.getInstance(algorithm);
     }
