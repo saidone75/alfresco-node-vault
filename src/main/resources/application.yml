@@ -96,6 +96,7 @@ application:
       double-check: ${VAULT_DOUBLE_CHECK:true}
       encryption:
         enabled: true
+        metadata: true
         key: testkey
   same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
 server:

@@ -26,4 +26,8 @@ public interface CryptoService {
 
     InputStream decrypt(InputStream inputStream);
 
+    String encryptText(String text);
+
+    String decryptText(String encryptedText);
+
 }

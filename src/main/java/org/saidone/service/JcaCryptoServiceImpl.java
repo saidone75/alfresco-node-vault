@@ -19,6 +19,7 @@
 package org.saidone.service;
 
 import lombok.val;
+import org.apache.commons.lang3.ArrayUtils;
 import org.saidone.component.BaseComponent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -26,53 +27,63 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
-import java.util.Arrays;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Base64;
 
 @Service
 @ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "true")
 public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService {
 
-    private final SecretKeySpec secretKey;
+    @Value("${application.service.vault.encryption.key}")
+    private String key;
+
+    private static final int SALT_LENGTH = 16;
     private static final int IV_LENGTH = 12;
     private static final int TAG_LENGTH = 128;
 
-    private static final String KEY_DIGEST_ALGORITHM = "AES";
+    private static final String KEY_FACTORY_ALGORITHM = "PBKDF2WithHmacSHA256";
     private static final String ALGORITHM = "AES";
     private static final String CIPHER_TRANSFORMATION = "AES/GCM/NoPadding";
 
-    public JcaCryptoServiceImpl(@Value("${application.service.vault.encryption.key}") String key) {
+    private SecretKeySpec getSecretKey(byte[] salt) {
         try {
-            val sha = MessageDigest.getInstance(KEY_DIGEST_ALGORITHM);
-            byte[] keyBytes = Arrays.copyOf(sha.digest(key.getBytes(StandardCharsets.UTF_8)), 32);
-            this.secretKey = new SecretKeySpec(keyBytes, ALGORITHM);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("Unable to initialize CryptoService", e);
+            val spec = new PBEKeySpec(key.toCharArray(), salt, 100000, 256);
+            val skf = SecretKeyFactory.getInstance(KEY_FACTORY_ALGORITHM);
+            return new SecretKeySpec(skf.generateSecret(spec).getEncoded(), ALGORITHM);
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            throw new IllegalStateException("Unable to derive secret key", e);
         }
     }
 
     @Override
     public InputStream encrypt(InputStream inputStream) {
         try {
+            // Generate random salt for PBKDF2
+            byte[] salt = new byte[SALT_LENGTH];
+            new SecureRandom().nextBytes(salt);
+
             // Generate random IV for GCM mode
             byte[] iv = new byte[IV_LENGTH];
             new SecureRandom().nextBytes(iv);
 
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             val spec = new GCMParameterSpec(TAG_LENGTH, iv);
+            val secretKey = getSecretKey(salt);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec);
 
-            // Prepend IV to the input stream
+            // Prepend salt and IV to the input stream
             return new SequenceInputStream(
-                    new ByteArrayInputStream(iv),
+                    new ByteArrayInputStream(ArrayUtils.addAll(salt, iv)),
                     new CipherInputStream(inputStream, cipher)
             );
         } catch (Exception e) {
@@ -83,16 +94,80 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
     @Override
     public InputStream decrypt(InputStream inputStream) {
         try {
-            // Read IV from the beginning of the stream
+            // Read salt from the the stream
+            byte[] salt = inputStream.readNBytes(SALT_LENGTH);
+
+            // Read IV from the the stream
             byte[] iv = inputStream.readNBytes(IV_LENGTH);
 
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             val spec = new GCMParameterSpec(TAG_LENGTH, iv);
+            val secretKey = getSecretKey(salt);
             cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
 
             return new CipherInputStream(inputStream, cipher);
         } catch (Exception e) {
             throw new RuntimeException("Error during decryption", e);
+        }
+    }
+
+    @Override
+    public String encryptText(String text) {
+        try {
+            // Generate random salt for PBKDF2
+            byte[] salt = new byte[SALT_LENGTH];
+            new SecureRandom().nextBytes(salt);
+
+            // Generate random IV for GCM mode
+            byte[] iv = new byte[IV_LENGTH];
+            new SecureRandom().nextBytes(iv);
+
+            val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
+            val spec = new GCMParameterSpec(TAG_LENGTH, iv);
+            val secretKey = getSecretKey(salt);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec);
+
+            // Encrypt the text
+            byte[] encryptedBytes = cipher.doFinal(text.getBytes(StandardCharsets.UTF_8));
+
+            // Combine IV, salt and encrypted data
+            byte[] combined = ArrayUtils.addAll(ArrayUtils.addAll(salt, iv), encryptedBytes);
+
+            // Return as Base64 encoded string
+            return Base64.getEncoder().encodeToString(combined);
+        } catch (Exception e) {
+            throw new RuntimeException("Error during text encryption", e);
+        }
+    }
+
+    @Override
+    public String decryptText(String encryptedText) {
+        try {
+            // Decode from Base64
+            byte[] decoded = Base64.getDecoder().decode(encryptedText);
+
+            // Extract salt
+            byte[] salt = new byte[SALT_LENGTH];
+            System.arraycopy(decoded, 0, salt, 0, SALT_LENGTH);
+
+            // Extract IV
+            byte[] iv = new byte[IV_LENGTH];
+            System.arraycopy(decoded, SALT_LENGTH, iv, 0, IV_LENGTH);
+
+            // Extract the encrypted data
+            byte[] encryptedBytes = new byte[decoded.length - (SALT_LENGTH + IV_LENGTH)];
+            System.arraycopy(decoded, SALT_LENGTH + IV_LENGTH, encryptedBytes, 0, encryptedBytes.length);
+
+            val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
+            val spec = new GCMParameterSpec(TAG_LENGTH, iv);
+            val secretKey = getSecretKey(salt);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
+
+            // Decrypt and convert back to string
+            byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+            return new String(decryptedBytes, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("Error during text decryption", e);
         }
     }
 

@@ -21,6 +21,7 @@ package org.saidone.repository;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.saidone.model.MetadataKeys;
 import org.saidone.service.CryptoService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -49,10 +50,9 @@ public class EncryptedGridFsRepositoryImpl extends GridFsRepositoryImpl {
 
     @Override
     public void saveFile(InputStream inputStream, String fileName, String contentType, Map<String, String> metadata) {
-        InputStream streamToStore = inputStream;
-        streamToStore = cryptoService.encrypt(inputStream);
-        metadata.put("encrypted", "true");
-        super.saveFile(streamToStore, fileName, contentType, metadata);
+        val encryptedInputStream = cryptoService.encrypt(inputStream);
+        metadata.put(MetadataKeys.ENCRYPTED, String.valueOf(true));
+        super.saveFile(encryptedInputStream, fileName, contentType, metadata);
     }
 
     @Override
@@ -66,8 +66,8 @@ public class EncryptedGridFsRepositoryImpl extends GridFsRepositoryImpl {
 
     private boolean isEncrypted(GridFSFile file) {
         val metadata = file.getMetadata();
-        if (metadata != null && metadata.containsKey("encrypted")) {
-            return Boolean.parseBoolean(metadata.getString("encrypted"));
+        if (metadata != null && metadata.containsKey(MetadataKeys.ENCRYPTED)) {
+            return Boolean.parseBoolean(metadata.getString(MetadataKeys.ENCRYPTED));
         }
         return false;
     }
