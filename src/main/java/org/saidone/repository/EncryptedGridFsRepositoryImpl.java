@@ -40,13 +40,10 @@ public class EncryptedGridFsRepositoryImpl extends GridFsRepositoryImpl {
     @Override
     @SneakyThrows
     public InputStream getFileContent(GridFSFile file) {
-        if (file != null) {
-            if (isEncrypted(file)) {
-                return cryptoService.decrypt(getFileContent(file));
-            }
-            return getFileContent(file);
+        if (isEncrypted(file)) {
+            return cryptoService.decrypt(super.getFileContent(file));
         }
-        return null;
+        return super.getFileContent(file);
     }
 
     private boolean isEncrypted(GridFSFile file) {
