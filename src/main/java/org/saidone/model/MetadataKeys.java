@@ -25,5 +25,6 @@ public interface MetadataKeys {
     String CONTENT_TYPE = "contentType";
     String CHECKSUM_ALGORITHM = "checksumAlgorithm";
     String CHECKSUM_VALUE = "checksumValue";
+    String ENCRYPTED = "encrypted";
 
 }

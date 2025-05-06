@@ -132,7 +132,6 @@ public class VaultApiController {
 
         val headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(nodeContent.getContentType()));
-        headers.setContentLength(nodeContent.getLength());
         if (attachment) {
             headers.setContentDispositionFormData("attachment", nodeContent.getFileName());
         }
