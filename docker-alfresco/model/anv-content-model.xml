@@ -20,18 +20,18 @@
     </namespaces>
 
     <aspects>
-        <aspect name="anv:archive" />
-    </aspects>
+        <aspect name="anv:archive"/>
 
-    <aspects>
         <aspect name="anv:restored">
-            <property name="anv:was">
-                <title>Original uuid</title>
-                <type>d:text</type>
-                <index enabled="true">
-                    <tokenised>false</tokenised>
-                </index>
-            </property>
+            <properties>
+                <property name="anv:was">
+                    <title>Original uuid</title>
+                    <type>d:text</type>
+                    <index enabled="true">
+                        <tokenised>false</tokenised>
+                    </index>
+                </property>
+            </properties>
         </aspect>
     </aspects>
 
