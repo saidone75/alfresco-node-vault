@@ -33,4 +33,6 @@ public interface GridFsRepository {
 
     void deleteFileById(String uuid);
 
+    boolean isEncrypted(String uuid);
+
 }
