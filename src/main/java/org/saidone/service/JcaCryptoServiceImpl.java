@@ -36,6 +36,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.Base64;
 
 @Service
 @ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "true")
@@ -45,7 +46,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
     private static final int IV_LENGTH = 12;
     private static final int TAG_LENGTH = 128;
 
-    private static final String KEY_DIGEST_ALGORITHM = "AES";
+    private static final String KEY_DIGEST_ALGORITHM = "SHA-256";
     private static final String ALGORITHM = "AES";
     private static final String CIPHER_TRANSFORMATION = "AES/GCM/NoPadding";
 
@@ -93,6 +94,58 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
             return new CipherInputStream(inputStream, cipher);
         } catch (Exception e) {
             throw new RuntimeException("Error during decryption", e);
+        }
+    }
+
+    @Override
+    public String encryptText(String text) {
+        try {
+            // Generate random IV for GCM mode
+            byte[] iv = new byte[IV_LENGTH];
+            new SecureRandom().nextBytes(iv);
+
+            val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
+            val spec = new GCMParameterSpec(TAG_LENGTH, iv);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec);
+
+            // Encrypt the text
+            byte[] encryptedBytes = cipher.doFinal(text.getBytes(StandardCharsets.UTF_8));
+
+            // Combine IV and encrypted data
+            byte[] combined = new byte[iv.length + encryptedBytes.length];
+            System.arraycopy(iv, 0, combined, 0, iv.length);
+            System.arraycopy(encryptedBytes, 0, combined, iv.length, encryptedBytes.length);
+
+            // Return as Base64 encoded string
+            return Base64.getEncoder().encodeToString(combined);
+        } catch (Exception e) {
+            throw new RuntimeException("Error during text encryption", e);
+        }
+    }
+
+    @Override
+    public String decryptText(String encryptedText) {
+        try {
+            // Decode from Base64
+            byte[] combined = Base64.getDecoder().decode(encryptedText);
+
+            // Extract IV from the beginning
+            byte[] iv = new byte[IV_LENGTH];
+            System.arraycopy(combined, 0, iv, 0, iv.length);
+
+            // Extract the encrypted data
+            byte[] encryptedBytes = new byte[combined.length - iv.length];
+            System.arraycopy(combined, iv.length, encryptedBytes, 0, encryptedBytes.length);
+
+            val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
+            val spec = new GCMParameterSpec(TAG_LENGTH, iv);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
+
+            // Decrypt and convert back to string
+            byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+            return new String(decryptedBytes, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            throw new RuntimeException("Error during text decryption", e);
         }
     }
 

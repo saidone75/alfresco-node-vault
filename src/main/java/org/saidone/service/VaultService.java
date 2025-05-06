@@ -35,7 +35,7 @@ import org.saidone.model.MetadataKeys;
 import org.saidone.model.NodeContent;
 import org.saidone.model.NodeWrapper;
 import org.saidone.repository.GridFsRepositoryImpl;
-import org.saidone.repository.MongoNodeRepository;
+import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +58,7 @@ import java.util.HashMap;
 public class VaultService extends BaseComponent {
 
     private final AlfrescoService alfrescoService;
-    private final MongoNodeRepository mongoNodeRepository;
+    private final MongoNodeRepositoryImpl mongoNodeRepository;
     private final GridFsRepositoryImpl gridFsRepository;
 
     @Value("${application.service.vault.hash-algorithm}")
