@@ -206,17 +206,21 @@ public class VaultService extends BaseComponent {
 
     /**
      * Performs a double check of content integrity for the node identified by {@code nodeId} by comparing hash digests.
-     * <p>
-     * It computes the hash of the node content retrieved from the Alfresco service using a digest input stream with the
-     * configured algorithm, then compares it against the hash computed from the corresponding MongoDB GridFS stored file.
-     * If the hashes match, the double check passes; otherwise, a {@link HashesMismatchException} is thrown.
-     * <p>
-     * Any {@link IOException} or {@link NoSuchAlgorithmException} encountered during the process will cause a
-     * {@link VaultException} to be thrown, wrapping the original error message.
      *
-     * @param nodeId the identifier of the node whose content hash is to be verified
-     * @throws HashesMismatchException if the computed hash from the content and the stored hash differ
-     * @throws VaultException          if there is an error accessing the content or computing the hash
+     * This method verifies the integrity of a node's content by comparing hash values calculated from two sources:
+     * 1. The content retrieved from the Alfresco service
+     * 2. The corresponding file stored in MongoDB GridFS
+     *
+     * The verification process uses the configured algorithm (defined in DOUBLE_CHECK_ALGORITHM constant)
+     * to compute hash digests. If the computed hashes match, the integrity check passes; otherwise,
+     * a {@link HashesMismatchException} is thrown.
+     *
+     * For encrypted files, the method retrieves the content from GridFS and computes the hash on the
+     * decrypted content. For non-encrypted files, it uses the repository's hash computation functionality.
+     *
+     * @param nodeId the identifier of the node whose content integrity needs to be verified
+     * @throws HashesMismatchException if the computed hashes from Alfresco and MongoDB don't match
+     * @throws VaultException if an error occurs during hash computation or content retrieval
      */
     public void doubleCheck(String nodeId) {
         log.debug("Comparing {} hashes for node: {}", DOUBLE_CHECK_ALGORITHM, nodeId);
