@@ -27,5 +27,9 @@ public interface AnvContentModel {
     String ANV_PREFIX = "anv";
     String ASP_ARCHIVE_LOCALNAME = "archive";
     String ASP_ARCHIVE = String.format("%s:%s", ANV_PREFIX, ASP_ARCHIVE_LOCALNAME);
+    String ASP_RESTORED_LOCALNAME = "restored";
+    String ASP_RESTORED = String.format("%s:%s", ANV_PREFIX, ASP_RESTORED_LOCALNAME);
+    String PROP_WAS_LOCALNAME = "was";
+    String PROP_WAS = String.format("%s:%s", ANV_PREFIX, PROP_WAS_LOCALNAME);
 
 }
