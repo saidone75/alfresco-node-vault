@@ -58,16 +58,17 @@ This approach bridges the gap between complete document purging (often unaccepta
 and the indefinite retention of all documents in the active repository (unsustainable from a performance perspective).
 
 ## Key Features
-- Lean, elegant code architecture
+- Lean and elegant code architecture
 - Fully FOSS, released under an open license
-- 100% test coverage
-- Minimal memory footprint
 - Custom upload and download methods
-- On-demand or scheduled archiving
+- Scheduled or on-demand archiving
 - MongoDB storage via GridFS
+- Content and metadata encryption
 - REST API with proxy support
 - Engineered for flexibility and bespoke integrations
 - No installation or changes required on Alfresco
+- 100% test coverage
+- Minimal memory footprint
 
 Pull requests are welcome!
 
