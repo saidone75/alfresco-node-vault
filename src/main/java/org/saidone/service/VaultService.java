@@ -24,10 +24,12 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.Node;
+import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
 import org.saidone.exception.HashesMismatchException;
 import org.saidone.exception.NodeNotOnVaultException;
 import org.saidone.exception.VaultException;
+import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.misc.ProgressTrackingInputStream;
 import org.saidone.model.MetadataKeys;
 import org.saidone.model.NodeContent;
@@ -40,11 +42,8 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.DigestInputStream;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
-import java.util.HexFormat;
 
 /**
  * Service responsible for archiving, restoring, and managing nodes in the vault.
@@ -80,8 +79,7 @@ public class VaultService extends BaseComponent {
      */
     @SneakyThrows
     private void archiveNodeContent(Node node, InputStream inputStream) {
-        var digest = MessageDigest.getInstance(checksumAlgorithm);
-        try (val digestInputStream = new DigestInputStream(inputStream, digest)) {
+        try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
             gridFsRepository.saveFile(
                     digestInputStream,
                     node.getName(),
@@ -89,13 +87,13 @@ public class VaultService extends BaseComponent {
                     new HashMap<>() {{
                         put(MetadataKeys.UUID, node.getId());
                     }});
-            val hexDigest = HexFormat.of().formatHex(digest.digest());
-            log.trace("{}: {}", checksumAlgorithm, hexDigest);
+            val hash = digestInputStream.getHash();
+            log.trace("{}: {}", checksumAlgorithm, hash);
             gridFsRepository.updateFileMetadata(
                     node.getId(),
                     new HashMap<>() {{
                         put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
-                        put(MetadataKeys.CHECKSUM_VALUE, hexDigest);
+                        put(MetadataKeys.CHECKSUM_VALUE, hash);
                     }});
         }
     }
@@ -223,15 +221,25 @@ public class VaultService extends BaseComponent {
     public void doubleCheck(String nodeId) {
         log.debug("Comparing {} hashes for node: {}", DOUBLE_CHECK_ALGORITHM, nodeId);
         try {
-            val digest = MessageDigest.getInstance(DOUBLE_CHECK_ALGORITHM);
-            try (val digestInputStream = new DigestInputStream(alfrescoService.getNodeContent(nodeId), digest)) {
-                digestInputStream.transferTo(OutputStream.nullOutputStream());
-                val hexDigest = HexFormat.of().formatHex(digest.digest());
-                val mongoHash = gridFsRepository.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
-                if (hexDigest.equals(mongoHash)) {
+            try (val alfrescoDigestInputStream = new AnvDigestInputStream(alfrescoService.getNodeContent(nodeId), DOUBLE_CHECK_ALGORITHM)) {
+                alfrescoDigestInputStream.transferTo(OutputStream.nullOutputStream());
+                val alfrescoHash = alfrescoDigestInputStream.getHash();
+                var mongoHash = Strings.EMPTY;
+                if (!gridFsRepository.isEncrypted(nodeId)) {
+                    mongoHash = gridFsRepository.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
+                } else {
+                    val gridFSFile = gridFsRepository.findFileById(nodeId);
+                    if (gridFSFile != null) {
+                        try (val mongoDigestInputStream = new AnvDigestInputStream(gridFsRepository.getFileContent(gridFSFile), DOUBLE_CHECK_ALGORITHM)) {
+                            mongoDigestInputStream.transferTo(OutputStream.nullOutputStream());
+                            mongoHash = mongoDigestInputStream.getHash();
+                        }
+                    }
+                }
+                if (alfrescoHash.equals(mongoHash)) {
                     log.debug("Digest check passed for node: {}", nodeId);
                 } else {
-                    throw new HashesMismatchException(hexDigest, mongoHash);
+                    throw new HashesMismatchException(alfrescoHash, mongoHash);
                 }
             }
         } catch (IOException | NoSuchAlgorithmException e) {

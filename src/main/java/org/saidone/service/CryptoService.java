@@ -16,23 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.repository;
-
-import com.mongodb.client.gridfs.model.GridFSFile;
+package org.saidone.service;
 
 import java.io.InputStream;
-import java.util.Map;
 
-public interface GridFsRepository {
+public interface CryptoService {
 
-    void saveFile(InputStream inputStream, String fileName, String contentType, Map<String, String> metadata);
+    InputStream encrypt(InputStream inputStream);
 
-    void updateFileMetadata(String uuid, Map<String, String> metadata);
-
-    GridFSFile findFileById(String uuid);
-
-    void deleteFileById(String uuid);
-
-    boolean isEncrypted(String uuid);
+    InputStream decrypt(InputStream inputStream);
 
 }
