@@ -24,6 +24,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
 import org.bson.Document;
+import org.saidone.component.BaseComponent;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
@@ -37,9 +39,10 @@ import org.springframework.stereotype.Repository;
 import java.io.InputStream;
 import java.util.Map;
 
-@RequiredArgsConstructor
 @Repository
-public class GridFsRepositoryImpl implements GridFsRepository {
+@ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "false", matchIfMissing = true)
+@RequiredArgsConstructor
+public class GridFsRepositoryImpl extends BaseComponent implements GridFsRepository {
 
     private final GridFsTemplate gridFsTemplate;
     private final GridFsOperations gridFsOperations;
@@ -94,6 +97,11 @@ public class GridFsRepositoryImpl implements GridFsRepository {
         val command = new Document(String.format("file%s", algorithm.toLowerCase()), findFileById(uuid).getId()).append("root", "fs");
         val result = mongoTemplate.executeCommand(command);
         return result.getString(algorithm.toLowerCase());
+    }
+
+    @Override
+    public boolean isEncrypted(String uuid) {
+        return false;
     }
 
 }

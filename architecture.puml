@@ -7,11 +7,12 @@ hide stereotype
 title Alfresco Node Vault
 
 System_Boundary(anv, "Alfresco Node Vault") {
-  Component(anvProxy, "Proxy")
+  Component(anvProxy, "Proxy", "Spring Cloud Gateway")
   Component(anvApi, "REST API")
   Component(anvHandler, "Event handler")
   Component(anvJob, "Scheduled job")
   Component(anvVault, "VaultService")
+  Component(anvCrypto, "CryptoService",,"(if required)")
   Component(anvAlfresco, "AlfrescoService")
   ContainerDb(anvMongo, "Mongo DB")
 }
@@ -34,7 +35,9 @@ Rel_D(anvApi, anvVault, "")
 Rel_D(anvHandler, anvVault, "")
 Rel_D(anvJob, anvVault, "")
 Rel_D(anvJob, anvAlfresco, "")
-BiRel_D(anvVault, anvMongo, "rw")
+BiRel_D(anvVault, anvCrypto, "")
+BiRel_D(anvVault, anvMongo, "")
+BiRel_D(anvCrypto, anvMongo, "")
 Rel_R(anvVault, anvAlfresco, "")
 Rel_R(anvAlfresco, acsApi, "")
 
