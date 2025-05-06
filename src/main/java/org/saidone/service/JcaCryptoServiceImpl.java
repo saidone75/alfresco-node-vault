@@ -19,11 +19,11 @@
 package org.saidone.service;
 
 import lombok.val;
+import org.apache.commons.lang3.ArrayUtils;
 import org.saidone.component.BaseComponent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
-import org.yaml.snakeyaml.util.Tuple;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -35,11 +35,9 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
 import java.util.Base64;
 
 @Service
@@ -67,13 +65,6 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
         }
     }
 
-    private byte[] combineSaltAndIv(byte[] salt, byte[] iv) {
-        byte[] combined = new byte[salt.length + iv.length];
-        System.arraycopy(salt, 0, combined, 0, salt.length);
-        System.arraycopy(iv, 0, combined, salt.length, iv.length);
-        return combined;
-    }
-
     @Override
     public InputStream encrypt(InputStream inputStream) {
         try {
@@ -92,7 +83,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
 
             // Prepend salt and IV to the input stream
             return new SequenceInputStream(
-                    new ByteArrayInputStream(combineSaltAndIv(salt, iv)),
+                    new ByteArrayInputStream(ArrayUtils.addAll(salt, iv)),
                     new CipherInputStream(inputStream, cipher)
             );
         } catch (Exception e) {
@@ -139,11 +130,8 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
             // Encrypt the text
             byte[] encryptedBytes = cipher.doFinal(text.getBytes(StandardCharsets.UTF_8));
 
-            // Combine IV and encrypted data
-            byte[] combined = new byte[SALT_LENGTH + IV_LENGTH + encryptedBytes.length];
-            System.arraycopy(salt, 0, combined, 0, SALT_LENGTH);
-            System.arraycopy(iv, 0, combined, SALT_LENGTH, IV_LENGTH);
-            System.arraycopy(encryptedBytes, 0, combined, (SALT_LENGTH + IV_LENGTH), encryptedBytes.length);
+            // Combine IV, salt and encrypted data
+            byte[] combined = ArrayUtils.addAll(ArrayUtils.addAll(salt, iv), encryptedBytes);
 
             // Return as Base64 encoded string
             return Base64.getEncoder().encodeToString(combined);
@@ -156,19 +144,19 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
     public String decryptText(String encryptedText) {
         try {
             // Decode from Base64
-            byte[] combined = Base64.getDecoder().decode(encryptedText);
+            byte[] decoded = Base64.getDecoder().decode(encryptedText);
 
             // Extract salt
             byte[] salt = new byte[SALT_LENGTH];
-            System.arraycopy(combined, 0, salt, 0, SALT_LENGTH);
+            System.arraycopy(decoded, 0, salt, 0, SALT_LENGTH);
 
-            // Extract IV from the beginning
+            // Extract IV
             byte[] iv = new byte[IV_LENGTH];
-            System.arraycopy(combined, SALT_LENGTH, iv, 0, IV_LENGTH);
+            System.arraycopy(decoded, SALT_LENGTH, iv, 0, IV_LENGTH);
 
             // Extract the encrypted data
-            byte[] encryptedBytes = new byte[combined.length - (SALT_LENGTH + IV_LENGTH)];
-            System.arraycopy(combined, SALT_LENGTH + IV_LENGTH, encryptedBytes, 0, encryptedBytes.length);
+            byte[] encryptedBytes = new byte[decoded.length - (SALT_LENGTH + IV_LENGTH)];
+            System.arraycopy(decoded, SALT_LENGTH + IV_LENGTH, encryptedBytes, 0, encryptedBytes.length);
 
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             val spec = new GCMParameterSpec(TAG_LENGTH, iv);
@@ -182,7 +170,5 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
             throw new RuntimeException("Error during text decryption", e);
         }
     }
-
-
 
 }
