@@ -21,10 +21,9 @@ package org.saidone.model;
 public interface MetadataKeys {
 
     String UUID = "uuid";
-    String FILE_NAME = "fileName";
-    String CONTENT_TYPE = "contentType";
-    String CHECKSUM_ALGORITHM = "checksumAlgorithm";
-    String CHECKSUM_VALUE = "checksumValue";
-    String ENCRYPTED = "encrypted";
+    String CONTENT_TYPE = "_contentType";
+    String CHECKSUM_ALGORITHM = "chkAlg";
+    String CHECKSUM_VALUE = "chkVal";
+    String ENCRYPTED = "enc";
 
 }
