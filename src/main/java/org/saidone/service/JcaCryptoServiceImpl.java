@@ -40,6 +40,30 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
+/**
+ * Implementation of the {@link CryptoService} using Java Cryptography Architecture (JCA) with AES encryption.
+ *
+ * This service performs encryption and decryption of data streams and text strings using AES in GCM mode
+ * with no padding. Encryption keys are derived via PBKDF2 with HmacSHA256 from a configured password and a
+ * randomly generated salt.
+ *
+ * Encryption process:
+ * - Generates a random salt and initialization vector (IV) for each encryption operation.
+ * - Derives a secret AES key from the password and salt using PBKDF2 with 100,000 iterations.
+ * - Encrypts the input stream using AES/GCM/NoPadding cipher initialized with the derived key and IV.
+ * - Prepends the salt and IV bytes to the encrypted data stream for use during decryption.
+ *
+ * Decryption process:
+ * - Reads the salt and IV bytes prepended to the encrypted input stream.
+ * - Derives the AES key using the same PBKDF2 parameters and the extracted salt.
+ * - Decrypts the rest of the input stream using AES/GCM/NoPadding cipher initialized with the derived key and IV.
+ *
+ * The service supports both streaming encryption/decryption of arbitrary input streams and
+ * convenience methods for encrypting and decrypting UTF-8 encoded strings with Base64 encoding.
+ *
+ * Activation of this service is conditional on the Spring property
+ * {@code application.service.vault.encryption.enabled=true}.
+ */
 @Service
 @ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "true")
 public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService {
@@ -55,6 +79,15 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
     private static final String ALGORITHM = "AES";
     private static final String CIPHER_TRANSFORMATION = "AES/GCM/NoPadding";
 
+    /**
+     * Derives a secret AES key from the configured password and the given salt using PBKDF2 with HmacSHA256.
+     *
+     * This method uses 100,000 iterations and generates a 256-bit key suitable for AES encryption.
+     *
+     * @param salt the salt bytes used in key derivation to ensure uniqueness and strengthen security
+     * @return a SecretKeySpec representing the derived AES secret key
+     * @throws IllegalStateException if the key derivation algorithm is not available or the key specification is invalid
+     */
     private SecretKeySpec getSecretKey(byte[] salt) {
         try {
             val spec = new PBEKeySpec(key.toCharArray(), salt, 100000, 256);
@@ -65,6 +98,21 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
         }
     }
 
+    /**
+     * Encrypts the provided input stream using AES encryption in GCM mode with no padding.
+     *
+     * This method generates a random salt and initialization vector (IV) for each encryption operation.
+     * The salt is used to derive a secret AES key from a configured password using PBKDF2 with HmacSHA256,
+     * ensuring cryptographic strength and uniqueness of the key.
+     *
+     * The IV is used to initialize the cipher for AES-GCM encryption.
+     * The method returns an InputStream that prepends the concatenated salt and IV bytes before the encrypted data stream,
+     * allowing the decryption process to retrieve these parameters.
+     *
+     * @param inputStream the input stream containing plaintext data to encrypt
+     * @return an InputStream emitting the salt, IV, and encrypted data in sequence
+     * @throws RuntimeException if any error occurs during the encryption process
+     */
     @Override
     public InputStream encrypt(InputStream inputStream) {
         try {
@@ -91,6 +139,21 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
         }
     }
 
+    /**
+     * Encrypts the provided input stream using AES encryption in GCM mode with no padding.
+     *
+     * This method generates a random salt and initialization vector (IV) for each encryption operation.
+     * The salt is used to derive a secret AES key from a configured password using PBKDF2 with HmacSHA256,
+     * ensuring cryptographic strength and uniqueness of the key.
+     *
+     * The IV is used to initialize the cipher for AES-GCM encryption.
+     * The method returns an InputStream that prepends the concatenated salt and IV bytes before the encrypted data stream,
+     * allowing the decryption process to retrieve these parameters.
+     *
+     * @param inputStream the input stream containing plaintext data to encrypt
+     * @return an InputStream emitting the salt, IV, and encrypted data in sequence
+     * @throws RuntimeException if any error occurs during the encryption process
+     */
     @Override
     public InputStream decrypt(InputStream inputStream) {
         try {
@@ -111,6 +174,14 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
         }
     }
 
+    /**
+     * Encrypts the given text by converting it to UTF-8 bytes, encrypting those bytes,
+     * and then encoding the result into a Base64 string.
+     *
+     * @param text the plaintext string to encrypt
+     * @return a Base64-encoded string representing the encrypted text
+     * @throws RuntimeException if any error occurs during the encryption process
+     */
     @Override
     public String encryptText(String text) {
         try {
@@ -121,6 +192,20 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
         }
     }
 
+    /**
+     * Decrypts a Base64-encoded, AES-encrypted text string.
+     *
+     * This method performs the following steps:
+     * - Decodes the input Base64 string into bytes.
+     * - Decrypts the bytes using the configured AES decryption process.
+     * - Converts the decrypted bytes into a UTF-8 encoded string.
+     *
+     * If any error occurs during decoding or decryption, a RuntimeException is thrown.
+     *
+     * @param encryptedText the Base64-encoded encrypted string to decrypt
+     * @return the original decrypted plaintext string
+     * @throws RuntimeException if an error occurs during decryption
+     */
     @Override
     public String decryptText(String encryptedText) {
         try {
