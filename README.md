@@ -80,18 +80,21 @@ Pull requests are welcome!
 
 Global configuration is stored in `application.yml` file, the relevant parameters are:
 
-| Parameter/env variable        | Default value                              | Purpose                                                             |
-|-------------------------------|--------------------------------------------|---------------------------------------------------------------------|
-| ALFRESCO_BASE_PATH            | http://localhost:8080                      | Scheme, host and port of the Alfresco server                        |
-| ALFRESCO_USERNAME             | admin                                      | Alfresco user                                                       |
-| ALFRESCO_PASSWORD             | admin                                      | Password for the Alfresco user                                      |
-| ACTIVE_MQ_URL                 | tcp://localhost:61616                      | ActiveMQ broker URL                                                 |
-| EVENT_HANDLER_ENABLED         | false                                      | Event based archive behaviour switch                                |
-| ARCHIVING_JOB_ENABLED         | true                                       | Archiving scheduled job switch                                      |
-| ARCHIVING_JOB_CRON_EXPRESSION | 0 0/5 2-6 * * ?                            | Scheduled job cron expression                                       |
-| ARCHIVING_JOB_QUERY           | TYPE:'cm:content' AND ASPECT:'anv:archive' | Query for selecting documents to be archived                        |
-| VAULT_HASH_ALGORITHM          | SHA-256                                    | Hash stored as metadata on GridFS                                   |
-| VAULT_DOUBLE_CHECK            | true                                       | Double check content integrity before removing document on Alfresco |
+| Parameter/env variable        | Default value                              | Purpose                                                            |
+|-------------------------------|--------------------------------------------|--------------------------------------------------------------------|
+| ALFRESCO_BASE_PATH            | http://localhost:8080                      | Scheme, host and port of the Alfresco server                       |
+| ALFRESCO_USERNAME             | admin                                      | Alfresco user                                                      |
+| ALFRESCO_PASSWORD             | admin                                      | Password for the Alfresco user                                     |
+| ACTIVE_MQ_URL                 | tcp://localhost:61616                      | ActiveMQ broker URL                                                |
+| EVENT_HANDLER_ENABLED         | false                                      | Event based archive behaviour switch                               |
+| ARCHIVING_JOB_ENABLED         | true                                       | Archiving scheduled job switch                                     |
+| ARCHIVING_JOB_CRON_EXPRESSION | 0 0/5 2-6 * * ?                            | Scheduled job cron expression                                      |
+| ARCHIVING_JOB_QUERY           | TYPE:'cm:content' AND ASPECT:'anv:archive' | Query for selecting documents to be archived                       |
+| VAULT_HASH_ALGORITHM          | SHA-256                                    | Hash stored as metadata on GridFS                                  |
+| VAULT_DOUBLE_CHECK            | true                                       | Double check content integrity before removing document on Alfresco|
+| VAULT_ENCRYPTION_ENABLED      | false                                      | Enable content encrypyion                                          |
+| VAULT_ENCRYPT_METADATA        | false                                      | Encrypt also metadata                                              |
+| VAULT_ENCRYPTION_KEY          | changeme                                   | Encryption key                                                     |
 
 ## Build
 
