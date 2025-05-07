@@ -14,7 +14,12 @@ start() {
     docker volume create $VOLUME_PREFIX-ass-volume
     docker volume create $VOLUME_PREFIX-mongo-volume
     docker volume create $VOLUME_PREFIX-grafana-volume
-    docker-compose -f "$COMPOSE_FILE_PATH" --env-file "$ENV_FILE_PATH" up --build -d
+
+    if [ "$1" = "novault" ]; then
+        docker-compose -f "$COMPOSE_FILE_PATH" --env-file "$ENV_FILE_PATH" up --build -d --scale anv-vault=0
+    else
+        docker-compose -f "$COMPOSE_FILE_PATH" --env-file "$ENV_FILE_PATH" up --build -d
+    fi
 }
 
 down() {
@@ -46,11 +51,11 @@ case "$1" in
   build_start)
     down
     build
-    start
+    start "$2"
     tail
     ;;
   start)
-    start
+    start "$2"
     tail
     ;;
   stop)
@@ -64,5 +69,5 @@ case "$1" in
     tail
     ;;
   *)
-    echo "Usage: $0 {build|build_start|start|stop|purge|tail}"
+    echo "Usage: $0 {build|build_start|start|stop|purge|tail} [novault]"
 esac

@@ -180,7 +180,7 @@ services:
       - "3000:3000"
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
-  vault:
+  anv-vault:
     image: anv:latest
     container_name: anv-vault
     mem_limit: 256m
