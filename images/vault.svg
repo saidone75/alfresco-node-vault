@@ -12,9 +12,9 @@
         <circle cx="-26" cy="-15" r="8" fill="#0071bc"></circle>
         <circle cx="0" cy="0" r="14" fill="#ccc"></circle>
     </g>
-    <line x1="110" y1="80" x2="110" y2="120" stroke="#ccc" stroke-width="2"></line>
-    <line x1="90" y1="100" x2="130" y2="100" stroke="#ccc" stroke-width="2"></line>
-    <circle cx="110" cy="100" r="20" fill="none" stroke="#ccc" stroke-width="2"></circle>
+    <line x1="110" y1="80" x2="110" y2="120" stroke="#ccc" stroke-width="3"></line>
+    <line x1="90" y1="100" x2="130" y2="100" stroke="#ccc" stroke-width="3"></line>
+    <circle cx="110" cy="100" r="20" fill="none" stroke="#ccc" stroke-width="3"></circle>
     <rect x="42" y="60" width="7" height="20" rx="2" fill="#777"></rect>
     <rect x="42" y="120" width="7" height="20" rx="2" fill="#777"></rect>
 </svg>
