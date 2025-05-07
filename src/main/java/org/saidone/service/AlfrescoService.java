@@ -44,6 +44,7 @@ import org.saidone.misc.ProgressTrackingOutputStream;
 import org.saidone.model.NodeContent;
 import org.saidone.model.SystemSearchRequest;
 import org.saidone.model.alfresco.AnvContentModel;
+import org.saidone.utils.CastUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -190,8 +191,16 @@ public class AlfrescoService extends BaseComponent {
         nodesApi.deleteNode(nodeId, config.isPermanentlyDeleteNodes());
     }
 
-
-    // FIXME
+    /**
+     * Restores a previously archived node from the vault back to the repository.
+     * This method creates a new node in the repository based on the properties of the archived node.
+     * The archived node is marked with a reference to its original ID using the WAS property.
+     *
+     * @param node The archived node to restore
+     * @param restorePermissions If true, the original permissions will be applied to the restored node
+     * @return The ID of the newly created node in the repository
+     * @throws Exception If any error occurs during the restoration process
+     */
     @SneakyThrows
     public String restoreNode(Node node, boolean restorePermissions) {
         val nodeBodyCreate = new NodeBodyCreate();
@@ -200,7 +209,7 @@ public class AlfrescoService extends BaseComponent {
         val aspectNames = node.getAspectNames();
         aspectNames.remove(AnvContentModel.ASP_ARCHIVE);
         nodeBodyCreate.setAspectNames(aspectNames);
-        val properties = (HashMap<String, Object>) node.getProperties();
+        val properties = CastUtils.castToMapOfStringObject(node.getProperties());
         properties.put(AnvContentModel.PROP_WAS, node.getId());
         nodeBodyCreate.setProperties(properties);
         if (restorePermissions) {

@@ -114,27 +114,8 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
     @Override
     public String encryptText(String text) {
         try {
-            // Generate random salt for PBKDF2
-            byte[] salt = new byte[SALT_LENGTH];
-            new SecureRandom().nextBytes(salt);
-
-            // Generate random IV for GCM mode
-            byte[] iv = new byte[IV_LENGTH];
-            new SecureRandom().nextBytes(iv);
-
-            val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
-            val spec = new GCMParameterSpec(TAG_LENGTH, iv);
-            val secretKey = getSecretKey(salt);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec);
-
-            // Encrypt the text
-            byte[] encryptedBytes = cipher.doFinal(text.getBytes(StandardCharsets.UTF_8));
-
-            // Combine salt, IV and encrypted data
-            byte[] combined = ArrayUtils.addAll(ArrayUtils.addAll(salt, iv), encryptedBytes);
-
-            // Return as base64 encoded string
-            return Base64.getEncoder().encodeToString(combined);
+            byte[] encryptedBytes = encrypt(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))).readAllBytes();
+            return Base64.getEncoder().encodeToString(encryptedBytes);
         } catch (Exception e) {
             throw new RuntimeException("Error during text encryption", e);
         }
@@ -143,28 +124,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
     @Override
     public String decryptText(String encryptedText) {
         try {
-            // Decode from base64
-            byte[] decoded = Base64.getDecoder().decode(encryptedText);
-
-            // Extract salt
-            byte[] salt = new byte[SALT_LENGTH];
-            System.arraycopy(decoded, 0, salt, 0, SALT_LENGTH);
-
-            // Extract IV
-            byte[] iv = new byte[IV_LENGTH];
-            System.arraycopy(decoded, SALT_LENGTH, iv, 0, IV_LENGTH);
-
-            // Extract the encrypted data
-            byte[] encryptedBytes = new byte[decoded.length - (SALT_LENGTH + IV_LENGTH)];
-            System.arraycopy(decoded, SALT_LENGTH + IV_LENGTH, encryptedBytes, 0, encryptedBytes.length);
-
-            val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
-            val spec = new GCMParameterSpec(TAG_LENGTH, iv);
-            val secretKey = getSecretKey(salt);
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
-
-            // Decrypt and convert back to string
-            byte[] decryptedBytes = cipher.doFinal(encryptedBytes);
+            byte[] decryptedBytes = decrypt(new ByteArrayInputStream(Base64.getDecoder().decode(encryptedText))).readAllBytes();
             return new String(decryptedBytes, StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new RuntimeException("Error during text decryption", e);
