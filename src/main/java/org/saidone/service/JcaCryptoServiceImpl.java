@@ -19,7 +19,6 @@
 package org.saidone.service;
 
 import lombok.val;
-import org.apache.commons.lang3.ArrayUtils;
 import org.saidone.component.BaseComponent;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -129,9 +128,14 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
             val secretKey = getSecretKey(salt);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec);
 
+            // Concatenate salt and IV
+            byte[] saltAndIv = new byte[SALT_LENGTH + IV_LENGTH];
+            System.arraycopy(salt, 0, saltAndIv, 0, SALT_LENGTH);
+            System.arraycopy(iv, 0, saltAndIv, SALT_LENGTH, IV_LENGTH);
+
             // Prepend salt and IV to the input stream
             return new SequenceInputStream(
-                    new ByteArrayInputStream(ArrayUtils.addAll(salt, iv)),
+                    new ByteArrayInputStream(saltAndIv),
                     new CipherInputStream(inputStream, cipher)
             );
         } catch (Exception e) {
