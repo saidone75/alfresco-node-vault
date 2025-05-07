@@ -187,8 +187,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
     @Override
     public String encryptText(String text) {
         try (val is = encrypt(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8)))) {
-            byte[] encryptedBytes = is.readAllBytes();
-            return Base64.getEncoder().encodeToString(encryptedBytes);
+            return Base64.getEncoder().encodeToString(is.readAllBytes());
         } catch (Exception e) {
             throw new RuntimeException("Error during text encryption", e);
         }
@@ -211,8 +210,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
     @Override
     public String decryptText(String encryptedText) {
         try (val is = decrypt(new ByteArrayInputStream(Base64.getDecoder().decode(encryptedText)))) {
-            byte[] decryptedBytes = is.readAllBytes();
-            return new String(decryptedBytes, StandardCharsets.UTF_8);
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new RuntimeException("Error during text decryption", e);
         }
