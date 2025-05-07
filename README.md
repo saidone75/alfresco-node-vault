@@ -99,12 +99,19 @@ Java and Maven required
 
 `mvn package -DskipTests -Dlicense.skip=true`
 
-look at the `build.sh` or `build.bat` scripts for creating a convenient distribution package.
+Look at the `build.sh` or `build.bat` scripts for creating a convenient distribution package.
 
 ## Testing
 
-For integration tests just change configuration and point it to an existing Alfresco installation, or use
-`alfresco.(sh|bat)` script to start it with docker.
+For integration tests you can use `vault.(sh|bat)` script to start all needed containers, then
+
+`mvn test`
+
+will run the integration tests, and
+
+`mvn test -Dtests=massive`
+
+will run a load test.
 
 ## Run
 
