@@ -44,6 +44,7 @@ import org.saidone.misc.ProgressTrackingOutputStream;
 import org.saidone.model.NodeContent;
 import org.saidone.model.SystemSearchRequest;
 import org.saidone.model.alfresco.AnvContentModel;
+import org.saidone.utils.CastUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -208,8 +209,7 @@ public class AlfrescoService extends BaseComponent {
         val aspectNames = node.getAspectNames();
         aspectNames.remove(AnvContentModel.ASP_ARCHIVE);
         nodeBodyCreate.setAspectNames(aspectNames);
-        var properties = (HashMap<String, Object>) node.getProperties();
-        if (properties == null) properties = new HashMap<>();
+        val properties = CastUtils.castToMapOfStringObject(node.getProperties());
         properties.put(AnvContentModel.PROP_WAS, node.getId());
         nodeBodyCreate.setProperties(properties);
         if (restorePermissions) {
