@@ -1,16 +1,24 @@
 @ECHO OFF
-
-SET COMPOSE_FILE_PATH=%CD%\docker-alfresco\docker-compose.yml
-SET ENV_FILE_PATH=%CD%\docker-alfresco\.env
+SET COMPOSE_FILE_PATH=%CD%\docker\docker-compose.yml
+SET ENV_FILE_PATH=%CD%\docker\.env
 SET VOLUME_PREFIX=anv
-
 IF [%1]==[] (
-    echo "Usage: %0 {start|stop|purge|tail}"
+    echo "Usage: %0 {build|build_start|start|stop|purge|tail} [novault]"
     GOTO END
 )
-
+IF %1==build (
+    CALL :build
+    GOTO END
+)
+IF %1==build_start (
+    CALL :down
+    CALL :build
+    CALL :start %2
+    CALL :tail
+    GOTO END
+)
 IF %1==start (
-    CALL :start
+    CALL :start %2
     CALL :tail
     GOTO END
 )
@@ -27,25 +35,29 @@ IF %1==tail (
     CALL :tail
     GOTO END
 )
-
-echo "Usage: %0 {start|stop|purge|tail}"
+echo "Usage: %0 {build_start|start|stop|purge|tail} [novault]"
 :END
 EXIT /B %ERRORLEVEL%
-
 :start
-    docker network create %VOLUME_PREFIX%-shared-network
     docker volume create %VOLUME_PREFIX%-acs-volume
     docker volume create %VOLUME_PREFIX%-postgres-volume
     docker volume create %VOLUME_PREFIX%-ass-volume
     docker volume create %VOLUME_PREFIX%-mongo-volume
     docker volume create %VOLUME_PREFIX%-grafana-volume
     echo %ENV_FILE_PATH%
-    docker-compose -f "%COMPOSE_FILE_PATH%" --env-file "%ENV_FILE_PATH%" up --build -d
+    IF [%1]==[novault] (
+        docker-compose -f "%COMPOSE_FILE_PATH%" --env-file "%ENV_FILE_PATH%" up --build -d --scale anv-vault=0
+    ) ELSE (
+        docker-compose -f "%COMPOSE_FILE_PATH%" --env-file "%ENV_FILE_PATH%" up --build -d
+    )
 EXIT /B 0
 :down
     if exist "%COMPOSE_FILE_PATH%" (
         docker-compose -f "%COMPOSE_FILE_PATH%" --env-file "%ENV_FILE_PATH%" down
     )
+EXIT /B 0
+:build
+	docker build -t anv:latest . -f docker/Dockerfile.vault
 EXIT /B 0
 :tail
     docker-compose -f "%COMPOSE_FILE_PATH%" --env-file "%ENV_FILE_PATH%" logs -f

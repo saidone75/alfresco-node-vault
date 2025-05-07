@@ -130,10 +130,10 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
             // Encrypt the text
             byte[] encryptedBytes = cipher.doFinal(text.getBytes(StandardCharsets.UTF_8));
 
-            // Combine IV, salt and encrypted data
+            // Combine salt, IV and encrypted data
             byte[] combined = ArrayUtils.addAll(ArrayUtils.addAll(salt, iv), encryptedBytes);
 
-            // Return as Base64 encoded string
+            // Return as base64 encoded string
             return Base64.getEncoder().encodeToString(combined);
         } catch (Exception e) {
             throw new RuntimeException("Error during text encryption", e);
@@ -143,7 +143,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
     @Override
     public String decryptText(String encryptedText) {
         try {
-            // Decode from Base64
+            // Decode from base64
             byte[] decoded = Base64.getDecoder().decode(encryptedText);
 
             // Extract salt

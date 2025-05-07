@@ -5,7 +5,7 @@ scrape_configs:
   - job_name: 'alfresco-node-vault'
     metrics_path: '/actuator/prometheus'
     static_configs:
-      - targets: ['host.docker.internal:8086']
+      - targets: ['anv-vault:8086']
     basic_auth:
       username: 'admin'
       password: 'admin'

@@ -7,12 +7,12 @@ hide stereotype
 title Alfresco Node Vault
 
 System_Boundary(anv, "Alfresco Node Vault") {
-  Component(anvProxy, "Proxy", "Spring Cloud Gateway")
+  Component(anvProxy, "Proxy")
   Component(anvApi, "REST API")
   Component(anvHandler, "Event handler")
   Component(anvJob, "Scheduled job")
   Component(anvVault, "VaultService")
-  Component(anvCrypto, "CryptoService",,"(if required)")
+  Component(anvCrypto, "CryptoService")
   Component(anvAlfresco, "AlfrescoService")
   ContainerDb(anvMongo, "Mongo DB")
 }
@@ -24,7 +24,7 @@ if they are no longer present in Alfresco
 end note
 
 System_Boundary(acs, "Alfresco Content Service") {
-  ContainerQueue(acsQueue, "Active MQ")
+  ComponentQueue(acsQueue, "Active MQ")
   Component(acsApi, "REST API")
 }
 

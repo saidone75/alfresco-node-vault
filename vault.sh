@@ -1,17 +1,25 @@
 #!/bin/sh
 
-COMPOSE_FILE_PATH="${PWD}/docker-alfresco/docker-compose.yml"
-ENV_FILE_PATH="${PWD}/docker-alfresco/.env"
+COMPOSE_FILE_PATH="${PWD}/docker/docker-compose.yml"
+ENV_FILE_PATH="${PWD}/docker/.env"
 VOLUME_PREFIX=anv
 
+build() {
+  docker build -t anv:latest . -f docker/Dockerfile.vault
+}
+
 start() {
-    docker network create $VOLUME_PREFIX-shared-network 2> /dev/null
     docker volume create $VOLUME_PREFIX-acs-volume
     docker volume create $VOLUME_PREFIX-postgres-volume
     docker volume create $VOLUME_PREFIX-ass-volume
     docker volume create $VOLUME_PREFIX-mongo-volume
     docker volume create $VOLUME_PREFIX-grafana-volume
-    docker-compose -f "$COMPOSE_FILE_PATH" --env-file "$ENV_FILE_PATH" up --build -d
+
+    if [ "$1" = "novault" ]; then
+        docker-compose -f "$COMPOSE_FILE_PATH" --env-file "$ENV_FILE_PATH" up --build -d --scale anv-vault=0
+    else
+        docker-compose -f "$COMPOSE_FILE_PATH" --env-file "$ENV_FILE_PATH" up --build -d
+    fi
 }
 
 down() {
@@ -37,8 +45,17 @@ tail_all() {
 }
 
 case "$1" in
+  build)
+    build
+    ;;
+  build_start)
+    down
+    build
+    start "$2"
+    tail
+    ;;
   start)
-    start
+    start "$2"
     tail
     ;;
   stop)
@@ -52,5 +69,5 @@ case "$1" in
     tail
     ;;
   *)
-    echo "Usage: $0 {start|stop|purge|tail}"
+    echo "Usage: $0 {build|build_start|start|stop|purge|tail} [novault]"
 esac

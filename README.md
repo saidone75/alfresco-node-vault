@@ -63,7 +63,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Custom upload and download methods
 - Scheduled or on-demand archiving
 - MongoDB storage via GridFS
-- Optional strong encryption for content and metadata
+- Encryption for content and metadata
 - REST API with proxy support
 - Engineered for flexibility and bespoke integrations
 - No installation or changes required on Alfresco
