@@ -55,6 +55,7 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -189,13 +190,8 @@ public class AlfrescoService extends BaseComponent {
         nodesApi.deleteNode(nodeId, config.isPermanentlyDeleteNodes());
     }
 
-    /**
-     * Restores a node by creating a new node with the same properties and optionally restoring permissions.
-     *
-     * @param node               the {@link Node} to restore
-     * @param restorePermissions if true, permissions will be restored on the new node
-     * @return the identifier of the newly created node
-     */
+
+    // FIXME
     @SneakyThrows
     public String restoreNode(Node node, boolean restorePermissions) {
         val nodeBodyCreate = new NodeBodyCreate();
@@ -204,7 +200,9 @@ public class AlfrescoService extends BaseComponent {
         val aspectNames = node.getAspectNames();
         aspectNames.remove(AnvContentModel.ASP_ARCHIVE);
         nodeBodyCreate.setAspectNames(aspectNames);
-        nodeBodyCreate.setProperties(node.getProperties());
+        val properties = (HashMap<String, Object>) node.getProperties();
+        properties.put(AnvContentModel.PROP_WAS, node.getId());
+        nodeBodyCreate.setProperties(properties);
         if (restorePermissions) {
             val permissionBody = new PermissionsBody();
             permissionBody.setIsInheritanceEnabled(node.getPermissions().isIsInheritanceEnabled());
