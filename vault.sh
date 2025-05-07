@@ -64,5 +64,5 @@ case "$1" in
     tail
     ;;
   *)
-    echo "Usage: $0 {start|stop|purge|tail}"
+    echo "Usage: $0 {build|build_start|start|stop|purge|tail}"
 esac

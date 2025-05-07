@@ -182,7 +182,7 @@ services:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
   vault:
     image: anv:latest
-    container_name: vault
+    container_name: anv-vault
     mem_limit: 256m
     build:
       dockerfile: ./docker/Dockerfile.vault
