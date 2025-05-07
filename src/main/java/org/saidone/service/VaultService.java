@@ -37,6 +37,7 @@ import org.saidone.model.NodeWrapper;
 import org.saidone.repository.GridFsRepositoryImpl;
 import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.mongodb.core.query.Meta;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -175,8 +176,8 @@ public class VaultService extends BaseComponent {
         }
         val nodeContent = new NodeContent();
         nodeContent.setFileName(gridFSFile.getFilename());
-        if (gridFSFile.getMetadata() != null && gridFSFile.getMetadata().containsKey("_contentType")) {
-            nodeContent.setContentType(gridFSFile.getMetadata().getString("_contentType"));
+        if (gridFSFile.getMetadata() != null && gridFSFile.getMetadata().containsKey(MetadataKeys.CONTENT_TYPE)) {
+            nodeContent.setContentType(gridFSFile.getMetadata().getString(MetadataKeys.CONTENT_TYPE));
         }
         nodeContent.setLength(gridFSFile.getLength());
         nodeContent.setContentStream(gridFsRepository.getFileContent(gridFSFile));

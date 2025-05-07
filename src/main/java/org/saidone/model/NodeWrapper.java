@@ -31,6 +31,7 @@ import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.Node;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -52,9 +53,13 @@ public class NodeWrapper {
 
     @Id
     private String id;
+    @BsonProperty("arcDt")
     private Instant archiveDate;
+    @BsonProperty("res")
     private boolean restored;
+    @BsonProperty("enc")
     private boolean encrypted;
+    @BsonProperty("node")
     private String nodeJson;
 
     public NodeWrapper(Node node) throws JsonProcessingException {
@@ -65,7 +70,7 @@ public class NodeWrapper {
         this.archiveDate = java.time.Instant.now();
         this.nodeJson = objectMapper.writeValueAsString(node);
     }
-    
+
     public Node getNode() {
         if (nodeJson == null || nodeJson.isEmpty()) {
             return null;
@@ -77,7 +82,7 @@ public class NodeWrapper {
             return null;
         }
     }
-    
+
     private static ObjectMapper createObjectMapper() {
         val mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
@@ -85,5 +90,5 @@ public class NodeWrapper {
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         return mapper;
     }
-    
+
 }
