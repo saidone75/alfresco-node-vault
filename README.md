@@ -92,8 +92,8 @@ Global configuration is stored in `application.yml` file, the relevant parameter
 | ARCHIVING_JOB_QUERY           | TYPE:'cm:content' AND ASPECT:'anv:archive' | Query for selecting documents to be archived                       |
 | VAULT_HASH_ALGORITHM          | SHA-256                                    | Hash stored as metadata on GridFS                                  |
 | VAULT_DOUBLE_CHECK            | true                                       | Double check content integrity before removing document on Alfresco|
-| VAULT_ENCRYPTION_ENABLED      | false                                      | Enable content encrypyion                                          |
-| VAULT_ENCRYPT_METADATA        | false                                      | Encrypt also metadata                                              |
+| VAULT_ENCRYPTION_ENABLED      | true                                       | Enable content encrypyion                                          |
+| VAULT_ENCRYPT_METADATA        | true                                       | Encrypt also metadata                                              |
 | VAULT_ENCRYPTION_KEY          | changeme                                   | Encryption key                                                     |
 
 ## Build
