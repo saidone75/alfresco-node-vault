@@ -24,7 +24,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.Node;
-import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
 import org.saidone.exception.HashesMismatchException;
 import org.saidone.exception.NodeNotOnVaultException;
@@ -37,13 +36,9 @@ import org.saidone.model.NodeWrapper;
 import org.saidone.repository.GridFsRepositoryImpl;
 import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.mongodb.core.query.Meta;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 
 /**
@@ -206,32 +201,25 @@ public class VaultService extends BaseComponent {
     }
 
     /**
-     * Performs a hash comparison (double check) for the content of the specified node.
-     * <p>
-     * This method computes the hash of the node content retrieved from Alfresco using the configured
-     * {@code DOUBLE_CHECK_ALGORITHM} and compares it with the hash computed from the corresponding content
-     * stored in MongoDB GridFS. If the hashes match, the check passes; otherwise, a {@link HashesMismatchException}
-     * is thrown.
-     * </p>
+     * Performs a consistency check by comparing the cryptographic hashes of a node's content retrieved from both Alfresco and MongoDB storage systems
+     * using the specified algorithm. If the hashes match, the method logs a successful comparison. If a mismatch is detected, a {@link HashesMismatchException}
+     * is thrown. Any exception that occurs during hash computation is wrapped and rethrown as a {@link VaultException}.
      *
-     * @param nodeId the identifier of the node whose content hashes are to be compared
-     * @throws VaultException          if an I/O error or algorithm error occurs during hash computation
+     * @param nodeId the unique identifier of the node whose content will be checked
      * @throws HashesMismatchException if the computed hashes from Alfresco and MongoDB do not match
+     * @throws VaultException          if any error occurs during hash calculation or comparison
      */
     public void doubleCheck(String nodeId) {
         log.debug("Comparing {} hashes for node: {}", DOUBLE_CHECK_ALGORITHM, nodeId);
         try {
-            try (val alfrescoDigestInputStream = new AnvDigestInputStream(alfrescoService.getNodeContent(nodeId), DOUBLE_CHECK_ALGORITHM)) {
-                alfrescoDigestInputStream.transferTo(OutputStream.nullOutputStream());
-                val alfrescoHash = alfrescoDigestInputStream.getHash();
-                val mongoHash = gridFsRepository.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
-                if (alfrescoHash.equals(mongoHash)) {
-                    log.debug("Digest check passed for node: {}", nodeId);
-                } else {
-                    throw new HashesMismatchException(alfrescoHash, mongoHash);
-                }
+            val alfrescoHash = alfrescoService.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
+            val mongoHash = gridFsRepository.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
+            if (alfrescoHash.equals(mongoHash)) {
+                log.debug("Digest check passed for node: {}", nodeId);
+            } else {
+                throw new HashesMismatchException(alfrescoHash, mongoHash);
             }
-        } catch (IOException | NoSuchAlgorithmException e) {
+        } catch (Exception e) {
             throw new VaultException(String.format("Cannot compute hashes: %s", e.getMessage()));
         }
     }

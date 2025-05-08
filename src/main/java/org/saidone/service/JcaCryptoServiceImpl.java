@@ -19,9 +19,11 @@
 package org.saidone.service;
 
 import lombok.val;
+import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
+import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.saidone.component.BaseComponent;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
@@ -40,63 +42,109 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
 /**
- * Implementation of the {@link CryptoService} using Java Cryptography Architecture (JCA) with AES encryption.
+ * Implementation of the CryptoService interface using the Java Cryptography Architecture (JCA).
  * <p>
- * This service performs encryption and decryption of data streams and text strings using AES in GCM mode
- * with no padding. Encryption keys are derived via PBKDF2 with HmacSHA256 from a configured password and a
- * randomly generated salt.
+ * This service provides encryption and decryption capabilities using AES-GCM with PBKDF2 key derivation.
+ * It supports both stream-based and text-based encryption operations with the following security features:
+ * AES encryption in GCM (Galois/Counter Mode) for authenticated encryption,
+ * PBKDF2 with HMAC-SHA256 for secure key derivation from passwords,
+ * Secure random generation of cryptographic salt and initialization vectors,
+ * Base64 encoding for text-based encryption results.
  * <p>
- * Encryption process:
- * - Generates a random salt and initialization vector (IV) for each encryption operation.
- * - Derives a secret AES key from the password and salt using PBKDF2 with 100,000 iterations.
- * - Encrypts the input stream using AES/GCM/NoPadding cipher initialized with the derived key and IV.
- * - Prepends the salt and IV bytes to the encrypted data stream for use during decryption.
- * <p>
- * Decryption process:
- * - Reads the salt and IV bytes prepended to the encrypted input stream.
- * - Derives the AES key using the same PBKDF2 parameters and the extracted salt.
- * - Decrypts the rest of the input stream using AES/GCM/NoPadding cipher initialized with the derived key and IV.
- * <p>
- * The service supports both streaming encryption/decryption of arbitrary input streams and
- * convenience methods for encrypting and decrypting UTF-8 encoded strings with Base64 encoding.
- * <p>
- * Activation of this service is conditional on the Spring property
- * {@code application.service.vault.encryption.enabled=true}.
+ * This implementation is conditionally enabled based on the following application properties:
+ * application.service.vault.encryption.enabled = true
+ * application.service.vault.encryption.impl = 'jca'
+ *
+ * @see CryptoService
+ * @see BaseComponent
  */
 @Service
-@ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "true")
+@ConditionalOnExpression("${application.service.vault.encryption.enabled:true} == true && '${application.service.vault.encryption.impl:}' == 'jca'")
 public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService {
 
-    @Value("${application.service.vault.encryption.key}")
+    @Value("${application.service.vault.encryption.jca.salt-length:16}")
+    private int SALT_LENGTH;
+    @Value("${application.service.vault.encryption.jca.iv-length:12}")
+    private int IV_LENGTH;
+    private final int TAG_LENGTH = 128;
+    private static final String CIPHER_TRANSFORMATION = "AES/GCM/NoPadding";
+
+    @Value("${application.service.vault.encryption.jca.key}")
     private String key;
 
-    private static final int SALT_LENGTH = 16;
-    private static final int IV_LENGTH = 12;
-    private static final int TAG_LENGTH = 128;
+    private static final String KEY_ALGORITHM = "AES";
 
-    private static final String KEY_FACTORY_ALGORITHM = "PBKDF2WithHmacSHA256";
-    private static final String ALGORITHM = "AES";
-    private static final String CIPHER_TRANSFORMATION = "AES/GCM/NoPadding";
+    @Value("${application.service.vault.encryption.jca.kdf.impl}")
+    private String kdfImpl;
+
+    private static final String PBKDF2_KEY_FACTORY_ALGORITHM = "PBKDF2WithHmacSHA256";
+    @Value("${application.service.vault.encryption.jca.kdf.pbkdf2.iterations:100000}")
+    private int PBKDF2_ITERATIONS;
+
+    @Value("${application.service.vault.encryption.jca.kdf.argon2.parallelism:1}")
+    private int ARGON2_PARALLELISM;
+    @Value("${application.service.vault.encryption.jca.kdf.argon2.memory:65536}")
+    private int ARGON2_MEMORY;
+    @Value("${application.service.vault.encryption.jca.kdf.argon2.iterations:3}")
+    private int ARGON2_ITERATIONS;
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
     /**
-     * Derives a secret AES key from the configured password and the given salt using PBKDF2 with HmacSHA256.
-     * <p>
-     * This method uses 100,000 iterations and generates a 256-bit key suitable for AES encryption.
+     * Derives a {@link SecretKeySpec} using the specified salt.
+     * <br>
+     * The key derivation function (KDF) used depends on the value of {@code kdfImpl}.
+     * If {@code kdfImpl} is set to "argon2", the Argon2 KDF is used; otherwise, PBKDF2 is applied.
      *
-     * @param salt the salt bytes used in key derivation to ensure uniqueness and strengthen security
-     * @return a SecretKeySpec representing the derived AES secret key
-     * @throws IllegalStateException if the key derivation algorithm is not available or the key specification is invalid
+     * @param salt the salt to use for key derivation
+     * @return the derived {@link SecretKeySpec}
      */
     private SecretKeySpec deriveSecretKey(byte[] salt) {
+        if (kdfImpl.equals("argon2")) return deriveArgon2SecretKey(salt);
+        else return derivePbkdf2SecretKey(salt);
+    }
+
+    /**
+     * Derives a secret key using the PBKDF2 (Password-Based Key Derivation Function 2) algorithm with the given salt.
+     * <br>
+     * This method transforms a password and salt into a {@link SecretKeySpec} suitable for cryptographic operations
+     * by running the PBKDF2 function for a specified number of iterations and key length.
+     *
+     * @param salt the salt used in the key derivation process
+     * @return the derived {@link SecretKeySpec}
+     * @throws IllegalStateException if the key derivation process cannot be completed due to algorithm or key spec errors
+     */
+    private SecretKeySpec derivePbkdf2SecretKey(byte[] salt) {
         try {
-            val spec = new PBEKeySpec(key.toCharArray(), salt, 100000, 256);
-            val skf = SecretKeyFactory.getInstance(KEY_FACTORY_ALGORITHM);
-            return new SecretKeySpec(skf.generateSecret(spec).getEncoded(), ALGORITHM);
+            val spec = new PBEKeySpec(key.toCharArray(), salt, PBKDF2_ITERATIONS, 256);
+            val skf = SecretKeyFactory.getInstance(PBKDF2_KEY_FACTORY_ALGORITHM);
+            return new SecretKeySpec(skf.generateSecret(spec).getEncoded(), KEY_ALGORITHM);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new IllegalStateException("Unable to derive secret key", e);
         }
+    }
+
+    /**
+     * Derives a secret key using the Argon2 key derivation function.
+     * <p>
+     * This method initializes an Argon2BytesGenerator with parameters such as salt, parallelism, memory cost, and iterations.
+     * The supplied salt and an instance variable {@code key} are used to generate a 32-byte key, which is then returned
+     * as a {@link SecretKeySpec} suitable for AES encryption.
+     *
+     * @param salt the salt to use for the Argon2 key derivation function
+     * @return a SecretKeySpec containing the derived AES key
+     */
+    private SecretKeySpec deriveArgon2SecretKey(byte[] salt) {
+        val builder = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
+                .withSalt(salt)
+                .withParallelism(ARGON2_PARALLELISM)
+                .withMemoryAsKB(ARGON2_MEMORY)
+                .withIterations(ARGON2_ITERATIONS);
+        val generator = new Argon2BytesGenerator();
+        generator.init(builder.build());
+        byte[] generatedKeyBytes = new byte[32];
+        generator.generateBytes(key.getBytes(StandardCharsets.UTF_8), generatedKeyBytes);
+        return new SecretKeySpec(generatedKeyBytes, "AES");
     }
 
     /**
