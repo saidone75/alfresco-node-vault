@@ -89,7 +89,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
      * @return a SecretKeySpec representing the derived AES secret key
      * @throws IllegalStateException if the key derivation algorithm is not available or the key specification is invalid
      */
-    private SecretKeySpec getSecretKey(byte[] salt) {
+    private SecretKeySpec deriveSecretKey(byte[] salt) {
         try {
             val spec = new PBEKeySpec(key.toCharArray(), salt, 100000, 256);
             val skf = SecretKeyFactory.getInstance(KEY_FACTORY_ALGORITHM);
@@ -127,7 +127,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
 
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             val spec = new GCMParameterSpec(TAG_LENGTH, iv);
-            val secretKey = getSecretKey(salt);
+            val secretKey = deriveSecretKey(salt);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec);
 
             // Concatenate salt and IV
@@ -167,7 +167,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
 
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             val spec = new GCMParameterSpec(TAG_LENGTH, iv);
-            val secretKey = getSecretKey(salt);
+            val secretKey = deriveSecretKey(salt);
             cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
 
             return new CipherInputStream(inputStream, cipher);
