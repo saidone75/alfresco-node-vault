@@ -21,9 +21,8 @@ package org.saidone.repository;
 import lombok.val;
 import org.saidone.model.NodeWrapper;
 import org.saidone.service.CryptoService;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -35,10 +34,10 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
     private final CryptoService cryptoService;
 
     public EncryptedMongoNodeRepositoryImpl(
-            @Qualifier("mongoNodeRepository") MongoRepository<NodeWrapper, String> delegate,
+            MongoOperations mongoOperations,
             CryptoService cryptoService
     ) {
-        super(delegate);
+        super(mongoOperations);
         this.cryptoService = cryptoService;
     }
 

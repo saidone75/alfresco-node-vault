@@ -21,7 +21,7 @@ package org.saidone.gateway.predicate;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.logging.log4j.util.Strings;
-import org.saidone.repository.MongoNodeRepository;
+import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -33,10 +33,10 @@ import java.util.regex.Pattern;
 @Slf4j
 public class IsOnVaultPredicate extends AbstractRoutePredicateFactory<IsOnVaultPredicate.Config> {
 
-    private final MongoNodeRepository mongoNodeRepository;
+    private final MongoNodeRepositoryImpl mongoNodeRepository;
     private static final Pattern nodeContentPattern = Pattern.compile("^.*/nodes/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}).*$");
 
-    public IsOnVaultPredicate(MongoNodeRepository mongoNodeRepository) {
+    public IsOnVaultPredicate(MongoNodeRepositoryImpl mongoNodeRepository) {
         super(IsOnVaultPredicate.Config.class);
         this.mongoNodeRepository = mongoNodeRepository;
     }
