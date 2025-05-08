@@ -28,7 +28,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-@ConditionalOnProperty(name = "application.service.vault.encryption.metadata", havingValue = "true")
+@ConditionalOnProperty(name = {"application.service.vault.encryption.enabled", "application.service.vault.encryption.metadata"},
+        havingValue = "true")
 public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
 
     private final CryptoService cryptoService;
