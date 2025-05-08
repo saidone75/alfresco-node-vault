@@ -102,7 +102,14 @@ application:
           key: ${VAULT_ENCRYPTION_KEY:changeme}
           salt-length: 16
           iv-length: 12
-          iterations: 100000
+          kdf:
+            impl: pbkdf2
+            pbkdf2:
+              iterations: 100000
+            argon2:
+              parallelism: 1
+              memory: 65536
+              iterations: 3
   same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
 server:
   port: 8086
