@@ -206,22 +206,17 @@ public class VaultService extends BaseComponent {
     }
 
     /**
-     * Performs a double check of content integrity for the node identified by {@code nodeId} by comparing hash digests.
+     * Performs a hash comparison (double check) for the content of the specified node.
+     * <p>
+     * This method computes the hash of the node content retrieved from Alfresco using the configured
+     * {@code DOUBLE_CHECK_ALGORITHM} and compares it with the hash computed from the corresponding content
+     * stored in MongoDB GridFS. If the hashes match, the check passes; otherwise, a {@link HashesMismatchException}
+     * is thrown.
+     * </p>
      *
-     * This method verifies the integrity of a node's content by comparing hash values calculated from two sources:
-     * 1. The content retrieved from the Alfresco service
-     * 2. The corresponding file stored in MongoDB GridFS
-     *
-     * The verification process uses the configured algorithm (defined in DOUBLE_CHECK_ALGORITHM constant)
-     * to compute hash digests. If the computed hashes match, the integrity check passes; otherwise,
-     * a {@link HashesMismatchException} is thrown.
-     *
-     * For encrypted files, the method retrieves the content from GridFS and computes the hash on the
-     * decrypted content. For non-encrypted files, it uses the repository's hash computation functionality.
-     *
-     * @param nodeId the identifier of the node whose content integrity needs to be verified
-     * @throws HashesMismatchException if the computed hashes from Alfresco and MongoDB don't match
-     * @throws VaultException if an error occurs during hash computation or content retrieval
+     * @param nodeId the identifier of the node whose content hashes are to be compared
+     * @throws VaultException          if an I/O error or algorithm error occurs during hash computation
+     * @throws HashesMismatchException if the computed hashes from Alfresco and MongoDB do not match
      */
     public void doubleCheck(String nodeId) {
         log.debug("Comparing {} hashes for node: {}", DOUBLE_CHECK_ALGORITHM, nodeId);
@@ -229,18 +224,7 @@ public class VaultService extends BaseComponent {
             try (val alfrescoDigestInputStream = new AnvDigestInputStream(alfrescoService.getNodeContent(nodeId), DOUBLE_CHECK_ALGORITHM)) {
                 alfrescoDigestInputStream.transferTo(OutputStream.nullOutputStream());
                 val alfrescoHash = alfrescoDigestInputStream.getHash();
-                var mongoHash = Strings.EMPTY;
-                if (!gridFsRepository.isEncrypted(nodeId)) {
-                    mongoHash = gridFsRepository.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
-                } else {
-                    val gridFSFile = gridFsRepository.findFileById(nodeId);
-                    if (gridFSFile != null) {
-                        try (val mongoDigestInputStream = new AnvDigestInputStream(gridFsRepository.getFileContent(gridFSFile), DOUBLE_CHECK_ALGORITHM)) {
-                            mongoDigestInputStream.transferTo(OutputStream.nullOutputStream());
-                            mongoHash = mongoDigestInputStream.getHash();
-                        }
-                    }
-                }
+                val mongoHash = gridFsRepository.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
                 if (alfrescoHash.equals(mongoHash)) {
                     log.debug("Digest check passed for node: {}", nodeId);
                 } else {

@@ -33,6 +33,6 @@ public interface GridFsRepository {
 
     void deleteFileById(String uuid);
 
-    boolean isEncrypted(String uuid);
+    String computeHash(String uuid, String algorithm);
 
 }

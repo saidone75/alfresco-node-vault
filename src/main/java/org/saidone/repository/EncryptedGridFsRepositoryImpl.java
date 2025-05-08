@@ -21,6 +21,7 @@ package org.saidone.repository;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
 import org.saidone.service.CryptoService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -30,6 +31,7 @@ import org.springframework.data.mongodb.gridfs.GridFsTemplate;
 import org.springframework.stereotype.Repository;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 
 @Repository
@@ -64,18 +66,24 @@ public class EncryptedGridFsRepositoryImpl extends GridFsRepositoryImpl {
         return super.getFileContent(file);
     }
 
+    @Override
+    @SneakyThrows
+    public String computeHash(String uuid, String algorithm) {
+        val file = findFileById(uuid);
+        if (isEncrypted(file)) {
+            try (val mongoDigestInputStream = new AnvDigestInputStream(getFileContent(file), algorithm)) {
+                mongoDigestInputStream.transferTo(OutputStream.nullOutputStream());
+                return mongoDigestInputStream.getHash();
+            }
+        } else return super.computeHash(file, algorithm);
+    }
+
     private boolean isEncrypted(GridFSFile file) {
         val metadata = file.getMetadata();
         if (metadata != null && metadata.containsKey(MetadataKeys.ENCRYPTED)) {
             return Boolean.parseBoolean(metadata.getString(MetadataKeys.ENCRYPTED));
         }
         return false;
-    }
-
-    @Override
-    public boolean isEncrypted(String uuid) {
-        val file = findFileById(uuid);
-        return isEncrypted(file);
     }
 
 }
