@@ -93,15 +93,15 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
         return null;
     }
 
-    public String computeHash(String uuid, String algorithm) {
-        val command = new Document(String.format("file%s", algorithm.toLowerCase()), findFileById(uuid).getId()).append("root", "fs");
+    protected String computeHash(GridFSFile file, String algorithm) {
+        val command = new Document(String.format("file%s", algorithm.toLowerCase()), file.getId()).append("root", "fs");
         val result = mongoTemplate.executeCommand(command);
         return result.getString(algorithm.toLowerCase());
     }
 
     @Override
-    public boolean isEncrypted(String uuid) {
-        return false;
+    public String computeHash(String uuid, String algorithm) {
+        return computeHash(findFileById(uuid), algorithm);
     }
 
 }
