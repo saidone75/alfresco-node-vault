@@ -40,6 +40,7 @@ import org.saidone.component.BaseComponent;
 import org.saidone.config.AlfrescoServiceConfig;
 import org.saidone.exception.ApiExceptionError;
 import org.saidone.exception.VaultException;
+import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.misc.ProgressTrackingOutputStream;
 import org.saidone.model.NodeContent;
 import org.saidone.model.SystemSearchRequest;
@@ -51,12 +52,12 @@ import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -196,7 +197,7 @@ public class AlfrescoService extends BaseComponent {
      * This method creates a new node in the repository based on the properties of the archived node.
      * The archived node is marked with a reference to its original ID using the WAS property.
      *
-     * @param node The archived node to restore
+     * @param node               The archived node to restore
      * @param restorePermissions If true, the original permissions will be applied to the restored node
      * @return The ID of the newly created node in the repository
      * @throws Exception If any error occurs during the restoration process
@@ -240,7 +241,7 @@ public class AlfrescoService extends BaseComponent {
 
         try (val is = nodeContent.getContentStream();
              val os = new ProgressTrackingOutputStream(conn.getOutputStream(), nodeId, nodeContent.getLength())) {
-          is.transferTo(os);
+            is.transferTo(os);
         }
 
         val responseCode = conn.getResponseCode();
@@ -249,6 +250,14 @@ public class AlfrescoService extends BaseComponent {
         } else {
             log.error("Failed to upload content for node {} with HTTP status: {}", nodeId, responseCode);
             throw new VaultException(String.format("Failed to upload content for node %s with HTTP status: %d", nodeId, responseCode));
+        }
+    }
+
+    @SneakyThrows
+    public String computeHash(String nodeId, String algorithm) {
+        try (val alfrescoDigestInputStream = new AnvDigestInputStream(getNodeContent(nodeId), algorithm)) {
+            alfrescoDigestInputStream.transferTo(OutputStream.nullOutputStream());
+            return alfrescoDigestInputStream.getHash();
         }
     }
 
