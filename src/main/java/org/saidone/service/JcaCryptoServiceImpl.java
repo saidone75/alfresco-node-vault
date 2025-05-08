@@ -39,7 +39,6 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
-
 /**
  * Implementation of the CryptoService interface using the Java Cryptography Architecture (JCA).
  * <p>
@@ -70,7 +69,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
     private int IV_LENGTH;
     @Value("${application.service.vault.encryption.jca.iterations:100000}")
     private int ITERATIONS;
-    private int TAG_LENGTH = 128;
+    private final int TAG_LENGTH = 128;
 
     private static final String KEY_FACTORY_ALGORITHM = "PBKDF2WithHmacSHA256";
     private static final String ALGORITHM = "AES";
