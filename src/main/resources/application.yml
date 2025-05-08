@@ -97,7 +97,12 @@ application:
       encryption:
         enabled: ${VAULT_ENCRYPTION_ENABLED:true}
         metadata: ${VAULT_ENCRYPT_METADATA:true}
-        key: ${VAULT_ENCRYPTION_KEY:changeme}
+        impl: jca
+        jca:
+          key: ${VAULT_ENCRYPTION_KEY:changeme}
+          salt-length: 16
+          iv-length: 12
+          iterations: 100000
   same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
 server:
   port: 8086

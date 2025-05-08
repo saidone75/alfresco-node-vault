@@ -21,7 +21,7 @@ package org.saidone.service;
 import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
@@ -39,40 +39,38 @@ import java.security.SecureRandom;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
+
 /**
- * Implementation of the {@link CryptoService} using Java Cryptography Architecture (JCA) with AES encryption.
+ * Implementation of the CryptoService interface using the Java Cryptography Architecture (JCA).
  * <p>
- * This service performs encryption and decryption of data streams and text strings using AES in GCM mode
- * with no padding. Encryption keys are derived via PBKDF2 with HmacSHA256 from a configured password and a
- * randomly generated salt.
+ * This service provides encryption and decryption capabilities using AES-GCM with PBKDF2 key derivation.
+ * It supports both stream-based and text-based encryption operations with the following security features:
+ * AES encryption in GCM (Galois/Counter Mode) for authenticated encryption,
+ * PBKDF2 with HMAC-SHA256 for secure key derivation from passwords,
+ * Secure random generation of cryptographic salt and initialization vectors,
+ * Base64 encoding for text-based encryption results.
  * <p>
- * Encryption process:
- * - Generates a random salt and initialization vector (IV) for each encryption operation.
- * - Derives a secret AES key from the password and salt using PBKDF2 with 100,000 iterations.
- * - Encrypts the input stream using AES/GCM/NoPadding cipher initialized with the derived key and IV.
- * - Prepends the salt and IV bytes to the encrypted data stream for use during decryption.
- * <p>
- * Decryption process:
- * - Reads the salt and IV bytes prepended to the encrypted input stream.
- * - Derives the AES key using the same PBKDF2 parameters and the extracted salt.
- * - Decrypts the rest of the input stream using AES/GCM/NoPadding cipher initialized with the derived key and IV.
- * <p>
- * The service supports both streaming encryption/decryption of arbitrary input streams and
- * convenience methods for encrypting and decrypting UTF-8 encoded strings with Base64 encoding.
- * <p>
- * Activation of this service is conditional on the Spring property
- * {@code application.service.vault.encryption.enabled=true}.
+ * This implementation is conditionally enabled based on the following application properties:
+ * application.service.vault.encryption.enabled = true
+ * application.service.vault.encryption.impl = 'jca'
+ *
+ * @see CryptoService
+ * @see BaseComponent
  */
 @Service
-@ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "true")
+@ConditionalOnExpression("${application.service.vault.encryption.enabled:true} == true && '${application.service.vault.encryption.impl:}' == 'jca'")
 public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService {
 
-    @Value("${application.service.vault.encryption.key}")
+    @Value("${application.service.vault.encryption.jca.key}")
     private String key;
 
-    private static final int SALT_LENGTH = 16;
-    private static final int IV_LENGTH = 12;
-    private static final int TAG_LENGTH = 128;
+    @Value("${application.service.vault.encryption.jca.salt-length:16}")
+    private int SALT_LENGTH;
+    @Value("${application.service.vault.encryption.jca.iv-length:12}")
+    private int IV_LENGTH;
+    @Value("${application.service.vault.encryption.jca.iterations:100000}")
+    private int ITERATIONS;
+    private int TAG_LENGTH = 128;
 
     private static final String KEY_FACTORY_ALGORITHM = "PBKDF2WithHmacSHA256";
     private static final String ALGORITHM = "AES";
@@ -91,7 +89,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
      */
     private SecretKeySpec deriveSecretKey(byte[] salt) {
         try {
-            val spec = new PBEKeySpec(key.toCharArray(), salt, 100000, 256);
+            val spec = new PBEKeySpec(key.toCharArray(), salt, ITERATIONS, 256);
             val skf = SecretKeyFactory.getInstance(KEY_FACTORY_ALGORITHM);
             return new SecretKeySpec(skf.generateSecret(spec).getEncoded(), ALGORITHM);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
