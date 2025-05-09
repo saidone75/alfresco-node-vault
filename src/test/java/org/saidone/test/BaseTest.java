@@ -72,10 +72,11 @@ public abstract class BaseTest {
     @SneakyThrows
     public Node createNode(File file) {
         val nodeBodyCreate = new NodeBodyCreate();
-        nodeBodyCreate.setName(String.format("%s.pdf", generateName()));
+        nodeBodyCreate.setName(String.format("%s.%s", generateName(), file.getName().replaceAll("^.*\\.(.*)$", "$1")));
         nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
         val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, true, null, null, null, null).getBody()).getEntry();
         nodesApi.updateNodeContent(node.getId(), Files.readAllBytes(file.toPath()), null, null, null, null, null);
+        log.debug("Node {} created with name: {}", node.getId(), node.getName());
         return node;
     }
 
@@ -88,7 +89,8 @@ public abstract class BaseTest {
     @SneakyThrows
     public Node createNode(URL url) {
         if (!downloadedFiles.containsKey(url.toString())) {
-            val tmpFile = File.createTempFile("anv-", ".tmp");
+            val extension = url.getPath().replaceAll("^.*\\.(.*)$", "$1");
+            val tmpFile = File.createTempFile("anv-", String.format(".%s", extension));
             tmpFile.deleteOnExit();
             FileUtils.copyURLToFile(url, tmpFile);
             downloadedFiles.put(url.toString(), tmpFile);

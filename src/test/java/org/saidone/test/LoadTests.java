@@ -61,12 +61,11 @@ class LoadTests extends BaseTest {
     @SneakyThrows
     void massiveLoadTest() {
         val url = URI.create("https://freetestdata.com/wp-content/uploads/2021/09/Free_Test_Data_100KB_PDF.pdf").toURL();
-        @Cleanup val executor = Executors.newFixedThreadPool(4);
+        @Cleanup val executor = Executors.newFixedThreadPool(8);
         val running = new AtomicBoolean(true);
         Runnable task = () -> {
             while (running.get()) {
                 val nodeId = createNode(url).getId();
-                log.debug("Node created: {}", nodeId);
                 alfrescoService.addAspects(nodeId, List.of(AnvContentModel.ASP_ARCHIVE));
             }
         };
