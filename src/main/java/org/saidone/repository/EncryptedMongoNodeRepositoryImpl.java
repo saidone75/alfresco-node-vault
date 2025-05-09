@@ -18,6 +18,7 @@
 
 package org.saidone.repository;
 
+import lombok.NonNull;
 import lombok.val;
 import org.saidone.model.NodeWrapper;
 import org.saidone.service.CryptoService;
@@ -28,7 +29,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-@ConditionalOnProperty(name = "application.service.vault.encryption.metadata", havingValue = "true")
+@ConditionalOnProperty(name = {"application.service.vault.encryption.enabled", "application.service.vault.encryption.metadata"},
+        havingValue = "true")
 public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
 
     private final CryptoService cryptoService;
@@ -42,13 +44,13 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
     }
 
     @Override
-    public <S extends NodeWrapper> S save(S entity) {
+    public <S extends NodeWrapper> @NonNull S save(@NonNull S entity) {
         encryptNode(entity);
         return super.save(entity);
     }
 
     @Override
-    public Optional<NodeWrapper> findById(String s) {
+    public @NonNull Optional<NodeWrapper> findById(@NonNull String s) {
         val result = super.findById(s);
         result.ifPresent(this::decryptNode);
         return result;

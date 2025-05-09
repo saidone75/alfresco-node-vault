@@ -18,6 +18,7 @@
 
 package org.saidone.repository;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.saidone.component.BaseComponent;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 @Repository
 @RequiredArgsConstructor
@@ -44,13 +46,15 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
     private final MongoOperations mongoOperations;
 
     @Override
-    public <S extends NodeWrapper> S insert(S entity) {
+    @NonNull
+    public <S extends NodeWrapper> S insert(@NonNull S entity) {
         mongoOperations.insert(entity);
         return entity;
     }
 
     @Override
-    public <S extends NodeWrapper> List<S> insert(Iterable<S> entities) {
+    @NonNull
+    public <S extends NodeWrapper> List<S> insert(@NonNull Iterable<S> entities) {
         List<S> result = new ArrayList<>();
         for (S entity : entities) {
             result.add(insert(entity));
@@ -59,13 +63,15 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
     }
 
     @Override
-    public <S extends NodeWrapper> S save(S entity) {
+    @NonNull
+    public <S extends NodeWrapper> S save(@NonNull S entity) {
         mongoOperations.save(entity);
         return entity;
     }
 
     @Override
-    public <S extends NodeWrapper> List<S> saveAll(Iterable<S> entities) {
+    @NonNull
+    public <S extends NodeWrapper> List<S> saveAll(@NonNull Iterable<S> entities) {
         List<S> result = new ArrayList<>();
         for (S entity : entities) {
             result.add(save(entity));
@@ -74,28 +80,32 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
     }
 
     @Override
-    public <S extends NodeWrapper> Optional<S> findOne(Example<S> example) {
+    @NonNull
+    public <S extends NodeWrapper> Optional<S> findOne(@NonNull Example<S> example) {
         return Optional.ofNullable(mongoOperations.findOne(
                 Query.query(Criteria.byExample(example)),
                 example.getProbeType()));
     }
 
     @Override
-    public <S extends NodeWrapper> List<S> findAll(Example<S> example) {
+    @NonNull
+    public <S extends NodeWrapper> List<S> findAll(@NonNull Example<S> example) {
         return mongoOperations.find(
                 Query.query(Criteria.byExample(example)),
                 example.getProbeType());
     }
 
     @Override
-    public <S extends NodeWrapper> List<S> findAll(Example<S> example, Sort sort) {
+    @NonNull
+    public <S extends NodeWrapper> List<S> findAll(@NonNull Example<S> example, @NonNull Sort sort) {
         return mongoOperations.find(
                 Query.query(Criteria.byExample(example)).with(sort),
                 example.getProbeType());
     }
 
     @Override
-    public <S extends NodeWrapper> Page<S> findAll(Example<S> example, Pageable pageable) {
+    @NonNull
+    public <S extends NodeWrapper> Page<S> findAll(@NonNull Example<S> example, @NonNull Pageable pageable) {
         long count = count(example);
         val content = mongoOperations.find(
                 Query.query(Criteria.byExample(example)).with(pageable),
@@ -104,27 +114,34 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
     }
 
     @Override
-    public <S extends NodeWrapper, R> R findBy(Example<S> example, Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
-        return null;
+    public <S extends NodeWrapper, R> @NonNull R findBy(@NonNull Example<S> example, @NonNull Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
+        val methodSignature = StackWalker.getInstance()
+                .walk(Stream::findFirst)
+                .map(StackWalker.StackFrame::toString)
+                .orElse("unknown");
+        throw new UnsupportedOperationException(String.format("Method %s is not implemented in this version of the repository", methodSignature));
     }
 
     @Override
-    public Optional<NodeWrapper> findById(String id) {
+    @NonNull
+    public Optional<NodeWrapper> findById(@NonNull String id) {
         return Optional.ofNullable(mongoOperations.findById(id, NodeWrapper.class));
     }
 
     @Override
-    public boolean existsById(String id) {
+    public boolean existsById(@NonNull String id) {
         return mongoOperations.exists(Query.query(Criteria.where("_id").is(id)), NodeWrapper.class);
     }
 
     @Override
+    @NonNull
     public List<NodeWrapper> findAll() {
         return mongoOperations.findAll(NodeWrapper.class);
     }
 
     @Override
-    public List<NodeWrapper> findAllById(Iterable<String> ids) {
+    @NonNull
+    public List<NodeWrapper> findAllById(@NonNull Iterable<String> ids) {
         val query = new Query(Criteria.where("_id").in(ids));
         return mongoOperations.find(query, NodeWrapper.class);
     }
@@ -135,24 +152,24 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
     }
 
     @Override
-    public void deleteById(String id) {
+    public void deleteById(@NonNull String id) {
         val query = new Query(Criteria.where("_id").is(id));
         mongoOperations.remove(query, NodeWrapper.class);
     }
 
     @Override
-    public void delete(NodeWrapper entity) {
+    public void delete(@NonNull NodeWrapper entity) {
         mongoOperations.remove(entity);
     }
 
     @Override
-    public void deleteAllById(Iterable<? extends String> ids) {
+    public void deleteAllById(@NonNull Iterable<? extends String> ids) {
         val query = new Query(Criteria.where("_id").in(ids));
         mongoOperations.remove(query, NodeWrapper.class);
     }
 
     @Override
-    public void deleteAll(Iterable<? extends NodeWrapper> entities) {
+    public void deleteAll(@NonNull Iterable<? extends NodeWrapper> entities) {
         for (val entity : entities) {
             delete(entity);
         }
@@ -164,12 +181,14 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
     }
 
     @Override
-    public List<NodeWrapper> findAll(Sort sort) {
+    @NonNull
+    public List<NodeWrapper> findAll(@NonNull Sort sort) {
         return mongoOperations.find(new Query().with(sort), NodeWrapper.class);
     }
 
     @Override
-    public Page<NodeWrapper> findAll(Pageable pageable) {
+    @NonNull
+    public Page<NodeWrapper> findAll(@NonNull Pageable pageable) {
         long count = count();
         val content = mongoOperations.find(
                 new Query().with(pageable),
@@ -179,12 +198,12 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
     }
 
     @Override
-    public <S extends NodeWrapper> long count(Example<S> example) {
+    public <S extends NodeWrapper> long count(@NonNull Example<S> example) {
         return mongoOperations.count(Query.query(Criteria.byExample(example)), example.getProbeType());
     }
 
     @Override
-    public <S extends NodeWrapper> boolean exists(Example<S> example) {
+    public <S extends NodeWrapper> boolean exists(@NonNull Example<S> example) {
         return mongoOperations.exists(Query.query(Criteria.byExample(example)), example.getProbeType());
     }
 
