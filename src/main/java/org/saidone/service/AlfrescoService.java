@@ -253,6 +253,20 @@ public class AlfrescoService extends BaseComponent {
         }
     }
 
+    /**
+     * Computes a cryptographic hash of the content for the specified node using the provided algorithm.
+     * <p>
+     * This method retrieves the node content from Alfresco, calculates the hash using the specified
+     * algorithm via an {@link AnvDigestInputStream}, and returns the hash value as a hexadecimal string.
+     * The node content is streamed directly through the hash computation to avoid loading the entire
+     * content into memory.
+     *
+     * @param nodeId    the unique identifier of the node whose content will be hashed
+     * @param algorithm the name of the hash algorithm to use (e.g., "MD5", "SHA-256")
+     * @return a hexadecimal string representation of the computed hash
+     * @throws RuntimeException if any I/O or algorithm-related exceptions occur during processing
+     *                         (wrapped via {@code @SneakyThrows})
+     */
     @SneakyThrows
     public String computeHash(String nodeId, String algorithm) {
         try (val alfrescoDigestInputStream = new AnvDigestInputStream(getNodeContent(nodeId), algorithm)) {
