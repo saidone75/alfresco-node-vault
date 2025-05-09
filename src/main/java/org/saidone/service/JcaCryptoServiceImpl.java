@@ -18,13 +18,21 @@
 
 package org.saidone.service;
 
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import lombok.Data;
+import lombok.Setter;
 import lombok.val;
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.saidone.component.BaseComponent;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
@@ -59,34 +67,25 @@ import java.util.Base64;
  * @see BaseComponent
  */
 @Service
+@Setter
+@ConfigurationProperties(prefix = "application.service.vault.encryption.jca")
 @ConditionalOnExpression("${application.service.vault.encryption.enabled:true} == true && '${application.service.vault.encryption.impl:}' == 'jca'")
 public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService {
 
-    @Value("${application.service.vault.encryption.jca.salt-length:16}")
+    @Min(16)
     private int saltLength;
-    @Value("${application.service.vault.encryption.jca.iv-length:12}")
+    @Min(12)
     private int ivLength;
     private static final int TAG_LENGTH = 128;
     private static final String CIPHER_TRANSFORMATION = "AES/GCM/NoPadding";
-
-    @Value("${application.service.vault.encryption.jca.key}")
-    private String key;
-
     private static final String KEY_ALGORITHM = "AES";
 
-    @Value("${application.service.vault.encryption.jca.kdf.impl}")
-    private String kdfImpl;
+    @NotBlank
+    private String key;
 
-    private static final String PBKDF2_KEY_FACTORY_ALGORITHM = "PBKDF2WithHmacSHA256";
-    @Value("${application.service.vault.encryption.jca.kdf.pbkdf2.iterations:100000}")
-    private int pbkdf2Iterations;
-
-    @Value("${application.service.vault.encryption.jca.kdf.argon2.parallelism:1}")
-    private int argon2Parallelism;
-    @Value("${application.service.vault.encryption.jca.kdf.argon2.memory:65536}")
-    private int argon2Memory;
-    @Value("${application.service.vault.encryption.jca.kdf.argon2.iterations:3}")
-    private int argon2Iterations;
+    @Valid
+    @NotNull
+    private Kdf kdf;
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
@@ -100,7 +99,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
      * @return the derived {@link SecretKeySpec}
      */
     private SecretKeySpec deriveSecretKey(byte[] salt) {
-        if (kdfImpl.equals("argon2")) return deriveArgon2SecretKey(salt);
+        if (kdf.equals("argon2")) return deriveArgon2SecretKey(salt);
         else return derivePbkdf2SecretKey(salt);
     }
 
@@ -116,8 +115,8 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
      */
     private SecretKeySpec derivePbkdf2SecretKey(byte[] salt) {
         try {
-            val spec = new PBEKeySpec(key.toCharArray(), salt, pbkdf2Iterations, 256);
-            val skf = SecretKeyFactory.getInstance(PBKDF2_KEY_FACTORY_ALGORITHM);
+            val spec = new PBEKeySpec(key.toCharArray(), salt, kdf.pbkdf2.getIterations(), 256);
+            val skf = SecretKeyFactory.getInstance(Kdf.Pbkdf2.PBKDF2_KEY_FACTORY_ALGORITHM);
             return new SecretKeySpec(skf.generateSecret(spec).getEncoded(), KEY_ALGORITHM);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new IllegalStateException("Unable to derive secret key", e);
@@ -137,14 +136,14 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
     private SecretKeySpec deriveArgon2SecretKey(byte[] salt) {
         val builder = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
                 .withSalt(salt)
-                .withParallelism(argon2Parallelism)
-                .withMemoryAsKB(argon2Memory)
-                .withIterations(argon2Iterations);
+                .withParallelism(kdf.argon2.parallelism)
+                .withMemoryAsKB(kdf.argon2.memory)
+                .withIterations(kdf.argon2.iterations);
         val generator = new Argon2BytesGenerator();
         generator.init(builder.build());
         byte[] generatedKeyBytes = new byte[32];
         generator.generateBytes(key.getBytes(StandardCharsets.UTF_8), generatedKeyBytes);
-        return new SecretKeySpec(generatedKeyBytes, "AES");
+        return new SecretKeySpec(generatedKeyBytes, KEY_ALGORITHM);
     }
 
     /**
@@ -262,6 +261,58 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
         } catch (Exception e) {
             throw new RuntimeException("Error during text decryption", e);
         }
+    }
+
+    /**
+     * Encapsulates the configuration for the Key Derivation Function (KDF) used in cryptographic processes.
+     * This class allows choosing between "pbkdf2" and "argon2" implementations through the "impl" property.
+     * Each implementation can be further configured using nested classes for their specific parameters.
+     * Validation annotations ensure correct configuration by enforcing the presence of mandatory fields and constraints on parameter values.
+     * <p>
+     * The Pbkdf2 nested class defines the algorithm and required iteration count for PBKDF2-based key derivation.
+     * The Argon2 nested class specifies settings for Argon2-based key derivation, such as parallelism, memory usage, and iterations.
+     */
+    @Validated
+    @Data
+    public static class Kdf {
+        @NotBlank(message = "The 'impl' field of Kdf is required")
+        @Pattern(
+                regexp = "pbkdf2|argon2",
+                message = "The 'impl' field of Kdf must be either 'pbkdf2' or 'argon2'"
+        )
+        private String impl;
+        @Valid
+        private Pbkdf2 pbkdf2;
+        @Valid
+        private Argon2 argon2;
+
+        /**
+         * Contains configuration settings for the PBKDF2 implementation of the key derivation function.
+         * Defines the algorithm used for key factory and the minimum number of iterations to be applied during key derivation.
+         * The iterations parameter is essential to determine the computational difficulty of the operation.
+         */
+        @Data
+        public static class Pbkdf2 {
+            private static final String PBKDF2_KEY_FACTORY_ALGORITHM = "PBKDF2WithHmacSHA256";
+            @Min(100000)
+            private Integer iterations = 100000;
+        }
+
+        /**
+         * Contains configuration settings for the Argon2 implementation of the key derivation function.
+         * Specifies minimum values for parallelism, memory consumption (in bytes), and the number of iterations required.
+         * These parameters influence both the security and the computational requirements of the derivation process.
+         */
+        @Data
+        public static class Argon2 {
+            @Min(1)
+            private Integer parallelism = 1;
+            @Min(65536)
+            private Integer memory;
+            @Min(3)
+            private Integer iterations;
+        }
+
     }
 
 }
