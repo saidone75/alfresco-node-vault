@@ -63,10 +63,10 @@ import java.util.Base64;
 public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService {
 
     @Value("${application.service.vault.encryption.jca.salt-length:16}")
-    private int SALT_LENGTH;
+    private int saltLength;
     @Value("${application.service.vault.encryption.jca.iv-length:12}")
-    private int IV_LENGTH;
-    private final int TAG_LENGTH = 128;
+    private int ivLength;
+    private static final int TAG_LENGTH = 128;
     private static final String CIPHER_TRANSFORMATION = "AES/GCM/NoPadding";
 
     @Value("${application.service.vault.encryption.jca.key}")
@@ -79,14 +79,14 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
 
     private static final String PBKDF2_KEY_FACTORY_ALGORITHM = "PBKDF2WithHmacSHA256";
     @Value("${application.service.vault.encryption.jca.kdf.pbkdf2.iterations:100000}")
-    private int PBKDF2_ITERATIONS;
+    private int pbkdf2Iterations;
 
     @Value("${application.service.vault.encryption.jca.kdf.argon2.parallelism:1}")
-    private int ARGON2_PARALLELISM;
+    private int argon2Parallelism;
     @Value("${application.service.vault.encryption.jca.kdf.argon2.memory:65536}")
-    private int ARGON2_MEMORY;
+    private int argon2Memory;
     @Value("${application.service.vault.encryption.jca.kdf.argon2.iterations:3}")
-    private int ARGON2_ITERATIONS;
+    private int argon2Iterations;
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
@@ -116,7 +116,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
      */
     private SecretKeySpec derivePbkdf2SecretKey(byte[] salt) {
         try {
-            val spec = new PBEKeySpec(key.toCharArray(), salt, PBKDF2_ITERATIONS, 256);
+            val spec = new PBEKeySpec(key.toCharArray(), salt, pbkdf2Iterations, 256);
             val skf = SecretKeyFactory.getInstance(PBKDF2_KEY_FACTORY_ALGORITHM);
             return new SecretKeySpec(skf.generateSecret(spec).getEncoded(), KEY_ALGORITHM);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
@@ -137,9 +137,9 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
     private SecretKeySpec deriveArgon2SecretKey(byte[] salt) {
         val builder = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
                 .withSalt(salt)
-                .withParallelism(ARGON2_PARALLELISM)
-                .withMemoryAsKB(ARGON2_MEMORY)
-                .withIterations(ARGON2_ITERATIONS);
+                .withParallelism(argon2Parallelism)
+                .withMemoryAsKB(argon2Memory)
+                .withIterations(argon2Iterations);
         val generator = new Argon2BytesGenerator();
         generator.init(builder.build());
         byte[] generatedKeyBytes = new byte[32];
@@ -166,11 +166,11 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
     public InputStream encrypt(InputStream inputStream) {
         try {
             // Generate random salt for PBKDF2
-            byte[] salt = new byte[SALT_LENGTH];
+            byte[] salt = new byte[saltLength];
             secureRandom.nextBytes(salt);
 
             // Generate random IV for GCM mode
-            byte[] iv = new byte[IV_LENGTH];
+            byte[] iv = new byte[ivLength];
             secureRandom.nextBytes(iv);
 
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
@@ -179,9 +179,9 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec);
 
             // Concatenate salt and IV
-            byte[] saltAndIv = new byte[SALT_LENGTH + IV_LENGTH];
-            System.arraycopy(salt, 0, saltAndIv, 0, SALT_LENGTH);
-            System.arraycopy(iv, 0, saltAndIv, SALT_LENGTH, IV_LENGTH);
+            byte[] saltAndIv = new byte[saltLength + ivLength];
+            System.arraycopy(salt, 0, saltAndIv, 0, saltLength);
+            System.arraycopy(iv, 0, saltAndIv, saltLength, ivLength);
 
             // Prepend salt and IV to the input stream
             return new SequenceInputStream(
@@ -208,10 +208,10 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
     public InputStream decrypt(InputStream inputStream) {
         try {
             // Read salt from the the stream
-            byte[] salt = inputStream.readNBytes(SALT_LENGTH);
+            byte[] salt = inputStream.readNBytes(saltLength);
 
             // Read IV from the the stream
-            byte[] iv = inputStream.readNBytes(IV_LENGTH);
+            byte[] iv = inputStream.readNBytes(ivLength);
 
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             val spec = new GCMParameterSpec(TAG_LENGTH, iv);
