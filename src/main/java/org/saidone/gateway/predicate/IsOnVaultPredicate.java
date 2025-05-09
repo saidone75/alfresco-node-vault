@@ -29,6 +29,28 @@ import org.springframework.web.server.ServerWebExchange;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
+/**
+ * Predicate implementation for Spring Cloud Gateway that checks if a node is present in the vault.
+ * <p>
+ * This predicate examines the path of the incoming HTTP request and tries to extract a node UUID
+ * from it using a predefined regular expression. If a valid node identifier is found, it queries
+ * the {@link MongoNodeRepositoryImpl} to determine whether the corresponding node is present.
+ * The predicate returns {@code true} if the node exists in the vault, otherwise {@code false}.
+ * <p>
+ * Expected matching path format: any string containing "/nodes/{uuid}" where <i>{uuid}</i> is a
+ * valid UUID version 4.
+ * <p>
+ * Logging is performed for debugging purposes, indicating detection of the node ID and the result
+ * of the vault check.
+ * <p>
+ * Extends {@link AbstractRoutePredicateFactory} to be used as a custom route predicate in gateway
+ * routing configurations.
+ * <p>
+ * The inner static {@code Config} class is required for Spring Cloud Gateway custom predicate factories.
+ * <p>
+ * Dependencies:
+ * - {@link MongoNodeRepositoryImpl}: Used for checking node existence by ID.
+ */
 @Component
 @Slf4j
 public class IsOnVaultPredicate extends AbstractRoutePredicateFactory<IsOnVaultPredicate.Config> {

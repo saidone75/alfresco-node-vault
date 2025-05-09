@@ -34,6 +34,26 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+/**
+ * Event filter that matches repository nodes based on their path.
+ * <p>
+ * The filter allows to specify either an exact string path or a regular expression pattern.
+ * When applied, it checks if the node involved in the event is located in the configured path,
+ * or if its path matches the provided pattern.
+ * </p>
+ *
+ * <p>
+ * This filter uses the {@link NodesApi} to retrieve node details, including its path, from the repository.
+ * It can be instantiated using either a string path or a regular expression pattern via the static factory methods.
+ * </p>
+ *
+ * <p>
+ * The {@code test} method logs the result of the path check for each event.
+ * </p>
+ *
+ * @see org.alfresco.event.sdk.handling.filter.AbstractEventFilter
+ * @see org.alfresco.core.handler.NodesApi
+ */
 @Component
 @Slf4j
 public class PathFilter extends AbstractEventFilter {

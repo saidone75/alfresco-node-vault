@@ -32,6 +32,23 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Event filter that prevents re-processing of the same repository node within a specified time threshold.
+ * <p>
+ * This filter maintains a map of recently processed node IDs with their associated expiry timestamps.
+ * When an event is received, the filter checks if the node ID is present and its threshold time has elapsed.
+ * If the node was not processed recently or the threshold has expired, the filter allows processing and
+ * updates the timestamp for that node. Otherwise, the event is skipped and a warning is logged.
+ * </p>
+ *
+ * <p>
+ * The threshold duration is specified in milliseconds and configured when instantiating the filter.
+ * A scheduled cleanup task regularly removes expired node entries from the internal cache.
+ * This filter is designed to be thread-safe and operate in concurrent event-driven environments.
+ * </p>
+ *
+ * @see org.alfresco.event.sdk.handling.filter.AbstractEventFilter
+ */
 @Component
 @EnableScheduling
 @RequiredArgsConstructor
