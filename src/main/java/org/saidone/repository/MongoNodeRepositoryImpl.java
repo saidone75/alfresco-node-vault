@@ -40,7 +40,7 @@ import java.util.stream.Stream;
 
 @Repository
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "application.service.vault.encryption.metadata", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "false", matchIfMissing = true)
 public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepository<NodeWrapper, String> {
 
     private final MongoOperations mongoOperations;
