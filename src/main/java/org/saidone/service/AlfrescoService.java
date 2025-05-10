@@ -139,11 +139,14 @@ public class AlfrescoService extends BaseComponent {
     }
 
     /**
-     * Downloads the content of a node and writes it to a temporary file.
+     * Retrieves the content of a node as an InputStream from the content service using the specified node identifier.
+     * <p>
+     * This method constructs the URL for the node content endpoint, opens a connection,
+     * sets the required authorization header, and returns the response stream.
      *
-     * @param nodeId the identifier of the node whose content is to be downloaded
-     * @return an InputStream for the node content
-     * @throws VaultException if an error occurs during download or file creation
+     * @param nodeId the unique identifier of the node whose content is to be retrieved
+     * @return an InputStream containing the node's content
+     * @throws RuntimeException if an I/O error occurs while opening the connection or obtaining the content stream
      */
     @SneakyThrows
     public InputStream getNodeContent(String nodeId) {
