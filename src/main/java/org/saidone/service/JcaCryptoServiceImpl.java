@@ -99,7 +99,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
      * @return the derived {@link SecretKeySpec}
      */
     private SecretKeySpec deriveSecretKey(byte[] salt) {
-        if (kdf.equals("argon2")) return deriveArgon2SecretKey(salt);
+        if (kdf.getImpl().equals("argon2")) return deriveArgon2SecretKey(salt);
         else return derivePbkdf2SecretKey(salt);
     }
 

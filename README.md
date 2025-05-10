@@ -120,6 +120,10 @@ will run a load test.
 
 `$ java -jar anv.jar`
 
+## Documentation
+
+The Javadoc is available at the following address: https://saidone75.github.io/alfresco-node-vault/
+
 ## License
 
 Copyright (c) 2025 Saidone
