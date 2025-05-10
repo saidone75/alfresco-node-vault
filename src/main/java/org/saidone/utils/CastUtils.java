@@ -26,9 +26,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Utility class providing methods for safely casting collections to specific generic types.
+ * <p>
+ * This class offers methods to cast a list of unknown type to a list of strings,
+ * and to cast an object representing a map to a map with string keys and object values.
+ * All methods return empty collections if the provided input is null.
+ */
 @UtilityClass
 public class CastUtils {
 
+    /**
+     * Casts a list of unknown element type to a list of strings.
+     * <p>
+     * If the input list is null, an empty list is returned.
+     * Performs a runtime cast of all elements to String.
+     *
+     * @param list the input list with unknown element type
+     * @return a list containing the elements cast to String, or an empty list if input is null
+     * @throws ClassCastException if any element cannot be cast to String
+     */
     public List<String> castToListOfStrings(List<?> list) {
         return list != null ? list
                 .stream()
@@ -37,6 +54,16 @@ public class CastUtils {
                 ) : new ArrayList<>();
     }
 
+    /**
+     * Casts an object representing a map to a map with String keys and Object values.
+     * <p>
+     * If the input map is null, an empty map is returned.
+     * Performs a runtime cast of each entry's key to String and value to Object.
+     *
+     * @param map the input object expected to be of type Map<?, ?>
+     * @return a new map with string keys and object values, or an empty map if input is null
+     * @throws ClassCastException if any map entry key cannot be cast to String
+     */
     public Map<String, Object> castToMapOfStringObject(Object map) {
         return map != null ? ((Map<?, ?>) map)
                 .entrySet()
