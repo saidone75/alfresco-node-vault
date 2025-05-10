@@ -28,6 +28,11 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
+/**
+ * Repository implementation that encrypts node data before saving to MongoDB
+ * and decrypts it when retrieving. This implementation is active only when
+ * vault encryption and metadata encryption are enabled in the application properties.
+ */
 @Repository
 @ConditionalOnProperty(name = {"application.service.vault.encryption.enabled", "application.service.vault.encryption.metadata"},
         havingValue = "true")
@@ -35,6 +40,12 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
 
     private final CryptoService cryptoService;
 
+    /**
+     * Constructs an EncryptedMongoNodeRepositoryImpl with the given MongoOperations and CryptoService.
+     *
+     * @param mongoOperations the MongoDB operations instance
+     * @param cryptoService   the service used for encryption and decryption
+     */
     public EncryptedMongoNodeRepositoryImpl(
             MongoOperations mongoOperations,
             CryptoService cryptoService
@@ -43,12 +54,25 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
         this.cryptoService = cryptoService;
     }
 
+    /**
+     * Saves the given node entity after encrypting its JSON content.
+     *
+     * @param entity the node entity to save
+     * @param <S>    the type of the node entity
+     * @return the saved node entity
+     */
     @Override
     public <S extends NodeWrapper> @NonNull S save(@NonNull S entity) {
         encryptNode(entity);
         return super.save(entity);
     }
 
+    /**
+     * Finds a node by its ID and decrypts its JSON content if it is encrypted.
+     *
+     * @param s the ID of the node to find
+     * @return an Optional containing the found node, or empty if not found
+     */
     @Override
     public @NonNull Optional<NodeWrapper> findById(@NonNull String s) {
         val result = super.findById(s);
@@ -56,6 +80,12 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
         return result;
     }
 
+    /**
+     * Encrypts the JSON content of the given node and marks it as encrypted.
+     *
+     * @param node the node to encrypt
+     * @param <S>  the type of the node
+     */
     private <S extends NodeWrapper> void encryptNode(S node) {
         if (node != null && node.getNodeJson() != null) {
             node.setNodeJson(cryptoService.encryptText(node.getNodeJson()));
@@ -63,6 +93,12 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
         }
     }
 
+    /**
+     * Decrypts the JSON content of the given node if it is marked as encrypted.
+     *
+     * @param node the node to decrypt
+     * @param <S>  the type of the node
+     */
     private <S extends NodeWrapper> void decryptNode(S node) {
         if (node != null && node.getNodeJson() != null && node.isEncrypted()) {
             node.setNodeJson(cryptoService.decryptText(node.getNodeJson()));
