@@ -50,21 +50,32 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
 /**
- * Implementation of the CryptoService interface using the Java Cryptography Architecture (JCA).
+ * Service that provides symmetric encryption and decryption using the Java Cryptography Architecture (JCA).
  * <p>
- * This service provides encryption and decryption capabilities using AES-GCM with PBKDF2 key derivation.
- * It supports both stream-based and text-based encryption operations with the following security features:
- * AES encryption in GCM (Galois/Counter Mode) for authenticated encryption,
- * PBKDF2 with HMAC-SHA256 for secure key derivation from passwords,
- * Secure random generation of cryptographic salt and initialization vectors,
- * Base64 encoding for text-based encryption results.
+ * This implementation uses AES encryption in GCM mode, allowing configuration of key derivation,
+ * initialization vector (IV) length, salt length, and encryption key. The supported key derivation
+ * functions are PBKDF2 and Argon2, selectable through configuration.
  * <p>
- * This implementation is conditionally enabled based on the following application properties:
- * application.service.vault.encryption.enabled = true
- * application.service.vault.encryption.impl = 'jca'
+ * Configuration for this service is loaded using the prefix "application.service.vault.encryption.jca".
+ * The service is enabled only if encryption is turned on and the implementation is set to "jca" in application settings.
+ * <p>
+ * For every encryption operation, a random salt and IV are generated. The salt is used to derive
+ * a unique AES key based on the configured password, thus ensuring cryptographic strength and uniqueness.
+ * The IV is employed to initialize the cipher for GCM mode encryption. Both salt and IV are prepended
+ * to the resulting encrypted data stream, so decryption can reliably extract the necessary parameters.
+ * <p>
+ * This class encrypts and decrypts both binary streams and text content. Text data is encrypted as UTF-8 bytes,
+ * then encoded or decoded with Base64 for textual representation. All parameters for encryption and
+ * decryption are managed internally by the service, requiring only input data and returning the result.
+ * <p>
+ * The Kdf inner class encapsulates the key derivation function configuration, enabling choice between pbkdf2 and argon2.
+ * Separate nested classes allow independent tuning of PBKDF2 and Argon2 parameters such as iterations, memory usage,
+ * and computational parallelism, supporting both flexibility and cryptographic safety.
+ * <p>
+ * This service is managed as a Spring service component and its settings are automatically injected from configuration properties.
  *
  * @see CryptoService
- * @see BaseComponent
+ * @see Kdf
  */
 @Service
 @Setter
