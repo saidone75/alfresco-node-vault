@@ -227,13 +227,15 @@ public class AlfrescoService extends BaseComponent {
         nodeBodyCreate.setDefinition(node.getDefinition());
 
         if (!nodeExists(node.getParentId())) {
+            log.debug("Parent node {} does not exist anymore, checking path...", node.getParentId());
             val originalPathElements = node.getPath().getElements().stream().map(PathElement::getName).toList().subList(1, node.getPath().getElements().size());
             if (!pathExists(String.join("/", originalPathElements))) {
+                log.debug("Path {} does not exist anymore, creating path structure...", String.join("/", originalPathElements));
                 node.setParentId(createPathIfNotExists("-root-", originalPathElements));
             } else {
+                log.debug("Path {} exists, getting parent node...", String.join("/", originalPathElements));
                 node.setParentId(Objects.requireNonNull(nodesApi.getNode("-root-", null, String.join("/", originalPathElements), null).getBody()).getEntry().getId());
             }
-
         }
 
         return Objects.requireNonNull(nodesApi.createNode(node.getParentId(), nodeBodyCreate, true, null, null, null, null).getBody()).getEntry().getId();
