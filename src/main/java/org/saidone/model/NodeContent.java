@@ -22,12 +22,34 @@ import lombok.Data;
 
 import java.io.InputStream;
 
+/**
+ * Represents the content of a node including its metadata and the actual content stream.
+ * <p>
+ * This class holds information about the file name, content type, length of the content,
+ * and an InputStream to read the content data.
+ * </p>
+ */
 @Data
 public class NodeContent {
 
+    /**
+     * The name of the file associated with this node content.
+     */
     private String fileName;
+
+    /**
+     * The MIME type of the content.
+     */
     private String contentType;
+
+    /**
+     * The length of the content in bytes.
+     */
     private long length;
+
+    /**
+     * The input stream to read the content data.
+     */
     private InputStream contentStream;
 
 }
