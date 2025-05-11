@@ -29,6 +29,14 @@ spring:
           uri: ${ALFRESCO_BASE_PATH:http://localhost:8080}
           predicates:
             - Path=/alfresco/**,/api-explorer/**
+    vault:
+      uri: http://localhost:8200
+      token: root
+      kv:
+        enabled: true
+        backend: secret
+  config:
+    import: vault://
   activemq:
     brokerUrl: ${ACTIVE_MQ_URL:tcp://localhost:61616}
   jms:
@@ -73,8 +81,7 @@ application:
   event-handler:
     enabled: ${EVENT_HANDLER_ENABLED:false}
   archiving-job:
-    cron-expression: ${ARCHIVING_JOB_CRON_EXPRESSION:0 0/1 * * * ?}
-    #query: TYPE:'cm:content' AND cm:created:[MIN TO NOW-10YEARS]
+    cron-expression: ${ARCHIVING_JOB_CRON_EXPRESSION:0 0/5 2-6 * * ?}
     query: ${ARCHIVING_JOB_QUERY:TYPE:'cm:content' AND ASPECT:'anv:archive'}
     enabled: ${ARCHIVING_JOB_ENABLED:true}
   service:
@@ -99,7 +106,7 @@ application:
         metadata: ${VAULT_ENCRYPT_METADATA:true}
         impl: jca
         jca:
-          key: ${VAULT_ENCRYPTION_KEY:changeme}
+          secret: ${VAULT_ENCRYPTION_SECRET:changeme}
           salt-length: 16
           iv-length: 12
           kdf:
