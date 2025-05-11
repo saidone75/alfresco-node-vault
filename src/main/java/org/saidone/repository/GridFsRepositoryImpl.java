@@ -39,6 +39,34 @@ import org.springframework.stereotype.Repository;
 import java.io.InputStream;
 import java.util.Map;
 
+/**
+ * Repository implementation for the management of files in MongoDB's GridFS
+ * without encryption support.
+ * <p>
+ * Implements the {@link GridFsRepository} interface, enabling file storage, retrieval,
+ * metadata updates and file deletion in the GridFS storage system.
+ * Utilizes Spring Data's {@code GridFsTemplate}, {@code GridFsOperations}, and {@code MongoTemplate}
+ * for interactions with MongoDB and GridFS collections.
+ * <p>
+ * On initialization, an ascending index is automatically created on the
+ * {@code metadata.uuid} field in the {@code fs.files} collection to improve query
+ * performance for operations that search files by UUID.
+ * <p>
+ * Supports the following main operations:
+ * - Stores files with a name, content type, and associated metadata.
+ * - Updates the metadata of an existing file identified by a unique {@code uuid}.
+ * - Retrieves a single file from GridFS by its {@code uuid}, returning a {@link GridFSFile}.
+ * - Deletes a file from GridFS using its {@code uuid} as key.
+ * - Provides file content streams via {@link InputStream} for efficient reading of file contents.
+ * - Computes cryptographic hash values of files using MongoDB commands, with the hash algorithm selectable at runtime.
+ * <p>
+ * This implementation is registered in the Spring context only if the property
+ * {@code application.service.vault.encryption.enabled} is set to {@code false} or is not defined.
+ * <p>
+ * Extends {@link org.saidone.component.BaseComponent} to inherit standardized component lifecycle logging.
+ * <p>
+ * Thread safety is guaranteed by relying on the thread-safe beans of the Spring container for all MongoDB operations.
+ */
 @Repository
 @ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "false", matchIfMissing = true)
 @RequiredArgsConstructor

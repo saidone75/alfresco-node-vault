@@ -20,10 +20,7 @@ package org.saidone.utils;
 
 import lombok.experimental.UtilityClass;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -37,41 +34,49 @@ import java.util.stream.Collectors;
 public class CastUtils {
 
     /**
-     * Casts a list of unknown element type to a list of strings.
-     * <p>
-     * If the input list is null, an empty list is returned.
-     * Performs a runtime cast of all elements to String.
+     * Safely casts a list of objects to a list containing only non-null strings.
+     * <br>
+     * This method filters out null values and elements that are not instances of {@code String}.
+     * If the input list is {@code null}, an empty list is returned.
      *
-     * @param list the input list with unknown element type
-     * @return a list containing the elements cast to String, or an empty list if input is null
-     * @throws ClassCastException if any element cannot be cast to String
+     * @param list the input list containing elements of any type
+     * @return a list containing only non-null strings from the original list,
+     * or an empty list if input is {@code null}
      */
     public List<String> castToListOfStrings(List<?> list) {
-        return list != null ? list
-                .stream()
+        if (list == null) return Collections.emptyList();
+        return list.stream()
+                .filter(Objects::nonNull)
+                .filter(String.class::isInstance)
                 .map(String.class::cast)
-                .collect(Collectors.toList()
-                ) : new ArrayList<>();
+                .toList();
     }
 
     /**
-     * Casts an object representing a map to a map with String keys and Object values.
-     * <p>
-     * If the input map is null, an empty map is returned.
-     * Performs a runtime cast of each entry's key to String and value to Object.
+     * Casts an input object to a map with {@code String} keys and {@code Object} values.
+     * <br>
+     * If the provided object is {@code null}, an empty map is returned.
+     * If the provided object is not an instance of {@code Map<?, ?>}, an {@code IllegalArgumentException} is thrown.
+     * The method performs a runtime cast of each key to {@code String}; if any key cannot be cast, a {@code ClassCastException} will be thrown.
      *
-     * @param map the input object expected to be of type Map<?, ?>
-     * @return a new map with string keys and object values, or an empty map if input is null
-     * @throws ClassCastException if any map entry key cannot be cast to String
+     * @param object the object to cast, expected to be a map with string keys
+     * @return a map with string keys and object values, or an empty map if the input is null
+     * @throws IllegalArgumentException if the input object is not a map
+     * @throws ClassCastException       if a map key cannot be cast to {@code String}
      */
-    public Map<String, Object> castToMapOfStringObject(Object map) {
-        return map != null ? ((Map<?, ?>) map)
-                .entrySet()
+    public Map<String, Object> castToMapOfStringObject(Object object) {
+        if (object == null) {
+            return new HashMap<>();
+        }
+        if (!(object instanceof Map<?, ?> inputMap)) {
+            throw new IllegalArgumentException("Input object is not a Map: " + object.getClass().getName());
+        }
+        return inputMap.entrySet()
                 .stream()
                 .collect(Collectors.toMap(
                         e -> (String) e.getKey(),
-                        e -> (Object) e.getValue()
-                )) : new HashMap<>();
+                        Map.Entry::getValue
+                ));
     }
 
 }

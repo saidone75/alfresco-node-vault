@@ -25,6 +25,16 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
+/**
+ * AnvDigestInputStream is a specialized {@link FilterInputStream} that computes a cryptographic digest
+ * of the data as it is read from the underlying {@link InputStream}.
+ * <p>
+ * The digest is updated incrementally with each read operation using the specified algorithm (such as "SHA-256" or "MD5").
+ * Once the stream has been fully read, the computed digest value can be retrieved as a hexadecimal string via {@link #getHash()}.
+ * <p>
+ * Typical use cases include automatic hash calculation (checksum or fingerprint) for content verification
+ * during streaming or processing of large files without needing to load all data into memory.
+ */
 public class AnvDigestInputStream extends FilterInputStream {
 
     private final MessageDigest digest;

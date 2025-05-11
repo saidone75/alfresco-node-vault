@@ -38,6 +38,28 @@ import org.springframework.stereotype.Component;
 
 import java.util.Set;
 
+/**
+ * Handles Alfresco repository events for archiving nodes when certain criteria are met.
+ * <p>
+ * This component listens to node-related events via the Alfresco Event SDK and triggers node archiving
+ * using the configured {@link VaultService}. Event handling is conditional, allowing activation through
+ * application properties.
+ * <p>
+ * Events are filtered based on:
+ * - Node type (must match {@code AlfrescoContentModel.TYPE_CONTENT}),
+ * - Presence of a specific archive aspect,
+ * - Whether the node has been processed recently (using a configurable threshold to avoid duplicate processing).
+ * <p>
+ * When an event passes the filters, the handler will archive the targeted node and log the operation outcome.
+ * Any errors during archiving are also logged.
+ * <p>
+ * Activation of this handler depends on the {@code application.event-handler.enabled} property.
+ *
+ * @see VaultService#archiveNode(String)
+ * @see org.alfresco.event.sdk.handling.filter.EventFilter
+ * @see org.alfresco.event.sdk.handling.handler.OnNodeCreatedEventHandler
+ * @see org.alfresco.event.sdk.handling.handler.OnNodeUpdatedEventHandler
+ */
 @Component
 @ConditionalOnProperty(name = "application.event-handler.enabled", havingValue = "true")
 @RequiredArgsConstructor

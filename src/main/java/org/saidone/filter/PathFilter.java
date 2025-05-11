@@ -35,24 +35,26 @@ import java.util.Objects;
 import java.util.regex.Pattern;
 
 /**
- * Event filter that matches repository nodes based on their path.
+ * Event filter for Alfresco repository events that determines if a node is located at
+ * a specific path or matches a given path pattern.
  * <p>
- * The filter allows to specify either an exact string path or a regular expression pattern.
- * When applied, it checks if the node involved in the event is located in the configured path,
- * or if its path matches the provided pattern.
- * </p>
- *
+ * This filter provides two configurable modes:
+ * - Testing if a node's path exactly matches a provided string.
+ * - Testing if a node's path matches a regular expression pattern.
  * <p>
- * This filter uses the {@link NodesApi} to retrieve node details, including its path, from the repository.
- * It can be instantiated using either a string path or a regular expression pattern via the static factory methods.
- * </p>
- *
+ * The filter relies on the {@link NodesApi} to fetch node details, specifically to
+ * retrieve the node's path attribute at event evaluation time. Log messages provide
+ * traceability of the filter's decisions for debugging purposes.
  * <p>
- * The {@code test} method logs the result of the path check for each event.
- * </p>
+ * Typical usage involves obtaining an instance via the static factory methods:
+ * - {@code PathFilter.of(String path)} to filter by exact path name
+ * - {@code PathFilter.of(Pattern pathPattern)} to filter by regular expression
+ * <p>
+ * Integration with Spring ensures that the required {@link NodesApi} dependency
+ * is supplied at runtime. This filter is intended to be used as part of event processing
+ * chains, allowing only events whose nodes match the specified path criteria to pass through.
  *
  * @see org.alfresco.event.sdk.handling.filter.AbstractEventFilter
- * @see org.alfresco.core.handler.NodesApi
  */
 @Component
 @Slf4j

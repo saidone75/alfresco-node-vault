@@ -38,6 +38,23 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+/**
+ * Repository implementation for managing NodeWrapper entities in MongoDB.
+ * <p>
+ * Implements the MongoRepository interface using MongoOperations to perform database operations.
+ * <p>
+ * Activation of this repository is controlled by the property 'application.service.vault.encryption.enabled':
+ * it is enabled when the value is "false" or the property is missing.
+ * <p>
+ * Offers various CRUD operations such as insertion, save, batch operations, find by example, find by sort
+ * or pageable criteria, counting, and removal of entities. Supports custom queries using Example, Sort, and Pageable.
+ * <p>
+ * The findBy(Example, Function) method is not implemented and will always throw an UnsupportedOperationException.
+ * <p>
+ * This class extends BaseComponent and is intended for scenarios where node encryption is disabled at the application level.
+ * <p>
+ * Depends on MongoOperations for thread-safe persistence handling of NodeWrapper documents.
+ */
 @Repository
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "false", matchIfMissing = true)

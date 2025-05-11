@@ -33,19 +33,26 @@ import org.springframework.stereotype.Component;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Event filter that prevents re-processing of the same repository node within a specified time threshold.
+ * An event filter for Alfresco repository events that ensures each node is processed
+ * only once within a configurable time threshold.
  * <p>
- * This filter maintains a map of recently processed node IDs with their associated expiry timestamps.
- * When an event is received, the filter checks if the node ID is present and its threshold time has elapsed.
- * If the node was not processed recently or the threshold has expired, the filter allows processing and
- * updates the timestamp for that node. Otherwise, the event is skipped and a warning is logged.
- * </p>
- *
+ * This filter prevents repeated processing of the same node event within a specified duration,
+ * helping to avoid duplicate processing and reduce unnecessary load on the system.
+ * A node ID is tracked in a thread-safe, static map upon successful test evaluation.
+ * Further events for that node are rejected until the threshold expires.
  * <p>
- * The threshold duration is specified in milliseconds and configured when instantiating the filter.
- * A scheduled cleanup task regularly removes expired node entries from the internal cache.
- * This filter is designed to be thread-safe and operate in concurrent event-driven environments.
- * </p>
+ * The time threshold is provided when instantiating the filter via the {@link #of(long)} factory method.
+ * The {@link #test(RepoEvent)} method checks if the node associated with the event has been processed
+ * recently, returning {@code true} and updating the internal tracking map if the node is eligible,
+ * or returning {@code false} otherwise.
+ * <p>
+ * The filter periodically cleans its tracking map to remove expired node entries using the
+ * {@link #cleanRecentlyProcessedNodes()} scheduled method, minimizing memory usage.
+ * <p>
+ * Thread safety is ensured by the use of a {@link ConcurrentHashMap}.
+ * Logging is provided for skipped and removed nodes for debugging and traceability.
+ * <p>
+ * This filter is typically used in event processing chains to enforce de-duplication logic on node events.
  *
  * @see org.alfresco.event.sdk.handling.filter.AbstractEventFilter
  */
