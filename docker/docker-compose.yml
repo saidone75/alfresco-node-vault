@@ -194,7 +194,7 @@ services:
     ports:
       - "8086:8086"
   anv-hashicorp-vault:
-    image: hashicorp/vault:1.18.3
+    image: ${HASHICORP_VAULT_IMAGE}:${HASHICORP_VAULT_IMAGE_VERSION}
     container_name: anv-hashicorp-vault
     ports:
       - "8200:8200"
