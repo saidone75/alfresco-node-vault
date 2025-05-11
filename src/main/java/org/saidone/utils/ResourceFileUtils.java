@@ -18,52 +18,77 @@
 
 package org.saidone.utils;
 
-import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Objects;
 
+/**
+ * Utility class providing methods to access files from filesystem or classpath resources.
+ * <p>
+ * This class offers methods to obtain a {@link File} instance from a specified resource path.
+ * It first attempts to locate the file in the local filesystem using an absolute or relative path.
+ * If the file is not found in the filesystem, it will attempt to locate and extract the resource from the classpath.
+ * When accessing resources from the classpath, the method creates a temporary file which will be deleted on JVM exit,
+ * or will use a specified destination path if provided.
+ * Logging is used to notify where the file was found or if a resource is being loaded from the classpath.
+ */
 @UtilityClass
 @Slf4j
 public class ResourceFileUtils {
 
-    public File getFileFromResource(String resourcePath) throws Exception {
+    /**
+     * Obtains a file from either the filesystem or classpath resources.
+     *
+     * @param resourcePath the path to the resource, either absolute path in the filesystem or a classpath resource
+     * @return the {@link File} object representing the resource
+     */
+    public File getFileFromResource(String resourcePath) throws IOException {
         return getFileFromResource(resourcePath, null);
     }
 
-    @SneakyThrows
-    public File getFileFromResource(String resourcePath, String destinationPath) {
-        // first look into FS
+    /**
+     * Retrieves a file from the given path, searching first in the filesystem and then in the classpath resources.
+     * <br>
+     * If the specified resource path exists as a file in the filesystem, a {@link File} object pointing to this location is returned.
+     * If the file does not exist, the method attempts to locate the resource in the application's classpath. If found,
+     * it will extract the resource as a temporary file, or use a specific destination path if provided.
+     * If a temporary file is created, it will be marked for deletion on JVM exit.
+     *
+     * @param resourcePath    the path to the resource in the filesystem or the name of the classpath resource
+     * @param destinationPath optional path for the extracted resource file (used if resource is found in classpath);
+     *                        if null, a temporary file is created
+     * @return a {@link File} object representing the file or a copy of the extracted classpath resource
+     * @throws FileNotFoundException if the resource cannot be found in both the filesystem and classpath
+     * @throws IOException           if an I/O error occurs during file access or resource extraction
+     */
+    public File getFileFromResource(String resourcePath, String destinationPath) throws FileNotFoundException, IOException {
         val filePath = Path.of(resourcePath);
         val file = filePath.toFile();
         if (file.exists() && file.isFile()) {
             log.info("Found file as absolute path => {}", resourcePath);
             return file;
         } else {
-            // look for it in the classpath (resources)
             log.info("Looking for resource in classpath => {}", resourcePath);
-            val is = Objects.requireNonNull(
-                    ResourceFileUtils.class.getClassLoader().getResourceAsStream(resourcePath),
-                    "Resource not found in classpath => " + resourcePath
-            );
-            // create temporary file
-            var tempFile = (File) null;
-            if (destinationPath != null) {
-                tempFile = new File(destinationPath);
-            } else {
-                tempFile = Files.createTempFile("resource-", ".tmp").toFile();
+            try (var is = ResourceFileUtils.class.getClassLoader().getResourceAsStream(resourcePath)) {
+                if (is == null) {
+                    throw new FileNotFoundException("Resource not found in file system or classpath: " + resourcePath);
+                }
+                val tempFile = destinationPath != null
+                        ? new File(destinationPath)
+                        : Files.createTempFile("resource-", ".tmp").toFile();
+                tempFile.deleteOnExit();
+                try (val fos = new FileOutputStream(tempFile)) {
+                    is.transferTo(fos);
+                }
+                return tempFile;
             }
-            tempFile.deleteOnExit();
-            try (val fos = new FileOutputStream(tempFile)) {
-                is.transferTo(fos);
-            }
-            return tempFile;
         }
     }
 
