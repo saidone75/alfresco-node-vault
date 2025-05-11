@@ -23,6 +23,15 @@ import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.saidone.Constants;
 
+/**
+ * Abstract base class for application components providing lifecycle management logging.
+ * <p>
+ * This class utilizes {@link jakarta.annotation.PostConstruct} and {@link jakarta.annotation.PreDestroy}
+ * annotations to automatically log messages when components are started and stopped,
+ * aiding in the monitoring and debugging of application lifecycle events.
+ * <p>
+ * Subclasses inherit the logging behavior without the need to redefine it.
+ */
 @Slf4j
 public abstract class BaseComponent {
 
