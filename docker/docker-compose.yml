@@ -209,6 +209,18 @@ services:
         }
     cap_add:
       - IPC_LOCK
+  anv-hashicorp-vault-provisioner:
+    image: ${HASHICORP_VAULT_IMAGE}:${HASHICORP_VAULT_IMAGE_VERSION}
+    container_name: anv-hashicorp-vault-provisioner
+    depends_on:
+      - anv-hashicorp-vault
+    entrypoint: >
+      sh -c "
+        export VAULT_ADDR='http://anv-hashicorp-vault:8200' && \
+        export VAULT_TOKEN='root' && \
+        sleep 5 && \
+        vault kv put secret/AlfrescoNodeVault application.service.vault.encryption.jca.key=vault-secret
+      "
 volumes:
   anv-acs-volume:
     external: true

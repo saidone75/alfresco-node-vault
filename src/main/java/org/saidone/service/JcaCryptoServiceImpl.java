@@ -92,7 +92,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
     private static final String KEY_ALGORITHM = "AES";
 
     @NotBlank
-    private String key;
+    private String secret;
 
     @Valid
     @NotNull
@@ -126,7 +126,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
      */
     private SecretKeySpec derivePbkdf2SecretKey(byte[] salt) {
         try {
-            val spec = new PBEKeySpec(key.toCharArray(), salt, kdf.pbkdf2.getIterations(), 256);
+            val spec = new PBEKeySpec(secret.toCharArray(), salt, kdf.pbkdf2.getIterations(), 256);
             val skf = SecretKeyFactory.getInstance(Kdf.Pbkdf2.PBKDF2_KEY_FACTORY_ALGORITHM);
             return new SecretKeySpec(skf.generateSecret(spec).getEncoded(), KEY_ALGORITHM);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
@@ -153,7 +153,7 @@ public class JcaCryptoServiceImpl extends BaseComponent implements CryptoService
         val generator = new Argon2BytesGenerator();
         generator.init(builder.build());
         byte[] generatedKeyBytes = new byte[32];
-        generator.generateBytes(key.getBytes(StandardCharsets.UTF_8), generatedKeyBytes);
+        generator.generateBytes(secret.getBytes(StandardCharsets.UTF_8), generatedKeyBytes);
         return new SecretKeySpec(generatedKeyBytes, KEY_ALGORITHM);
     }
 

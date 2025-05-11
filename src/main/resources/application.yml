@@ -35,7 +35,6 @@ spring:
       kv:
         enabled: true
         backend: secret
-        default-context: "kv/springboot-vault-docker"
   config:
     import: vault://
   activemq:
@@ -50,8 +49,6 @@ spring:
       database: vault
       username: root
       password: example
-app:
-  secret: ${APP_SECRET:"changeme"}
 springdoc:
   swagger-ui:
     enabled: true
@@ -109,7 +106,7 @@ application:
         metadata: ${VAULT_ENCRYPT_METADATA:true}
         impl: jca
         jca:
-          key: ${VAULT_ENCRYPTION_KEY:changeme}
+          secret: ${VAULT_ENCRYPTION_SECRET:changeme}
           salt-length: 16
           iv-length: 12
           kdf:
