@@ -30,19 +30,15 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * Scheduled job responsible for archiving Alfresco nodes based on a configured query.
+ * Schedules and executes the periodic archiving of Alfresco nodes matching a configurable query.
  * <p>
- * This job is enabled conditionally via the property {@code application.archiving-job.enabled}.
- * When enabled, it runs according to the cron expression defined in
- * {@code application.archiving-job.cron-expression} and archives nodes matching the query
- * specified in {@code application.archiving-job.query}.
- * </p>
+ * This component runs only if the property 'application.archiving-job.enabled' is set to true.
+ * It uses the AlfrescoService to search for nodes based on a query string and archives each found node
+ * through the VaultService. The schedule for execution and the search query are defined in the application configuration.
+ * Archiving execution is synchronized to avoid overlapping runs.
  * <p>
- * The job uses {@link AlfrescoService} to search for nodes and {@link VaultService} to archive them.
- * </p>
- * <p>
- * Thread-safe execution is ensured by synchronizing the archiving process.
- * </p>
+ * The job is intended to automate the archival of nodes in regular intervals and ensure that
+ * only one instance of the archive operation runs at any given time.
  */
 @Component
 @RequiredArgsConstructor
