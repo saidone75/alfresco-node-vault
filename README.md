@@ -68,6 +68,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Engineered for flexibility and bespoke integrations
 - No installation or changes required on Alfresco
 - 100% test coverage
+- Prometheus monitoring support for metrics and health checks
 - Minimal memory footprint
 
 Pull requests are welcome!
