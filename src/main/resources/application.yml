@@ -30,7 +30,7 @@ spring:
           predicates:
             - Path=/alfresco/**,/api-explorer/**
     vault:
-      uri: http://localhost:8200
+      uri: ${VAULT_URL:http://localhost:8200}
       token: root
       kv:
         enabled: true
