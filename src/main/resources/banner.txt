@@ -1,0 +1,15 @@
+${AnsiColor.YELLOW}
+       d8888 888b    888 888     888
+      d88888 8888b   888 888     888
+     d88P888 88888b  888 888     888
+    d88P 888 888Y88b 888 Y88b   d88P
+   d88P  888 888 Y88b888  Y88b d88P
+  d88P   888 888  Y88888   Y88o88P
+ d8888888888 888   Y8888    Y888P
+d88P     888 888    Y888     Y8P
+
+Alfresco Node Vault - v.${application.version}
+Copyright (c) 2025 Saidone
+Powered by Spring Boot ${spring-boot.version}
+Active profiles: ${spring.profiles.active}
+${AnsiColor.DEFAULT}

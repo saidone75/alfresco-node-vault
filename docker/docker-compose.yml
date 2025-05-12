@@ -1,0 +1,238 @@
+services:
+  alfresco:
+    build:
+      dockerfile: ./Dockerfile.alfresco
+      context: .
+      args:
+        ACS_IMAGE: ${ACS_IMAGE}
+        ACS_VERSION: ${ACS_VERSION}
+    container_name: anv-alfresco
+    mem_limit: 1536m
+    environment:
+      JAVA_TOOL_OPTIONS: "
+            -Dencryption.keystore.type=JCEKS
+            -Dencryption.cipherAlgorithm=DESede/CBC/PKCS5Padding
+            -Dencryption.keyAlgorithm=DESede
+            -Dencryption.keystore.location=/usr/local/tomcat/shared/classes/alfresco/extension/keystore/keystore
+            -Dmetadata-keystore.password=mp6yc0UD9e
+            -Dmetadata-keystore.aliases=metadata
+            -Dmetadata-keystore.metadata.password=oKIWzVdEdA
+            -Dmetadata-keystore.metadata.algorithm=DESede
+            "
+      JAVA_OPTS: "
+            -Ddb.driver=org.postgresql.Driver
+            -Ddb.username=alfresco
+            -Ddb.password=alfresco
+            -Ddb.url=jdbc:postgresql://postgres:5432/alfresco
+            -Dsolr.host=solr6
+            -Dsolr.port=8983
+            -Dsolr.secureComms=secret
+            -Dsolr.sharedSecret=secret
+            -Dsolr.base.url=/solr
+            -Dindex.subsystem.name=solr6
+            -Dshare.host=127.0.0.1
+            -Dshare.port=8080
+            -Dalfresco.host=localhost
+            -Dalfresco.port=8080
+            -Daos.baseUrlOverwrite=http://localhost:8080/alfresco/aos
+            -Dmessaging.broker.url=\"failover:(nio://activemq:61616)?timeout=3000&jms.useCompression=true\"
+            -Ddeployment.method=DOCKER_COMPOSE
+            -Dtransform.service.enabled=true
+            -Dtransform.service.url=http://transform-router:8095
+            -Dsfs.url=http://shared-file-store:8099/
+            -DlocalTransform.core-aio.url=http://transform-core-aio:8090/
+            -Dcsrf.filter.enabled=false
+            -Ddsync.service.uris=http://localhost:9090/alfresco
+            -XX:MinRAMPercentage=50 -XX:MaxRAMPercentage=80
+            -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:8000
+            -Dcom.sun.management.jmxremote=true
+            -Djava.rmi.server.hostname=localhost
+            -Dcom.sun.management.jmxremote.port=50800
+            -Dcom.sun.management.jmxremote.rmi.port=50801
+            -Dcom.sun.management.jmxremote.authenticate=false
+            -Dcom.sun.management.jmxremote.ssl=false
+            "
+    ports:
+      - "8000:8000"
+      - "8080:8080"
+      - "50800:50800"
+      - "50801:50801"
+    networks:
+      - default
+    volumes:
+      - anv-acs-volume:/usr/local/tomcat/alf_data
+  share:
+    image: ${SHARE_IMAGE}:${SHARE_VERSION}
+    container_name: anv-share
+    mem_limit: 512m
+    environment:
+      REPO_HOST: host.docker.internal
+      REPO_PORT: 8080
+    ports:
+      - "8180:8080"
+    networks:
+      - default
+  postgres:
+    image: ${POSTGRES_IMAGE}:${POSTGRES_VERSION}
+    container_name: anv-postgres
+    mem_limit: 512m
+    environment:
+      - POSTGRES_PASSWORD=alfresco
+      - POSTGRES_USER=alfresco
+      - POSTGRES_DB=alfresco
+    command: postgres -c max_connections=300 -c log_min_messages=LOG
+    ports:
+      - "5432:5432"
+    networks:
+      - default
+    volumes:
+      - anv-postgres-volume:/var/lib/postgresql/data
+  solr6:
+    image: ${ASS_IMAGE}:${ASS_VERSION}
+    container_name: anv-solr
+    mem_limit: 1g
+    environment:
+      # Solr needs to know how to register itself with Alfresco
+      SOLR_ALFRESCO_HOST: "alfresco"
+      SOLR_ALFRESCO_PORT: "8080"
+      # Alfresco needs to know how to call solr
+      SOLR_SOLR_HOST: "solr6"
+      SOLR_SOLR_PORT: "8983"
+      # Create the default alfresco and archive cores
+      SOLR_CREATE_ALFRESCO_DEFAULTS: "alfresco,archive"
+      # HTTPS or SECRET
+      ALFRESCO_SECURE_COMMS: "secret"
+      # SHARED SECRET VALUE
+      JAVA_TOOL_OPTIONS: "
+           -Dalfresco.secureComms.secret=secret
+         "
+    ports:
+      - "8083:8983" # Browser port
+    networks:
+      - default
+    volumes:
+      - anv-ass-volume:/opt/alfresco-search-services/data
+  activemq:
+    image: ${ACTIVEMQ_IMAGE}:${ACTIVEMQ_VERSION}
+    container_name: anv-activemq
+    ports:
+      - 8161:8161 # Web Console
+      - 5672:5672 # AMQP
+      - 61616:61616 # OpenWire
+      - 61613:61613 # STOMP
+    networks:
+      - default
+  mongo:
+    image: ${MONGO_IMAGE}
+    container_name: anv-mongo
+    ports:
+      - 27017:27017
+    networks:
+      - default
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - anv-mongo-volume:/data/db
+  mongo-express:
+    image: ${MONGO_EXPRESS_IMAGE}
+    container_name: anv-mongo-express
+    ports:
+      - 8081:8081
+    networks:
+      - default
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      ME_CONFIG_BASICAUTH: "false"
+  prometheus:
+    image: ${PROMETHEUS_IMAGE}
+    container_name: anv-prometheus
+    volumes:
+      - ./grafana/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
+  grafana:
+    build:
+      dockerfile: grafana/Dockerfile.grafana
+      context: .
+      args:
+        GRAFANA_IMAGE: ${GRAFANA_IMAGE}
+    container_name: anv-grafana
+    ports:
+      - "4000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+    volumes:
+      - anv-grafana-volume:/var/lib/grafana
+      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+  nginx:
+    image: ${NGINX_IMAGE}
+    container_name: anv-nginx
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+  anv-hashicorp-vault:
+    image: ${HASHICORP_VAULT_IMAGE}:${HASHICORP_VAULT_IMAGE_VERSION}
+    container_name: anv-hashicorp-vault
+    ports:
+      - "8200:8200"
+    networks:
+      - default
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: "root"
+      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
+      VAULT_LOCAL_CONFIG: |
+        {
+          "ui": true
+        }
+    cap_add:
+      - IPC_LOCK
+  anv-hashicorp-vault-provisioner:
+    image: ${HASHICORP_VAULT_IMAGE}:${HASHICORP_VAULT_IMAGE_VERSION}
+    container_name: anv-hashicorp-vault-provisioner
+    depends_on:
+      - anv-hashicorp-vault
+    entrypoint: >
+      sh -c "
+        export VAULT_ADDR='http://anv-hashicorp-vault:8200' && \
+        export VAULT_TOKEN='root' && \
+        sleep 5 && \
+        vault kv put secret/AlfrescoNodeVault application.service.vault.encryption.jca.key=vault-secret
+      "
+  anv-vault:
+    image: anv:latest
+    container_name: anv-vault
+    mem_limit: 256m
+    build:
+      dockerfile: ./docker/Dockerfile.vault
+      context: ../
+    depends_on:
+      anv-hashicorp-vault-provisioner:
+        condition: service_completed_successfully
+    environment:
+      ALFRESCO_BASE_PATH: http://alfresco:8080
+      ACTIVE_MQ_URL: tcp://activemq:61616
+      MONGODB_URL: mongodb://mongo:27017
+      VAULT_URL: http://anv-hashicorp-vault:8200
+    ports:
+      - "8086:8086"
+volumes:
+  anv-acs-volume:
+    external: true
+  anv-postgres-volume:
+    external: true
+  anv-ass-volume:
+    external: true
+  anv-mongo-volume:
+    external: true
+  anv-grafana-volume:
+    name: grafana-data

@@ -1,0 +1,50 @@
+@startuml
+!include <C4/C4_Container>
+!include <C4/C4_Component>
+
+hide stereotype
+
+title Alfresco Node Vault
+
+System_Boundary(anv, "Alfresco Node Vault") {
+  Component(anvProxy, "Proxy")
+  Component(anvApi, "REST API")
+  Component(anvHandler, "Event handler")
+  Component(anvJob, "Scheduled job")
+  Component(anvVault, "VaultService")
+  Component(anvCrypto, "CryptoService")
+  Component(anvAlfresco, "AlfrescoService")
+  ContainerDb(anvMongo, "Mongo DB")
+}
+
+note right of [anvProxy]
+Intercepts calls to Alfresco
+and serves documents from MongoDB
+if they are no longer present in Alfresco
+end note
+
+System_Boundary(acs, "Alfresco Content Service") {
+  ComponentQueue(acsQueue, "Active MQ")
+  Component(acsApi, "REST API")
+}
+
+Rel_D(acsQueue, anvHandler, "events")
+Rel_D(anvProxy, anvApi, "")
+Rel_R(anvProxy, acsApi, "")
+Rel_D(anvApi, anvVault, "")
+Rel_D(anvHandler, anvVault, "")
+Rel_D(anvJob, anvVault, "")
+Rel_D(anvJob, anvAlfresco, "")
+BiRel_D(anvVault, anvCrypto, "")
+BiRel_D(anvVault, anvMongo, "")
+BiRel_D(anvCrypto, anvMongo, "")
+Rel_R(anvVault, anvAlfresco, "")
+Rel_R(anvAlfresco, acsApi, "")
+
+Component(client, "Client")
+
+Rel_D(client, anvProxy, "")
+Rel_D(client, anvApi, "")
+Rel_D(client, acsApi, "")
+
+@enduml

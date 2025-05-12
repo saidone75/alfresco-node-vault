@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<model name="anv:contentModel" xmlns="http://www.alfresco.org/model/dictionary/1.0">
+
+    <!-- Optional meta-data about the model -->
+    <description>Alfresco Node Vault Content Model</description>
+    <version>1.0.0</version>
+
+    <imports>
+        <!-- Import Alfresco Dictionary Definitions -->
+        <import uri="http://www.alfresco.org/model/dictionary/1.0" prefix="d"/>
+        <!-- Import Alfresco Content Domain Model Definitions -->
+        <import uri="http://www.alfresco.org/model/content/1.0" prefix="cm"/>
+        <!-- Import Alfresco System Model Definitions -->
+        <import uri="http://www.alfresco.org/model/system/1.0" prefix="sys"/>
+    </imports>
+
+    <!-- Custom namespace -->
+    <namespaces>
+        <namespace uri="https://www.saidone.org/model/anv/1.0" prefix="anv"/>
+    </namespaces>
+
+    <aspects>
+        <aspect name="anv:archive"/>
+
+        <aspect name="anv:restored">
+            <properties>
+                <property name="anv:was">
+                    <title>Original uuid</title>
+                    <type>d:text</type>
+                    <index enabled="true">
+                        <tokenised>false</tokenised>
+                    </index>
+                </property>
+            </properties>
+        </aspect>
+    </aspects>
+
+</model>
