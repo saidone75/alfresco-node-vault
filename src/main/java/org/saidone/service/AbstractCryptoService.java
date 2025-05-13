@@ -1,6 +1,5 @@
 package org.saidone.service;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -35,12 +34,6 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     @Valid
     @NotNull
     protected Kdf kdf;
-
-    @PostConstruct
-    public void init() {
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + secret);
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + kdf);
-    }
 
     protected SecretKeySpec deriveSecretKey(String algorithm, byte[] salt) {
         return switch (kdf.getImpl()) {
