@@ -20,9 +20,9 @@ package org.saidone.config;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import lombok.Setter;
 import org.saidone.service.AbstractCryptoService;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
@@ -32,9 +32,12 @@ import org.springframework.validation.annotation.Validated;
 @Data
 @ConfigurationProperties(prefix = "application.service.vault.encryption")
 @Validated
-public class EncryptionProperties {
-    @NotBlank
-    private String secret;
+public class EncryptionConfig {
+
+    @Setter
+    private String secretPath;
+    @Setter
+    private String secretKey;
 
     @Valid
     @NotNull
