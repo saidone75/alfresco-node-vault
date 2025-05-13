@@ -14,6 +14,7 @@ import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.bouncycastle.crypto.params.HKDFParameters;
 import org.saidone.component.BaseComponent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 
 import javax.crypto.SecretKeyFactory;
@@ -23,6 +24,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 import java.util.Base64;
 
 /**
@@ -34,8 +36,8 @@ import java.util.Base64;
 @Setter
 public abstract class AbstractCryptoService extends BaseComponent implements CryptoService {
 
-    @NotBlank
-    protected String secret;
+    @Autowired
+    private SecretService secretService;
 
     @Valid
     @NotNull
@@ -61,7 +63,9 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
      */
     private SecretKeySpec derivePbkdf2SecretKey(String algorithm, byte[] salt) {
         try {
-            val spec = new PBEKeySpec(secret.toCharArray(), salt, kdf.pbkdf2.getIterations(), 256);
+            val secret = secretService.getSecret();
+            val spec = new PBEKeySpec(new String(secret, StandardCharsets.UTF_8).toCharArray(), salt, kdf.pbkdf2.getIterations(), 256);
+            Arrays.fill(secret, (byte) 0);
             val skf = SecretKeyFactory.getInstance(Kdf.Pbkdf2.PBKDF2_KEY_FACTORY_ALGORITHM);
             return new SecretKeySpec(skf.generateSecret(spec).getEncoded(), algorithm);
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
@@ -74,8 +78,9 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
      */
     private SecretKeySpec deriveHkdfSecretKey(String algorithm, byte[] salt) {
         val hkdf = new HKDFBytesGenerator(new SHA256Digest());
-        val secretBytes = secret.getBytes(StandardCharsets.UTF_8);
-        val hkdfParams = new HKDFParameters(secretBytes, salt, kdf.hkdf.getInfo().getBytes(StandardCharsets.UTF_8));
+        val secret = secretService.getSecret();
+        val hkdfParams = new HKDFParameters(secret, salt, kdf.hkdf.getInfo().getBytes(StandardCharsets.UTF_8));
+        Arrays.fill(secret, (byte) 0);
         hkdf.init(hkdfParams);
         byte[] keyBytes = new byte[32];
         hkdf.generateBytes(keyBytes, 0, keyBytes.length);
@@ -94,7 +99,9 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
         val generator = new Argon2BytesGenerator();
         generator.init(builder.build());
         byte[] keyBytes = new byte[32];
-        generator.generateBytes(secret.getBytes(StandardCharsets.UTF_8), keyBytes);
+        val secret = secretService.getSecret();
+        generator.generateBytes(secret, keyBytes);
+        Arrays.fill(secret, (byte) 0);
         return new SecretKeySpec(keyBytes, algorithm);
     }
 

@@ -22,7 +22,7 @@ import jakarta.validation.constraints.Min;
 import lombok.Setter;
 import lombok.val;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.saidone.config.EncryptionProperties;
+import org.saidone.config.EncryptionConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -79,8 +79,7 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
     private static final SecureRandom secureRandom = new SecureRandom();
 
     @Autowired
-    public void configure(EncryptionProperties properties) {
-        this.secret = properties.getSecret();
+    public void configure(EncryptionConfig properties) {
         this.kdf = properties.getKdf();
         this.saltLength = properties.getBc().getSaltLength();
         this.nonceLength = properties.getBc().getNonceLength();

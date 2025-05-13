@@ -76,7 +76,7 @@ PBKDF2 (Password-Based Key Derivation Function 2) is a widely supported KDF that
 Argon2 is a modern KDF designed to be resistant to GPU, ASIC, and side-channel attacks. It won the Password Hashing Competition in 2015.
 
 - **Pros**: Strong resistance to parallel attacks, memory-hardness deters hardware acceleration
-- **Cons**: Less widely supported than PBKDF2, use more more memory
+- **Cons**: Less widely supported than PBKDF2, high memory usage
 - **Recommended Settings**:
     - memory: 65536 (64MB) or higher
     - parallelism: 4 (adjust based on available CPU cores)
@@ -134,6 +134,7 @@ Uses the Bouncy Castle provider to implement ChaCha20-Poly1305 authenticated enc
 
 1. **Storage of Master Secret**:
     - The master secret should be stored securely using environment variables or a secrets manager
+    - The system is configured by default to retrieve the master key from HashiCorp Vault
     - Never commit secrets to source control
 
 2. **Nonce/IV Usage**:
@@ -147,8 +148,8 @@ Uses the Bouncy Castle provider to implement ChaCha20-Poly1305 authenticated enc
 ## Performance Considerations
 
 - **ChaCha20-Poly1305 (BC)** typically performs better on:
-    - Older hardware without AES-NI
     - ARM and RISC-V CPUs
+    - Older hardware without AES-NI
 
 - **AES-GCM (JCA)** typically performs better on:
     - Modern x86 servers with AES-NI
