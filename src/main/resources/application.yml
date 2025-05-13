@@ -113,7 +113,7 @@ application:
           salt-length: 16
           nonce-length: 12
         kdf:
-          impl: hkdf
+          impl: pbkdf2
           pbkdf2:
             iterations: 100000
           hkdf:

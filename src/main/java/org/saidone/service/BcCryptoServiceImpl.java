@@ -15,6 +15,7 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package org.saidone.service;
 
 import jakarta.validation.constraints.Min;
@@ -36,6 +37,26 @@ import java.io.SequenceInputStream;
 import java.security.SecureRandom;
 import java.security.Security;
 
+/**
+ * Implements symmetric encryption/decryption using ChaCha20-Poly1305 via the Bouncy Castle provider.
+ * <p>
+ * Key features:
+ * - ChaCha20 encryption with Poly1305 authentication
+ * - Configurable salt and nonce lengths
+ * - Support for PBKDF2, HKDF and Argon2 key derivation
+ * - Stream-based operation for efficient memory usage
+ * - Base64 text encoding/decoding support
+ * <p>
+ * Configuration:
+ * - Prefix: application.service.vault.encryption.bc
+ * - Enabled when encryption.enabled=true and encryption.impl=bc
+ * <p>
+ * Security measures:
+ * - Per-operation random salt and nonce generation
+ * - Password-based key derivation with strong KDFs
+ * - Authenticated encryption with Poly1305 mode
+ * - Efficient processing of large data streams
+ */
 @Service
 @Setter
 @ConfigurationProperties(prefix = "application.service.vault.encryption.bc")
@@ -65,6 +86,21 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
         this.nonceLength = properties.getBc().getNonceLength();
     }
 
+    /**
+     * Encrypts a data stream using ChaCha20-Poly1305 authenticated encryption.
+     * <p>
+     * The encryption process follows these steps:
+     * 1. Generates random salt and nonce
+     * 2. Derives encryption key from salt using configured KDF
+     * 3. Initializes ChaCha20-Poly1305 cipher
+     * 4. Prepends salt+nonce to encrypted stream
+     * <p>
+     * The output stream format is: [salt][nonce][encrypted data]
+     *
+     * @param inputStream The plaintext input data to be encrypted
+     * @return An InputStream containing concatenated salt, nonce and encrypted data
+     * @throws RuntimeException if any error occurs during the encryption process
+     */
     @Override
     public InputStream encrypt(InputStream inputStream) {
         try {
@@ -98,6 +134,24 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
         }
     }
 
+    /**
+     * Decrypts a ChaCha20-Poly1305 encrypted stream.
+     * <p>
+     * The decryption process follows these steps:
+     * 1. Reads salt and nonce from stream header
+     * 2. Derives decryption key from salt
+     * 3. Initializes cipher for decryption
+     * 4. Returns decrypting stream for remaining data
+     * <p>
+     * Expected input format: [salt][nonce][encrypted data]
+     * where:
+     * - salt length = saltLength
+     * - nonce length = nonceLength
+     *
+     * @param inputStream InputStream containing encrypted data with prepended salt and nonce
+     * @return An InputStream yielding the decrypted data
+     * @throws RuntimeException if any error occurs during the decryption process
+     */
     @Override
     public InputStream decrypt(InputStream inputStream) {
         try {

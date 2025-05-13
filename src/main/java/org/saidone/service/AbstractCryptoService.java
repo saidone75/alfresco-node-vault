@@ -25,6 +25,12 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
+/**
+ * Abstract base class implementing cryptographic operations using different key derivation functions
+ * Extends BaseComponent for lifecycle management and implements CryptoService interface
+ * Supports PBKDF2, HKDF and Argon2 key derivation functions
+ * Contains inner configuration classes for each KDF type with validation constraints
+ */
 @Setter
 public abstract class AbstractCryptoService extends BaseComponent implements CryptoService {
 
@@ -35,6 +41,13 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     @NotNull
     protected Kdf kdf;
 
+    /**
+     * Derives a secret key using the configured key derivation function
+     *
+     * @param algorithm The encryption algorithm to use
+     * @param salt      Random salt value for key derivation
+     * @return SecretKeySpec instance for the derived key
+     */
     protected SecretKeySpec deriveSecretKey(String algorithm, byte[] salt) {
         return switch (kdf.getImpl()) {
             case "hkdf" -> deriveHkdfSecretKey(algorithm, salt);
@@ -43,6 +56,9 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
         };
     }
 
+    /**
+     * Derives a secret key using PBKDF2 key derivation function
+     */
     private SecretKeySpec derivePbkdf2SecretKey(String algorithm, byte[] salt) {
         try {
             val spec = new PBEKeySpec(secret.toCharArray(), salt, kdf.pbkdf2.getIterations(), 256);
@@ -53,6 +69,9 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
         }
     }
 
+    /**
+     * Derives a secret key using HKDF key derivation function
+     */
     private SecretKeySpec deriveHkdfSecretKey(String algorithm, byte[] salt) {
         val hkdf = new HKDFBytesGenerator(new SHA256Digest());
         val secretBytes = secret.getBytes(StandardCharsets.UTF_8);
@@ -63,6 +82,9 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
         return new SecretKeySpec(keyBytes, algorithm);
     }
 
+    /**
+     * Derives a secret key using Argon2 key derivation function
+     */
     private SecretKeySpec deriveArgon2SecretKey(String algorithm, byte[] salt) {
         val builder = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
                 .withSalt(salt)
@@ -76,6 +98,10 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
         return new SecretKeySpec(keyBytes, algorithm);
     }
 
+    /**
+     * Configuration class for key derivation function settings
+     * Contains nested configuration classes for PBKDF2, HKDF and Argon2
+     */
     @Validated
     @Data
     public static class Kdf {
@@ -92,6 +118,9 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
         @Valid
         private Argon2 argon2;
 
+        /**
+         * Configuration for PBKDF2 key derivation function
+         */
         @Data
         public static class Pbkdf2 {
             private static final String PBKDF2_KEY_FACTORY_ALGORITHM = "PBKDF2WithHmacSHA256";
@@ -99,12 +128,18 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
             private Integer iterations = 100000;
         }
 
+        /**
+         * Configuration for HKDF key derivation function
+         */
         @Data
         public static class Hkdf {
             @NotBlank(message = "The 'info' field of HKDF is required")
             private String info;
         }
 
+        /**
+         * Configuration for Argon2 key derivation function
+         */
         @Data
         public static class Argon2 {
             @Min(1)
@@ -117,6 +152,12 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
 
     }
 
+    /**
+     * Encrypts a plain text string and returns Base64 encoded result
+     *
+     * @param text The text to encrypt
+     * @return Base64 encoded encrypted text
+     */
     public String encryptText(String text) {
         try (val is = encrypt(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8)))) {
             return Base64.getEncoder().encodeToString(is.readAllBytes());
@@ -125,6 +166,12 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
         }
     }
 
+    /**
+     * Decrypts a Base64 encoded encrypted text string
+     *
+     * @param encryptedText The Base64 encoded encrypted text
+     * @return Decrypted plain text
+     */
     public String decryptText(String encryptedText) {
         try (val is = decrypt(new ByteArrayInputStream(Base64.getDecoder().decode(encryptedText)))) {
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);
