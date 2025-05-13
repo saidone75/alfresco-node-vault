@@ -21,6 +21,7 @@ package org.saidone.service;
 import jakarta.validation.constraints.Min;
 import lombok.Setter;
 import lombok.val;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.saidone.config.EncryptionProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -29,45 +30,51 @@ import org.springframework.stereotype.Service;
 
 import javax.crypto.Cipher;
 import javax.crypto.CipherInputStream;
-import javax.crypto.spec.GCMParameterSpec;
+import javax.crypto.spec.IvParameterSpec;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
 import java.security.SecureRandom;
+import java.security.Security;
 
 /**
- * Implements symmetric encryption/decryption using AES-GCM mode via Java Cryptography Architecture (JCA).
+ * Implements symmetric encryption/decryption using ChaCha20-Poly1305 via the Bouncy Castle provider.
  * <p>
  * Key features:
- * - AES encryption in GCM authenticated mode
- * - Configurable salt and IV lengths
+ * - ChaCha20 encryption with Poly1305 authentication
+ * - Configurable salt and nonce lengths
  * - Support for PBKDF2, HKDF and Argon2 key derivation
  * - Stream-based operation for efficient memory usage
  * - Base64 text encoding/decoding support
  * <p>
  * Configuration:
- * - Prefix: application.service.vault.encryption.jca
- * - Enabled when encryption.enabled=true and encryption.impl=jca
+ * - Prefix: application.service.vault.encryption.bc
+ * - Enabled when encryption.enabled=true and encryption.impl=bc
  * <p>
  * Security measures:
- * - Per-operation random salt and IV generation
+ * - Per-operation random salt and nonce generation
  * - Password-based key derivation with strong KDFs
- * - Authenticated encryption with GCM mode
- * - No padding for precise size control
+ * - Authenticated encryption with Poly1305 mode
+ * - Efficient processing of large data streams
  */
 @Service
 @Setter
-@ConfigurationProperties(prefix = "application.service.vault.encryption.jca")
-@ConditionalOnExpression("${application.service.vault.encryption.enabled:true} == true && '${application.service.vault.encryption.impl:}' == 'jca'")
-public class JcaCryptoServiceImpl extends AbstractCryptoService implements CryptoService {
+@ConfigurationProperties(prefix = "application.service.vault.encryption.bc")
+@ConditionalOnExpression("${application.service.vault.encryption.enabled:true} == true && '${application.service.vault.encryption.impl:}' == 'bc'")
+public class BcCryptoServiceImpl extends AbstractCryptoService implements CryptoService {
+
+    static {
+        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
+            Security.addProvider(new BouncyCastleProvider());
+        }
+    }
 
     @Min(16)
     private int saltLength;
     @Min(12)
-    private int ivLength;
-    private static final int TAG_LENGTH = 128;
-    private static final String KEY_ALGORITHM = "AES";
-    private static final String CIPHER_TRANSFORMATION = "AES/GCM/NoPadding";
+    private int nonceLength;
+    private static final String CIPHER_TRANSFORMATION = "ChaCha20-Poly1305";
+    private static final String KEY_ALGORITHM = "ChaCha20";
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
@@ -75,49 +82,51 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
     public void configure(EncryptionProperties properties) {
         this.secret = properties.getSecret();
         this.kdf = properties.getKdf();
-        this.saltLength = properties.getJca().getSaltLength();
-        this.ivLength = properties.getJca().getIvLength();
+        this.saltLength = properties.getBc().getSaltLength();
+        this.nonceLength = properties.getBc().getNonceLength();
     }
 
     /**
-     * Encrypts a data stream using AES-GCM authenticated encryption.
+     * Encrypts a data stream using ChaCha20-Poly1305 authenticated encryption.
      * <p>
      * The encryption process follows these steps:
-     * 1. Generates random salt and IV
+     * 1. Generates random salt and nonce
      * 2. Derives encryption key from salt using configured KDF
-     * 3. Initializes AES-GCM cipher
-     * 4. Prepends salt+IV to encrypted stream
+     * 3. Initializes ChaCha20-Poly1305 cipher
+     * 4. Prepends salt+nonce to encrypted stream
      * <p>
-     * The output stream format is: [salt][IV][encrypted data]
+     * The output stream format is: [salt][nonce][encrypted data]
      *
      * @param inputStream The plaintext input data to be encrypted
-     * @return An InputStream containing concatenated salt, IV and encrypted data
+     * @return An InputStream containing concatenated salt, nonce and encrypted data
      * @throws RuntimeException if any error occurs during the encryption process
      */
     @Override
     public InputStream encrypt(InputStream inputStream) {
         try {
-            // Generate random salt for PBKDF2
+            // Generate random salt and nonce
             byte[] salt = new byte[saltLength];
             secureRandom.nextBytes(salt);
 
-            // Generate random IV for GCM mode
-            byte[] iv = new byte[ivLength];
-            secureRandom.nextBytes(iv);
+            byte[] nonce = new byte[nonceLength];
+            secureRandom.nextBytes(nonce);
 
-            val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
-            val spec = new GCMParameterSpec(TAG_LENGTH, iv);
+            // Derive key using configured KDF
             val secretKey = deriveSecretKey(KEY_ALGORITHM, salt);
+
+            // Initialize ChaCha20-Poly1305 cipher
+            val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION, BouncyCastleProvider.PROVIDER_NAME);
+            val spec = new IvParameterSpec(nonce);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec);
 
-            // Concatenate salt and IV
-            byte[] saltAndIv = new byte[saltLength + ivLength];
-            System.arraycopy(salt, 0, saltAndIv, 0, saltLength);
-            System.arraycopy(iv, 0, saltAndIv, saltLength, ivLength);
+            // Concatenate salt and nonce
+            byte[] saltAndNonce = new byte[saltLength + nonceLength];
+            System.arraycopy(salt, 0, saltAndNonce, 0, saltLength);
+            System.arraycopy(nonce, 0, saltAndNonce, saltLength, nonceLength);
 
-            // Prepend salt and IV to the input stream
+            // Prepend salt and nonce to encrypted stream  
             return new SequenceInputStream(
-                    new ByteArrayInputStream(saltAndIv),
+                    new ByteArrayInputStream(saltAndNonce),
                     new CipherInputStream(inputStream, cipher)
             );
         } catch (Exception e) {
@@ -126,35 +135,38 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
     }
 
     /**
-     * Decrypts an AES-GCM encrypted stream.
+     * Decrypts a ChaCha20-Poly1305 encrypted stream.
      * <p>
      * The decryption process follows these steps:
-     * 1. Reads salt and IV from stream header
+     * 1. Reads salt and nonce from stream header
      * 2. Derives decryption key from salt
      * 3. Initializes cipher for decryption
      * 4. Returns decrypting stream for remaining data
      * <p>
-     * Expected input format: [salt][IV][encrypted data]
+     * Expected input format: [salt][nonce][encrypted data]
      * where:
      * - salt length = saltLength
-     * - IV length = ivLength
+     * - nonce length = nonceLength
      *
-     * @param inputStream InputStream containing encrypted data with prepended salt and IV
+     * @param inputStream InputStream containing encrypted data with prepended salt and nonce
      * @return An InputStream yielding the decrypted data
      * @throws RuntimeException if any error occurs during the decryption process
      */
     @Override
     public InputStream decrypt(InputStream inputStream) {
         try {
-            // Read salt from the the stream
+            // Read salt from stream
             byte[] salt = inputStream.readNBytes(saltLength);
 
-            // Read IV from the the stream
-            byte[] iv = inputStream.readNBytes(ivLength);
+            // Read nonce from stream
+            byte[] nonce = inputStream.readNBytes(nonceLength);
 
-            val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
-            val spec = new GCMParameterSpec(TAG_LENGTH, iv);
+            // Derive key using configured KDF
             val secretKey = deriveSecretKey(KEY_ALGORITHM, salt);
+
+            // Initialize ChaCha20-Poly1305 cipher for decryption
+            val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION, BouncyCastleProvider.PROVIDER_NAME);
+            val spec = new IvParameterSpec(nonce);
             cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
 
             return new CipherInputStream(inputStream, cipher);
