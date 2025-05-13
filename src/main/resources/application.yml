@@ -105,7 +105,7 @@ application:
         enabled: ${VAULT_ENCRYPTION_ENABLED:true}
         metadata: ${VAULT_ENCRYPT_METADATA:true}
         secret: ${VAULT_ENCRYPTION_SECRET:changeme}
-        impl: jca
+        impl: bc
         jca:
           salt-length: 16
           iv-length: 12
@@ -113,7 +113,7 @@ application:
           salt-length: 16
           nonce-length: 12
         kdf:
-          impl: pbkdf2
+          impl: hkdf
           pbkdf2:
             iterations: 100000
           hkdf:

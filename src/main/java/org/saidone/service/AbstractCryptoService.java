@@ -54,19 +54,12 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     }
 
     private SecretKeySpec deriveHkdfSecretKey(String algorithm, byte[] salt) {
-        // Use HKDF with SHA-256 as digest
         val hkdf = new HKDFBytesGenerator(new SHA256Digest());
-
-        // Create HKDF parameters
         val secretBytes = secret.getBytes(StandardCharsets.UTF_8);
         val hkdfParams = new HKDFParameters(secretBytes, salt, kdf.hkdf.getInfo().getBytes(StandardCharsets.UTF_8));
-
         hkdf.init(hkdfParams);
-
-        // Generate a 32-byte (256-bit) key for ChaCha20
         byte[] keyBytes = new byte[32];
         hkdf.generateBytes(keyBytes, 0, keyBytes.length);
-
         return new SecretKeySpec(keyBytes, algorithm);
     }
 
@@ -78,9 +71,9 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
                 .withIterations(kdf.argon2.iterations);
         val generator = new Argon2BytesGenerator();
         generator.init(builder.build());
-        byte[] generatedKeyBytes = new byte[32];
-        generator.generateBytes(secret.getBytes(StandardCharsets.UTF_8), generatedKeyBytes);
-        return new SecretKeySpec(generatedKeyBytes, algorithm);
+        byte[] keyBytes = new byte[32];
+        generator.generateBytes(secret.getBytes(StandardCharsets.UTF_8), keyBytes);
+        return new SecretKeySpec(keyBytes, algorithm);
     }
 
     @Validated
