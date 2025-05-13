@@ -116,7 +116,7 @@ application:
           impl: pbkdf2
           pbkdf2:
             iterations: 100000
-          hdkf:
+          hkdf:
             info: hkdf-info
           argon2:
             parallelism: 1

@@ -1,11 +1,13 @@
 package org.saidone.service;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import lombok.Setter;
 import lombok.val;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
@@ -13,7 +15,6 @@ import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.bouncycastle.crypto.params.HKDFParameters;
 import org.saidone.component.BaseComponent;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.validation.annotation.Validated;
 
 import javax.crypto.SecretKeyFactory;
@@ -25,7 +26,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Base64;
 
-@ConfigurationProperties(prefix = "application.service.vault.encryption")
+@Setter
 public abstract class AbstractCryptoService extends BaseComponent implements CryptoService {
 
     @NotBlank
@@ -34,6 +35,12 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     @Valid
     @NotNull
     protected Kdf kdf;
+
+    @PostConstruct
+    public void init() {
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + secret);
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + kdf);
+    }
 
     protected SecretKeySpec deriveSecretKey(String algorithm, byte[] salt) {
         return switch (kdf.getImpl()) {

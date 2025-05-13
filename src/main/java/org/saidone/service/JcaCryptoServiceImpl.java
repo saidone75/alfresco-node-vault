@@ -21,6 +21,8 @@ package org.saidone.service;
 import jakarta.validation.constraints.Min;
 import lombok.Setter;
 import lombok.val;
+import org.saidone.config.EncryptionProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
@@ -68,6 +70,14 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
     private static final String CIPHER_TRANSFORMATION = "AES/GCM/NoPadding";
 
     private static final SecureRandom secureRandom = new SecureRandom();
+
+    @Autowired
+    public void configure(EncryptionProperties properties) {
+        this.secret = properties.getSecret();
+        this.kdf = properties.getKdf();
+        this.saltLength = properties.getJca().getSaltLength();
+        this.ivLength = properties.getJca().getIvLength();
+    }
 
     /**
      * Encrypts a data stream using AES-GCM authenticated encryption.
