@@ -69,7 +69,7 @@ public class CastUtils {
             return new HashMap<>();
         }
         if (!(object instanceof Map<?, ?> inputMap)) {
-            throw new IllegalArgumentException("Input object is not a Map: " + object.getClass().getName());
+            throw new IllegalArgumentException(String.format("Input object is not a Map: %s", object.getClass().getName()));
         }
         return inputMap.entrySet()
                 .stream()
