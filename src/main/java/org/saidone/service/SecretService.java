@@ -20,23 +20,15 @@ package org.saidone.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.EncryptionConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.vault.core.VaultTemplate;
 
-import javax.crypto.Cipher;
-import javax.crypto.KeyGenerator;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.GCMParameterSpec;
 import java.nio.charset.StandardCharsets;
-import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * Service for managing encryption secrets used in the application.
@@ -61,125 +53,29 @@ public class SecretService extends BaseComponent {
     private final VaultTemplate vaultTemplate;
     private final EncryptionConfig properties;
 
-    private static final SecureRandom secureRandom = new SecureRandom();
-    private SecretKey secretKey;
-    private byte[] iv;
-    private byte[] secret;
-
-    private CompletableFuture<Void> rotateSecret;
-    private boolean running;
-
-    @Override
-    public void init() {
-        super.init();
-        if (properties.getVaultSecretPath() != null && properties.getVaultSecretKey() != null) {
-            setSecret(getSecretFromVault());
-        } else {
-            setSecret(properties.getSecret().getBytes(StandardCharsets.UTF_8));
-        }
-        running = true;
-        rotateSecret = CompletableFuture.runAsync(this::rotateSecret);
-    }
-
-    /**
-     * Continuously rotates the encryption secret while the service is running.
-     * <p>
-     * This method runs in a loop as long as the {@code running} flag is true.
-     * It periodically calls {@link #getSecret()} to decrypt and re-encrypt the secret,
-     * ensuring cryptographic freshness by regenerating encryption keys and initialization vectors.
-     * Between rotations, it sleeps for a random duration up to 5 seconds to avoid predictable timing.
-     * Any {@link InterruptedException} during sleep is caught and logged as a warning.
-     */
-    private void rotateSecret() {
-        while (running) {
-            try {
-                getSecret();
-                TimeUnit.MILLISECONDS.sleep(secureRandom.nextInt(5000));
-            } catch (InterruptedException e) {
-                log.warn("Error rotating secret", e);
-            }
-        }
-    }
-
-    /**
-     * Returns the decrypted secret as a byte array.
-     * <p>
-     * This method synchronizes access to ensure thread safety when decrypting
-     * the stored secret. It uses AES encryption with GCM mode (128-bit tag)
-     * and no padding. The method decrypts the current encrypted secret using
-     * the stored secret key and initialization vector (IV), then re-encrypts
-     * it with a newly generated key and IV to maintain cryptographic freshness.
-     *
-     * @return the decrypted secret bytes
-     * @throws RuntimeException if any error occurs during decryption
-     */
-    public synchronized byte[] getSecret() {
+    public byte[] getSecret() {
         try {
-            val cipher = Cipher.getInstance("AES/GCM/NoPadding");
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(128, iv));
-            val secret = cipher.doFinal(this.secret);
-            setSecret(secret);
-            return secret;
-        } catch (Exception e) {
-            throw new RuntimeException("Error decrypting secret", e);
-        }
-    }
-
-    /**
-     * Encrypts and stores the provided secret byte array using AES encryption with GCM mode.
-     * <p>
-     * This method generates a new 256-bit AES secret key and a random 12-byte initialization vector (IV)
-     * using a secure random number generator. It then encrypts the given secret with the generated key and IV,
-     * storing the resulting ciphertext internally. After encryption, the input secret byte array is securely wiped
-     * by filling it with zeroes to prevent sensitive data retention in memory.
-     * <p>
-     * If any error occurs during key generation or encryption, a RuntimeException is thrown.
-     *
-     * @param secret the plaintext secret bytes to be encrypted and stored; this array will be zeroed out after use
-     * @throws RuntimeException if encryption or key generation fails
-     */
-    private void setSecret(byte[] secret) {
-        try {
-            val keyGen = KeyGenerator.getInstance("AES");
-            keyGen.init(256, secureRandom);
-            secretKey = keyGen.generateKey();
-            val cipher = Cipher.getInstance("AES/GCM/NoPadding");
-            iv = new byte[12];
-            secureRandom.nextBytes(iv);
-            cipher.init(Cipher.ENCRYPT_MODE, this.secretKey, new GCMParameterSpec(128, iv));
-            this.secret = cipher.doFinal(secret);
-        } catch (Exception e) {
-            throw new RuntimeException("Error encrypting secret", e);
-        }
-    }
-
-    /**
-     * Retrieves the secret from the Vault using the configured Vault path and key.
-     * <p>
-     * This method reads the secret at the specified Vault path via the VaultTemplate,
-     * expecting the secret data to be stored under the "data" key in the response.
-     * It extracts the secret value using the configured secret key and returns it as a UTF-8 encoded byte array.
-     *
-     * @return the secret byte array fetched from Vault
-     * @throws IllegalStateException if the secret is not found at the configured Vault path
-     */
-    private byte[] getSecretFromVault() {
-        val response = vaultTemplate.read(properties.getVaultSecretPath());
-        if (response.getData() == null) {
-            throw new IllegalStateException("Secret not found in Vault");
-        }
-        return (((Map<?, ?>) response.getData().get("data")).get(properties.getVaultSecretKey())).toString().getBytes(StandardCharsets.UTF_8);
-    }
-
-    @Override
-    public void stop() {
-        running = false;
-        try {
-            rotateSecret.get();
+            return getSecretAsync().get();
         } catch (ExecutionException | InterruptedException e) {
-            log.error(e.getMessage());
+            throw new RuntimeException(e);
         }
-        super.stop();
+    }
+
+    public CompletableFuture<byte[]> getSecretAsync() {
+        return CompletableFuture.supplyAsync(() -> {
+            var response = vaultTemplate.read(properties.getVaultSecretPath());
+            if (response.getData() == null) {
+                throw new IllegalStateException("Secret not found in Vault");
+            }
+            Object data = ((Map<?, ?>) response.getData().get("data"))
+                    .get(properties.getVaultSecretKey());
+
+            if (data == null) {
+                throw new IllegalStateException("Secret key not found");
+            }
+
+            return data.toString().getBytes(StandardCharsets.UTF_8);
+        });
     }
 
 }
