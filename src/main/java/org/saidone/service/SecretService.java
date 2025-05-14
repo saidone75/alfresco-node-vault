@@ -83,7 +83,7 @@ public class SecretService extends BaseComponent {
 
     /**
      * Continuously rotates the encryption secret while the service is running.
-     *
+     * <p>
      * This method runs in a loop as long as the {@code running} flag is true.
      * It periodically calls {@link #getSecret()} to decrypt and re-encrypt the secret,
      * ensuring cryptographic freshness by regenerating encryption keys and initialization vectors.
@@ -103,7 +103,7 @@ public class SecretService extends BaseComponent {
 
     /**
      * Returns the decrypted secret as a byte array.
-     *
+     * <p>
      * This method synchronizes access to ensure thread safety when decrypting
      * the stored secret. It uses AES encryption with GCM mode (128-bit tag)
      * and no padding. The method decrypts the current encrypted secret using
@@ -127,12 +127,12 @@ public class SecretService extends BaseComponent {
 
     /**
      * Encrypts and stores the provided secret byte array using AES encryption with GCM mode.
-     *
+     * <p>
      * This method generates a new 256-bit AES secret key and a random 12-byte initialization vector (IV)
      * using a secure random number generator. It then encrypts the given secret with the generated key and IV,
      * storing the resulting ciphertext internally. After encryption, the input secret byte array is securely wiped
      * by filling it with zeroes to prevent sensitive data retention in memory.
-     *
+     * <p>
      * If any error occurs during key generation or encryption, a RuntimeException is thrown.
      *
      * @param secret the plaintext secret bytes to be encrypted and stored; this array will be zeroed out after use
@@ -157,7 +157,7 @@ public class SecretService extends BaseComponent {
 
     /**
      * Retrieves the secret from the Vault using the configured Vault path and key.
-     *
+     * <p>
      * This method reads the secret at the specified Vault path via the VaultTemplate,
      * expecting the secret data to be stored under the "data" key in the response.
      * It extracts the secret value using the configured secret key and returns it as a UTF-8 encoded byte array.
