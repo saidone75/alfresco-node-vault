@@ -38,6 +38,21 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Service for managing encryption secrets used in the application.
+ * <p>
+ * This service retrieves a secret either from a configured Vault path or from application properties,
+ * and maintains it in encrypted form in memory. It provides functionality to periodically rotate the secret,
+ * decrypting it when needed, and securely re-encrypting it with a newly generated AES key and IV.
+ * <p>
+ * The encryption uses AES with GCM mode with no padding. The secret is stored encrypted in memory,
+ * with new keys and IVs generated whenever the secret is updated or rotated.
+ * <p>
+ * The secret rotation operation runs asynchronously in a background thread, which periodically decrypts and re-encrypts
+ * the secret with a new key and IV, to maintain cryptographic freshness.
+ * <p>
+ * The service lifecycle is tied to the application lifecycle via the {@link BaseComponent} lifecycle methods.
+ */
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -66,7 +81,16 @@ public class SecretService extends BaseComponent {
         rotateSecret = CompletableFuture.runAsync(this::rotateSecret);
     }
 
-    public void rotateSecret() {
+    /**
+     * Continuously rotates the encryption secret while the service is running.
+     *
+     * This method runs in a loop as long as the {@code running} flag is true.
+     * It periodically calls {@link #getSecret()} to decrypt and re-encrypt the secret,
+     * ensuring cryptographic freshness by regenerating encryption keys and initialization vectors.
+     * Between rotations, it sleeps for a random duration up to 5 seconds to avoid predictable timing.
+     * Any {@link InterruptedException} during sleep is caught and logged as a warning.
+     */
+    private void rotateSecret() {
         while (running) {
             try {
                 getSecret();
@@ -77,6 +101,18 @@ public class SecretService extends BaseComponent {
         }
     }
 
+    /**
+     * Returns the decrypted secret as a byte array.
+     *
+     * This method synchronizes access to ensure thread safety when decrypting
+     * the stored secret. It uses AES encryption with GCM mode (128-bit tag)
+     * and no padding. The method decrypts the current encrypted secret using
+     * the stored secret key and initialization vector (IV), then re-encrypts
+     * it with a newly generated key and IV to maintain cryptographic freshness.
+     *
+     * @return the decrypted secret bytes
+     * @throws RuntimeException if any error occurs during decryption
+     */
     public synchronized byte[] getSecret() {
         try {
             val cipher = Cipher.getInstance("AES/GCM/NoPadding");
@@ -89,6 +125,19 @@ public class SecretService extends BaseComponent {
         }
     }
 
+    /**
+     * Encrypts and stores the provided secret byte array using AES encryption with GCM mode.
+     *
+     * This method generates a new 256-bit AES secret key and a random 12-byte initialization vector (IV)
+     * using a secure random number generator. It then encrypts the given secret with the generated key and IV,
+     * storing the resulting ciphertext internally. After encryption, the input secret byte array is securely wiped
+     * by filling it with zeroes to prevent sensitive data retention in memory.
+     *
+     * If any error occurs during key generation or encryption, a RuntimeException is thrown.
+     *
+     * @param secret the plaintext secret bytes to be encrypted and stored; this array will be zeroed out after use
+     * @throws RuntimeException if encryption or key generation fails
+     */
     private void setSecret(byte[] secret) {
         try {
             val keyGen = KeyGenerator.getInstance("AES");
@@ -106,6 +155,16 @@ public class SecretService extends BaseComponent {
         }
     }
 
+    /**
+     * Retrieves the secret from the Vault using the configured Vault path and key.
+     *
+     * This method reads the secret at the specified Vault path via the VaultTemplate,
+     * expecting the secret data to be stored under the "data" key in the response.
+     * It extracts the secret value using the configured secret key and returns it as a UTF-8 encoded byte array.
+     *
+     * @return the secret byte array fetched from Vault
+     * @throws IllegalStateException if the secret is not found at the configured Vault path
+     */
     private byte[] getSecretFromVault() {
         val response = vaultTemplate.read(properties.getVaultSecretPath());
         if (response.getData() == null) {
