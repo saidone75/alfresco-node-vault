@@ -150,8 +150,6 @@ public class SecretService extends BaseComponent {
             this.secret = cipher.doFinal(secret);
         } catch (Exception e) {
             throw new RuntimeException("Error encrypting secret", e);
-        } finally {
-            Arrays.fill(secret, (byte) 0);
         }
     }
 

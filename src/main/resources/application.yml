@@ -107,7 +107,7 @@ application:
         vault-secret-path: ${VAULT_ENCRYPTION_SECRET_PATH:secret/data/AlfrescoNodeVault}
         vault-secret-key: ${VAULT_ENCRYPTION_SECRET_KEY:anv.secret}
         secret: ${VAULT_ENCRYPTION_SECRET:changeme}
-        impl: jca
+        impl: bc
         jca:
           salt-length: 16
           iv-length: 12
