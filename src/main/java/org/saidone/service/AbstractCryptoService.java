@@ -80,10 +80,10 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
         val hkdf = new HKDFBytesGenerator(new SHA256Digest());
         val secret = secretService.getSecret();
         val hkdfParams = new HKDFParameters(secret, salt, kdf.hkdf.getInfo().getBytes(StandardCharsets.UTF_8));
-        Arrays.fill(secret, (byte) 0);
         hkdf.init(hkdfParams);
         byte[] keyBytes = new byte[32];
         hkdf.generateBytes(keyBytes, 0, keyBytes.length);
+        Arrays.fill(secret, (byte) 0);
         return new SecretKeySpec(keyBytes, algorithm);
     }
 

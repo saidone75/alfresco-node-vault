@@ -19,11 +19,13 @@
 package org.saidone.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.EncryptionConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.vault.core.VaultTemplate;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -34,11 +36,11 @@ public class SecretService extends BaseComponent {
     private final EncryptionConfig properties;
 
     public synchronized byte[] getSecret() {
-        var response = vaultTemplate.read(properties.getSecretPath());
+        val response = vaultTemplate.read(properties.getSecretPath());
         if (response.getData() == null) {
             throw new IllegalStateException("Secret not found in Vault");
         }
-        return (byte[]) ((Map<?, ?>) response.getData().get("data")).get(properties.getSecretKey());
+        return (((Map<?, ?>) response.getData().get("data")).get(properties.getSecretKey())).toString().getBytes(StandardCharsets.UTF_8);
     }
 
 }
