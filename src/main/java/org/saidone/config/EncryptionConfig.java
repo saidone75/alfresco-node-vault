@@ -35,9 +35,11 @@ import org.springframework.validation.annotation.Validated;
 public class EncryptionConfig {
 
     @Setter
-    private String secretPath;
+    private String vaultSecretPath;
     @Setter
-    private String secretKey;
+    private String vaultSecretKey;
+    @Setter
+    private String secret;
 
     @Valid
     @NotNull

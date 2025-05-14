@@ -35,12 +35,16 @@ public class SecretService extends BaseComponent {
     private final VaultTemplate vaultTemplate;
     private final EncryptionConfig properties;
 
-    public synchronized byte[] getSecret() {
-        val response = vaultTemplate.read(properties.getSecretPath());
-        if (response.getData() == null) {
-            throw new IllegalStateException("Secret not found in Vault");
+    public byte[] getSecret() {
+        if (properties.getVaultSecretPath() != null && properties.getVaultSecretKey() != null) {
+            val response = vaultTemplate.read(properties.getVaultSecretPath());
+            if (response.getData() == null) {
+                throw new IllegalStateException("Secret not found in Vault");
+            }
+            return (((Map<?, ?>) response.getData().get("data")).get(properties.getVaultSecretKey())).toString().getBytes(StandardCharsets.UTF_8);
+        } else {
+            return properties.getSecret().getBytes(StandardCharsets.UTF_8);
         }
-        return (((Map<?, ?>) response.getData().get("data")).get(properties.getSecretKey())).toString().getBytes(StandardCharsets.UTF_8);
     }
 
 }
