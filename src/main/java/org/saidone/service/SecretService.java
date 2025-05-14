@@ -19,32 +19,110 @@
 package org.saidone.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.EncryptionConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.vault.core.VaultTemplate;
 
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class SecretService extends BaseComponent {
 
     private final VaultTemplate vaultTemplate;
     private final EncryptionConfig properties;
 
-    public byte[] getSecret() {
+    private static final SecureRandom secureRandom = new SecureRandom();
+    private SecretKey secretKey;
+    private byte[] iv;
+    private byte[] secret;
+
+    private CompletableFuture<Void> rotateSecret;
+    private boolean running;
+
+    @Override
+    public void init() {
+        super.init();
         if (properties.getVaultSecretPath() != null && properties.getVaultSecretKey() != null) {
-            val response = vaultTemplate.read(properties.getVaultSecretPath());
-            if (response.getData() == null) {
-                throw new IllegalStateException("Secret not found in Vault");
-            }
-            return (((Map<?, ?>) response.getData().get("data")).get(properties.getVaultSecretKey())).toString().getBytes(StandardCharsets.UTF_8);
+            setSecret(getSecretFromVault());
         } else {
-            return properties.getSecret().getBytes(StandardCharsets.UTF_8);
+            setSecret(properties.getSecret().getBytes(StandardCharsets.UTF_8));
         }
+        running = true;
+        rotateSecret = CompletableFuture.runAsync(this::rotateSecret);
+    }
+
+    public void rotateSecret() {
+        while (running) {
+            try {
+                getSecret();
+                TimeUnit.MILLISECONDS.sleep(secureRandom.nextInt(5000));
+            } catch (InterruptedException e) {
+                log.warn("Error rotating secret", e);
+            }
+        }
+    }
+
+    public synchronized byte[] getSecret() {
+        try {
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            cipher.init(Cipher.DECRYPT_MODE, secretKey, new GCMParameterSpec(128, iv));
+            val secret = cipher.doFinal(this.secret);
+            setSecret(secret);
+            return secret;
+        } catch (Exception e) {
+            throw new RuntimeException("Error decrypting secret", e);
+        }
+    }
+
+    private void setSecret(byte[] secret) {
+        try {
+            val keyGen = KeyGenerator.getInstance("AES");
+            keyGen.init(256, secureRandom);
+            secretKey = keyGen.generateKey();
+            val cipher = Cipher.getInstance("AES/GCM/NoPadding");
+            iv = new byte[12];
+            secureRandom.nextBytes(iv);
+            cipher.init(Cipher.ENCRYPT_MODE, this.secretKey, new GCMParameterSpec(128, iv));
+            this.secret = cipher.doFinal(secret);
+        } catch (Exception e) {
+            throw new RuntimeException("Error encrypting secret", e);
+        } finally {
+            Arrays.fill(secret, (byte) 0);
+        }
+    }
+
+    private byte[] getSecretFromVault() {
+        val response = vaultTemplate.read(properties.getVaultSecretPath());
+        if (response.getData() == null) {
+            throw new IllegalStateException("Secret not found in Vault");
+        }
+        return (((Map<?, ?>) response.getData().get("data")).get(properties.getVaultSecretKey())).toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    @Override
+    public void stop() {
+        running = false;
+        try {
+            rotateSecret.get();
+        } catch (ExecutionException | InterruptedException e) {
+            log.error(e.getMessage());
+        }
+        super.stop();
     }
 
 }
