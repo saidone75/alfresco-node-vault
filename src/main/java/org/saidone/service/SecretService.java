@@ -20,6 +20,7 @@ package org.saidone.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.EncryptionConfig;
 import org.springframework.stereotype.Service;
@@ -53,28 +54,27 @@ public class SecretService extends BaseComponent {
     private final VaultTemplate vaultTemplate;
     private final EncryptionConfig properties;
 
-    public byte[] getSecret() {
+    public Pair<byte[], Integer> getSecret(int version) {
         try {
-            return getSecretAsync().get();
+            return getSecretAsync(version).get();
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
 
-    public CompletableFuture<byte[]> getSecretAsync() {
+    private CompletableFuture<Pair<byte[], Integer>> getSecretAsync(int version) {
         return CompletableFuture.supplyAsync(() -> {
             var response = vaultTemplate.read(properties.getVaultSecretPath());
             if (response.getData() == null) {
                 throw new IllegalStateException("Secret not found in Vault");
             }
-            Object data = ((Map<?, ?>) response.getData().get("data"))
+            var data = ((Map<?, ?>) response.getData().get("data"))
                     .get(properties.getVaultSecretKey());
-
+            // TODO recuperare versione corretta
             if (data == null) {
                 throw new IllegalStateException("Secret key not found");
             }
-
-            return data.toString().getBytes(StandardCharsets.UTF_8);
+            return Pair.of(data.toString().getBytes(StandardCharsets.UTF_8), 0);
         });
     }
 
