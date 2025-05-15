@@ -54,7 +54,7 @@ public class SecretService extends BaseComponent {
     private final VaultTemplate vaultTemplate;
     private final EncryptionConfig properties;
 
-    public Pair<byte[], Integer> getSecret(int version) {
+    public Pair<byte[], Integer> getSecret(Integer version) {
         try {
             return getSecretAsync(version).get();
         } catch (ExecutionException | InterruptedException e) {
@@ -62,7 +62,7 @@ public class SecretService extends BaseComponent {
         }
     }
 
-    private CompletableFuture<Pair<byte[], Integer>> getSecretAsync(int version) {
+    private CompletableFuture<Pair<byte[], Integer>> getSecretAsync(Integer version) {
         return CompletableFuture.supplyAsync(() -> {
             var response = vaultTemplate.read(properties.getVaultSecretPath());
             if (response.getData() == null) {

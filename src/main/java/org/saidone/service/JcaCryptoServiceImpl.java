@@ -33,6 +33,7 @@ import javax.crypto.spec.GCMParameterSpec;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
+import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 
 /**
@@ -107,16 +108,17 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             val spec = new GCMParameterSpec(TAG_LENGTH, iv);
             val secretKey = deriveSecretKey(KEY_ALGORITHM, salt);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey.getLeft(), spec);
 
-            // Concatenate salt and IV
-            byte[] saltAndIv = new byte[saltLength + ivLength];
-            System.arraycopy(salt, 0, saltAndIv, 0, saltLength);
-            System.arraycopy(iv, 0, saltAndIv, saltLength, ivLength);
+            // Concatenate key version, salt and IV
+            byte[] keyVersionSaltAndIv = new byte[4 + saltLength + ivLength];
+            System.arraycopy(ByteBuffer.allocate(4).putInt(secretKey.getRight()).array(), 0, keyVersionSaltAndIv, 0, 4);
+            System.arraycopy(salt, 0, keyVersionSaltAndIv, 4, saltLength);
+            System.arraycopy(iv, 0, keyVersionSaltAndIv, 4 + saltLength, ivLength);
 
             // Prepend salt and IV to the input stream
             return new SequenceInputStream(
-                    new ByteArrayInputStream(saltAndIv),
+                    new ByteArrayInputStream(keyVersionSaltAndIv),
                     new CipherInputStream(inputStream, cipher)
             );
         } catch (Exception e) {
@@ -128,15 +130,16 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
      * Decrypts an AES-GCM encrypted stream.
      * <p>
      * The decryption process follows these steps:
-     * 1. Reads salt and IV from stream header
+     * 1. Reads key version, salt and IV from stream header
      * 2. Derives decryption key from salt
      * 3. Initializes cipher for decryption
      * 4. Returns decrypting stream for remaining data
      * <p>
-     * Expected input format: [salt][IV][encrypted data]
+     * Expected input format: [key version][salt][IV][encrypted data]
      * where:
-     * - salt length = saltLength
-     * - IV length = ivLength
+     * - key version length = 4 bytes
+     * - salt length = saltLength bytes
+     * - IV length = ivLength bytes
      *
      * @param inputStream InputStream containing encrypted data with prepended salt and IV
      * @return An InputStream yielding the decrypted data
@@ -145,16 +148,22 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
     @Override
     public InputStream decrypt(InputStream inputStream) {
         try {
-            // Read salt from the the stream
+            // Read key version from stream
+            val keyVersion = ByteBuffer.wrap(inputStream.readNBytes(4)).getInt();
+
+            // Read salt from stream
             byte[] salt = inputStream.readNBytes(saltLength);
 
-            // Read IV from the the stream
+            // Read IV from stream
             byte[] iv = inputStream.readNBytes(ivLength);
 
+            // Derive key using configured KDF
+            val secretKey = deriveSecretKey(KEY_ALGORITHM, salt, keyVersion);
+
+            // Initialize AES-GCM cipher for decryption
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             val spec = new GCMParameterSpec(TAG_LENGTH, iv);
-            val secretKey = deriveSecretKey(KEY_ALGORITHM, salt);
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey.getLeft(), spec);
 
             return new CipherInputStream(inputStream, cipher);
         } catch (Exception e) {

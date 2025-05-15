@@ -44,6 +44,11 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     @NotNull
     protected Kdf kdf;
 
+    // with version == null we retrieve the last version
+    protected Pair<SecretKeySpec, Integer> deriveSecretKey(String algorithm, byte[] salt) {
+       return deriveSecretKey(algorithm, salt, null);
+    }
+
     /**
      * Derives a secret key using the configured key derivation function
      *
@@ -51,7 +56,7 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
      * @param salt      Random salt value for key derivation
      * @return SecretKeySpec instance for the derived key
      */
-    protected Pair<SecretKeySpec, Integer> deriveSecretKey(String algorithm, byte[] salt, int version) {
+    protected Pair<SecretKeySpec, Integer> deriveSecretKey(String algorithm, byte[] salt, Integer version) {
         return switch (kdf.getImpl()) {
             case "hkdf" -> deriveHkdfSecretKey(algorithm, salt, version);
             case "argon2" -> deriveArgon2SecretKey(algorithm, salt, version);
@@ -62,7 +67,7 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     /**
      * Derives a secret key using PBKDF2 key derivation function
      */
-    private Pair<SecretKeySpec, Integer> derivePbkdf2SecretKey(String algorithm, byte[] salt, int version) {
+    private Pair<SecretKeySpec, Integer> derivePbkdf2SecretKey(String algorithm, byte[] salt, Integer version) {
         try {
             val secret = secretService.getSecret(version);
             val spec = new PBEKeySpec(new String(secret.getLeft(), StandardCharsets.UTF_8).toCharArray(), salt, kdf.pbkdf2.getIterations(), 256);
@@ -77,7 +82,7 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     /**
      * Derives a secret key using HKDF key derivation function
      */
-    private Pair<SecretKeySpec, Integer> deriveHkdfSecretKey(String algorithm, byte[] salt, int version) {
+    private Pair<SecretKeySpec, Integer> deriveHkdfSecretKey(String algorithm, byte[] salt, Integer version) {
         val hkdf = new HKDFBytesGenerator(new SHA256Digest());
         val secret = secretService.getSecret(version);
         val hkdfParams = new HKDFParameters(secret.getLeft(), salt, kdf.hkdf.getInfo().getBytes(StandardCharsets.UTF_8));
