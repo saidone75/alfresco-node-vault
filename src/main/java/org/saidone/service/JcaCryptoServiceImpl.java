@@ -86,7 +86,7 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
      * 1. Generates random salt and IV
      * 2. Derives encryption key from salt using configured KDF
      * 3. Initializes AES-GCM cipher
-     * 4. Prepends salt+IV to encrypted stream
+     * 4. Prepends key version+salt+IV to encrypted stream
      * <p>
      * The output stream format is: [salt][IV][encrypted data]
      *
@@ -116,7 +116,7 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
             System.arraycopy(salt, 0, keyVersionSaltAndIv, 4, saltLength);
             System.arraycopy(iv, 0, keyVersionSaltAndIv, 4 + saltLength, ivLength);
 
-            // Prepend salt and IV to the input stream
+            // Prepend key version, salt and IV to the input stream
             return new SequenceInputStream(
                     new ByteArrayInputStream(keyVersionSaltAndIv),
                     new CipherInputStream(inputStream, cipher)

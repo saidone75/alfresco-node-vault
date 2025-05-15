@@ -93,7 +93,7 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
      * 1. Generates random salt and nonce
      * 2. Derives encryption key from salt using configured KDF
      * 3. Initializes ChaCha20-Poly1305 cipher
-     * 4. Prepends salt+nonce to encrypted stream
+     * 4. Prepends key version+salt+nonce to encrypted stream
      * <p>
      * The output stream format is: [salt][nonce][encrypted data]
      *
@@ -125,7 +125,7 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
             System.arraycopy(salt, 0, keyVersionSaltAndNonce, 4, saltLength);
             System.arraycopy(nonce, 0, keyVersionSaltAndNonce, 4 + saltLength, nonceLength);
 
-            // Prepend salt and nonce to encrypted stream  
+            // Prepend key version, salt and nonce to encrypted stream
             return new SequenceInputStream(
                     new ByteArrayInputStream(keyVersionSaltAndNonce),
                     new CipherInputStream(inputStream, cipher)
