@@ -35,6 +35,8 @@ import org.springframework.validation.annotation.Validated;
 public class EncryptionConfig {
 
     @Setter
+    private String vaultSecretKvMount;
+    @Setter
     private String vaultSecretPath;
     @Setter
     private String vaultSecretKey;

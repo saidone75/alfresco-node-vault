@@ -25,6 +25,8 @@ import org.saidone.component.BaseComponent;
 import org.saidone.config.EncryptionConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.vault.core.VaultTemplate;
+import org.springframework.vault.core.VaultVersionedKeyValueOperations;
+import org.springframework.vault.support.Versioned;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -54,6 +56,14 @@ public class SecretService extends BaseComponent {
     private final VaultTemplate vaultTemplate;
     private final EncryptionConfig properties;
 
+    private static VaultVersionedKeyValueOperations vaultVersionedKeyValueOperations;
+
+    @Override
+    public void init() {
+        super.init();
+        vaultVersionedKeyValueOperations = vaultTemplate.opsForVersionedKeyValue(properties.getVaultSecretKvMount());
+    }
+
     public Pair<byte[], Integer> getSecret(Integer version) {
         try {
             return getSecretAsync(version).get();
@@ -64,17 +74,18 @@ public class SecretService extends BaseComponent {
 
     private CompletableFuture<Pair<byte[], Integer>> getSecretAsync(Integer version) {
         return CompletableFuture.supplyAsync(() -> {
-            var response = vaultTemplate.read(properties.getVaultSecretPath());
-            if (response.getData() == null) {
-                throw new IllegalStateException("Secret not found in Vault");
+            Versioned<Map<String, Object>> response;
+            if (version == null) {
+                response = vaultVersionedKeyValueOperations.get(properties.getVaultSecretPath());
+            } else {
+                response = vaultVersionedKeyValueOperations.get(properties.getVaultSecretPath(), Versioned.Version.from(version));
             }
-            var data = ((Map<?, ?>) response.getData().get("data"))
-                    .get(properties.getVaultSecretKey());
-            // TODO recuperare versione corretta
-            if (data == null) {
-                throw new IllegalStateException("Secret key not found");
-            }
-            return Pair.of(data.toString().getBytes(StandardCharsets.UTF_8), 0);
+            if (response != null && response.getData() != null && response.getMetadata() != null) {
+                return Pair.of(
+                        ((Map<?, ?>) response.getData()).get(properties.getVaultSecretKey()).toString().getBytes(StandardCharsets.UTF_8),
+                        response.getMetadata().getVersion().getVersion()
+                );
+            } else throw new RuntimeException("Unable to retrieve secret from vault");
         });
     }
 
