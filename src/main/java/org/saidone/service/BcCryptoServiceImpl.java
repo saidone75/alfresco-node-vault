@@ -34,6 +34,7 @@ import javax.crypto.spec.IvParameterSpec;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.SequenceInputStream;
+import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 import java.security.Security;
 
@@ -116,16 +117,17 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
             // Initialize ChaCha20-Poly1305 cipher
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION, BouncyCastleProvider.PROVIDER_NAME);
             val spec = new IvParameterSpec(nonce);
-            cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec);
+            cipher.init(Cipher.ENCRYPT_MODE, secretKey.getLeft(), spec);
 
-            // Concatenate salt and nonce
-            byte[] saltAndNonce = new byte[saltLength + nonceLength];
-            System.arraycopy(salt, 0, saltAndNonce, 0, saltLength);
-            System.arraycopy(nonce, 0, saltAndNonce, saltLength, nonceLength);
+            // Concatenate key version, salt and nonce
+            byte[] keyVersionSaltAndNonce = new byte[4 + saltLength + nonceLength];
+            System.arraycopy(ByteBuffer.allocate(4).putInt(secretKey.getRight()).array(), 0, keyVersionSaltAndNonce, 0, 4);
+            System.arraycopy(salt, 0, keyVersionSaltAndNonce, 4, saltLength);
+            System.arraycopy(nonce, 0, keyVersionSaltAndNonce, 4 + saltLength, nonceLength);
 
             // Prepend salt and nonce to encrypted stream  
             return new SequenceInputStream(
-                    new ByteArrayInputStream(saltAndNonce),
+                    new ByteArrayInputStream(keyVersionSaltAndNonce),
                     new CipherInputStream(inputStream, cipher)
             );
         } catch (Exception e) {
@@ -137,15 +139,16 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
      * Decrypts a ChaCha20-Poly1305 encrypted stream.
      * <p>
      * The decryption process follows these steps:
-     * 1. Reads salt and nonce from stream header
+     * 1. Reads key version, salt and nonce from stream header
      * 2. Derives decryption key from salt
      * 3. Initializes cipher for decryption
      * 4. Returns decrypting stream for remaining data
      * <p>
-     * Expected input format: [salt][nonce][encrypted data]
+     * Expected input format: [key version][salt][nonce][encrypted data]
      * where:
-     * - salt length = saltLength
-     * - nonce length = nonceLength
+     * - key version length = 4 bytes
+     * - salt length = saltLength bytes
+     * - IV length = ivLength bytes
      *
      * @param inputStream InputStream containing encrypted data with prepended salt and nonce
      * @return An InputStream yielding the decrypted data
@@ -154,6 +157,9 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
     @Override
     public InputStream decrypt(InputStream inputStream) {
         try {
+            // Read key version from stream
+            val keyVersion = ByteBuffer.wrap(inputStream.readNBytes(4)).getInt();
+
             // Read salt from stream
             byte[] salt = inputStream.readNBytes(saltLength);
 
@@ -161,12 +167,12 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
             byte[] nonce = inputStream.readNBytes(nonceLength);
 
             // Derive key using configured KDF
-            val secretKey = deriveSecretKey(KEY_ALGORITHM, salt);
+            val secretKey = deriveSecretKey(KEY_ALGORITHM, salt, keyVersion);
 
             // Initialize ChaCha20-Poly1305 cipher for decryption
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION, BouncyCastleProvider.PROVIDER_NAME);
             val spec = new IvParameterSpec(nonce);
-            cipher.init(Cipher.DECRYPT_MODE, secretKey, spec);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey.getLeft(), spec);
 
             return new CipherInputStream(inputStream, cipher);
         } catch (Exception e) {

@@ -78,7 +78,7 @@ public class NodeWrapper {
         try {
             return objectMapper.readValue(nodeJson, Node.class);
         } catch (IOException e) {
-            log.error("Error while deserializing node => {}", e.getMessage(), e);
+            log.error("Error while deserializing node: {}", e.getMessage(), e);
             return null;
         }
     }

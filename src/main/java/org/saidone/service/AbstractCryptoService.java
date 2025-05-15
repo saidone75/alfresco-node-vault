@@ -8,6 +8,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.Setter;
 import lombok.val;
+import org.apache.commons.lang3.tuple.Pair;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.crypto.generators.Argon2BytesGenerator;
 import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
@@ -43,6 +44,11 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     @NotNull
     protected Kdf kdf;
 
+    // with version == null we retrieve the last version
+    protected Pair<SecretKeySpec, Integer> deriveSecretKey(String algorithm, byte[] salt) {
+       return deriveSecretKey(algorithm, salt, null);
+    }
+
     /**
      * Derives a secret key using the configured key derivation function
      *
@@ -50,24 +56,24 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
      * @param salt      Random salt value for key derivation
      * @return SecretKeySpec instance for the derived key
      */
-    protected SecretKeySpec deriveSecretKey(String algorithm, byte[] salt) {
+    protected Pair<SecretKeySpec, Integer> deriveSecretKey(String algorithm, byte[] salt, Integer version) {
         return switch (kdf.getImpl()) {
-            case "hkdf" -> deriveHkdfSecretKey(algorithm, salt);
-            case "argon2" -> deriveArgon2SecretKey(algorithm, salt);
-            default -> derivePbkdf2SecretKey(algorithm, salt);
+            case "hkdf" -> deriveHkdfSecretKey(algorithm, salt, version);
+            case "argon2" -> deriveArgon2SecretKey(algorithm, salt, version);
+            default -> derivePbkdf2SecretKey(algorithm, salt, version);
         };
     }
 
     /**
      * Derives a secret key using PBKDF2 key derivation function
      */
-    private SecretKeySpec derivePbkdf2SecretKey(String algorithm, byte[] salt) {
+    private Pair<SecretKeySpec, Integer> derivePbkdf2SecretKey(String algorithm, byte[] salt, Integer version) {
         try {
-            val secret = secretService.getSecret();
-            val spec = new PBEKeySpec(new String(secret, StandardCharsets.UTF_8).toCharArray(), salt, kdf.pbkdf2.getIterations(), 256);
-            Arrays.fill(secret, (byte) 0);
+            val secret = secretService.getSecret(version);
+            val spec = new PBEKeySpec(new String(secret.getLeft(), StandardCharsets.UTF_8).toCharArray(), salt, kdf.pbkdf2.getIterations(), 256);
+            Arrays.fill(secret.getLeft(), (byte) 0);
             val skf = SecretKeyFactory.getInstance(Kdf.Pbkdf2.PBKDF2_KEY_FACTORY_ALGORITHM);
-            return new SecretKeySpec(skf.generateSecret(spec).getEncoded(), algorithm);
+            return Pair.of(new SecretKeySpec(skf.generateSecret(spec).getEncoded(), algorithm), secret.getRight());
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new IllegalStateException("Unable to derive secret key", e);
         }
@@ -76,21 +82,21 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     /**
      * Derives a secret key using HKDF key derivation function
      */
-    private SecretKeySpec deriveHkdfSecretKey(String algorithm, byte[] salt) {
+    private Pair<SecretKeySpec, Integer> deriveHkdfSecretKey(String algorithm, byte[] salt, Integer version) {
         val hkdf = new HKDFBytesGenerator(new SHA256Digest());
-        val secret = secretService.getSecret();
-        val hkdfParams = new HKDFParameters(secret, salt, kdf.hkdf.getInfo().getBytes(StandardCharsets.UTF_8));
+        val secret = secretService.getSecret(version);
+        val hkdfParams = new HKDFParameters(secret.getLeft(), salt, kdf.hkdf.getInfo().getBytes(StandardCharsets.UTF_8));
         hkdf.init(hkdfParams);
         byte[] keyBytes = new byte[32];
         hkdf.generateBytes(keyBytes, 0, keyBytes.length);
-        Arrays.fill(secret, (byte) 0);
-        return new SecretKeySpec(keyBytes, algorithm);
+        Arrays.fill(secret.getLeft(), (byte) 0);
+        return Pair.of(new SecretKeySpec(keyBytes, algorithm), secret.getRight());
     }
 
     /**
      * Derives a secret key using Argon2 key derivation function
      */
-    private SecretKeySpec deriveArgon2SecretKey(String algorithm, byte[] salt) {
+    private Pair<SecretKeySpec, Integer> deriveArgon2SecretKey(String algorithm, byte[] salt, int version) {
         val builder = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
                 .withSalt(salt)
                 .withParallelism(kdf.argon2.parallelism)
@@ -99,10 +105,10 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
         val generator = new Argon2BytesGenerator();
         generator.init(builder.build());
         byte[] keyBytes = new byte[32];
-        val secret = secretService.getSecret();
-        generator.generateBytes(secret, keyBytes);
-        Arrays.fill(secret, (byte) 0);
-        return new SecretKeySpec(keyBytes, algorithm);
+        val secret = secretService.getSecret(version);
+        generator.generateBytes(secret.getLeft(), keyBytes);
+        Arrays.fill(secret.getLeft(), (byte) 0);
+        return Pair.of(new SecretKeySpec(keyBytes, algorithm), secret.getRight());
     }
 
     /**
