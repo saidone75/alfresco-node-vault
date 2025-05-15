@@ -95,7 +95,7 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
      * 3. Initializes ChaCha20-Poly1305 cipher
      * 4. Prepends key version+salt+nonce to encrypted stream
      * <p>
-     * The output stream format is: [salt][nonce][encrypted data]
+     * The output stream format is: [key version][salt][nonce][encrypted data]
      *
      * @param inputStream The plaintext input data to be encrypted
      * @return An InputStream containing concatenated salt, nonce and encrypted data

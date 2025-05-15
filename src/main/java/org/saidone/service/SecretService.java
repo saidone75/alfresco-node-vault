@@ -34,19 +34,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Service for managing encryption secrets used in the application.
+ * Service class for interacting with Vault to retrieve secrets.
  * <p>
- * This service retrieves a secret either from a configured Vault path or from application properties,
- * and maintains it in encrypted form in memory. It provides functionality to periodically rotate the secret,
- * decrypting it when needed, and securely re-encrypting it with a newly generated AES key and IV.
- * <p>
- * The encryption uses AES with GCM mode with no padding. The secret is stored encrypted in memory,
- * with new keys and IVs generated whenever the secret is updated or rotated.
- * <p>
- * The secret rotation operation runs asynchronously in a background thread, which periodically decrypts and re-encrypts
- * the secret with a new key and IV, to maintain cryptographic freshness.
- * <p>
- * The service lifecycle is tied to the application lifecycle via the {@link BaseComponent} lifecycle methods.
+ * This service uses Spring Vault's versioned key-value operations to fetch secrets
+ * from a configured Vault path and key. It supports retrieving secrets by specific version
+ * or the latest version if none is specified.
  */
 @RequiredArgsConstructor
 @Service
@@ -64,6 +56,13 @@ public class SecretService extends BaseComponent {
         vaultVersionedKeyValueOperations = vaultTemplate.opsForVersionedKeyValue(properties.getVaultSecretKvMount());
     }
 
+    /**
+     * Retrieves the secret from Vault for the specified version.
+     *
+     * @param version the version of the secret to retrieve; if null, retrieves the latest version
+     * @return a Pair containing the secret bytes and the version number
+     * @throws RuntimeException if unable to retrieve the secret or if an error occurs during retrieval
+     */
     public Pair<byte[], Integer> getSecret(Integer version) {
         try {
             return getSecretAsync(version).get();
