@@ -104,8 +104,9 @@ application:
       encryption:
         enabled: ${VAULT_ENCRYPTION_ENABLED:true}
         metadata: ${VAULT_ENCRYPT_METADATA:true}
-        secret-path: ${VAULT_ENCRYPTION_SECRET_PATH:secret/data/AlfrescoNodeVault}
-        secret-key: ${VAULT_ENCRYPTION_SECRET_KEY:anv.secret}
+        vault-secret-path: ${VAULT_ENCRYPTION_SECRET_PATH:secret/data/AlfrescoNodeVault}
+        vault-secret-key: ${VAULT_ENCRYPTION_SECRET_KEY:anv.secret}
+        secret: ${VAULT_ENCRYPTION_SECRET:changeme}
         impl: bc
         jca:
           salt-length: 16

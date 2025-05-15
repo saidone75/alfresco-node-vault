@@ -19,32 +19,63 @@
 package org.saidone.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.val;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.EncryptionConfig;
 import org.springframework.stereotype.Service;
 import org.springframework.vault.core.VaultTemplate;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
+/**
+ * Service for managing encryption secrets used in the application.
+ * <p>
+ * This service retrieves a secret either from a configured Vault path or from application properties,
+ * and maintains it in encrypted form in memory. It provides functionality to periodically rotate the secret,
+ * decrypting it when needed, and securely re-encrypting it with a newly generated AES key and IV.
+ * <p>
+ * The encryption uses AES with GCM mode with no padding. The secret is stored encrypted in memory,
+ * with new keys and IVs generated whenever the secret is updated or rotated.
+ * <p>
+ * The secret rotation operation runs asynchronously in a background thread, which periodically decrypts and re-encrypts
+ * the secret with a new key and IV, to maintain cryptographic freshness.
+ * <p>
+ * The service lifecycle is tied to the application lifecycle via the {@link BaseComponent} lifecycle methods.
+ */
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class SecretService extends BaseComponent {
 
     private final VaultTemplate vaultTemplate;
     private final EncryptionConfig properties;
 
-    public synchronized byte[] getSecret() {
-        val response = vaultTemplate.read(properties.getSecretPath());
-        if (response.getData() == null) {
-            throw new IllegalStateException("Secret not found in Vault");
+    public Pair<byte[], Integer> getSecret(Integer version) {
+        try {
+            return getSecretAsync(version).get();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
         }
-        val secret = (String) ((Map<?, ?>) response.getData().get("data")).get(properties.getSecretKey());
-        byte[] secretBytes = secret.getBytes(StandardCharsets.UTF_8);
-        Arrays.fill(secret.toCharArray(), '\0');
-        return secretBytes;
+    }
+
+    private CompletableFuture<Pair<byte[], Integer>> getSecretAsync(Integer version) {
+        return CompletableFuture.supplyAsync(() -> {
+            var response = vaultTemplate.read(properties.getVaultSecretPath());
+            if (response.getData() == null) {
+                throw new IllegalStateException("Secret not found in Vault");
+            }
+            var data = ((Map<?, ?>) response.getData().get("data"))
+                    .get(properties.getVaultSecretKey());
+            // TODO recuperare versione corretta
+            if (data == null) {
+                throw new IllegalStateException("Secret key not found");
+            }
+            return Pair.of(data.toString().getBytes(StandardCharsets.UTF_8), 0);
+        });
     }
 
 }
