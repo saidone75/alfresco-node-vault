@@ -63,11 +63,12 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Custom upload and download methods
 - Scheduled or on-demand archiving
 - MongoDB storage via GridFS
-- Encryption for content and metadata
+- Focus on [strong encryption](doc/Encryption.md) option for both content and metadata
 - REST API with proxy support
 - Engineered for flexibility and bespoke integrations
 - No installation or changes required on Alfresco
 - 100% test coverage
+- Prometheus monitoring support for metrics and health checks
 - Minimal memory footprint
 
 Pull requests are welcome!

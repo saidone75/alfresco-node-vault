@@ -206,7 +206,7 @@ services:
         export VAULT_ADDR='http://anv-hashicorp-vault:8200' && \
         export VAULT_TOKEN='root' && \
         sleep 5 && \
-        vault kv put secret/AlfrescoNodeVault application.service.vault.encryption.jca.key=vault-secret
+        vault kv put secret/AlfrescoNodeVault anv.secret=vault-secret
       "
   anv-vault:
     image: anv:latest
