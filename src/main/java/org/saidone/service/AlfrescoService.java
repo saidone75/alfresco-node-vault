@@ -102,6 +102,10 @@ public class AlfrescoService extends BaseComponent {
         super.init();
         basicAuth = String.format("Basic %s", Base64.getEncoder().encodeToString((String.format("%s:%s", userName, password)).getBytes(StandardCharsets.UTF_8)));
         guestHome = getGuestHome();
+        if (guestHome == null) {
+            log.error("Unable to start {}", this.getClass().getSimpleName());
+            super.shutDown(0);
+        }
     }
 
     /**
