@@ -20,6 +20,7 @@ package org.saidone.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.apache.commons.lang3.tuple.Pair;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.EncryptionConfig;
@@ -54,6 +55,11 @@ public class SecretService extends BaseComponent {
     public void init() {
         super.init();
         vaultVersionedKeyValueOperations = vaultTemplate.opsForVersionedKeyValue(properties.getVaultSecretKvMount());
+        val health = vaultTemplate.opsForSys().health();
+        if (!health.isInitialized()) {
+            log.error("Unable to start {}", this.getClass().getSimpleName());
+            super.shutDown(0);
+        }
     }
 
     /**

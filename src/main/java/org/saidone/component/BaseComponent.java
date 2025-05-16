@@ -22,27 +22,50 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import org.saidone.Constants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * Abstract base class for application components providing lifecycle management logging.
+ * Abstract base class for components within the Alfresco Node Vault application.
  * <p>
- * This class utilizes {@link jakarta.annotation.PostConstruct} and {@link jakarta.annotation.PreDestroy}
- * annotations to automatically log messages when components are started and stopped,
- * aiding in the monitoring and debugging of application lifecycle events.
- * <p>
- * Subclasses inherit the logging behavior without the need to redefine it.
+ * Provides lifecycle logging for startup and shutdown events, and a method to
+ * programmatically shut down the Spring application context and exit the JVM.
+ * </p>
  */
 @Slf4j
 public abstract class BaseComponent {
 
+    @Autowired
+    private ApplicationContext applicationContext;
+
+    /**
+     * Initialization callback invoked after the component's dependencies have been injected.
+     * Logs a startup message indicating the component is starting.
+     */
     @PostConstruct
     public void init() {
         log.info("{} Starting {}", Constants.START_PREFIX, this.getClass().getSimpleName());
     }
 
+    /**
+     * Destruction callback invoked before the component is removed from the context.
+     * Logs a shutdown message indicating the component is stopping.
+     */
     @PreDestroy
     public void stop() {
         log.info("{} Stopping {}", Constants.STOP_PREFIX, this.getClass().getSimpleName());
+    }
+
+    /**
+     * Shuts down the Spring application and exits the JVM with the given exit code.
+     *
+     * @param exitCode the exit code to return to the operating system
+     */
+    public void shutDown(int exitCode) {
+        log.info("Shutting down application");
+        ((ConfigurableApplicationContext) applicationContext).close();
+        System.exit(exitCode);
     }
 
 }
