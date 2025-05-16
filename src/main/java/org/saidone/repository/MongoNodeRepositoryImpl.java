@@ -18,8 +18,10 @@
 
 package org.saidone.repository;
 
+import jakarta.annotation.PostConstruct;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.model.NodeWrapper;
@@ -58,9 +60,22 @@ import java.util.stream.Stream;
 @Repository
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "false", matchIfMissing = true)
+@Slf4j
 public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepository<NodeWrapper, String> {
 
     private final MongoOperations mongoOperations;
+
+    @PostConstruct
+    @Override
+    public void init() {
+        super.init();
+        try {
+            mongoOperations.getCollectionNames();
+        } catch (Exception e) {
+            log.error("Unable to start {}", this.getClass().getSimpleName());
+            super.shutDown(0);
+        }
+    }
 
     @Override
     @NonNull

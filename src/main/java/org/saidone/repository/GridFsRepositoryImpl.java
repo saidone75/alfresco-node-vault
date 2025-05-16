@@ -22,6 +22,7 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.bson.Document;
 import org.saidone.component.BaseComponent;
@@ -70,6 +71,7 @@ import java.util.Map;
 @Repository
 @ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "false", matchIfMissing = true)
 @RequiredArgsConstructor
+@Slf4j
 public class GridFsRepositoryImpl extends BaseComponent implements GridFsRepository {
 
     private final GridFsTemplate gridFsTemplate;
@@ -78,9 +80,15 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
 
     @PostConstruct
     public void init() {
-        val indexOps = mongoTemplate.indexOps("fs.files");
-        val index = new Index().on("metadata.uuid", Sort.Direction.ASC).named("metadata_uuid_index");
-        indexOps.ensureIndex(index);
+        super.init();
+        try {
+            val indexOps = mongoTemplate.indexOps("fs.files");
+            val index = new Index().on("metadata.uuid", Sort.Direction.ASC).named("metadata_uuid_index");
+            indexOps.ensureIndex(index);
+        } catch (Exception e) {
+            log.error("Unable to start {}", this.getClass().getSimpleName());
+            super.shutDown(0);
+        }
     }
 
     @Override
