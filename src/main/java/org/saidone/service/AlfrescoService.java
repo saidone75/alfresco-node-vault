@@ -261,7 +261,7 @@ public class AlfrescoService extends BaseComponent {
             is.transferTo(os);
         }
 
-        val responseCode = conn.getResponseCode();
+        int responseCode = conn.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
             log.debug("Upload completed successfully for node: {}", nodeId);
         } else {
