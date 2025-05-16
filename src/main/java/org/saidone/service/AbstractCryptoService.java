@@ -46,15 +46,20 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
 
     // with version == null we retrieve the last version
     protected Pair<SecretKeySpec, Integer> deriveSecretKey(String algorithm, byte[] salt) {
-       return deriveSecretKey(algorithm, salt, null);
+        return deriveSecretKey(algorithm, salt, null);
     }
 
     /**
-     * Derives a secret key using the configured key derivation function
+     * Derives a secret key based on the specified key derivation function (KDF) implementation.
      *
-     * @param algorithm The encryption algorithm to use
-     * @param salt      Random salt value for key derivation
-     * @return SecretKeySpec instance for the derived key
+     * <p>This method selects the key derivation algorithm implementation configured in {@code kdf}
+     * and derives a secret key accordingly. Supported KDF implementations include HKDF, Argon2,
+     * and PBKDF2 (default).</p>
+     *
+     * @param algorithm the name of the cryptographic algorithm for which the secret key is derived
+     * @param salt      the salt value used in the key derivation process
+     * @param version   the version of the key derivation parameters to use
+     * @return a {@code Pair} containing the derived {@link javax.crypto.spec.SecretKeySpec} and an {@link Integer} representing the key version
      */
     protected Pair<SecretKeySpec, Integer> deriveSecretKey(String algorithm, byte[] salt, Integer version) {
         return switch (kdf.getImpl()) {
