@@ -88,7 +88,7 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
      * 3. Initializes AES-GCM cipher
      * 4. Prepends key version+salt+IV to encrypted stream
      * <p>
-     * The output stream format is: [salt][IV][encrypted data]
+     * The output stream format is: [key version][salt][IV][encrypted data]
      *
      * @param inputStream The plaintext input data to be encrypted
      * @return An InputStream containing concatenated salt, IV and encrypted data

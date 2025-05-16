@@ -3,7 +3,7 @@ setlocal EnableDelayedExpansion
 
 :: Configuration
 set "REPO_DIR=%CD%"
-set "JAVADOC_DIR=%REPO_DIR%\target\site\apidocs"
+set "JAVADOC_DIR=%REPO_DIR%\target\reports\apidocs"
 set "GH_PAGES_DIR=%REPO_DIR%\gh-pages-temp"
 set "BRANCH=gh-pages"
 
