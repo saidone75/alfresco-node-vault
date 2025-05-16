@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # Configuration
-REPO_DIR=$(pwd)                             # Current repository directory
-JAVADOC_DIR="$REPO_DIR/target/site/apidocs" # Javadoc output directory
-GH_PAGES_DIR="$REPO_DIR/gh-pages-temp"      # Temporary directory for gh-pages
-BRANCH="gh-pages"                           # GitHub Pages branch
+REPO_DIR=$(pwd)                                # Current repository directory
+JAVADOC_DIR="$REPO_DIR/target/reports/apidocs" # Javadoc output directory
+GH_PAGES_DIR="$REPO_DIR/gh-pages-temp"         # Temporary directory for gh-pages
+BRANCH="gh-pages"                              # GitHub Pages branch
 ORIGINAL_BRANCH=$(git rev-parse --abbrev-ref HEAD) # Store the current branch
 
 # Generate Javadoc
