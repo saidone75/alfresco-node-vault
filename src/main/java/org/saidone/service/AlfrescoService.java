@@ -90,18 +90,23 @@ public class AlfrescoService extends BaseComponent {
     private int chunkSize;
 
     private static String basicAuth;
-    public static Node guestHome;
+    private static Node guestHome;
 
     /**
-     * Initializes the service, sets up basic authentication header,
-     * retrieves the "Guest Home" node, and configures the WebClient.
+     * Initializes the AlfrescoService component after dependency injection.
+     * <p>
+     * This method overrides the base initialization to set up the Basic Authentication
+     * header used for Alfresco API requests. It constructs the header by encoding the
+     * configured username and password in Base64 with UTF-8 charset, then formats it
+     * as a standard HTTP Basic Auth header.
+     * <p>
+     * Calls super.init() to perform any initialization defined in the superclass.
      */
     @PostConstruct
     @Override
     public void init() {
         super.init();
         basicAuth = String.format("Basic %s", Base64.getEncoder().encodeToString((String.format("%s:%s", userName, password)).getBytes(StandardCharsets.UTF_8)));
-        guestHome = getGuestHome();
     }
 
     /**
@@ -109,19 +114,19 @@ public class AlfrescoService extends BaseComponent {
      *
      * @return the Guest Home {@link Node} or null if not found
      */
-    private Node getGuestHome() {
-        var guestHomeNode = (Node) null;
+    public Node getGuestHome() {
+        if (guestHome != null) return guestHome;
         try {
-            guestHomeNode = Objects.requireNonNull(nodesApi.getNode("-root-", null, "/Guest Home", null).getBody()).getEntry();
+            guestHome = Objects.requireNonNull(nodesApi.getNode("-root-", null, "/Guest Home", null).getBody()).getEntry();
         } catch (Exception e) {
             log.warn(e.getMessage());
         }
-        if (guestHomeNode != null) {
-            log.debug("Guest Home: {}", guestHomeNode.getId());
+        if (guestHome != null) {
+            log.debug("Guest Home: {}", guestHome.getId());
         } else {
             log.warn("Guest Home not found");
         }
-        return guestHomeNode;
+        return guestHome;
     }
 
     /**
@@ -261,7 +266,7 @@ public class AlfrescoService extends BaseComponent {
             is.transferTo(os);
         }
 
-        val responseCode = conn.getResponseCode();
+        int responseCode = conn.getResponseCode();
         if (responseCode == HttpURLConnection.HTTP_OK) {
             log.debug("Upload completed successfully for node: {}", nodeId);
         } else {

@@ -40,6 +40,9 @@ public abstract class BaseTest {
     NodeArchivingJob nodeArchivingJob;
 
     @Autowired
+    protected AlfrescoService alfrescoService;
+
+    @Autowired
     protected NodesApi nodesApi;
 
     protected static String parentId;
@@ -53,7 +56,7 @@ public abstract class BaseTest {
             val nodeBodyCreate = new NodeBodyCreate();
             nodeBodyCreate.setName(String.format("%s_test", faker.animal().name()));
             nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_FOLDER);
-            parentId = Objects.requireNonNull(nodesApi.createNode(AlfrescoService.guestHome.getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry().getId();
+            parentId = Objects.requireNonNull(nodesApi.createNode(alfrescoService.getGuestHome().getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry().getId();
             TestCleanupService.setParentId(parentId);
         }
         log.info("Running --> {}", testInfo.getDisplayName());
