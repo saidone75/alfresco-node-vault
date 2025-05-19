@@ -106,7 +106,7 @@
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>alfresco-testcontainers</artifactId>
-            <version>0.8.0</version>
+            <version>0.8.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
