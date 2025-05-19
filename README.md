@@ -1,6 +1,6 @@
 # Alfresco Node Vault
 
-<img width="50%" src="images/vault.png">
+![Vault](images/vault.png)
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 ![Java CI](https://github.com/saidone75/alfresco-node-vault/actions/workflows/build.yml/badge.svg)
@@ -73,7 +73,7 @@ Pull requests are welcome!
 
 ## Architecture
 
-<img width="50%" src="images/architecture.png">
+![Architecture](images/architecture.png)
 
 ## Application global config
 
