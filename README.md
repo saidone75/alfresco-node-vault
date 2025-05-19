@@ -73,7 +73,7 @@ Pull requests are welcome!
 
 ## Architecture
 
-![Architecture](images/architecture.png)
+<img width="50%" src="images/architecture.png">
 
 ## Application global config
 
