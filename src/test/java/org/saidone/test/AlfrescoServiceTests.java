@@ -23,6 +23,7 @@ import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.alfresco.core.model.PathElement;
 import org.junit.jupiter.api.*;
 import org.saidone.model.alfresco.AlfrescoContentModel;
 import org.saidone.service.AlfrescoService;
@@ -37,6 +38,7 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -99,6 +101,15 @@ class AlfrescoServiceTests extends BaseTest {
         val consumer = (Consumer<String>) result::set;
         assertDoesNotThrow(() -> alfrescoService.searchAndProcess(String.format("=%s:'%s'", AlfrescoContentModel.PROP_NAME, node.getName()), consumer));
         assertEquals(node.getId(), result.get());
+    }
+
+    @Test
+    @Order(60)
+    public void test() {
+        val nodeId = alfrescoService.createPathIfNotExists(BaseTest.parentId, List.of("foo", "bar", "baz"));
+        val node = alfrescoService.getNode(nodeId);
+        val path = node.getPath().getElements().stream().skip(1).map(PathElement::getName).collect(Collectors.joining("/"));
+        assertTrue(alfrescoService.pathExists(String.format("%s/%s", path, node.getName())));
     }
 
 }
