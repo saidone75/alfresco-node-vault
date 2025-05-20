@@ -23,80 +23,31 @@ import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.alfresco.testcontainers.AlfrescoContainer;
-import org.junit.jupiter.api.MethodOrderer;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.*;
 import org.saidone.model.alfresco.AlfrescoContentModel;
-import org.saidone.repository.GridFsRepositoryImpl;
-import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.saidone.service.AlfrescoService;
-import org.saidone.service.SecretService;
 import org.saidone.service.VaultService;
-import org.saidone.utils.ResourceFileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.testcontainers.containers.wait.strategy.Wait;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
+import org.saidone.utils.ResourceFileUtils;
 
 import java.nio.file.Files;
-import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@Testcontainers
 @SpringBootTest
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Slf4j
 class AlfrescoServiceTests extends BaseTest {
 
-    @Container
-    static AlfrescoContainer<?> alfrescoContainer;
-
-    static {
-        try {
-            alfrescoContainer = new AlfrescoContainer<>("23.2.1")
-                    .withExposedPorts(8080)
-                    .withEnv("JAVA_OPTS", "-Xms1g -Xmx2g")
-                    .waitingFor(Wait.forHttp("/alfresco/api/-default-/public/alfresco/versions/1/probes/-ready-")
-                            .forStatusCode(200)
-                            .withStartupTimeout(Duration.ofMinutes(20)));
-            alfrescoContainer.start();
-            log.info("Alfresco container started on port: {}", alfrescoContainer.getMappedPort(8080));
-        } catch (Exception e) {
-            log.error("Failed to start Alfresco container: {}", e.getMessage());
-            throw new RuntimeException("Could not start Alfresco container", e);
-        }
-    }
-
-    @DynamicPropertySource
-    static void alfrescoProperties(DynamicPropertyRegistry registry) {
-        String alfrescoUrl = String.format("http://localhost:%d", alfrescoContainer.getMappedPort(8080));
-        registry.add("content.service.url", () -> alfrescoUrl);
-        log.info("Configured content.service.url: {}", alfrescoUrl);
-    }
-
     @MockitoBean
     VaultService vaultService;
-
-    @MockitoBean
-    SecretService secretService;
-
-    @MockitoBean
-    MongoNodeRepositoryImpl mongoNodeRepository;
-
-    @MockitoBean
-    GridFsRepositoryImpl gridFsRepository;
 
     @Autowired
     AlfrescoService alfrescoService;
