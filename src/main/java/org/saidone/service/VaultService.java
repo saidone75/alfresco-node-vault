@@ -18,6 +18,7 @@
 
 package org.saidone.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -38,6 +39,7 @@ import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 
@@ -152,8 +154,9 @@ public class VaultService extends BaseComponent {
      * @param nodeId the ID of the node
      * @return the Alfresco Node object
      * @throws NodeNotOnVaultException if the node is not found in the vault
+     * @throws JsonProcessingException if there is an error processing the node metadata JSON
      */
-    public Node getNode(String nodeId) {
+    public Node getNode(String nodeId) throws JsonProcessingException {
         return getNodeWrapper(nodeId).getNode();
     }
 
@@ -190,8 +193,9 @@ public class VaultService extends BaseComponent {
      * @param restorePermissions whether to restore permissions along with the node
      * @return the new node ID assigned by Alfresco after restoration
      * @throws NodeNotOnVaultException if the node is not found in the vault
+     * @throws JsonProcessingException if there is an error processing the node metadata JSON
      */
-    public String restoreNode(String nodeId, boolean restorePermissions) {
+    public String restoreNode(String nodeId, boolean restorePermissions) throws JsonProcessingException {
         val nodeWrapper = getNodeWrapper(nodeId);
         val newNodeId = alfrescoService.restoreNode(nodeWrapper.getNode(), restorePermissions);
         alfrescoService.restoreNodeContent(newNodeId, getNodeContent(nodeId));
