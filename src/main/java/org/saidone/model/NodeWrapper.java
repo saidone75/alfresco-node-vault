@@ -36,7 +36,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.io.IOException;
 import java.time.Instant;
 
 @Data
@@ -62,7 +61,7 @@ public class NodeWrapper {
     @BsonProperty("node")
     private String nodeJson;
 
-    public NodeWrapper(Node node) throws JsonProcessingException {
+    public NodeWrapper(Node node) throws IllegalArgumentException, JsonProcessingException {
         if (node == null) {
             throw new IllegalArgumentException("Node cannot be null");
         }
@@ -71,15 +70,16 @@ public class NodeWrapper {
         this.nodeJson = objectMapper.writeValueAsString(node);
     }
 
-    public Node getNode() {
+    public Node getNode() throws JsonProcessingException {
         if (nodeJson == null || nodeJson.isEmpty()) {
             return null;
         }
         try {
             return objectMapper.readValue(nodeJson, Node.class);
-        } catch (IOException e) {
-            log.error("Error while deserializing node: {}", e.getMessage(), e);
-            return null;
+        } catch (JsonProcessingException e) {
+            log.error("Error while deserializing node: {}", e.getMessage());
+            log.trace(e.getMessage(), e);
+            throw e;
         }
     }
 

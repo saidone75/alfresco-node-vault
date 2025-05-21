@@ -18,6 +18,7 @@
 
 package org.saidone.test;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import feign.FeignException;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
@@ -25,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.PathElement;
 import org.junit.jupiter.api.*;
+import org.saidone.model.NodeWrapper;
 import org.saidone.model.alfresco.AlfrescoContentModel;
 import org.saidone.service.AlfrescoService;
 import org.saidone.service.VaultService;
@@ -36,6 +38,7 @@ import org.saidone.utils.ResourceFileUtils;
 
 import java.nio.file.Files;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -115,6 +118,17 @@ class AlfrescoServiceTests extends BaseTest {
         node = alfrescoService.getNode(nodeId);
         path = node.getPath().getElements().stream().skip(1).map(PathElement::getName).collect(Collectors.joining("/"));
         assertTrue(alfrescoService.pathExists(String.format("%s/%s", path, node.getName())));
+    }
+
+    @Test
+    @Order(70)
+    @SneakyThrows
+    public void nodeWrapperTest() {
+        assertThrows(IllegalArgumentException.class, () -> new NodeWrapper(null));
+        val node = createNode();
+        val nodeWrapper = assertDoesNotThrow(() -> new NodeWrapper(node));
+        nodeWrapper.setNodeJson(UUID.randomUUID().toString());
+        assertThrows(JsonProcessingException.class, nodeWrapper::getNode);
     }
 
 }
