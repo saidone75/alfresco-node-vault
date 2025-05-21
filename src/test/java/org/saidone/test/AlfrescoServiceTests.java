@@ -105,10 +105,15 @@ class AlfrescoServiceTests extends BaseTest {
 
     @Test
     @Order(60)
-    public void test() {
-        val nodeId = alfrescoService.createPathIfNotExists(BaseTest.parentId, List.of("foo", "bar", "baz"));
-        val node = alfrescoService.getNode(nodeId);
-        val path = node.getPath().getElements().stream().skip(1).map(PathElement::getName).collect(Collectors.joining("/"));
+    public void createPathIfNotExistsTest() {
+        val pathElements = List.of("foo", "bar", "baz");
+        var nodeId = alfrescoService.createPathIfNotExists(BaseTest.parentId, pathElements);
+        var node = alfrescoService.getNode(nodeId);
+        var path = node.getPath().getElements().stream().skip(1).map(PathElement::getName).collect(Collectors.joining("/"));
+        assertTrue(alfrescoService.pathExists(String.format("%s/%s", path, node.getName())));
+        nodeId = alfrescoService.createPathIfNotExists(BaseTest.parentId, pathElements);
+        node = alfrescoService.getNode(nodeId);
+        path = node.getPath().getElements().stream().skip(1).map(PathElement::getName).collect(Collectors.joining("/"));
         assertTrue(alfrescoService.pathExists(String.format("%s/%s", path, node.getName())));
     }
 
