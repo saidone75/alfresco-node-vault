@@ -19,12 +19,14 @@
 package org.saidone.test;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.exc.MismatchedInputException;
 import feign.FeignException;
 import lombok.Cleanup;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.PathElement;
+import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.*;
 import org.saidone.model.NodeWrapper;
 import org.saidone.model.alfresco.AlfrescoContentModel;
@@ -129,6 +131,10 @@ class AlfrescoServiceTests extends BaseTest {
         val nodeWrapper = assertDoesNotThrow(() -> new NodeWrapper(node));
         nodeWrapper.setNodeJson(UUID.randomUUID().toString());
         assertThrows(JsonProcessingException.class, nodeWrapper::getNode);
+        nodeWrapper.setNodeJson(Strings.EMPTY);
+        assertThrows(MismatchedInputException.class, nodeWrapper::getNode);
+        nodeWrapper.setNodeJson(null);
+        assertThrows(IllegalArgumentException.class, nodeWrapper::getNode);
     }
 
 }

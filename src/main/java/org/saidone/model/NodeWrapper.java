@@ -25,11 +25,8 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.alfresco.core.model.Node;
 import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.springframework.data.annotation.Id;
@@ -70,13 +67,11 @@ public class NodeWrapper {
         this.nodeJson = objectMapper.writeValueAsString(node);
     }
 
-    public Node getNode() throws JsonProcessingException {
-        if (nodeJson == null || nodeJson.isEmpty()) {
-            return null;
-        }
+    @SneakyThrows
+    public Node getNode() {
         try {
             return objectMapper.readValue(nodeJson, Node.class);
-        } catch (JsonProcessingException e) {
+        } catch (Exception e) {
             log.error("Error while deserializing node: {}", e.getMessage());
             log.trace(e.getMessage(), e);
             throw e;
