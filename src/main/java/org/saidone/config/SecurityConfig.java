@@ -48,7 +48,7 @@ public class SecurityConfig {
         return http
                 .authorizeExchange(exchanges -> exchanges
                         .pathMatchers("/actuator/**").hasRole("ACTUATOR_ADMIN")
-                        .anyExchange().authenticated()
+                        .anyExchange().permitAll()
                 )
                 .httpBasic(withDefaults())
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
