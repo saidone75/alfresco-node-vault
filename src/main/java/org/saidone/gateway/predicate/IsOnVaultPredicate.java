@@ -23,9 +23,12 @@ import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 
+import java.nio.charset.Charset;
+import java.util.Base64;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -56,6 +59,7 @@ import java.util.regex.Pattern;
 public class IsOnVaultPredicate extends AbstractRoutePredicateFactory<IsOnVaultPredicate.Config> {
 
     private final MongoNodeRepositoryImpl mongoNodeRepository;
+
     private static final Pattern nodeContentPattern = Pattern.compile("^.*/nodes/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}).*$");
 
     public IsOnVaultPredicate(MongoNodeRepositoryImpl mongoNodeRepository) {
@@ -66,6 +70,7 @@ public class IsOnVaultPredicate extends AbstractRoutePredicateFactory<IsOnVaultP
     @Override
     public Predicate<ServerWebExchange> apply(Config config) {
         return exchange -> {
+            isAuthorized(exchange);
             val path = exchange.getRequest().getURI().getPath();
             val matcher = nodeContentPattern.matcher(path);
             if (matcher.matches()) {
@@ -77,6 +82,13 @@ public class IsOnVaultPredicate extends AbstractRoutePredicateFactory<IsOnVaultP
             }
             return false;
         };
+    }
+
+    private boolean isAuthorized(ServerWebExchange serverWebExchange) {
+        val authorization = serverWebExchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION);
+        val userNameAndPassword = new String(Base64.getDecoder().decode(authorization.getFirst().split("\\s")[1]), Charset.defaultCharset()).split(":");
+        log.debug("{}", userNameAndPassword);
+        return true;
     }
 
     public static class Config {
