@@ -22,7 +22,10 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.repository.MongoNodeRepositoryImpl;
+import org.saidone.service.AlfrescoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -58,7 +61,12 @@ import java.util.regex.Pattern;
 @Slf4j
 public class IsOnVaultPredicate extends AbstractRoutePredicateFactory<IsOnVaultPredicate.Config> {
 
+    @Autowired
+    @Lazy
+    private AlfrescoService alfrescoService;
+
     private final MongoNodeRepositoryImpl mongoNodeRepository;
+
 
     private static final Pattern nodeContentPattern = Pattern.compile("^.*/nodes/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}).*$");
 
@@ -86,9 +94,13 @@ public class IsOnVaultPredicate extends AbstractRoutePredicateFactory<IsOnVaultP
 
     private boolean isAuthorized(ServerWebExchange serverWebExchange) {
         val authorization = serverWebExchange.getRequest().getHeaders().get(HttpHeaders.AUTHORIZATION);
-        val userNameAndPassword = new String(Base64.getDecoder().decode(authorization.getFirst().split("\\s")[1]), Charset.defaultCharset()).split(":");
-        log.debug("{}", userNameAndPassword);
-        return true;
+        if (authorization != null) {
+            val userNameAndPassword = new String(Base64.getDecoder().decode(authorization.getFirst().split("\\s")[1]), Charset.defaultCharset()).split(":");
+            log.debug("{}", userNameAndPassword);
+            log.debug("{}", alfrescoService);
+            // FIXME
+        }
+        return false;
     }
 
     public static class Config {
