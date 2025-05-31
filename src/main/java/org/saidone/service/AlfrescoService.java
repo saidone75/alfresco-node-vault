@@ -26,6 +26,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.alfresco.authentication.handler.AuthenticationApi;
+import org.alfresco.authentication.model.TicketBody;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.model.*;
 import org.alfresco.search.handler.SearchApi;
@@ -74,6 +76,7 @@ import java.util.function.Consumer;
 public class AlfrescoService extends BaseComponent {
 
     private final AlfrescoServiceConfig config;
+    private final AuthenticationApi authenticationApi;
     private final NodesApi nodesApi;
     private final SearchApi searchApi;
 
@@ -127,6 +130,14 @@ public class AlfrescoService extends BaseComponent {
             log.warn("Guest Home not found");
         }
         return guestHome;
+    }
+
+    public void isAdmin(String userId, String password) {
+        val ticketBody = new TicketBody();
+        ticketBody.setUserId(userId);
+        ticketBody.setPassword(password);
+        val ticket = Objects.requireNonNull(authenticationApi.createTicket(ticketBody).getBody()).getEntry();
+        // TODO check if user is an administrator
     }
 
     /**
