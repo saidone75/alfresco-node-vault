@@ -29,6 +29,7 @@ import lombok.val;
 import org.alfresco.authentication.handler.AuthenticationApi;
 import org.alfresco.authentication.model.TicketBody;
 import org.alfresco.core.handler.NodesApi;
+import org.alfresco.core.handler.PeopleApi;
 import org.alfresco.core.model.*;
 import org.alfresco.search.handler.SearchApi;
 import org.alfresco.search.model.RequestPagination;
@@ -77,6 +78,7 @@ public class AlfrescoService extends BaseComponent {
 
     private final AlfrescoServiceConfig config;
     private final AuthenticationApi authenticationApi;
+    private final PeopleApi peopleApi;
     private final NodesApi nodesApi;
     private final SearchApi searchApi;
 
@@ -132,12 +134,30 @@ public class AlfrescoService extends BaseComponent {
         return guestHome;
     }
 
-    public void isAdmin(String userId, String password) {
+    /**
+     * Checks if the specified user has administrative privileges in Alfresco.
+     *
+     * <p>This method attempts to authenticate the user with the given userId and password.
+     * If authentication is successful, it retrieves the user's details and checks if the user
+     * has admin capabilities.</p>
+     *
+     * @param userId   the identifier of the user to check
+     * @param password the password of the user for authentication
+     * @return {@code true} if the user is authenticated and has admin privileges; {@code false} otherwise
+     */
+    public boolean isAdmin(String userId, String password) {
         val ticketBody = new TicketBody();
         ticketBody.setUserId(userId);
         ticketBody.setPassword(password);
-        val ticket = Objects.requireNonNull(authenticationApi.createTicket(ticketBody).getBody()).getEntry();
-        // TODO check if user is an administrator
+        if (authenticationApi.createTicket(ticketBody).getStatusCode().is2xxSuccessful()) {
+            try {
+                return Objects.requireNonNull(peopleApi.getPerson(userId, null).getBody()).getEntry().getCapabilities().isIsAdmin();
+            } catch (Exception e) {
+                log.error(e.getMessage());
+                return false;
+            }
+
+        } else return false;
     }
 
     /**
