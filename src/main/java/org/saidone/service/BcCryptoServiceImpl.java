@@ -74,6 +74,7 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
     private int saltLength;
     @Min(12)
     private int nonceLength;
+    // ChaCha20-Poly1305 is a stream cipher with AEAD; no padding is required or used.
     private static final String CIPHER_TRANSFORMATION = "ChaCha20-Poly1305";
     private static final String KEY_ALGORITHM = "ChaCha20";
 
