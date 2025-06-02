@@ -16,11 +16,19 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone;
+package org.saidone.config;
 
-public interface Constants {
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
+import org.springframework.context.annotation.Configuration;
 
-    String START_PREFIX = ">>>>>";
-    String STOP_PREFIX = "<<<<<";
-
+@Configuration
+@SecurityScheme(
+        name = "basicAuth",
+        type = SecuritySchemeType.HTTP,
+        scheme = "basic"
+)
+@SecurityRequirement(name = "basicAuth")
+public class OpenApiConfig {
 }

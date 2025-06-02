@@ -16,7 +16,6 @@ spring:
             - Method=GET
             - name: IsOnVaultPredicate
           filters:
-            - name: VaultAuthFilter
             - SetPath=/api/vault/nodes/{nodeId}
         - id: vault_node_content_route
           uri: http://localhost:8086
@@ -25,8 +24,11 @@ spring:
             - Method=GET
             - name: IsOnVaultPredicate
           filters:
-            - name: VaultAuthFilter
             - SetPath=/api/vault/nodes/{nodeId}/content
+        - id: vault_direct_api_route
+          uri: http://localhost:8086
+          predicates:
+            - Path=/api/vault/**
         - id: alfresco_default_route
           uri: ${ALFRESCO_BASE_PATH:http://localhost:8080}
           predicates:
