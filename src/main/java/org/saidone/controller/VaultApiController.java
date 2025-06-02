@@ -18,21 +18,23 @@
 
 package org.saidone.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.logging.log4j.util.Strings;
 import org.saidone.exception.NodeNotOnVaultException;
 import org.saidone.exception.VaultException;
 import org.saidone.model.Entry;
+import org.saidone.service.AlfrescoService;
 import org.saidone.service.VaultService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -40,6 +42,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.nio.charset.Charset;
+import java.util.Base64;
 
 @RestController
 @RequestMapping("/api/vault")
@@ -49,6 +54,7 @@ import org.springframework.web.bind.annotation.*;
 public class VaultApiController {
 
     private final VaultService vaultService;
+    private final AlfrescoService alfrescoService;
 
     @ExceptionHandler(Exception.class)
     @Operation(hidden = true)
@@ -86,6 +92,13 @@ public class VaultApiController {
                 .body("Server memory limit exceeded. Please try with a smaller file or contact administrator.");
     }
 
+    private boolean isAuthorized(String authHeader) {
+        if (Strings.isBlank(authHeader)) return false;
+        val userIdAndPassword = new String(Base64.getDecoder().decode(authHeader.split("\\s")[1]), Charset.defaultCharset()).split(":");
+        return alfrescoService.isAdmin(userIdAndPassword[0], userIdAndPassword[1]);
+    }
+
+    @SecurityRequirement(name = "basicAuth")
     @GetMapping("/nodes/{nodeId}")
     @Operation(
             summary = "Get node metadata",
@@ -103,11 +116,19 @@ public class VaultApiController {
                             content = @Content)
             })
     @SneakyThrows
-    public ResponseEntity<?> getNode(@PathVariable String nodeId) {
+    public ResponseEntity<?> getNode(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
+            @PathVariable String nodeId) {
+
+        if (!isAuthorized(auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         val node = vaultService.getNode(nodeId);
         return ResponseEntity.ok(new Entry(node));
     }
 
+    @SecurityRequirement(name = "basicAuth")
     @GetMapping("/nodes/{nodeId}/content")
     @Operation(
             summary = "Get node content",
@@ -126,8 +147,13 @@ public class VaultApiController {
                             content = @Content)
             })
     public ResponseEntity<InputStreamResource> getNodeContent(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId,
             @RequestParam(required = false, defaultValue = "true") boolean attachment) {
+
+        if (!isAuthorized(auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
 
         log.debug("Streaming node content for node: {}", nodeId);
 
@@ -144,6 +170,7 @@ public class VaultApiController {
                 .body(new InputStreamResource(nodeContent.getContentStream()));
     }
 
+    @SecurityRequirement(name = "basicAuth")
     @PostMapping("/nodes/{nodeId}/restore")
     @Operation(
             summary = "Restore a node",
@@ -162,12 +189,19 @@ public class VaultApiController {
             })
     @SneakyThrows
     public ResponseEntity<?> restoreNode(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId,
             @RequestParam(required = false, defaultValue = "false") boolean restorePermissions) {
+
+        if (!isAuthorized(auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         val newNodeId = vaultService.restoreNode(nodeId, restorePermissions);
         return ResponseEntity.ok().body(String.format("Node %s successfully restored as %s", nodeId, newNodeId));
     }
 
+    @SecurityRequirement(name = "basicAuth")
     @PostMapping("/nodes/{nodeId}/archive")
     @Operation(
             summary = "Archive a node",
@@ -184,7 +218,13 @@ public class VaultApiController {
                             content = @Content)
             })
     public ResponseEntity<?> archiveNode(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
+
+        if (!isAuthorized(auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
         vaultService.archiveNode(nodeId);
         return ResponseEntity.ok().body(String.format("Node %s successfully archived.", nodeId));
     }
