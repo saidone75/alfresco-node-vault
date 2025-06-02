@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone;
+package org.saidone.misc;
 
 public interface Constants {
 
