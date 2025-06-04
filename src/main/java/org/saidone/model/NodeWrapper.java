@@ -28,10 +28,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.model.Node;
-import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Instant;
 
@@ -49,13 +49,13 @@ public class NodeWrapper {
 
     @Id
     private String id;
-    @BsonProperty("arcDt")
+    @Field("arcDt")
     private Instant archiveDate;
-    @BsonProperty("res")
+    @Field("res")
     private boolean restored;
-    @BsonProperty("enc")
+    @Field("enc")
     private boolean encrypted;
-    @BsonProperty("node")
+    @Field("node")
     private String nodeJson;
 
     public NodeWrapper(Node node) throws IllegalArgumentException, JsonProcessingException {
