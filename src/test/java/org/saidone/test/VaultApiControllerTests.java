@@ -103,7 +103,7 @@ class VaultApiControllerTests extends BaseTest {
     }
 
     @Test
-    @Order(10)
+    @Order(20)
     @SneakyThrows
     void getNodeContentTest() {
         val nodeId = createNode().getId();
