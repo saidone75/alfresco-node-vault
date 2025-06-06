@@ -149,7 +149,7 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
      * where:
      * - key version length = 4 bytes
      * - salt length = saltLength bytes
-     * - IV length = ivLength bytes
+     * - nonce length = nonceLength bytes
      *
      * @param inputStream InputStream containing encrypted data with prepended salt and nonce
      * @return An InputStream yielding the decrypted data
