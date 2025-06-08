@@ -21,6 +21,8 @@ package org.saidone.audit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.http.HttpHeaders;
+import org.saidone.component.BaseComponent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
@@ -31,10 +33,10 @@ import reactor.core.publisher.Mono;
 import java.util.HashMap;
 
 @Component
-@ConditionalOnProperty(name = "application.vault.audit.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "application.service.vault.audit.enabled", havingValue = "true")
 @RequiredArgsConstructor
 @Slf4j
-public class AuditWebFilter implements WebFilter {
+public class AuditWebFilter extends BaseComponent implements WebFilter {
 
     private final AuditService auditService;
 
@@ -45,7 +47,7 @@ public class AuditWebFilter implements WebFilter {
         if (request.getRemoteAddress() != null) {
             metadata.put("ip", request.getRemoteAddress().getAddress().getHostAddress());
         }
-        metadata.put("userAgent", request.getHeaders().getFirst("User-Agent"));
+        metadata.put("userAgent", request.getHeaders().getFirst(HttpHeaders.USER_AGENT));
         metadata.put("path", request.getPath().value());
         metadata.put("method", request.getMethod());
         auditService.saveEntry(metadata, "request");
