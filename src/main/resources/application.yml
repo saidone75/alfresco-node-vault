@@ -129,6 +129,8 @@ application:
             parallelism: 1
             memory: 65536
             iterations: 3
+      audit:
+        enabled: true
 
   same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
 server:
