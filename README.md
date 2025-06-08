@@ -94,6 +94,7 @@ Global configuration is stored in `application.yml` file, the relevant parameter
 | VAULT_ENCRYPTION_ENABLED      | true                                       | Enable content encryption                                           |
 | VAULT_ENCRYPT_METADATA        | true                                       | Encrypt also metadata                                               |
 | VAULT_ENCRYPTION_SECRET       | changeme                                   | Encryption secret                                                   |
+| AUDIT_ENABLED                 | false                                      | Enable web request auditing                                         |
 
 ## Build
 
