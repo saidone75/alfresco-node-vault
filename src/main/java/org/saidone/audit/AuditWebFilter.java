@@ -1,3 +1,21 @@
+/*
+ *  Alfresco Node Vault - archive today, accelerate tomorrow
+ *  Copyright (C) 2025 Saidone
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package org.saidone.audit;
 
 import lombok.RequiredArgsConstructor;
@@ -11,10 +29,9 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
 import java.util.HashMap;
-import java.util.Map;
 
 @Component
-@ConditionalOnProperty(name = "application.audit.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "application.vault.audit.enabled", havingValue = "true")
 @RequiredArgsConstructor
 @Slf4j
 public class AuditWebFilter implements WebFilter {
@@ -24,21 +41,22 @@ public class AuditWebFilter implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         val request = exchange.getRequest();
-        Map<String, Object> metadata = new HashMap<>();
+        val metadata = new HashMap<String, Object>();
         if (request.getRemoteAddress() != null) {
             metadata.put("ip", request.getRemoteAddress().getAddress().getHostAddress());
         }
         metadata.put("userAgent", request.getHeaders().getFirst("User-Agent"));
         metadata.put("path", request.getPath().value());
-        metadata.put("method", request.getMethodValue());
+        metadata.put("method", request.getMethod());
         auditService.saveEntry(metadata, "request");
         return chain.filter(exchange).doFinally(signal -> {
-            Map<String, Object> responseData = new HashMap<>();
+            val responseData = new HashMap<String, Object>();
             responseData.put("status", exchange.getResponse().getStatusCode() != null ?
                     exchange.getResponse().getStatusCode().value() : null);
             responseData.put("path", request.getPath().value());
             auditService.saveEntry(responseData, "response");
         });
     }
+
 }
 
