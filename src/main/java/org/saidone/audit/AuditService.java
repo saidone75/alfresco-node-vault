@@ -21,7 +21,11 @@ package org.saidone.audit;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.saidone.component.BaseComponent;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -39,6 +43,26 @@ public class AuditService extends BaseComponent {
         entry.setMetadata(metadata);
         entry.setType(type);
         mongoTemplate.insert(entry);
+    }
+
+    public java.util.List<AuditEntry> findEntries(String type, Instant from, Instant to, Pageable pageable) {
+        val criteriaList = new java.util.ArrayList<Criteria>();
+        if (type != null) {
+            criteriaList.add(Criteria.where("type").is(type));
+        }
+        if (from != null || to != null) {
+            val timeCrit = Criteria.where("timestamp");
+            if (from != null) timeCrit.gte(from);
+            if (to != null) timeCrit.lte(to);
+            criteriaList.add(timeCrit);
+        }
+        Query query = new Query();
+        if (!criteriaList.isEmpty()) {
+            query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
+        }
+        query.with(pageable);
+        query.with(Sort.by(Sort.Direction.DESC, "timestamp"));
+        return mongoTemplate.find(query, AuditEntry.class);
     }
 
 }
