@@ -1,5 +1,6 @@
 package org.saidone.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -73,8 +74,10 @@ public class AuditApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
         val list = auditService.findEntries(type, from, to, pageable);
+        val objectMapper = new ObjectMapper();
+        objectMapper.writeValueAsString(list);
         return ResponseEntity.ok(list);
     }
 }
