@@ -1,6 +1,5 @@
 package org.saidone.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -10,14 +9,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import lombok.SneakyThrows;
+import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.audit.AuditEntry;
 import org.saidone.audit.AuditService;
 import org.saidone.service.AlfrescoService;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -76,8 +74,6 @@ public class AuditApiController {
 
         val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
         val list = auditService.findEntries(type, from, to, pageable);
-        val objectMapper = new ObjectMapper();
-        objectMapper.writeValueAsString(list);
         return ResponseEntity.ok(list);
     }
 }

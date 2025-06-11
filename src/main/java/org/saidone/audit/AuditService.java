@@ -28,6 +28,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class AuditService extends BaseComponent {
 
     private final MongoTemplate mongoTemplate;
 
-    public void saveEntry(Map<String, Object> metadata, String type) {
+    public void saveEntry(Map<String, Serializable> metadata, String type) {
         val entry = new AuditEntry();
         entry.setTimestamp(Instant.now());
         entry.setMetadata(metadata);
