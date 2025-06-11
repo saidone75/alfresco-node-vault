@@ -28,7 +28,9 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.io.Serializable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Map;
 
 @Service
@@ -37,7 +39,7 @@ public class AuditService extends BaseComponent {
 
     private final MongoTemplate mongoTemplate;
 
-    public void saveEntry(Map<String, Object> metadata, String type) {
+    public void saveEntry(Map<String, Serializable> metadata, String type) {
         val entry = new AuditEntry();
         entry.setTimestamp(Instant.now());
         entry.setMetadata(metadata);
@@ -46,17 +48,17 @@ public class AuditService extends BaseComponent {
     }
 
     public java.util.List<AuditEntry> findEntries(String type, Instant from, Instant to, Pageable pageable) {
-        val criteriaList = new java.util.ArrayList<Criteria>();
+        val criteriaList = new ArrayList<Criteria>();
         if (type != null) {
             criteriaList.add(Criteria.where("type").is(type));
         }
         if (from != null || to != null) {
-            val timeCrit = Criteria.where("timestamp");
-            if (from != null) timeCrit.gte(from);
-            if (to != null) timeCrit.lte(to);
-            criteriaList.add(timeCrit);
+            val timeCriteria = Criteria.where("timestamp");
+            if (from != null) timeCriteria.gte(from);
+            if (to != null) timeCriteria.lte(to);
+            criteriaList.add(timeCriteria);
         }
-        Query query = new Query();
+        val query = new Query();
         if (!criteriaList.isEmpty()) {
             query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
         }

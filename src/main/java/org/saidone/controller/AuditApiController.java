@@ -9,14 +9,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.val;
 import lombok.SneakyThrows;
+import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.audit.AuditEntry;
 import org.saidone.audit.AuditService;
 import org.saidone.service.AlfrescoService;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -73,7 +72,7 @@ public class AuditApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
         val list = auditService.findEntries(type, from, to, pageable);
         return ResponseEntity.ok(list);
     }
