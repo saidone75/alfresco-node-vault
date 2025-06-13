@@ -93,9 +93,24 @@ public class VaultApiController {
     }
 
     private boolean isAuthorized(String authHeader) {
-        if (Strings.isBlank(authHeader)) return false;
-        val userIdAndPassword = new String(Base64.getDecoder().decode(authHeader.split("\\s")[1]), Charset.defaultCharset()).split(":");
-        return alfrescoService.isAdmin(userIdAndPassword[0], userIdAndPassword[1]);
+        if (Strings.isBlank(authHeader)) {
+            return false;
+        }
+        val parts = authHeader.trim().split("\\s+", 2);
+        if (parts.length != 2 || !"basic".equalsIgnoreCase(parts[0])) {
+            return false;
+        }
+        try {
+            val decoded = new String(Base64.getDecoder().decode(parts[1]), Charset.defaultCharset());
+            val userIdAndPassword = decoded.split(":", 2);
+            if (userIdAndPassword.length != 2) {
+                return false;
+            }
+            return alfrescoService.isAdmin(userIdAndPassword[0], userIdAndPassword[1]);
+        } catch (IllegalArgumentException e) {
+            log.debug("Invalid Authorization header", e);
+            return false;
+        }
     }
 
     @SecurityRequirement(name = "basicAuth")
