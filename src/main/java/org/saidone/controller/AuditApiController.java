@@ -11,10 +11,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.apache.logging.log4j.util.Strings;
 import org.saidone.audit.AuditEntry;
 import org.saidone.audit.AuditService;
 import org.saidone.service.AlfrescoService;
+import org.saidone.service.AuthenticationService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
@@ -22,9 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.nio.charset.Charset;
 import java.time.Instant;
-import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -35,12 +33,7 @@ public class AuditApiController {
 
     private final AuditService auditService;
     private final AlfrescoService alfrescoService;
-
-    private boolean isAuthorized(String authHeader) {
-        if (Strings.isBlank(authHeader)) return false;
-        val userIdAndPassword = new String(Base64.getDecoder().decode(authHeader.split("\\s")[1]), Charset.defaultCharset()).split(":");
-        return alfrescoService.isAdmin(userIdAndPassword[0], userIdAndPassword[1]);
-    }
+    private final AuthenticationService authenticationService;
 
     @SecurityRequirement(name = "basicAuth")
     @GetMapping
@@ -68,7 +61,7 @@ public class AuditApiController {
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "20") int size) {
 
-        if (!isAuthorized(auth)) {
+        if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -76,4 +69,5 @@ public class AuditApiController {
         val list = auditService.findEntries(type, from, to, pageable);
         return ResponseEntity.ok(list);
     }
+
 }
