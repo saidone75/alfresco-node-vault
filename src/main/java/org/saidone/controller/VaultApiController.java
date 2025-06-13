@@ -30,11 +30,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.apache.logging.log4j.util.Strings;
 import org.saidone.exception.NodeNotOnVaultException;
 import org.saidone.exception.VaultException;
 import org.saidone.model.Entry;
-import org.saidone.service.AlfrescoService;
+import org.saidone.service.AuthenticationService;
 import org.saidone.service.VaultService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -42,9 +41,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.nio.charset.Charset;
-import java.util.Base64;
 
 @RestController
 @RequestMapping("/api/vault")
@@ -54,7 +50,7 @@ import java.util.Base64;
 public class VaultApiController {
 
     private final VaultService vaultService;
-    private final AlfrescoService alfrescoService;
+    private final AuthenticationService authenticationService;
 
     @ExceptionHandler(Exception.class)
     @Operation(hidden = true)
@@ -92,27 +88,6 @@ public class VaultApiController {
                 .body("Server memory limit exceeded. Please try with a smaller file or contact administrator.");
     }
 
-    private boolean isAuthorized(String authHeader) {
-        if (Strings.isBlank(authHeader)) {
-            return false;
-        }
-        val parts = authHeader.trim().split("\\s+", 2);
-        if (parts.length != 2 || !"basic".equalsIgnoreCase(parts[0])) {
-            return false;
-        }
-        try {
-            val decoded = new String(Base64.getDecoder().decode(parts[1]), Charset.defaultCharset());
-            val userIdAndPassword = decoded.split(":", 2);
-            if (userIdAndPassword.length != 2) {
-                return false;
-            }
-            return alfrescoService.isAdmin(userIdAndPassword[0], userIdAndPassword[1]);
-        } catch (IllegalArgumentException e) {
-            log.debug("Invalid Authorization header", e);
-            return false;
-        }
-    }
-
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/nodes/{nodeId}")
     @Operation(
@@ -135,7 +110,7 @@ public class VaultApiController {
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
 
-        if (!isAuthorized(auth)) {
+        if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -166,7 +141,7 @@ public class VaultApiController {
             @PathVariable String nodeId,
             @RequestParam(required = false, defaultValue = "true") boolean attachment) {
 
-        if (!isAuthorized(auth)) {
+        if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -208,7 +183,7 @@ public class VaultApiController {
             @PathVariable String nodeId,
             @RequestParam(required = false, defaultValue = "false") boolean restorePermissions) {
 
-        if (!isAuthorized(auth)) {
+        if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -236,7 +211,7 @@ public class VaultApiController {
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
 
-        if (!isAuthorized(auth)) {
+        if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
