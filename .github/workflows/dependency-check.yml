@@ -20,7 +20,7 @@ jobs:
         with:
           Project-Name: ${{ github.repository }}
       - name: Upload Depcheck report
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: dependency-check-report
           path: ${{ github.workspace }}/reports
