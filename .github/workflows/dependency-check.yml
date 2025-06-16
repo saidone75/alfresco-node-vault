@@ -16,7 +16,7 @@ jobs:
           distribution: 'zulu'
           java-version: '21'
           cache: 'maven'
-      - uses: GovTechSG/dependency-check-action@v1.0.0
+      - uses: GovTechSG/dependency-check-action@v2.0.0
         with:
           Project-Name: ${{ github.repository }}
       - name: Upload Depcheck report
