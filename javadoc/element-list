@@ -1,0 +1,17 @@
+org.saidone
+org.saidone.audit
+org.saidone.behaviour
+org.saidone.component
+org.saidone.config
+org.saidone.controller
+org.saidone.exception
+org.saidone.filter
+org.saidone.gateway.predicate
+org.saidone.job
+org.saidone.misc
+org.saidone.model
+org.saidone.model.alfresco
+org.saidone.monitor
+org.saidone.repository
+org.saidone.service
+org.saidone.utils
