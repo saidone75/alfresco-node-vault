@@ -110,6 +110,7 @@ class AlfrescoServiceTests extends BaseTest {
 
     @Test
     @Order(60)
+    @SneakyThrows
     public void createPathIfNotExistsTest() {
         val pathElements = List.of("foo", "bar", "baz");
         var nodeId = alfrescoService.createPathIfNotExists(BaseTest.parentId, pathElements);

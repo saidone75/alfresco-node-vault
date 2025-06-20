@@ -408,8 +408,7 @@ public class AlfrescoService extends BaseComponent {
      * @return the ID of the final node corresponding to the last path element
      * @throws Exception if a folder cannot be created or found at any point in the path
      */
-    @SneakyThrows
-    public String createPathIfNotExists(String parentId, List<String> path) {
+    public String createPathIfNotExists(String parentId, List<String> path) throws Exception {
         for (var pathPart : path) {
             var nodeBodyCreate = new NodeBodyCreate();
             nodeBodyCreate.setName(pathPart);
