@@ -63,6 +63,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Scheduled or on-demand archiving
 - MongoDB storage via GridFS
 - Focus on [strong encryption](doc/Encryption.md) option for both content and metadata
+- Passwords are securely stored in a secret engine
 - REST API with proxy support
 - Engineered for flexibility and bespoke integrations
 - No installation or changes required on Alfresco
@@ -86,6 +87,7 @@ Global configuration is stored in `application.yml` file, the relevant parameter
 | ALFRESCO_USERNAME             | admin                                      | Alfresco user                                                       |
 | ALFRESCO_PASSWORD             | admin                                      | Password for the Alfresco user                                      |
 | ACTIVE_MQ_URL                 | tcp://localhost:61616                      | ActiveMQ broker URL                                                 |
+| MONGODB_URL                   | mongodb://localhost:27017                  | MongoDB connection string                                           |
 | EVENT_HANDLER_ENABLED         | false                                      | Event based archive behaviour switch                                |
 | ARCHIVING_JOB_ENABLED         | true                                       | Archiving scheduled job switch                                      |
 | ARCHIVING_JOB_CRON_EXPRESSION | 0 0/5 2-6 * * ?                            | Scheduled job cron expression                                       |
@@ -94,13 +96,10 @@ Global configuration is stored in `application.yml` file, the relevant parameter
 | VAULT_DOUBLE_CHECK            | true                                       | Double check content integrity before removing document on Alfresco |
 | VAULT_ENCRYPTION_ENABLED      | true                                       | Enable content encryption                                           |
 | VAULT_ENCRYPT_METADATA        | true                                       | Encrypt also metadata                                               |
-| VAULT_ENCRYPTION_SECRET       | changeme                                   | Encryption secret                                                   |
-| MONGODB_URL                   | mongodb://localhost:27017                  | MongoDB connection string                                          |
-| SAME_NODE_PROCESSING_THRESHOLD| 10000                                      | Threshold for processing the same node                             |
-| VAULT_ENCRYPTION_KV_MOUNT     | secret                                     | Vault secret engine mount path                                     |
-| VAULT_ENCRYPTION_SECRET_PATH  | AlfrescoNodeVault                          | Path of encryption secret in Vault                                 |
-| VAULT_ENCRYPTION_SECRET_KEY   | anv.secret                                 | Key name of encryption secret                                      |
-| VAULT_URL                     | http://localhost:8200                      | Vault server URI                                                   |
+| VAULT_URL                     | http://localhost:8200                      | Vault secret engine URI                                             |
+| VAULT_ENCRYPTION_KV_MOUNT     | secret                                     | Vault secret engine mount path                                      |
+| VAULT_ENCRYPTION_SECRET_PATH  | AlfrescoNodeVault                          | Path of encryption secret in Vault secret engine                                 |
+| VAULT_ENCRYPTION_SECRET_KEY   | anv.secret                                 | Key name of encryption secret                                       |
 | AUDIT_ENABLED                 | false                                      | Enable web request auditing                                         |
 
 ## Build
