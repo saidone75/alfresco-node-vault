@@ -3,6 +3,7 @@
 ![Vault](images/vault.png)
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![Javadoc](https://img.shields.io/badge/Javadoc-API-blue.svg)](https://saidone75.github.io/alfresco-node-vault/javadoc/)
 ![Java CI](https://github.com/saidone75/alfresco-node-vault/actions/workflows/build.yml/badge.svg)
 ![CodeQL](https://github.com/saidone75/alfresco-node-vault/actions/workflows/codeql.yml/badge.svg)
 
@@ -122,7 +123,7 @@ will run a load test.
 
 ## Documentation
 
-The Javadoc is available at the following address: https://saidone75.github.io/alfresco-node-vault/
+The Javadoc is available at the following address: https://saidone75.github.io/alfresco-node-vault/javadoc/
 
 ## License
 

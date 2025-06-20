@@ -161,9 +161,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.11.2</version>
+                <version>3.6.3</version>
                 <configuration>
-                    <doclint>none</doclint>
+                    <encoding>UTF-8</encoding>
+                    <doctitle>Alfresco Node Vault</doctitle>
+                    <header>Alfresco Node Vault</header>
+                    <bottom>© 2025 Saidone</bottom>
+                    <failOnError>false</failOnError>
                 </configuration>
             </plugin>
             <plugin>
