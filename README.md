@@ -63,8 +63,8 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Scheduled or on-demand archiving
 - MongoDB storage via GridFS
 - Focus on [strong encryption](doc/Encryption.md) option for both content and metadata
-- Passwords are securely stored in a secret engine
-- REST API with proxy support
+- Passwords securely stored in a secret engine
+- REST API with Alfresco proxy support
 - Engineered for flexibility and bespoke integrations
 - No installation or changes required on Alfresco
 - 100% test coverage
@@ -129,7 +129,7 @@ will run a load test.
 
 ## Documentation
 
-The Javadoc is available at the following address: https://saidone75.github.io/alfresco-node-vault/javadoc/
+Javadoc is available at the following address: https://saidone75.github.io/alfresco-node-vault/javadoc/
 
 ## License
 
