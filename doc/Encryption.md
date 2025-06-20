@@ -137,9 +137,9 @@ Uses the Bouncy Castle provider to implement ChaCha20-Poly1305 authenticated enc
     - The system is configured by default to retrieve the master key from HashiCorp Vault
     - Never commit secrets to source control
 
-2. **Nonce/IV Usage**:
+2. **Nonce/IV and Key Version Usage**:
     - Each encryption operation uses a new random nonce/IV
-    - The system prepends the salt and nonce/IV to the encrypted data for decryption
+    - The system prepends the key version, salt and nonce/IV to the encrypted data for decryption
 
 5. **Processing Model**:
     - The system uses streaming encryption/decryption to handle large files efficiently
@@ -157,18 +157,33 @@ Uses the Bouncy Castle provider to implement ChaCha20-Poly1305 authenticated enc
 
 ## Format of Encrypted Data
 
-Both implementations produce output with the following structure:
+Every encrypted payload includes a short header with all the values required for
+decryption. The first 4 bytes store the **key version**, allowing for transparent
+key rotation. The remaining fields depend on the chosen provider:
+
+**JCA (AES‑GCM)**
 
 ```
-[salt][nonce/iv][encrypted data]
+[key version][salt][IV][encrypted data]
+```
+
+**Bouncy Castle (ChaCha20-Poly1305)**
+
+```
+[key version][salt][nonce][encrypted data]
 ```
 
 Where:
+- `key version` is a 4 byte integer written in big-endian order
 - `salt` is used for key derivation (length defined by configuration)
-- `nonce/iv` is used for the encryption algorithm (length defined by configuration)
-- `encrypted data` includes authentication data (GCM tag or Poly1305 authenticator)
+- `IV`/`nonce` is used by the encryption algorithm (length defined by configuration)
+- `encrypted data` also contains the authentication tag
 
-This format ensures that all information needed for decryption (except the master secret) is contained within the encrypted data itself.
+This structure ensures that everything needed for decryption (except the master
+secret) travels with the ciphertext. For reference, see the implementations in
+[JcaCryptoServiceImpl.java](../src/main/java/org/saidone/service/JcaCryptoServiceImpl.java)
+and
+[BcCryptoServiceImpl.java](../src/main/java/org/saidone/service/BcCryptoServiceImpl.java).
 
 ## Development Recommendations
 
