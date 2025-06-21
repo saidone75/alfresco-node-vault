@@ -28,6 +28,12 @@ import java.util.Map;
 
 @Data
 @Document(collection = "vault_audit")
+/**
+ * Entity representing a single audit entry stored in MongoDB.
+ * <p>
+ * An entry records the timestamp of the event, a map of associated metadata
+ * (typically request or response details) and the type of the event.
+ */
 public class AuditEntry {
 
     @Id
