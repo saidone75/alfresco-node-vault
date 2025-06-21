@@ -20,28 +20,39 @@ package org.saidone.component;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.saidone.misc.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
- * Abstract base class for components within the Alfresco Node Vault application.
- * <p>
- * Provides lifecycle logging for startup and shutdown events, and a method to
- * programmatically shut down the Spring application context and exit the JVM.
- * </p>
+ * Base class for all Spring managed components of the Alfresco Node Vault.
+ *
+ * <p>This class centralises common lifecycle handling.  It logs a message when
+ * a component is initialised or destroyed and exposes a helper method to
+ * gracefully close the {@link ApplicationContext} and terminate the
+ * application.</p>
  */
 @Slf4j
-public abstract class BaseComponent {
+public abstract class BaseComponent implements ApplicationContextAware {
 
     @Autowired
     private ApplicationContext applicationContext;
 
     /**
-     * Initialization callback invoked after the component's dependencies have been injected.
-     * Logs a startup message indicating the component is starting.
+     * Stores the injected {@link ApplicationContext} for later use.
+     */
+    @Override
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
+
+    /**
+     * Called after dependency injection is complete.
+     * Logs a startup message indicating that the component is ready.
      */
     @PostConstruct
     public void init() {
@@ -49,8 +60,8 @@ public abstract class BaseComponent {
     }
 
     /**
-     * Destruction callback invoked before the component is removed from the context.
-     * Logs a shutdown message indicating the component is stopping.
+     * Called just before the bean is destroyed.
+     * Logs a shutdown message indicating that the component is stopping.
      */
     @PreDestroy
     public void stop() {
@@ -58,9 +69,9 @@ public abstract class BaseComponent {
     }
 
     /**
-     * Shuts down the Spring application and exits the JVM with the given exit code.
+     * Closes the Spring context and terminates the JVM with the given exit code.
      *
-     * @param exitCode the exit code to return to the operating system
+     * @param exitCode exit code returned to the operating system
      */
     public void shutDown(int exitCode) {
         log.info("Shutting down application");
