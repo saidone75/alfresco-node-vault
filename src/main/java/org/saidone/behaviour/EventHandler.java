@@ -69,7 +69,7 @@ public class EventHandler extends BaseComponent implements OnNodeCreatedEventHan
     private final VaultService vaultService;
 
     @Value("${application.same-node-processing-threshold}")
-    private static long threshold;
+    private long threshold;
 
     @Override
     public void handleEvent(RepoEvent<DataAttributes<Resource>> event) {
@@ -83,6 +83,7 @@ public class EventHandler extends BaseComponent implements OnNodeCreatedEventHan
         }
     }
 
+    @Override
     public EventFilter getEventFilter() {
         return (NodeTypeFilter.of(AlfrescoContentModel.TYPE_CONTENT))
                 .and(AspectAddedFilter.of(AnvContentModel.ASP_ARCHIVE))
