@@ -22,18 +22,18 @@ import com.mongodb.client.model.CreateCollectionOptions;
 import com.mongodb.client.model.TimeSeriesGranularity;
 import com.mongodb.client.model.TimeSeriesOptions;
 import jakarta.annotation.PostConstruct;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
+@RequiredArgsConstructor
 @Component
 @Slf4j
 public class AuditCollectionCreator extends BaseComponent {
 
-    @Autowired
-    private MongoTemplate mongoTemplate;
+    private final MongoTemplate mongoTemplate;
 
     private static final String COLLECTION_NAME = "vault_audit";
 
