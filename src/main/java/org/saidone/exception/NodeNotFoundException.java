@@ -18,6 +18,12 @@
 
 package org.saidone.exception;
 
+/**
+ * Generic exception thrown when a requested node cannot be located.
+ * <p>
+ * More specific subclasses clarify whether the node was expected to be
+ * present in Alfresco or in the vault storage.
+ */
 public class NodeNotFoundException extends VaultException {
     public NodeNotFoundException(String message) {
         super(message);
