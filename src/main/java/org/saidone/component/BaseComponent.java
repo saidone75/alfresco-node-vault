@@ -20,10 +20,12 @@ package org.saidone.component;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.saidone.misc.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ConfigurableApplicationContext;
 
 /**
@@ -34,10 +36,15 @@ import org.springframework.context.ConfigurableApplicationContext;
  * </p>
  */
 @Slf4j
-public abstract class BaseComponent {
+public abstract class BaseComponent implements ApplicationContextAware {
 
     @Autowired
     private ApplicationContext applicationContext;
+
+    @Override
+    public void setApplicationContext(@NonNull ApplicationContext applicationContext) {
+        this.applicationContext = applicationContext;
+    }
 
     /**
      * Initialization callback invoked after the component's dependencies have been injected.
