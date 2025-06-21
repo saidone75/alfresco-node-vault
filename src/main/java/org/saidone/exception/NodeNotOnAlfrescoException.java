@@ -18,6 +18,9 @@
 
 package org.saidone.exception;
 
+/**
+ * Signals that a requested node cannot be found in the Alfresco repository.
+ */
 public class NodeNotOnAlfrescoException extends VaultException {
     public NodeNotOnAlfrescoException(String message) {
         super(String.format("Node %s not found on the vault", message));

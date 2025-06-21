@@ -18,6 +18,9 @@
 
 package org.saidone.exception;
 
+/**
+ * Base class for all runtime exceptions thrown by the Alfresco Node Vault.
+ */
 public class VaultException extends RuntimeException {
     public VaultException(String message) {
         super(message);
