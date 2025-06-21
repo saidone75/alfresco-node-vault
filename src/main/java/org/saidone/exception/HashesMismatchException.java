@@ -18,6 +18,10 @@
 
 package org.saidone.exception;
 
+/**
+ * Exception thrown when a node's checksum stored in Alfresco does not match the
+ * value stored in the vault.
+ */
 public class HashesMismatchException extends VaultException {
     public HashesMismatchException(String alfrescoHash, String mongoHash) {
         super("""

@@ -21,6 +21,13 @@ package org.saidone.exception;
 import com.fasterxml.jackson.annotation.JsonRootName;
 import lombok.Data;
 
+/**
+ * Represents an error payload returned by the REST API.
+ * <p>
+ * This class mirrors the structure used by Alfresco to describe errors
+ * occurring while processing a request. It can be serialized and returned as
+ * part of the response body.
+ */
 @Data
 @JsonRootName(value = "error")
 public class ApiExceptionError {
