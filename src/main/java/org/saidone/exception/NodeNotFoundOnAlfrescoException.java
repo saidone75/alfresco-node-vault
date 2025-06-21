@@ -21,8 +21,8 @@ package org.saidone.exception;
 /**
  * Thrown when a node cannot be located in Alfresco.
  */
-public class NodeNotOnAlfrescoException extends VaultException {
-    public NodeNotOnAlfrescoException(String message) {
+public class NodeNotFoundOnAlfrescoException extends NodeNotFoundException {
+    public NodeNotFoundOnAlfrescoException(String message) {
         super(String.format("Node %s not found on the vault", message));
     }
 }

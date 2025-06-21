@@ -25,7 +25,8 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
-import org.saidone.exception.NodeNotOnVaultException;
+import org.saidone.exception.NodeNotFoundOnAlfrescoException;
+import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.service.AlfrescoService;
 import org.saidone.service.VaultService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,8 +64,8 @@ class VaultServiceTests extends BaseTest {
     @Test
     @Order(20)
     void nonExistentNodeTest() {
-        assertThrows(NodeNotOnVaultException.class, () -> vaultService.getNode(UUID.randomUUID().toString()));
-        assertThrows(NodeNotOnVaultException.class, () -> vaultService.archiveNode(UUID.randomUUID().toString()));
+        assertThrows(NodeNotFoundOnVaultException.class, () -> vaultService.getNode(UUID.randomUUID().toString()));
+        assertThrows(NodeNotFoundOnAlfrescoException.class, () -> vaultService.archiveNode(UUID.randomUUID().toString()));
     }
 
     @Test
