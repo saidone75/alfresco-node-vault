@@ -37,6 +37,13 @@ import java.util.HashMap;
 @ConditionalOnProperty(name = "application.service.vault.audit.enabled", havingValue = "true")
 @RequiredArgsConstructor
 @Slf4j
+/**
+ * Web filter that audits incoming requests and outgoing responses.
+ * <p>
+ * For each request the filter collects basic metadata (IP address, user agent,
+ * path, HTTP method) and stores it via {@link AuditService}. When the response
+ * is completed a second audit entry is stored containing the status code.
+ */
 public class AuditWebFilter extends BaseComponent implements WebFilter {
 
     private final AuditService auditService;

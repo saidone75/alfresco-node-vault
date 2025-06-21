@@ -30,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.saidone.exception.NodeNotOnVaultException;
+import org.saidone.exception.NodeNotFoundException;
 import org.saidone.exception.VaultException;
 import org.saidone.model.Entry;
 import org.saidone.service.AuthenticationService;
@@ -70,9 +70,9 @@ public class VaultApiController {
                 .body(e.getMessage());
     }
 
-    @ExceptionHandler(NodeNotOnVaultException.class)
+    @ExceptionHandler(NodeNotFoundException.class)
     @Operation(hidden = true)
-    public ResponseEntity<String> handleNodeNotFoundOnVaultException(NodeNotOnVaultException e) {
+    public ResponseEntity<String> handleNodeNotFoundException(NodeNotFoundException e) {
         log.error(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)

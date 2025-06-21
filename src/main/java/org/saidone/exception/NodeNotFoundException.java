@@ -16,30 +16,16 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.audit;
+package org.saidone.exception;
 
-import lombok.Data;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.Map;
-
-@Data
-@Document(collection = "vault_audit")
 /**
- * Entity representing a single audit entry stored in MongoDB.
+ * Generic exception thrown when a requested node cannot be located.
  * <p>
- * An entry records the timestamp of the event, a map of associated metadata
- * (typically request or response details) and the type of the event.
+ * More specific subclasses clarify whether the node was expected to be
+ * present in Alfresco or in the vault storage.
  */
-public class AuditEntry {
-
-    @Id
-    private String id;
-    private Instant timestamp;
-    private Map<String, Serializable> metadata;
-    private String type;
-
+public class NodeNotFoundException extends VaultException {
+    public NodeNotFoundException(String message) {
+        super(message);
+    }
 }

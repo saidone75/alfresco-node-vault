@@ -21,8 +21,8 @@ package org.saidone.exception;
 /**
  * Thrown when a node cannot be located in the vault storage.
  */
-public class NodeNotOnVaultException extends VaultException {
-    public NodeNotOnVaultException(String message) {
+public class NodeNotFoundOnVaultException extends NodeNotFoundException {
+    public NodeNotFoundOnVaultException(String message) {
         super(String.format("Node %s not found on the vault", message));
     }
 }

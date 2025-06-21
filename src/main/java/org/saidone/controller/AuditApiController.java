@@ -13,7 +13,6 @@ import lombok.SneakyThrows;
 import lombok.val;
 import org.saidone.audit.AuditEntry;
 import org.saidone.audit.AuditService;
-import org.saidone.service.AlfrescoService;
 import org.saidone.service.AuthenticationService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -32,7 +31,6 @@ import java.util.List;
 public class AuditApiController {
 
     private final AuditService auditService;
-    private final AlfrescoService alfrescoService;
     private final AuthenticationService authenticationService;
 
     @SecurityRequirement(name = "basicAuth")

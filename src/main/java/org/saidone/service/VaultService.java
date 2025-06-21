@@ -27,7 +27,8 @@ import lombok.val;
 import org.alfresco.core.model.Node;
 import org.saidone.component.BaseComponent;
 import org.saidone.exception.HashesMismatchException;
-import org.saidone.exception.NodeNotOnVaultException;
+import org.saidone.exception.NodeNotFoundOnAlfrescoException;
+import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.exception.VaultException;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.misc.ProgressTrackingInputStream;
@@ -39,7 +40,6 @@ import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 
@@ -105,8 +105,8 @@ public class VaultService extends BaseComponent {
      * </p>
      *
      * @param nodeId the ID of the node to archive
-     * @throws NodeNotOnVaultException if the node is not found in Alfresco
-     * @throws VaultException          if any error occurs during archiving, including rollback
+     * @throws NodeNotFoundOnAlfrescoException if the node is not found in Alfresco
+     * @throws VaultException if any error occurs during archiving, including rollback
      */
     public void archiveNode(String nodeId) {
         log.info("Archiving node: {}", nodeId);
@@ -121,7 +121,7 @@ public class VaultService extends BaseComponent {
             if (doubleCheck) doubleCheck(nodeId);
             alfrescoService.deleteNode(nodeId);
         } catch (FeignException.NotFound e) {
-            throw new NodeNotOnVaultException(nodeId);
+            throw new NodeNotFoundOnAlfrescoException(nodeId);
         } catch (Exception e) {
             log.trace(e.getMessage(), e);
             // rollback
@@ -137,14 +137,14 @@ public class VaultService extends BaseComponent {
      *
      * @param nodeId the ID of the node
      * @return the NodeWrapper containing node metadata
-     * @throws NodeNotOnVaultException if the node is not found in the vault
+     * @throws NodeNotFoundOnVaultException if the node is not found in the vault
      */
     private NodeWrapper getNodeWrapper(String nodeId) {
         val nodeOptional = mongoNodeRepository.findById(nodeId);
         if (nodeOptional.isPresent()) {
             return nodeOptional.get();
         } else {
-            throw new NodeNotOnVaultException(nodeId);
+            throw new NodeNotFoundOnVaultException(nodeId);
         }
     }
 
@@ -153,7 +153,7 @@ public class VaultService extends BaseComponent {
      *
      * @param nodeId the ID of the node
      * @return the Alfresco Node object
-     * @throws NodeNotOnVaultException if the node is not found in the vault
+     * @throws NodeNotFoundOnVaultException if the node is not found in the vault
      * @throws JsonProcessingException if there is an error processing the node metadata JSON
      */
     public Node getNode(String nodeId) throws JsonProcessingException {
@@ -165,12 +165,12 @@ public class VaultService extends BaseComponent {
      *
      * @param nodeId the ID of the node
      * @return the NodeContent containing file name, content type, length, and content stream
-     * @throws NodeNotOnVaultException if the node content is not found in the vault
+     * @throws NodeNotFoundOnVaultException if the node content is not found in the vault
      */
     public NodeContent getNodeContent(String nodeId) {
         val gridFSFile = gridFsRepository.findFileById(nodeId);
         if (gridFSFile == null) {
-            throw new NodeNotOnVaultException(nodeId);
+            throw new NodeNotFoundOnVaultException(nodeId);
         }
         val nodeContent = new NodeContent();
         nodeContent.setFileName(gridFSFile.getFilename());
@@ -192,7 +192,7 @@ public class VaultService extends BaseComponent {
      * @param nodeId             the ID of the node to restore
      * @param restorePermissions whether to restore permissions along with the node
      * @return the new node ID assigned by Alfresco after restoration
-     * @throws NodeNotOnVaultException if the node is not found in the vault
+     * @throws NodeNotFoundOnVaultException if the node is not found in the vault
      * @throws JsonProcessingException if there is an error processing the node metadata JSON
      */
     public String restoreNode(String nodeId, boolean restorePermissions) throws JsonProcessingException {
