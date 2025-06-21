@@ -19,10 +19,10 @@
 package org.saidone.exception;
 
 /**
- * Base class for all runtime exceptions thrown by the Alfresco Node Vault.
+ * Thrown when a node cannot be located in Alfresco.
  */
-public class VaultException extends RuntimeException {
-    public VaultException(String message) {
-        super(message);
+public class NodeNotOnAlfrescoException extends VaultException {
+    public NodeNotOnAlfrescoException(String message) {
+        super(String.format("Node %s not found on the vault", message));
     }
 }
