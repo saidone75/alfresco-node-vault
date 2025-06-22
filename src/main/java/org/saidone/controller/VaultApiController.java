@@ -58,7 +58,7 @@ public class VaultApiController {
         log.error(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(e.getMessage());
+                .body("Internal server error");
     }
 
     @ExceptionHandler(VaultException.class)
@@ -67,7 +67,7 @@ public class VaultApiController {
         log.error(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(e.getMessage());
+                .body("Internal server error");
     }
 
     @ExceptionHandler(NodeNotFoundException.class)
@@ -76,7 +76,7 @@ public class VaultApiController {
         log.error(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(e.getMessage());
+                .body("Node not found");
     }
 
     @ExceptionHandler(OutOfMemoryError.class)
