@@ -28,6 +28,16 @@ import lombok.val;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
+/**
+ * Creates the MongoDB collection used for persisting {@code AuditEntry} records.
+ * <p>
+ * On application startup this component checks whether the collection
+ * {@value COLLECTION_NAME} exists and, if not, creates it as a time series
+ * collection with the {@code timestamp} field as its time key. The created
+ * collection stores additional audit metadata in the {@code metadata} sub
+ * document and uses a seconds granularity.
+ * </p>
+ */
 @RequiredArgsConstructor
 @Component
 @Slf4j
@@ -37,6 +47,9 @@ public class AuditCollectionCreator extends BaseComponent {
 
     private static final String COLLECTION_NAME = "vault_audit";
 
+    /**
+     * Creates the audit collection if it does not already exist.
+     */
     @PostConstruct
     @Override
     public void init() {
