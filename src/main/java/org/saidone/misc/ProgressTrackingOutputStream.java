@@ -24,6 +24,13 @@ import java.io.FilterOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 
+/**
+ * {@link OutputStream} wrapper that logs upload progress for debugging purposes.
+ * <p>
+ * Bytes written to the underlying stream are counted and progress is logged in
+ * 10% increments when trace logging is enabled.
+ * </p>
+ */
 @Slf4j
 public class ProgressTrackingOutputStream extends FilterOutputStream {
 
@@ -32,12 +39,25 @@ public class ProgressTrackingOutputStream extends FilterOutputStream {
     private long bytesWritten = 0;
     private int lastLoggedPercentage = 0;
 
+    /**
+     * Creates a new progress tracking output stream.
+     *
+     * @param out           the underlying output stream
+     * @param nodeId        identifier of the node being written
+     * @param contentLength total expected length of the stream in bytes
+     */
     public ProgressTrackingOutputStream(OutputStream out, String nodeId, long contentLength) {
         super(out);
         this.nodeId = nodeId;
         this.contentLength = contentLength;
     }
 
+    /**
+     * Writes a single byte and updates the write progress.
+     *
+     * @param b the byte to be written
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     public void write(int b) throws IOException {
         out.write(b);
@@ -45,6 +65,14 @@ public class ProgressTrackingOutputStream extends FilterOutputStream {
         if (log.isTraceEnabled()) logProgress();
     }
 
+    /**
+     * Writes bytes from a buffer and updates the write progress.
+     *
+     * @param b   the data
+     * @param off the start offset in the data
+     * @param len the number of bytes to write
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     public void write(byte[] b, int off, int len) throws IOException {
         out.write(b, off, len);
@@ -52,6 +80,9 @@ public class ProgressTrackingOutputStream extends FilterOutputStream {
         if (log.isTraceEnabled()) logProgress();
     }
 
+    /**
+     * Logs the progress of bytes written if the next threshold has been reached.
+     */
     private void logProgress() {
         if (contentLength > 0) {
             int percentage = (int) ((double) bytesWritten / contentLength * 100);

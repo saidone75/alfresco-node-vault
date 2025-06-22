@@ -24,6 +24,13 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * {@link InputStream} wrapper that logs read progress for debugging purposes.
+ * <p>
+ * The wrapper counts the number of bytes read from the underlying stream and
+ * logs the progress in 10% increments when trace logging is enabled.
+ * </p>
+ */
 @Slf4j
 public class ProgressTrackingInputStream extends FilterInputStream {
 
@@ -32,12 +39,25 @@ public class ProgressTrackingInputStream extends FilterInputStream {
     private long bytesRead = 0;
     private int lastLoggedPercentage = 0;
 
+    /**
+     * Creates a new progress tracking stream.
+     *
+     * @param in            the wrapped input stream
+     * @param nodeId        identifier of the node being read
+     * @param contentLength total expected length of the stream in bytes
+     */
     public ProgressTrackingInputStream(InputStream in, String nodeId, long contentLength) {
         super(in);
         this.nodeId = nodeId;
         this.contentLength = contentLength;
     }
 
+    /**
+     * Reads a single byte from the stream and updates the progress.
+     *
+     * @return the byte read or {@code -1} if the end of the stream is reached
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     public int read() throws IOException {
         int b = in.read();
@@ -48,6 +68,15 @@ public class ProgressTrackingInputStream extends FilterInputStream {
         return b;
     }
 
+    /**
+     * Reads bytes into an array and updates the read progress.
+     *
+     * @param b   the buffer into which the data is read
+     * @param off the start offset in the destination array
+     * @param len the maximum number of bytes to read
+     * @return the number of bytes read or {@code -1} if the end of the stream is reached
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         int bytes = in.read(b, off, len);
@@ -58,6 +87,9 @@ public class ProgressTrackingInputStream extends FilterInputStream {
         return bytes;
     }
 
+    /**
+     * Logs the progress of bytes read if the next threshold has been reached.
+     */
     private void logProgress() {
         if (contentLength > 0) {
             int percentage = (int) ((double) bytesRead / contentLength * 100);
