@@ -3,8 +3,8 @@ FROM ${GRAFANA_IMAGE}
 
 WORKDIR /etc/grafana
 
-COPY grafana/provisioning/ /etc/grafana/provisioning/
-COPY grafana/dashboards/ /var/lib/grafana/dashboards/
+COPY ./grafana/provisioning/ /etc/grafana/provisioning/
+COPY ./grafana/dashboards/ /var/lib/grafana/dashboards/
 
 USER root
 RUN chown -R grafana /etc/grafana /var/lib/grafana

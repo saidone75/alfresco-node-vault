@@ -16,15 +16,21 @@ start() {
     docker volume create $VOLUME_PREFIX-grafana-volume
 
     if [ "$1" = "novault" ]; then
-        docker-compose -f "$COMPOSE_FILE_PATH" --env-file "$ENV_FILE_PATH" up --build -d --scale anv-vault=0
+      docker-compose \
+      -f docker/docker-compose.yml \
+      -f docker/grafana/docker-compose.yml\
+      --env-file docker/.env up --build -d --scale anv-vault=0
     else
-        docker-compose -f "$COMPOSE_FILE_PATH" --env-file "$ENV_FILE_PATH" up --build -d
+      docker-compose \
+      -f docker/docker-compose.yml \
+      -f docker/grafana/docker-compose.yml\
+      --env-file docker/.env up --build -d
     fi
 }
 
 down() {
     if [ -f "$COMPOSE_FILE_PATH" ]; then
-        docker-compose -f "$COMPOSE_FILE_PATH" --env-file "$ENV_FILE_PATH" down
+        docker-compose -f "$COMPOSE_FILE_PATH" -f docker/grafana/docker-compose.yml --env-file "$ENV_FILE_PATH" down
     fi
 }
 
@@ -37,11 +43,11 @@ purge() {
 }
 
 tail() {
-    docker-compose -f "$COMPOSE_FILE_PATH" --env-file "$ENV_FILE_PATH" logs -f
+    docker-compose -f "$COMPOSE_FILE_PATH" -f docker/grafana/docker-compose.yml --env-file "$ENV_FILE_PATH" logs -f
 }
 
 tail_all() {
-    docker-compose -f "$COMPOSE_FILE_PATH" --env-file "$ENV_FILE_PATH" logs --tail="all"
+    docker-compose -f "$COMPOSE_FILE_PATH" -f docker/grafana/docker-compose.yml --env-file "$ENV_FILE_PATH" logs --tail="all"
 }
 
 case "$1" in
