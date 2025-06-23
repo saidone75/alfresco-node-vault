@@ -146,40 +146,6 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
       ME_CONFIG_BASICAUTH: "false"
-  prometheus:
-    image: ${PROMETHEUS_IMAGE}
-    container_name: anv-prometheus
-    volumes:
-      - ./grafana/prometheus.yml:/etc/prometheus/prometheus.yml
-    ports:
-      - "9090:9090"
-    # extra_hosts:
-    #   - "host.docker.internal:host-gateway"
-  grafana:
-    build:
-      dockerfile: grafana/Dockerfile.grafana
-      context: .
-      args:
-        GRAFANA_IMAGE: ${GRAFANA_IMAGE}
-    container_name: anv-grafana
-    ports:
-      - "4000:3000"
-    environment:
-      - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=admin
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
-    volumes:
-      - anv-grafana-volume:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
-  nginx:
-    image: ${NGINX_IMAGE}
-    container_name: anv-nginx
-    ports:
-      - "3000:3000"
-    volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
   anv-hashicorp-vault:
     image: ${HASHICORP_VAULT_IMAGE}:${HASHICORP_VAULT_IMAGE_VERSION}
     container_name: anv-hashicorp-vault
@@ -234,5 +200,3 @@ volumes:
     external: true
   anv-mongo-volume:
     external: true
-  anv-grafana-volume:
-    name: grafana-data
