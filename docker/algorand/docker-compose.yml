@@ -1,0 +1,34 @@
+services:
+  algod:
+    image: algorand/node:stable
+    container_name: algod
+    environment:
+      - anv-algorand-volume=/var/lib/algorand
+    volumes:
+      - anv-algorand-volume:/var/lib/algorand
+    ports:
+      - "4001:4001" # Algod API
+      - "9100:9100" # telemetry/debug (optional)
+    command: >
+      bash -c "
+        goal node start -d /var/lib/algorand;
+        tail -f /dev/null
+      "
+  kmd:
+    image: algorand/node:stable
+    container_name: kmd
+    depends_on:
+      - algod
+    environment:
+      - KMD_DATA=/var/lib/algorand
+    volumes:
+      - anv-algorand-volume:/var/lib/algorand
+    ports:
+      - "7833:7833" # KMD port
+    command: >
+      bash -c "
+        goal kmd start -d /var/lib/algorand;
+        tail -f /dev/null
+      "
+volumes:
+  anv-algorand-volume:
