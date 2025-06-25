@@ -62,6 +62,7 @@ docker volume create %VOLUME_PREFIX%-postgres-volume
 docker volume create %VOLUME_PREFIX%-ass-volume
 docker volume create %VOLUME_PREFIX%-mongo-volume
 docker volume create %VOLUME_PREFIX%-grafana-volume
+docker volume create %VOLUME_PREFIX%-algorand-volume
 
 echo %ENV_FILE_PATH%
 IF /I "%~1"=="novault" (
@@ -95,4 +96,5 @@ docker volume rm -f %VOLUME_PREFIX%-postgres-volume
 docker volume rm -f %VOLUME_PREFIX%-ass-volume
 docker volume rm -f %VOLUME_PREFIX%-mongo-volume
 docker volume rm -f %VOLUME_PREFIX%-grafana-volume
+docker volume rm -f %VOLUME_PREFIX%-algorand-volume
 EXIT /B 0
