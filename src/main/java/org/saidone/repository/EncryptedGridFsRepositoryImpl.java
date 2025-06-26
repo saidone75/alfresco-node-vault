@@ -23,7 +23,7 @@ import lombok.SneakyThrows;
 import lombok.val;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
-import org.saidone.service.CryptoService;
+import org.saidone.service.crypto.CryptoService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
