@@ -21,7 +21,7 @@ package org.saidone.repository;
 import lombok.NonNull;
 import lombok.val;
 import org.saidone.model.NodeWrapper;
-import org.saidone.service.CryptoService;
+import org.saidone.service.crypto.CryptoService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Repository;

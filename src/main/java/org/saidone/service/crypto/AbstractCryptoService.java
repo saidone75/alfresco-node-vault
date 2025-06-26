@@ -1,4 +1,4 @@
-package org.saidone.service;
+package org.saidone.service.crypto;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -15,6 +15,7 @@ import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.bouncycastle.crypto.params.HKDFParameters;
 import org.saidone.component.BaseComponent;
+import org.saidone.service.SecretService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 

@@ -23,7 +23,7 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.Setter;
-import org.saidone.service.AbstractCryptoService;
+import org.saidone.service.crypto.AbstractCryptoService;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;

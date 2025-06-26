@@ -51,13 +51,10 @@ public class VaultService extends BaseComponent {
     private final MongoNodeRepositoryImpl mongoNodeRepository;
     private final ContentService contentService;
 
-    @Value("${application.service.vault.hash-algorithm}")
-    private String checksumAlgorithm;
     @Value("${application.service.vault.double-check}")
     private boolean doubleCheck;
 
     private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
-
 
     /**
      * Archives a node by its ID.
@@ -69,7 +66,7 @@ public class VaultService extends BaseComponent {
      *
      * @param nodeId the ID of the node to archive
      * @throws NodeNotFoundOnAlfrescoException if the node is not found in Alfresco
-     * @throws VaultException if any error occurs during archiving, including rollback
+     * @throws VaultException                  if any error occurs during archiving, including rollback
      */
     public void archiveNode(String nodeId) {
         log.info("Archiving node: {}", nodeId);
@@ -117,7 +114,7 @@ public class VaultService extends BaseComponent {
      * @param nodeId the ID of the node
      * @return the Alfresco Node object
      * @throws NodeNotFoundOnVaultException if the node is not found in the vault
-     * @throws JsonProcessingException if there is an error processing the node metadata JSON
+     * @throws JsonProcessingException      if there is an error processing the node metadata JSON
      */
     public Node getNode(String nodeId) throws JsonProcessingException {
         return getNodeWrapper(nodeId).getNode();
@@ -134,7 +131,7 @@ public class VaultService extends BaseComponent {
      * @param restorePermissions whether to restore permissions along with the node
      * @return the new node ID assigned by Alfresco after restoration
      * @throws NodeNotFoundOnVaultException if the node is not found in the vault
-     * @throws JsonProcessingException if there is an error processing the node metadata JSON
+     * @throws JsonProcessingException      if there is an error processing the node metadata JSON
      */
     public String restoreNode(String nodeId, boolean restorePermissions) throws JsonProcessingException {
         val nodeWrapper = getNodeWrapper(nodeId);
