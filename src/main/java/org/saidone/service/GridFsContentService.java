@@ -34,6 +34,14 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 import java.util.HashMap;
 
+/**
+ * {@link ContentService} implementation backed by MongoDB GridFS.
+ * <p>
+ * This class handles persisting node content streams as GridFS files and
+ * retrieving them on demand. Checksums are calculated during the archive
+ * operation and stored as metadata.
+ * </p>
+ */
 @RequiredArgsConstructor
 @Service
 @Slf4j
@@ -98,11 +106,23 @@ public class GridFsContentService implements ContentService {
         return nodeContent;
     }
 
+    /**
+     * Removes the stored content associated with the given node identifier.
+     *
+     * @param nodeId the id of the node whose content should be deleted
+     */
     @Override
     public void deleteFileById(String nodeId) {
         gridFsRepository.deleteFileById(nodeId);
     }
 
+    /**
+     * Computes the checksum of a node's content stored in GridFS using the provided algorithm.
+     *
+     * @param nodeId    identifier of the node
+     * @param algorithm name of the hash algorithm
+     * @return the resulting hash string
+     */
     @Override
     public String computeHash(String nodeId, String algorithm) {
         return gridFsRepository.computeHash(nodeId, algorithm);
