@@ -34,6 +34,7 @@ import org.saidone.exception.NodeNotFoundException;
 import org.saidone.exception.VaultException;
 import org.saidone.model.Entry;
 import org.saidone.service.AuthenticationService;
+import org.saidone.service.ContentService;
 import org.saidone.service.VaultService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -42,6 +43,13 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+/**
+ * REST controller that exposes operations for interacting with the vault.
+ * <p>
+ * All endpoints require basic authentication and delegate the heavy lifting to
+ * {@link org.saidone.service.VaultService} and {@link org.saidone.service.ContentService}.
+ * </p>
+ */
 @RestController
 @RequestMapping("/api/vault")
 @RequiredArgsConstructor
@@ -50,8 +58,15 @@ import org.springframework.web.bind.annotation.*;
 public class VaultApiController {
 
     private final VaultService vaultService;
+    private final ContentService contentService;
     private final AuthenticationService authenticationService;
 
+    /**
+     * Handles any unexpected exception thrown during request processing.
+     *
+     * @param e the exception that was raised
+     * @return a generic {@code 500 Internal Server Error} response
+     */
     @ExceptionHandler(Exception.class)
     @Operation(hidden = true)
     public ResponseEntity<String> handleException(Exception e) {
@@ -61,6 +76,12 @@ public class VaultApiController {
                 .body("Internal server error");
     }
 
+    /**
+     * Handles vault specific errors that may occur while processing a request.
+     *
+     * @param e the thrown {@link VaultException}
+     * @return a generic error response with HTTP status {@code 500}
+     */
     @ExceptionHandler(VaultException.class)
     @Operation(hidden = true)
     public ResponseEntity<String> handleVaultException(Exception e) {
@@ -70,6 +91,12 @@ public class VaultApiController {
                 .body("Internal server error");
     }
 
+    /**
+     * Handles cases where the requested node cannot be found in the vault.
+     *
+     * @param e the thrown exception
+     * @return a response with HTTP status {@code 404 Not Found}
+     */
     @ExceptionHandler(NodeNotFoundException.class)
     @Operation(hidden = true)
     public ResponseEntity<String> handleNodeNotFoundException(NodeNotFoundException e) {
@@ -79,6 +106,12 @@ public class VaultApiController {
                 .body("Node not found");
     }
 
+    /**
+     * Handles out-of-memory situations that may occur when streaming large files.
+     *
+     * @param e the {@link OutOfMemoryError} encountered
+     * @return a response indicating that the server ran out of memory
+     */
     @ExceptionHandler(OutOfMemoryError.class)
     @Operation(hidden = true)
     public ResponseEntity<String> handleOutOfMemoryError(OutOfMemoryError e) {
@@ -106,6 +139,13 @@ public class VaultApiController {
                             content = @Content)
             })
     @SneakyThrows
+    /**
+     * Returns the metadata of a node stored in the vault.
+     *
+     * @param auth   optional Basic authentication header
+     * @param nodeId identifier of the node to retrieve
+     * @return the node metadata wrapped in an {@link Entry} object
+     */
     public ResponseEntity<?> getNode(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
@@ -136,6 +176,14 @@ public class VaultApiController {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
+    /**
+     * Streams the binary content of a node.
+     *
+     * @param auth       optional Basic authentication header
+     * @param nodeId     identifier of the node
+     * @param attachment {@code true} if the content should be sent as a download attachment
+     * @return the streamed content wrapped as an {@link InputStreamResource}
+     */
     public ResponseEntity<InputStreamResource> getNodeContent(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId,
@@ -147,7 +195,7 @@ public class VaultApiController {
 
         log.debug("Streaming node content for node: {}", nodeId);
 
-        val nodeContent = vaultService.getNodeContent(nodeId);
+        val nodeContent = contentService.getNodeContent(nodeId);
 
         val headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(nodeContent.getContentType()));
@@ -178,6 +226,14 @@ public class VaultApiController {
                             content = @Content)
             })
     @SneakyThrows
+    /**
+     * Restores a node previously archived in the vault.
+     *
+     * @param auth               optional Basic authentication header
+     * @param nodeId             identifier of the node to restore
+     * @param restorePermissions {@code true} to also restore permissions
+     * @return a textual confirmation message
+     */
     public ResponseEntity<?> restoreNode(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId,
@@ -207,6 +263,13 @@ public class VaultApiController {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
+    /**
+     * Archives an Alfresco node and removes it from the repository.
+     *
+     * @param auth   optional Basic authentication header
+     * @param nodeId identifier of the node to archive
+     * @return a confirmation message
+     */
     public ResponseEntity<?> archiveNode(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
