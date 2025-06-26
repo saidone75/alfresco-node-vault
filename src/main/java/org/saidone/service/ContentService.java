@@ -29,4 +29,8 @@ public interface ContentService {
 
     NodeContent getNodeContent(String nodeId);
 
+    void deleteFileById(String nodeId);
+
+    String computeHash(String nodeId, String algorithm);
+
 }

@@ -57,7 +57,7 @@ public class VaultService extends BaseComponent {
 
     private final AlfrescoService alfrescoService;
     private final MongoNodeRepositoryImpl mongoNodeRepository;
-    private final GridFsRepositoryImpl gridFsRepository;
+    private final ContentService contentService;
 
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
@@ -66,35 +66,6 @@ public class VaultService extends BaseComponent {
 
     private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
 
-    /**
-     * Archives the content of the given node by saving the content stream into a GridFS repository
-     * with associated metadata. The input stream is wrapped in a DigestInputStream to compute a checksum
-     * using the configured checksum algorithm during the save operation. After saving, the method also
-     * updates the file metadata with the checksum algorithm and the computed checksum value.
-     *
-     * @param node        the node whose content is to be archived
-     * @param inputStream the input stream of the node's content to be saved and checksummed
-     */
-    @SneakyThrows
-    private void archiveNodeContent(Node node, InputStream inputStream) {
-        try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
-            gridFsRepository.saveFile(
-                    digestInputStream,
-                    node.getName(),
-                    node.getContent().getMimeType(),
-                    new HashMap<>() {{
-                        put(MetadataKeys.UUID, node.getId());
-                    }});
-            val hash = digestInputStream.getHash();
-            log.trace("{}: {}", checksumAlgorithm, hash);
-            gridFsRepository.updateFileMetadata(
-                    node.getId(),
-                    new HashMap<>() {{
-                        put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
-                        put(MetadataKeys.CHECKSUM_VALUE, hash);
-                    }});
-        }
-    }
 
     /**
      * Archives a node by its ID.
@@ -117,7 +88,7 @@ public class VaultService extends BaseComponent {
                     nodeId,
                     node.getContent().getSizeInBytes());
             mongoNodeRepository.save(new NodeWrapper(node));
-            archiveNodeContent(node, nodeContentInputStream);
+            contentService.archiveNodeContent(node, nodeContentInputStream);
             if (doubleCheck) doubleCheck(nodeId);
             alfrescoService.deleteNode(nodeId);
         } catch (FeignException.NotFound e) {
@@ -127,7 +98,7 @@ public class VaultService extends BaseComponent {
             // rollback
             log.debug("Rollback required for node: {}", nodeId);
             mongoNodeRepository.deleteById(nodeId);
-            gridFsRepository.deleteFileById(nodeId);
+            contentService.deleteFileById(nodeId);
             throw new VaultException(String.format("Error archiving node %s: %s", nodeId, e.getMessage()));
         }
     }
@@ -161,28 +132,6 @@ public class VaultService extends BaseComponent {
     }
 
     /**
-     * Retrieves the content of a node stored in GridFS by node ID.
-     *
-     * @param nodeId the ID of the node
-     * @return the NodeContent containing file name, content type, length, and content stream
-     * @throws NodeNotFoundOnVaultException if the node content is not found in the vault
-     */
-    public NodeContent getNodeContent(String nodeId) {
-        val gridFSFile = gridFsRepository.findFileById(nodeId);
-        if (gridFSFile == null) {
-            throw new NodeNotFoundOnVaultException(nodeId);
-        }
-        val nodeContent = new NodeContent();
-        nodeContent.setFileName(gridFSFile.getFilename());
-        if (gridFSFile.getMetadata() != null && gridFSFile.getMetadata().containsKey(MetadataKeys.CONTENT_TYPE)) {
-            nodeContent.setContentType(gridFSFile.getMetadata().getString(MetadataKeys.CONTENT_TYPE));
-        }
-        nodeContent.setLength(gridFSFile.getLength());
-        nodeContent.setContentStream(gridFsRepository.getFileContent(gridFSFile));
-        return nodeContent;
-    }
-
-    /**
      * Restores a node from the vault back to Alfresco.
      * <p>
      * Restores node metadata and content, optionally restoring permissions,
@@ -198,7 +147,7 @@ public class VaultService extends BaseComponent {
     public String restoreNode(String nodeId, boolean restorePermissions) throws JsonProcessingException {
         val nodeWrapper = getNodeWrapper(nodeId);
         val newNodeId = alfrescoService.restoreNode(nodeWrapper.getNode(), restorePermissions);
-        alfrescoService.restoreNodeContent(newNodeId, getNodeContent(nodeId));
+        alfrescoService.restoreNodeContent(newNodeId, contentService.getNodeContent(nodeId));
         nodeWrapper.setRestored(true);
         mongoNodeRepository.save(nodeWrapper);
         return newNodeId;
@@ -217,7 +166,7 @@ public class VaultService extends BaseComponent {
         log.debug("Comparing {} hashes for node: {}", DOUBLE_CHECK_ALGORITHM, nodeId);
         try {
             val alfrescoHash = alfrescoService.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
-            val mongoHash = gridFsRepository.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
+            val mongoHash = contentService.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
             if (alfrescoHash.equals(mongoHash)) {
                 log.debug("Digest check passed for node: {}", nodeId);
             } else {
