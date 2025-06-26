@@ -14,4 +14,5 @@ org.saidone.model.alfresco
 org.saidone.monitor
 org.saidone.repository
 org.saidone.service
+org.saidone.service.crypto
 org.saidone.utils
