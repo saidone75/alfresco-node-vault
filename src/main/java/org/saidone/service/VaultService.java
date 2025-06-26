@@ -21,7 +21,6 @@ package org.saidone.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.Node;
@@ -30,18 +29,11 @@ import org.saidone.exception.HashesMismatchException;
 import org.saidone.exception.NodeNotFoundOnAlfrescoException;
 import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.exception.VaultException;
-import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.misc.ProgressTrackingInputStream;
-import org.saidone.model.MetadataKeys;
-import org.saidone.model.NodeContent;
 import org.saidone.model.NodeWrapper;
-import org.saidone.repository.GridFsRepositoryImpl;
 import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.io.InputStream;
-import java.util.HashMap;
 
 /**
  * Service responsible for archiving, restoring, and managing nodes in the vault.

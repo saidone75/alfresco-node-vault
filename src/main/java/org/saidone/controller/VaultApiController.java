@@ -34,6 +34,7 @@ import org.saidone.exception.NodeNotFoundException;
 import org.saidone.exception.VaultException;
 import org.saidone.model.Entry;
 import org.saidone.service.AuthenticationService;
+import org.saidone.service.ContentService;
 import org.saidone.service.VaultService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -50,6 +51,7 @@ import org.springframework.web.bind.annotation.*;
 public class VaultApiController {
 
     private final VaultService vaultService;
+    private final ContentService contentService;
     private final AuthenticationService authenticationService;
 
     @ExceptionHandler(Exception.class)
@@ -147,7 +149,7 @@ public class VaultApiController {
 
         log.debug("Streaming node content for node: {}", nodeId);
 
-        val nodeContent = vaultService.getNodeContent(nodeId);
+        val nodeContent = contentService.getNodeContent(nodeId);
 
         val headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(nodeContent.getContentType()));
