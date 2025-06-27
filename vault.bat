@@ -9,7 +9,7 @@ SET DOCKER_COMPOSE=docker-compose ^
 
 REM Check parameter
 IF "%~1"=="" (
-    echo Usage: %~nx0 {build|build_start|start|stop|purge|tail} [novault]
+    echo Usage: %~nx0 {build^|build_start^|start^|stop^|purge^|tail} [novault]
     GOTO END
 )
 
