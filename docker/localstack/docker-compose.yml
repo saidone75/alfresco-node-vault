@@ -1,0 +1,8 @@
+services:
+  localstack:
+    container_name: "${LOCALSTACK_DOCKER_NAME:-localstack-main}"
+    image: localstack/localstack
+    environment:
+      - SERVICES=s3
+    ports:
+      - "4566:4566"
