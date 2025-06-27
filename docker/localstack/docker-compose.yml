@@ -6,3 +6,6 @@ services:
       - SERVICES=s3
     ports:
       - "4566:4566"
+    volumes:
+      - ./localstack-script.sh:/etc/localstack/init/ready.d/script.sh
+      - '/var/run/docker.sock:/var/run/docker.sock'
