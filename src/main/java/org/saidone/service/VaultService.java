@@ -31,15 +31,15 @@ import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.exception.VaultException;
 import org.saidone.misc.ProgressTrackingInputStream;
 import org.saidone.model.NodeWrapper;
-import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
- * Service responsible for archiving, restoring, and managing nodes in the vault.
+ * Service responsible for archiving, restoring and managing nodes in the vault.
  * <p>
- * This service interacts with Alfresco to retrieve nodes and their content,
- * stores node metadata in MongoDB, and stores node content in GridFS.
+ * It interacts with Alfresco to retrieve nodes and their binaries while
+ * persisting metadata and content through the configured
+ * {@link NodeService} and {@link ContentService} implementations.
  * </p>
  */
 @Service
@@ -59,9 +59,10 @@ public class VaultService extends BaseComponent {
     /**
      * Archives a node by its ID.
      * <p>
-     * Retrieves the node and its content from Alfresco, saves metadata to MongoDB,
-     * stores the content in GridFS with checksum metadata, optionally performs a double-check
-     * of the checksum, and finally deletes the node from Alfresco.
+     * Retrieves the node and its content from Alfresco, stores metadata and
+     * binaries through the configured services with checksum information,
+     * optionally verifies the checksum and finally deletes the source node
+     * from Alfresco.
      * </p>
      *
      * @param nodeId the ID of the node to archive
@@ -93,10 +94,10 @@ public class VaultService extends BaseComponent {
     }
 
     /**
-     * Retrieves the wrapped node metadata from MongoDB by node ID.
+     * Retrieves the wrapped node metadata from the vault by node ID.
      *
      * @param nodeId the ID of the node
-     * @return the NodeWrapper containing node metadata
+     * @return the {@link NodeWrapper} containing node metadata
      * @throws NodeNotFoundOnVaultException if the node is not found in the vault
      */
     private NodeWrapper getNodeWrapper(String nodeId) {
@@ -119,7 +120,7 @@ public class VaultService extends BaseComponent {
      * Restores a node from the vault back to Alfresco.
      * <p>
      * Restores node metadata and content, optionally restoring permissions,
-     * and marks the node as restored in MongoDB.
+     * and marks the node as restored in the vault.
      * </p>
      *
      * @param nodeId             the ID of the node to restore
@@ -138,12 +139,14 @@ public class VaultService extends BaseComponent {
     }
 
     /**
-     * Performs a consistency check by comparing the cryptographic hashes of a node's content retrieved from both Alfresco and MongoDB storage systems
-     * using the specified algorithm. If the hashes match, the method logs a successful comparison. If a mismatch is detected, a {@link HashesMismatchException}
-     * is thrown. Any exception that occurs during hash computation is wrapped and rethrown as a {@link VaultException}.
+     * Performs a consistency check by comparing the cryptographic hashes of a node's
+     * content retrieved from both Alfresco and the vault storage using the specified
+     * algorithm. If the hashes match, a successful comparison is logged. If a mismatch
+     * is detected, a {@link HashesMismatchException} is thrown. Any exception occurring
+     * during hash computation is wrapped and rethrown as a {@link VaultException}.
      *
      * @param nodeId the unique identifier of the node whose content will be checked
-     * @throws HashesMismatchException if the computed hashes from Alfresco and MongoDB do not match
+     * @throws HashesMismatchException if the computed hashes from Alfresco and the vault do not match
      * @throws VaultException          if any error occurs during hash calculation or comparison
      */
     public void doubleCheck(String nodeId) {
