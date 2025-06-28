@@ -22,7 +22,6 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-@Service
 @RequiredArgsConstructor
 @Slf4j
 public class S3ContentService implements ContentService {
@@ -78,7 +77,7 @@ public class S3ContentService implements ContentService {
             nodeContent.setLength(head.contentLength());
             nodeContent.setContentStream(object);
             return nodeContent;
-        } catch (NoSuchKeyException | S3Exception e) {
+        } catch (S3Exception e) {
             throw new NodeNotFoundOnVaultException(nodeId);
         }
     }
@@ -108,7 +107,7 @@ public class S3ContentService implements ContentService {
                 dis.transferTo(OutputStream.nullOutputStream());
                 return dis.getHash();
             }
-        } catch (NoSuchKeyException | S3Exception e) {
+        } catch (S3Exception e) {
             throw new NodeNotFoundOnVaultException(nodeId);
         }
     }
