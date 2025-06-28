@@ -20,12 +20,33 @@ package org.saidone.service;
 
 import org.saidone.model.NodeWrapper;
 
+/**
+ * Service abstraction for persisting and retrieving node metadata within the
+ * vault. Implementations typically store {@link NodeWrapper} instances in a
+ * backing store such as MongoDB.
+ */
 public interface NodeService {
 
+    /**
+     * Persists the given wrapped node metadata.
+     *
+     * @param node the node wrapper to store
+     */
     void save(NodeWrapper node);
 
+    /**
+     * Retrieves a node wrapper by its identifier.
+     *
+     * @param nodeId the Alfresco node identifier
+     * @return the stored {@link NodeWrapper}
+     */
     NodeWrapper findById(String nodeId);
 
+    /**
+     * Removes the stored node metadata identified by the given ID.
+     *
+     * @param nodeId the Alfresco node identifier
+     */
     void deleteById(String nodeId);
 
 }
