@@ -20,10 +20,13 @@ public class S3Config {
 
     @Bean
     public S3Client s3Client() {
+        /*
         S3Client.Builder builder = S3Client.builder().region(Region.of(region));
         if (endpoint != null && !endpoint.isBlank()) {
             builder.endpointOverride(URI.create(endpoint));
         }
         return builder.build();
+         */
+        return null;
     }
 }

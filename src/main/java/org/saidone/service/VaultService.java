@@ -48,7 +48,7 @@ import org.springframework.stereotype.Service;
 public class VaultService extends BaseComponent {
 
     private final AlfrescoService alfrescoService;
-    private final MongoNodeRepositoryImpl mongoNodeRepository;
+    private final NodeService nodeService;
     private final ContentService contentService;
 
     @Value("${application.service.vault.double-check}")
@@ -76,7 +76,7 @@ public class VaultService extends BaseComponent {
                     alfrescoService.getNodeContent(nodeId),
                     nodeId,
                     node.getContent().getSizeInBytes());
-            mongoNodeRepository.save(new NodeWrapper(node));
+            nodeService.save(new NodeWrapper(node));
             contentService.archiveNodeContent(node, nodeContentInputStream);
             if (doubleCheck) doubleCheck(nodeId);
             alfrescoService.deleteNode(nodeId);
@@ -86,7 +86,7 @@ public class VaultService extends BaseComponent {
             log.trace(e.getMessage(), e);
             // rollback
             log.debug("Rollback required for node: {}", nodeId);
-            mongoNodeRepository.deleteById(nodeId);
+            nodeService.deleteById(nodeId);
             contentService.deleteFileById(nodeId);
             throw new VaultException(String.format("Error archiving node %s: %s", nodeId, e.getMessage()));
         }
@@ -100,12 +100,7 @@ public class VaultService extends BaseComponent {
      * @throws NodeNotFoundOnVaultException if the node is not found in the vault
      */
     private NodeWrapper getNodeWrapper(String nodeId) {
-        val nodeOptional = mongoNodeRepository.findById(nodeId);
-        if (nodeOptional.isPresent()) {
-            return nodeOptional.get();
-        } else {
-            throw new NodeNotFoundOnVaultException(nodeId);
-        }
+        return nodeService.findById(nodeId);
     }
 
     /**
@@ -138,7 +133,7 @@ public class VaultService extends BaseComponent {
         val newNodeId = alfrescoService.restoreNode(nodeWrapper.getNode(), restorePermissions);
         alfrescoService.restoreNodeContent(newNodeId, contentService.getNodeContent(nodeId));
         nodeWrapper.setRestored(true);
-        mongoNodeRepository.save(nodeWrapper);
+        nodeService.save(nodeWrapper);
         return newNodeId;
     }
 
