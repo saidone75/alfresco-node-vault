@@ -23,16 +23,53 @@ import com.mongodb.client.gridfs.model.GridFSFile;
 import java.io.InputStream;
 import java.util.Map;
 
+/**
+ * Abstraction for storing binary content in MongoDB's GridFS bucket. Provides
+ * basic CRUD operations along with helper methods for metadata management and
+ * hash calculation.
+ */
 public interface GridFsRepository {
 
+    /**
+     * Stores the provided stream as a file.
+     *
+     * @param inputStream the file content
+     * @param fileName    the file name to persist
+     * @param contentType MIME type associated with the file
+     * @param metadata    metadata key/value pairs
+     */
     void saveFile(InputStream inputStream, String fileName, String contentType, Map<String, String> metadata);
 
+    /**
+     * Updates metadata for an existing stored file.
+     *
+     * @param uuid     identifier of the file
+     * @param metadata metadata to merge with the existing entry
+     */
     void updateFileMetadata(String uuid, Map<String, String> metadata);
 
+    /**
+     * Retrieves a file descriptor by UUID.
+     *
+     * @param uuid identifier of the file
+     * @return the matching {@link GridFSFile} or {@code null}
+     */
     GridFSFile findFileById(String uuid);
 
+    /**
+     * Removes a file and its metadata from GridFS.
+     *
+     * @param uuid identifier of the file
+     */
     void deleteFileById(String uuid);
 
+    /**
+     * Calculates the cryptographic hash of a stored file.
+     *
+     * @param uuid      identifier of the file
+     * @param algorithm name of the hash algorithm (e.g. MD5 or SHA-256)
+     * @return the hexadecimal encoded hash value
+     */
     String computeHash(String uuid, String algorithm);
 
 }

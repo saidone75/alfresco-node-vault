@@ -27,18 +27,36 @@ import org.saidone.model.NodeWrapper;
 import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.stereotype.Service;
 
+/**
+ * Default {@link NodeService} implementation that persists node metadata using
+ * a {@link MongoNodeRepositoryImpl}. It throws
+ * {@link NodeNotFoundOnVaultException} when a requested node is not present in
+ * the repository.
+ */
 @RequiredArgsConstructor
 @Service
 public class MongoNodeService extends BaseComponent implements NodeService {
 
     private final MongoNodeRepositoryImpl mongoNodeRepository;
 
+    /**
+     * Saves the given node wrapper to the repository.
+     *
+     * @param nodeWrapper node metadata to persist
+     */
     @Override
     @SneakyThrows
     public void save(NodeWrapper nodeWrapper) {
         mongoNodeRepository.save(nodeWrapper);
     }
 
+    /**
+     * Retrieves the stored node wrapper by its identifier.
+     *
+     * @param nodeId the Alfresco node identifier
+     * @return the stored {@link NodeWrapper}
+     * @throws NodeNotFoundOnVaultException if the node does not exist
+     */
     @Override
     public NodeWrapper findById(String nodeId) {
         val nodeOptional = mongoNodeRepository.findById(nodeId);
@@ -49,6 +67,11 @@ public class MongoNodeService extends BaseComponent implements NodeService {
         }
     }
 
+    /**
+     * Deletes the node wrapper identified by the given ID.
+     *
+     * @param nodeId the Alfresco node identifier
+     */
     @Override
     public void deleteById(String nodeId) {
         mongoNodeRepository.deleteById(nodeId);
