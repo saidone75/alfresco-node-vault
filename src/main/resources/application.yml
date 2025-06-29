@@ -131,11 +131,12 @@ application:
             iterations: 3
       audit:
         enabled: true
-    s3:
-      bucket: ${S3_BUCKET:anv}
-      region: ${S3_REGION:eu-central-1}
-      endpoint: ${S3_ENDPOINT:http://localhost:4566}
-
+      storage:
+        impl: gridfs
+        s3:
+          bucket: ${S3_BUCKET:anv}
+          region: ${S3_REGION:eu-central-1}
+          endpoint: ${S3_ENDPOINT:http://localhost:4566}
   same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
 server:
   port: 8086

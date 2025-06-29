@@ -29,6 +29,8 @@ import org.saidone.model.MetadataKeys;
 import org.saidone.model.NodeContent;
 import org.saidone.repository.GridFsRepositoryImpl;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
@@ -45,6 +47,8 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 @Service
 @Slf4j
+@ConfigurationProperties(prefix = "application.service.vault.storage")
+@ConditionalOnExpression("'${application.service.vault.storage.impl:}' == 'gridfs'")
 public class GridFsContentService implements ContentService {
 
     @Value("${application.service.vault.hash-algorithm}")
