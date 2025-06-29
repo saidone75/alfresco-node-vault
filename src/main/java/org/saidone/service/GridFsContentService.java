@@ -56,16 +56,16 @@ public class GridFsContentService implements ContentService {
 
     private final GridFsRepositoryImpl gridFsRepository;
 
-    @Override
     /**
      * Archives the content of the given node by saving the content stream into a GridFS repository
-     * with associated metadata. The input stream is wrapped in a DigestInputStream to compute a checksum
-     * using the configured checksum algorithm during the save operation. After saving, the method also
-     * updates the file metadata with the checksum algorithm and the computed checksum value.
+     * with associated metadata. The input stream is wrapped in a {@link AnvDigestInputStream} to
+     * compute a checksum using the configured algorithm during the save operation. After saving, the
+     * method updates the file metadata with both the algorithm name and the computed value.
      *
      * @param node        the node whose content is to be archived
      * @param inputStream the input stream of the node's content to be saved and checksummed
      */
+    @Override
     @SneakyThrows
     public void archiveNodeContent(Node node, InputStream inputStream) {
         try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
@@ -87,14 +87,14 @@ public class GridFsContentService implements ContentService {
         }
     }
 
-    @Override
     /**
      * Retrieves the content of a node stored in GridFS by node ID.
      *
      * @param nodeId the ID of the node
-     * @return the NodeContent containing file name, content type, length, and content stream
+     * @return the {@link NodeContent} containing file name, content type, length and the content stream
      * @throws NodeNotFoundOnVaultException if the node content is not found in the vault
      */
+    @Override
     public NodeContent getNodeContent(String nodeId) {
         val gridFSFile = gridFsRepository.findFileById(nodeId);
         if (gridFSFile == null) {
