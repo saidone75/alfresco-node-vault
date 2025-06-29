@@ -31,6 +31,7 @@ import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.exception.VaultException;
 import org.saidone.misc.ProgressTrackingInputStream;
 import org.saidone.model.NodeWrapper;
+import org.saidone.service.content.ContentService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 

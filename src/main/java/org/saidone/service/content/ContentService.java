@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.service;
+package org.saidone.service.content;
 
 import org.alfresco.core.model.Node;
 import org.saidone.model.NodeContent;
