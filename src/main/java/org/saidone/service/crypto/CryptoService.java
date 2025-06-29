@@ -20,14 +20,46 @@ package org.saidone.service.crypto;
 
 import java.io.InputStream;
 
+/**
+ * Abstraction for symmetric encryption and decryption services.
+ * <p>
+ * Implementations such as {@link JcaCryptoServiceImpl} and
+ * {@link BcCryptoServiceImpl} perform stream based encryption using
+ * authenticated cipher modes. Returned {@link InputStream} instances must be
+ * consumed and closed by the caller.
+ */
 public interface CryptoService {
 
+    /**
+     * Encrypts the provided data stream.
+     *
+     * @param inputStream plaintext data to encrypt
+     * @return a stream containing the encrypted data
+     */
     InputStream encrypt(InputStream inputStream);
 
+    /**
+     * Decrypts an encrypted data stream.
+     *
+     * @param inputStream the encrypted data
+     * @return a stream yielding the decrypted plaintext
+     */
     InputStream decrypt(InputStream inputStream);
 
+    /**
+     * Encrypts a text value and returns the Base64 encoded result.
+     *
+     * @param text the text to encrypt
+     * @return encrypted text encoded in Base64
+     */
     String encryptText(String text);
 
+    /**
+     * Decrypts a Base64 encoded encrypted text value.
+     *
+     * @param encryptedText the Base64 encoded encrypted text
+     * @return the decrypted plain text
+     */
     String decryptText(String encryptedText);
 
 }

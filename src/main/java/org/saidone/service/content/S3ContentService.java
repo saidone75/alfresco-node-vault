@@ -32,7 +32,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
@@ -40,7 +39,6 @@ import software.amazon.awssdk.services.s3.model.*;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -58,12 +56,12 @@ public class S3ContentService implements ContentService {
     @Override
     @SneakyThrows
     public void archiveNodeContent(Node node, InputStream inputStream) {
-        Map<String, String> metadata = new HashMap<>();
+        val metadata = new HashMap<String, String>();
         metadata.put(MetadataKeys.UUID, node.getId());
-        metadata.put("filename", node.getName());
+        metadata.put(MetadataKeys.FILENAME, node.getName());
         metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
         try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
-            PutObjectRequest putRequest = PutObjectRequest.builder()
+            val putRequest = PutObjectRequest.builder()
                     .bucket(s3Config.getBucket())
                     .key(node.getId())
                     .contentType(node.getContent().getMimeType())
@@ -71,11 +69,11 @@ public class S3ContentService implements ContentService {
                     .build();
             s3Client.putObject(putRequest,
                     RequestBody.fromInputStream(digestInputStream, node.getContent().getSizeInBytes()));
-            String hash = digestInputStream.getHash();
+            val hash = digestInputStream.getHash();
             log.trace("{}: {}", checksumAlgorithm, hash);
             metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
             metadata.put(MetadataKeys.CHECKSUM_VALUE, hash);
-            CopyObjectRequest copyRequest = CopyObjectRequest.builder()
+            val copyRequest = CopyObjectRequest.builder()
                     .copySource(s3Config.getBucket() + "/" + node.getId())
                     .bucket(s3Config.getBucket())
                     .key(node.getId())
@@ -90,11 +88,11 @@ public class S3ContentService implements ContentService {
     @Override
     public NodeContent getNodeContent(String nodeId) {
         try {
-            HeadObjectResponse head = s3Client.headObject(HeadObjectRequest.builder()
+            val head = s3Client.headObject(HeadObjectRequest.builder()
                     .bucket(s3Config.getBucket()).key(nodeId).build());
-            ResponseInputStream<GetObjectResponse> object = s3Client.getObject(GetObjectRequest.builder()
+            val object = s3Client.getObject(GetObjectRequest.builder()
                     .bucket(s3Config.getBucket()).key(nodeId).build());
-            NodeContent nodeContent = new NodeContent();
+            val nodeContent = new NodeContent();
             nodeContent.setFileName(head.metadata().getOrDefault("filename", nodeId));
             nodeContent.setContentType(head.contentType());
             nodeContent.setLength(head.contentLength());
@@ -115,16 +113,6 @@ public class S3ContentService implements ContentService {
     @SneakyThrows
     public String computeHash(String nodeId, String algorithm) {
         try {
-            HeadObjectResponse head = s3Client.headObject(HeadObjectRequest.builder()
-                    .bucket(s3Config.getBucket()).key(nodeId).build());
-            Map<String, String> meta = head.metadata();
-            if (meta != null) {
-                String storedAlg = meta.get(MetadataKeys.CHECKSUM_ALGORITHM);
-                String storedVal = meta.get(MetadataKeys.CHECKSUM_VALUE);
-                if (storedAlg != null && storedAlg.equalsIgnoreCase(algorithm) && storedVal != null) {
-                    return storedVal;
-                }
-            }
             try (val dis = new AnvDigestInputStream(s3Client.getObject(GetObjectRequest.builder()
                     .bucket(s3Config.getBucket()).key(nodeId).build()), algorithm)) {
                 dis.transferTo(OutputStream.nullOutputStream());

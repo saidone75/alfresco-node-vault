@@ -5,6 +5,8 @@ import lombok.val;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 
@@ -21,9 +23,13 @@ public class S3Config {
 
     @Bean
     public S3Client s3Client() {
-        val builder = S3Client.builder().region(Region.of(region));
+        val builder = S3Client.builder().region(Region.of(region)).forcePathStyle(true);
         if (endpoint != null && !endpoint.isBlank()) {
             builder.endpointOverride(URI.create(endpoint));
+            if (endpoint.contains("localhost")) {
+                builder.credentialsProvider(StaticCredentialsProvider.create(
+                        AwsBasicCredentials.create("test", "test")));
+            }
         }
         return builder.build();
     }
