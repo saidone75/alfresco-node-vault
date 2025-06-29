@@ -1,4 +1,22 @@
-package org.saidone.service;
+/*
+ *  Alfresco Node Vault - archive today, accelerate tomorrow
+ *  Copyright (C) 2025 Saidone
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.saidone.service.content;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -11,6 +29,8 @@ import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
 import org.saidone.model.NodeContent;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
@@ -22,8 +42,11 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+@Service
 @RequiredArgsConstructor
 @Slf4j
+@ConfigurationProperties(prefix = "application.service.vault.storage")
+@ConditionalOnExpression("'${application.service.vault.storage.impl:}' == 's3'")
 public class S3ContentService implements ContentService {
 
     @Value("${application.service.vault.hash-algorithm}")
@@ -111,4 +134,5 @@ public class S3ContentService implements ContentService {
             throw new NodeNotFoundOnVaultException(nodeId);
         }
     }
+
 }

@@ -34,7 +34,7 @@ import org.saidone.exception.NodeNotFoundException;
 import org.saidone.exception.VaultException;
 import org.saidone.model.Entry;
 import org.saidone.service.AuthenticationService;
-import org.saidone.service.ContentService;
+import org.saidone.service.content.ContentService;
 import org.saidone.service.VaultService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -47,7 +47,7 @@ import org.springframework.web.bind.annotation.*;
  * REST controller that exposes operations for interacting with the vault.
  * <p>
  * All endpoints require basic authentication and delegate the heavy lifting to
- * {@link org.saidone.service.VaultService} and {@link org.saidone.service.ContentService}.
+ * {@link org.saidone.service.VaultService} and {@link ContentService}.
  * </p>
  */
 @RestController
