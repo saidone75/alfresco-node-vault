@@ -45,6 +45,15 @@ import java.util.HashMap;
 @Slf4j
 @ConfigurationProperties(prefix = "application.service.vault.storage")
 @ConditionalOnExpression("'${application.service.vault.storage.impl:}' == 's3'")
+/**
+ * {@link ContentService} implementation that stores node binaries in an Amazon S3 bucket.
+ * <p>
+ * Node content streams are uploaded as objects and checksums are calculated on the fly.
+ * The computed hash and other metadata are then stored alongside the object. This
+ * service is enabled when the configuration property
+ * {@code application.service.vault.storage.impl} is set to {@code s3}.
+ * </p>
+ */
 public class S3ContentService implements ContentService {
 
     @Value("${application.service.vault.hash-algorithm}")
@@ -53,6 +62,16 @@ public class S3ContentService implements ContentService {
     private final S3Client s3Client;
     private final S3Config s3Config;
 
+    /**
+     * Archives the content of the given node by uploading it to the configured
+     * S3 bucket. The stream is wrapped in an {@link AnvDigestInputStream} so
+     * that a checksum can be calculated during the upload. After storing the
+     * object, the computed hash along with additional metadata is written back
+     * to the object using a second copy operation.
+     *
+     * @param node        the node whose content should be archived
+     * @param inputStream stream providing the node binary
+     */
     @Override
     @SneakyThrows
     public void archiveNodeContent(Node node, InputStream inputStream) {
@@ -85,6 +104,13 @@ public class S3ContentService implements ContentService {
         }
     }
 
+    /**
+     * Retrieves a node's content from S3.
+     *
+     * @param nodeId the identifier of the node
+     * @return the {@link NodeContent} descriptor with stream and metadata
+     * @throws NodeNotFoundOnVaultException if the object does not exist in S3
+     */
     @Override
     public NodeContent getNodeContent(String nodeId) {
         try {
@@ -103,12 +129,28 @@ public class S3ContentService implements ContentService {
         }
     }
 
+    /**
+     * Deletes the object associated with the given node id from the S3 bucket.
+     *
+     * @param nodeId id of the node whose content should be removed
+     */
     @Override
     public void deleteFileById(String nodeId) {
         s3Client.deleteObject(DeleteObjectRequest.builder()
                 .bucket(s3Config.getBucket()).key(nodeId).build());
     }
 
+    /**
+     * Computes the checksum of a stored object using the requested algorithm.
+     * If the checksum is already present in the object's metadata and matches
+     * the algorithm, that value is returned. Otherwise the object is streamed
+     * to calculate the hash.
+     *
+     * @param nodeId    identifier of the node
+     * @param algorithm name of the hash algorithm
+     * @return the resulting hash string
+     * @throws NodeNotFoundOnVaultException if the object cannot be found
+     */
     @Override
     @SneakyThrows
     public String computeHash(String nodeId, String algorithm) {
