@@ -23,11 +23,13 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.Node;
+import org.saidone.component.BaseComponent;
 import org.saidone.config.S3Config;
 import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
 import org.saidone.model.NodeContent;
+import org.saidone.service.crypto.CryptoService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -37,8 +39,7 @@ import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -47,7 +48,7 @@ import java.util.Map;
 @Slf4j
 @ConfigurationProperties(prefix = "application.service.vault.storage")
 @ConditionalOnExpression("'${application.service.vault.storage.impl:}' == 's3'")
-public class S3ContentService implements ContentService {
+public class S3ContentService extends BaseComponent implements ContentService {
 
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
@@ -58,23 +59,44 @@ public class S3ContentService implements ContentService {
     @Override
     @SneakyThrows
     public void archiveNodeContent(Node node, InputStream inputStream) {
-        Map<String, String> metadata = new HashMap<>();
+        val metadata = new HashMap<String, String>();
         metadata.put(MetadataKeys.UUID, node.getId());
-        metadata.put("filename", node.getName());
+        metadata.put(MetadataKeys.FILENAME, node.getName());
         metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
-        try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
+
+        var tempFile = (File) null;
+
+        try {
+            // 1. Crea un file temporaneo
+            tempFile = File.createTempFile("upload-", ".tmp");
+
+            // 2. Scrive lo stream sul file e calcola l'hash in una passata
+            String hash;
+            try (OutputStream out = new FileOutputStream(tempFile);
+                 AnvDigestInputStream digestStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
+
+                long copied = digestStream.transferTo(out);
+                hash = digestStream.getHash();
+                log.trace("{}: {}", checksumAlgorithm, hash);
+
+                metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
+                metadata.put(MetadataKeys.CHECKSUM_VALUE, hash);
+            }
+
+            // 3. Prepara la richiesta S3 con lunghezza
             PutObjectRequest putRequest = PutObjectRequest.builder()
                     .bucket(s3Config.getBucket())
                     .key(node.getId())
                     .contentType(node.getContent().getMimeType())
                     .metadata(metadata)
                     .build();
-            s3Client.putObject(putRequest,
-                    RequestBody.fromInputStream(digestInputStream, node.getContent().getSizeInBytes()));
-            String hash = digestInputStream.getHash();
-            log.trace("{}: {}", checksumAlgorithm, hash);
-            metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
-            metadata.put(MetadataKeys.CHECKSUM_VALUE, hash);
+
+            try (InputStream fileInputStream = new FileInputStream(tempFile)) {
+                s3Client.putObject(putRequest, RequestBody.fromInputStream(fileInputStream, tempFile.length()));
+            }
+
+            // 4. Copia con metadati aggiornati
+
             CopyObjectRequest copyRequest = CopyObjectRequest.builder()
                     .copySource(s3Config.getBucket() + "/" + node.getId())
                     .bucket(s3Config.getBucket())
@@ -83,9 +105,26 @@ public class S3ContentService implements ContentService {
                     .metadataDirective(MetadataDirective.REPLACE)
                     .contentType(node.getContent().getMimeType())
                     .build();
+
+
+
             s3Client.copyObject(copyRequest);
+
+
+
+        } catch (IOException e) {
+            throw new UncheckedIOException("Error archiving node content", e);
+        } finally {
+            // 5. Pulisce il file temporaneo
+            if (tempFile != null && tempFile.exists()) {
+                boolean deleted = tempFile.delete();
+                if (!deleted) {
+                    log.warn("Could not delete temporary file: {}", tempFile.getAbsolutePath());
+                }
+            }
         }
     }
+
 
     @Override
     public NodeContent getNodeContent(String nodeId) {
