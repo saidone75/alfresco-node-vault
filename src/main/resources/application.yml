@@ -132,7 +132,7 @@ application:
       audit:
         enabled: true
       storage:
-        impl: gridfs
+        impl: s3
         s3:
           bucket: ${S3_BUCKET:anv}
           region: ${S3_REGION:eu-central-1}
