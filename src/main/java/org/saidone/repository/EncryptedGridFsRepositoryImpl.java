@@ -36,9 +36,10 @@ import java.io.OutputStream;
 import java.util.Map;
 
 /**
- * Repository implementation for storing and retrieving files in GridFS with encryption support.
- * This implementation encrypts files before saving and decrypts them when reading,
- * based on the encryption enabled property.
+ * GridFS repository that transparently encrypts content before it is persisted
+ * and decrypts it when retrieved. The behaviour is enabled only when the
+ * {@code application.service.vault.encryption.enabled} property is set to
+ * {@code true}.
  */
 @Repository
 @ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "true")

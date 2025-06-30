@@ -31,10 +31,10 @@ import java.util.Arrays;
 import java.util.Base64;
 
 /**
- * Abstract base class implementing cryptographic operations using different key derivation functions
- * Extends BaseComponent for lifecycle management and implements CryptoService interface
- * Supports PBKDF2, HKDF and Argon2 key derivation functions
- * Contains inner configuration classes for each KDF type with validation constraints
+ * Base implementation for {@link CryptoService} that provides common
+ * functionality for the concrete encryption services. It offers helper methods
+ * to derive secret keys using PBKDF2, HKDF or Argon2 and defines configuration
+ * beans for the supported key derivation algorithms.
  */
 @Setter
 public abstract class AbstractCryptoService extends BaseComponent implements CryptoService {
