@@ -26,51 +26,78 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HexFormat;
 
 /**
- * AnvDigestInputStream is a specialized {@link FilterInputStream} that computes a cryptographic digest
- * of the data as it is read from the underlying {@link InputStream}.
+ * {@code AnvDigestInputStream} wraps another {@link InputStream} and computes a
+ * message digest while the data is read.
  * <p>
- * The digest is updated incrementally with each read operation using the specified algorithm (such as "SHA-256" or "MD5").
- * Once the stream has been fully read, the computed digest value can be retrieved as a hexadecimal string via {@link #getHash()}.
- * <p>
- * Typical use cases include automatic hash calculation (checksum or fingerprint) for content verification
- * during streaming or processing of large files without needing to load all data into memory.
+ * The digest algorithm is provided at construction time and each read operation
+ * updates the underlying {@link MessageDigest}. When the stream has been
+ * consumed the final hash value can be obtained via {@link #getHash()}.
+ * This utility is typically used when a checksum or fingerprint of the streamed
+ * content is required without buffering the entire input in memory.
  */
 public class AnvDigestInputStream extends FilterInputStream {
 
     private final MessageDigest digest;
 
+    /**
+     * Creates a new digesting stream using the supplied algorithm.
+     *
+     * @param inputStream the underlying stream to read
+     * @param algorithm   name of the {@link MessageDigest} algorithm
+     * @throws NoSuchAlgorithmException if the algorithm is not available
+     */
     public AnvDigestInputStream(InputStream inputStream, String algorithm) throws NoSuchAlgorithmException {
         super(inputStream);
         this.digest = MessageDigest.getInstance(algorithm);
     }
 
+    /**
+     * Creates a digesting stream that performs no hashing.  This constructor is
+     * mainly useful when the same type is required but hashing is disabled.
+     *
+     * @param inputStream the underlying stream
+     */
+    public AnvDigestInputStream(InputStream inputStream) throws NoSuchAlgorithmException {
+        super(inputStream);
+        digest = null;
+    }
+
+    /** {@inheritDoc} */
     @Override
     public int read() throws IOException {
         int byteRead = in.read();
         if (byteRead != -1) {
-            digest.update((byte) byteRead);
+            if (digest != null) digest.update((byte) byteRead);
         }
         return byteRead;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int read(byte[] b) throws IOException {
         int bytesRead = in.read(b);
         if (bytesRead != -1) {
-            digest.update(b, 0, bytesRead);
+            if (digest != null) digest.update(b, 0, bytesRead);
         }
         return bytesRead;
     }
 
+    /** {@inheritDoc} */
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         int bytesRead = in.read(b, off, len);
         if (bytesRead != -1) {
-            digest.update(b, off, bytesRead);
+            if (digest != null) digest.update(b, off, bytesRead);
         }
         return bytesRead;
     }
 
+    /**
+     * Returns the computed hash as a lowercase hexadecimal string. This method
+     * should be called once the stream has been fully consumed.
+     *
+     * @return the digest of the read bytes
+     */
     public String getHash() {
         return HexFormat.of().formatHex(digest.digest());
     }

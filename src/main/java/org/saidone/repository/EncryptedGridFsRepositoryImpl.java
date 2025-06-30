@@ -24,6 +24,7 @@ import lombok.val;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
 import org.saidone.service.crypto.CryptoService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
@@ -35,9 +36,10 @@ import java.io.OutputStream;
 import java.util.Map;
 
 /**
- * Repository implementation for storing and retrieving files in GridFS with encryption support.
- * This implementation encrypts files before saving and decrypts them when reading,
- * based on the encryption enabled property.
+ * GridFS repository that transparently encrypts content before it is persisted
+ * and decrypts it when retrieved. The behaviour is enabled only when the
+ * {@code application.service.vault.encryption.enabled} property is set to
+ * {@code true}.
  */
 @Repository
 @ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "true")
@@ -73,8 +75,9 @@ public class EncryptedGridFsRepositoryImpl extends GridFsRepositoryImpl {
      * @param metadata    additional metadata to associate with the file
      */
     @Override
+    @SneakyThrows
     public void saveFile(InputStream inputStream, String fileName, String contentType, Map<String, String> metadata) {
-        val encryptedInputStream = cryptoService.encrypt(inputStream);
+        val encryptedInputStream = cryptoService.encrypt(new AnvDigestInputStream(inputStream));
         metadata.put(MetadataKeys.ENCRYPTED, String.valueOf(true));
         super.saveFile(encryptedInputStream, fileName, contentType, metadata);
     }

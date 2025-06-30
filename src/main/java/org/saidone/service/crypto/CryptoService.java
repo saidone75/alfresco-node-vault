@@ -18,15 +18,15 @@
 
 package org.saidone.service.crypto;
 
+import org.saidone.misc.AnvDigestInputStream;
+
 import java.io.InputStream;
 
 /**
- * Abstraction for symmetric encryption and decryption services.
- * <p>
- * Implementations such as {@link JcaCryptoServiceImpl} and
- * {@link BcCryptoServiceImpl} perform stream based encryption using
- * authenticated cipher modes. Returned {@link InputStream} instances must be
- * consumed and closed by the caller.
+ * Abstraction for stream based symmetric encryption and decryption services.
+ * Implementations return {@link InputStream} instances that must be consumed
+ * and closed by the caller. Concrete implementations include
+ * {@link JcaCryptoServiceImpl} and {@link BcCryptoServiceImpl}.
  */
 public interface CryptoService {
 
@@ -36,7 +36,7 @@ public interface CryptoService {
      * @param inputStream plaintext data to encrypt
      * @return a stream containing the encrypted data
      */
-    InputStream encrypt(InputStream inputStream);
+    InputStream encrypt(AnvDigestInputStream inputStream);
 
     /**
      * Decrypts an encrypted data stream.

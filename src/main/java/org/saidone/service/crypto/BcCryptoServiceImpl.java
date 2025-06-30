@@ -23,6 +23,7 @@ import lombok.Setter;
 import lombok.val;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.saidone.config.EncryptionConfig;
+import org.saidone.misc.AnvDigestInputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -39,24 +40,11 @@ import java.security.SecureRandom;
 import java.security.Security;
 
 /**
- * Implements symmetric encryption/decryption using ChaCha20-Poly1305 via the Bouncy Castle provider.
- * <p>
- * Key features:
- * - ChaCha20 encryption with Poly1305 authentication
- * - Configurable salt and nonce lengths
- * - Support for PBKDF2, HKDF and Argon2 key derivation
- * - Stream-based operation for efficient memory usage
- * - Base64 text encoding/decoding support
- * <p>
- * Configuration:
- * - Prefix: application.service.vault.encryption.bc
- * - Enabled when encryption.enabled=true and encryption.impl=bc
- * <p>
- * Security measures:
- * - Per-operation random salt and nonce generation
- * - Password-based key derivation with strong KDFs
- * - Authenticated encryption with Poly1305 mode
- * - Efficient processing of large data streams
+ * Cryptographic service based on the Bouncy Castle provider that performs
+ * ChaCha20-Poly1305 encryption. The bean is activated when
+ * {@code application.service.vault.encryption.impl} is set to {@code bc}.
+ * Random salt and nonce values are generated for every operation and the
+ * encryption key is derived using the configured KDF implementation.
  */
 @Service
 @Setter
@@ -103,7 +91,7 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
      * @throws RuntimeException if any error occurs during the encryption process
      */
     @Override
-    public InputStream encrypt(InputStream inputStream) {
+    public InputStream encrypt(AnvDigestInputStream inputStream) {
         try {
             // Generate random salt and nonce
             byte[] salt = new byte[saltLength];

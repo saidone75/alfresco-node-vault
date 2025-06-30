@@ -15,6 +15,7 @@ import org.bouncycastle.crypto.generators.HKDFBytesGenerator;
 import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.bouncycastle.crypto.params.HKDFParameters;
 import org.saidone.component.BaseComponent;
+import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.service.SecretService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -30,10 +31,10 @@ import java.util.Arrays;
 import java.util.Base64;
 
 /**
- * Abstract base class implementing cryptographic operations using different key derivation functions
- * Extends BaseComponent for lifecycle management and implements CryptoService interface
- * Supports PBKDF2, HKDF and Argon2 key derivation functions
- * Contains inner configuration classes for each KDF type with validation constraints
+ * Base implementation for {@link CryptoService} that provides common
+ * functionality for the concrete encryption services. It offers helper methods
+ * to derive secret keys using PBKDF2, HKDF or Argon2 and defines configuration
+ * beans for the supported key derivation algorithms.
  */
 @Setter
 public abstract class AbstractCryptoService extends BaseComponent implements CryptoService {
@@ -178,7 +179,7 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
      * @return Base64 encoded encrypted text
      */
     public String encryptText(String text) {
-        try (val is = encrypt(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8)))) {
+        try (val is = encrypt(new AnvDigestInputStream(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))))) {
             return Base64.getEncoder().encodeToString(is.readAllBytes());
         } catch (Exception e) {
             throw new RuntimeException("Error during text encryption", e);
