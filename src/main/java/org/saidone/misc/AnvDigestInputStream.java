@@ -99,7 +99,7 @@ public class AnvDigestInputStream extends FilterInputStream {
      * @return the digest of the read bytes
      */
     public String getHash() {
-        return HexFormat.of().formatHex(digest.digest());
+        return digest != null ? HexFormat.of().formatHex(digest.digest()) : null;
     }
 
 }
