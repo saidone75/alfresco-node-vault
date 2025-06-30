@@ -23,6 +23,7 @@ import lombok.Setter;
 import lombok.val;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.saidone.config.EncryptionConfig;
+import org.saidone.misc.AnvDigestInputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -103,7 +104,7 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
      * @throws RuntimeException if any error occurs during the encryption process
      */
     @Override
-    public InputStream encrypt(InputStream inputStream) {
+    public InputStream encrypt(AnvDigestInputStream inputStream) {
         try {
             // Generate random salt and nonce
             byte[] salt = new byte[saltLength];

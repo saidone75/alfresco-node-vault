@@ -44,11 +44,16 @@ public class AnvDigestInputStream extends FilterInputStream {
         this.digest = MessageDigest.getInstance(algorithm);
     }
 
+    public AnvDigestInputStream(InputStream inputStream) throws NoSuchAlgorithmException {
+        super(inputStream);
+        digest = null;
+    }
+
     @Override
     public int read() throws IOException {
         int byteRead = in.read();
         if (byteRead != -1) {
-            digest.update((byte) byteRead);
+            if (digest != null) digest.update((byte) byteRead);
         }
         return byteRead;
     }
@@ -57,7 +62,7 @@ public class AnvDigestInputStream extends FilterInputStream {
     public int read(byte[] b) throws IOException {
         int bytesRead = in.read(b);
         if (bytesRead != -1) {
-            digest.update(b, 0, bytesRead);
+            if (digest != null) digest.update(b, 0, bytesRead);
         }
         return bytesRead;
     }
@@ -66,7 +71,7 @@ public class AnvDigestInputStream extends FilterInputStream {
     public int read(byte[] b, int off, int len) throws IOException {
         int bytesRead = in.read(b, off, len);
         if (bytesRead != -1) {
-            digest.update(b, off, bytesRead);
+            if (digest != null) digest.update(b, off, bytesRead);
         }
         return bytesRead;
     }
