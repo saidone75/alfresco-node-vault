@@ -38,24 +38,11 @@ import java.nio.ByteBuffer;
 import java.security.SecureRandom;
 
 /**
- * Implements symmetric encryption/decryption using AES-GCM mode via Java Cryptography Architecture (JCA).
- * <p>
- * Key features:
- * - AES encryption in GCM authenticated mode
- * - Configurable salt and IV lengths
- * - Support for PBKDF2, HKDF and Argon2 key derivation
- * - Stream-based operation for efficient memory usage
- * - Base64 text encoding/decoding support
- * <p>
- * Configuration:
- * - Prefix: application.service.vault.encryption.jca
- * - Enabled when encryption.enabled=true and encryption.impl=jca
- * <p>
- * Security measures:
- * - Per-operation random salt and IV generation
- * - Password-based key derivation with strong KDFs
- * - Authenticated encryption with GCM mode
- * - No padding for precise size control
+ * {@link CryptoService} implementation based on the JCA provider. It encrypts
+ * and decrypts data using AES in GCM mode. The bean is active when
+ * {@code application.service.vault.encryption.impl} is set to {@code jca}.
+ * Random salt and IV values are produced for every operation and the secret key
+ * is derived using the configured KDF implementation.
  */
 @Service
 @Setter
