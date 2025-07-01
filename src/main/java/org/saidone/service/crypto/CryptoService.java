@@ -18,8 +18,6 @@
 
 package org.saidone.service.crypto;
 
-import org.saidone.misc.AnvDigestInputStream;
-
 import java.io.InputStream;
 
 /**
@@ -36,7 +34,7 @@ public interface CryptoService {
      * @param inputStream plaintext data to encrypt
      * @return a stream containing the encrypted data
      */
-    InputStream encrypt(AnvDigestInputStream inputStream);
+    InputStream encrypt(InputStream inputStream);
 
     /**
      * Decrypts an encrypted data stream.

@@ -22,7 +22,6 @@ import jakarta.validation.constraints.Min;
 import lombok.Setter;
 import lombok.val;
 import org.saidone.config.EncryptionConfig;
-import org.saidone.misc.AnvDigestInputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -83,7 +82,7 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
      * @throws RuntimeException if any error occurs during the encryption process
      */
     @Override
-    public InputStream encrypt(AnvDigestInputStream inputStream) {
+    public InputStream encrypt(InputStream inputStream) {
         try {
             // Generate random salt for PBKDF2
             byte[] salt = new byte[saltLength];

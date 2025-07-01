@@ -52,10 +52,11 @@ public class AnvDigestInputStream extends FilterInputStream {
     }
 
     /**
-     * Creates a digesting stream that performs no hashing.  This constructor is
+     * Creates a digesting stream that performs no hashing. This constructor is
      * mainly useful when the same type is required but hashing is disabled.
      *
      * @param inputStream the underlying stream
+     * @throws NoSuchAlgorithmException if the algorithm is not available
      */
     public AnvDigestInputStream(InputStream inputStream) throws NoSuchAlgorithmException {
         super(inputStream);
@@ -94,12 +95,14 @@ public class AnvDigestInputStream extends FilterInputStream {
 
     /**
      * Returns the computed hash as a lowercase hexadecimal string. This method
-     * should be called once the stream has been fully consumed.
+     * should be called once the stream has been fully consumed. If hashing was
+     * disabled via {@link #AnvDigestInputStream(InputStream)}, this method
+     * returns {@code null}.
      *
-     * @return the digest of the read bytes
+     * @return the digest of the read bytes or {@code null} if hashing is disabled
      */
     public String getHash() {
-        return HexFormat.of().formatHex(digest.digest());
+        return digest != null ? HexFormat.of().formatHex(digest.digest()) : null;
     }
 
 }

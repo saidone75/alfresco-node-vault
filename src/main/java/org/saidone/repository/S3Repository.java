@@ -16,18 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.exception;
+package org.saidone.repository;
 
-/**
- * Exception thrown when a node's checksum stored in Alfresco does not match the
- * value stored in the vault.
- */
-public class HashesMismatchException extends VaultException {
-    public HashesMismatchException(String alfrescoHash, String vaultHash) {
-        super("""
-                Hashes does not match:
-                Alfresco hash is %s
-                Vault    hash is %s
-                """.formatted(alfrescoHash, vaultHash));
-    }
+import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+
+import java.io.InputStream;
+
+public interface S3Repository {
+
+    void putObject(PutObjectRequest putObjectRequest, InputStream inputStream, Long size);
+
 }

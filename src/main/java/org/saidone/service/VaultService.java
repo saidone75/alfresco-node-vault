@@ -154,14 +154,14 @@ public class VaultService extends BaseComponent {
         log.debug("Comparing {} hashes for node: {}", DOUBLE_CHECK_ALGORITHM, nodeId);
         try {
             val alfrescoHash = alfrescoService.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
-            val mongoHash = contentService.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
-            if (alfrescoHash.equals(mongoHash)) {
+            val vaultHash = contentService.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
+            if (alfrescoHash.equals(vaultHash)) {
                 log.debug("Digest check passed for node: {}", nodeId);
             } else {
-                throw new HashesMismatchException(alfrescoHash, mongoHash);
+                throw new HashesMismatchException(alfrescoHash, vaultHash);
             }
         } catch (Exception e) {
-            throw new VaultException(String.format("Cannot compute hashes: %s", e.getMessage()));
+            throw new VaultException(String.format("Error while checking hashes: %s", e.getMessage()));
         }
     }
 
