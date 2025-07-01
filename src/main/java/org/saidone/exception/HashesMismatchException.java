@@ -23,11 +23,11 @@ package org.saidone.exception;
  * value stored in the vault.
  */
 public class HashesMismatchException extends VaultException {
-    public HashesMismatchException(String alfrescoHash, String mongoHash) {
+    public HashesMismatchException(String alfrescoHash, String vaultHash) {
         super("""
                 Hashes does not match:
                 Alfresco hash is %s
-                MongoDB  hash is %s
-                """.formatted(alfrescoHash, mongoHash));
+                Vault    hash is %s
+                """.formatted(alfrescoHash, vaultHash));
     }
 }
