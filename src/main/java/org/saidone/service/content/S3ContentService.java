@@ -28,6 +28,7 @@ import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
 import org.saidone.model.NodeContent;
+import org.saidone.repository.S3Repository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -50,6 +51,8 @@ public class S3ContentService implements ContentService {
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
 
+    private final S3Repository s3Repository;
+
     private final S3Client s3Client;
     private final S3Config s3Config;
 
@@ -67,8 +70,7 @@ public class S3ContentService implements ContentService {
                     .contentType(node.getContent().getMimeType())
                     .metadata(metadata)
                     .build();
-            s3Client.putObject(putRequest,
-                    RequestBody.fromInputStream(digestInputStream, node.getContent().getSizeInBytes()));
+            s3Repository.putObject(putRequest, digestInputStream, node.getContent().getSizeInBytes());
             val hash = digestInputStream.getHash();
             log.trace("{}: {}", checksumAlgorithm, hash);
             metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
