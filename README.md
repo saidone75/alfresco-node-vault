@@ -38,7 +38,7 @@ document accessibility.
 
 The application can archive nodes on-demand through a behavior or using a scheduled job.
 
-Nodes and binaries are archived on MongoDB with GridFS, ensuring efficient and scalable storage.
+Nodes and binaries are archived on MongoDB with GridFS or can be stored on AWS S3, ensuring efficient and scalable storage.
 
 The application can also act as a proxy to allow applications using REST APIs to retrieve nodes that no longer exist in
 Alfresco, ensuring operational continuity without the need to modify legacy client applications.
@@ -61,7 +61,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Fully FOSS, released under an open license
 - Custom upload and download methods
 - Scheduled or on-demand archiving
-- MongoDB storage via GridFS
+- MongoDB storage via GridFS with optional S3 backend
 - Focus on [strong encryption](doc/Encryption.md) option for both content and metadata
 - Passwords securely stored in a secret engine
 - REST API with Alfresco proxy support
@@ -93,7 +93,7 @@ Global configuration is stored in `application.yml` file, the relevant parameter
 | ARCHIVING_JOB_ENABLED         | true                                       | Archiving scheduled job switch                                      |
 | ARCHIVING_JOB_CRON_EXPRESSION | 0 0/5 2-6 * * ?                            | Scheduled job cron expression                                       |
 | ARCHIVING_JOB_QUERY           | TYPE:'cm:content' AND ASPECT:'anv:archive' | Query for selecting documents to be archived                        |
-| VAULT_HASH_ALGORITHM          | SHA-256                                    | Hash stored as metadata on GridFS                                   |
+| VAULT_HASH_ALGORITHM          | SHA-256                                    | Hash stored as metadata on GridFS or S3 object metadata            |
 | VAULT_DOUBLE_CHECK            | true                                       | Double check content integrity before removing document on Alfresco |
 | VAULT_ENCRYPTION_ENABLED      | true                                       | Enable content encryption                                           |
 | VAULT_ENCRYPT_METADATA        | true                                       | Encrypt also metadata                                               |
