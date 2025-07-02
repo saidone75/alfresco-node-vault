@@ -43,10 +43,13 @@ public class S3RepositoryImpl implements S3Repository {
 
     @Override
     public void putObject(InputStream inputStream, String bucketName, String nodeId) {
+        val clientConfig = s3Client.serviceClientConfiguration();
+        val asyncClientBuilder = S3AsyncClient.builder()
+                .region(clientConfig.region())
+                .credentialsProvider(clientConfig.credentialsProvider());
+        clientConfig.endpointOverride().ifPresent(asyncClientBuilder::endpointOverride);
         @Cleanup val transferManager = S3TransferManager.builder()
-                .s3Client(S3AsyncClient.builder()
-                        .region(Region.EU_CENTRAL_1)
-                        .build())
+                .s3Client(asyncClientBuilder.build())
                 .build();
         try {
            val metadata = new HashMap<String, String>();
