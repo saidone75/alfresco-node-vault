@@ -22,13 +22,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.Node;
+import org.saidone.model.MetadataKeys;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.http.ContentStreamProvider;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Default {@link S3Repository} implementation relying on the AWS SDK
@@ -50,17 +53,17 @@ public class S3RepositoryImpl implements S3Repository {
      * Uploads the provided stream as an object to S3. The node id is used as
      * the object key.
      *
-     * @param inputStream stream of the content to store
      * @param bucketName  destination bucket
      * @param node        node whose id acts as the key
+     * @param metadata    metadata key/value pairs to associate with the object
+     * @param inputStream stream of the content to store
      */
     @Override
-    public void putObject(InputStream inputStream, String bucketName, Node node) {
+    public void putObject(String bucketName, Node node, Map<String, String> metadata, InputStream inputStream) {
         val putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(node.getId())
-                // TODO set encrypted metadata if required
-                .metadata(new HashMap<>())
+                .metadata(metadata)
                 .build();
         s3Client.putObject(putObjectRequest, RequestBody.fromContentProvider(ContentStreamProvider.fromInputStream(inputStream), node.getContent().getMimeType()));
     }
@@ -76,8 +79,18 @@ public class S3RepositoryImpl implements S3Repository {
      */
     @Override
     public InputStream getObject(String bucketName, String nodeId) {
-        // TODO implementation
-        return null;
+        
+        return s3Client.getObject(GetObjectRequest.builder()
+                .bucket(bucketName).key(nodeId).build());
+    }
+
+    private boolean isEncrypted(String bucketName, String nodeId) {
+        val headObjectRequest = HeadObjectRequest.builder()
+                .bucket(bucketName)
+                .key(nodeId)
+                .build();
+        val metadata = s3Client.headObject(headObjectRequest).metadata();
+        return Boolean.parseBoolean(metadata.getOrDefault(MetadataKeys.ENCRYPTED, Boolean.FALSE.toString()));
     }
 
 }

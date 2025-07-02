@@ -25,6 +25,7 @@ import lombok.val;
 import org.alfresco.core.model.Node;
 import org.saidone.config.S3Config;
 import org.saidone.exception.NodeNotFoundOnVaultException;
+import org.saidone.exception.VaultException;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
 import org.saidone.model.NodeContent;
@@ -82,13 +83,14 @@ public class S3ContentService implements ContentService {
         metadata.put(MetadataKeys.FILENAME, node.getName());
         metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
         try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
-            s3Repository.putObject(digestInputStream, s3Config.getBucket(), node);
+            s3Repository.putObject(s3Config.getBucket(), node, metadata, digestInputStream);
             val hash = digestInputStream.getHash();
             log.trace("{}: {}", checksumAlgorithm, hash);
             metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
             metadata.put(MetadataKeys.CHECKSUM_VALUE, hash);
+            // FIXME try to avoid deprecated methods
             val copyRequest = CopyObjectRequest.builder()
-                    .copySource(s3Config.getBucket() + "/" + node.getId())
+                    .copySource(String.format("%s/%s", s3Config.getBucket(), node.getId()))
                     .bucket(s3Config.getBucket())
                     .key(node.getId())
                     .metadata(metadata)
@@ -114,7 +116,7 @@ public class S3ContentService implements ContentService {
             val object = s3Client.getObject(GetObjectRequest.builder()
                     .bucket(s3Config.getBucket()).key(nodeId).build());
             val nodeContent = new NodeContent();
-            nodeContent.setFileName(head.metadata().getOrDefault("filename", nodeId));
+            nodeContent.setFileName(head.metadata().getOrDefault(MetadataKeys.FILENAME, nodeId));
             nodeContent.setContentType(head.contentType());
             nodeContent.setLength(head.contentLength());
             nodeContent.setContentStream(object);
@@ -128,7 +130,7 @@ public class S3ContentService implements ContentService {
      * Removes the stored object associated with the given node id.
      */
     @Override
-    public void deleteFileById(String nodeId) {
+    public void deleteNodeContent(String nodeId) {
         s3Client.deleteObject(DeleteObjectRequest.builder()
                 .bucket(s3Config.getBucket()).key(nodeId).build());
     }
@@ -150,7 +152,7 @@ public class S3ContentService implements ContentService {
                 return dis.getHash();
             }
         } catch (S3Exception e) {
-            throw new NodeNotFoundOnVaultException(nodeId);
+            throw new VaultException(nodeId);
         }
     }
 

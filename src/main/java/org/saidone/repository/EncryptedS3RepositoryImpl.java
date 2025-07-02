@@ -19,12 +19,13 @@
 package org.saidone.repository;
 
 import org.alfresco.core.model.Node;
+import org.saidone.model.MetadataKeys;
 import org.saidone.service.crypto.CryptoService;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.io.InputStream;
+import java.util.Map;
 
 /**
  * {@link S3RepositoryImpl} variant that transparently encrypts data before
@@ -53,19 +54,28 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
 
     /**
      * Encrypts the provided stream before delegating to the parent implementation.
+     *
+     * @param bucketName  destination bucket
+     * @param node        node whose id acts as the key
+     * @param metadata    metadata key/value pairs to associate with the object
+     * @param inputStream content stream to encrypt and upload
      */
     @Override
-    public void putObject(InputStream inputStream, String bucketName, Node node) {
-        super.putObject(cryptoService.encrypt(inputStream), bucketName, node);
+    public void putObject(String bucketName, Node node, Map<String, String> metadata, InputStream inputStream) {
+        metadata.put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString());
+        super.putObject(bucketName, node, metadata, cryptoService.encrypt(inputStream));
     }
 
     /**
      * Retrieves and decrypts the object content for the given node id.
+     *
+     * @param bucketName bucket containing the object
+     * @param nodeId     the node id / object key
+     * @return decrypted content stream
      */
     @Override
     public InputStream getObject(String bucketName, String nodeId) {
-        return cryptoService.decrypt(s3Client.getObject(GetObjectRequest.builder()
-                .bucket(bucketName).key(nodeId).build()));
+        return cryptoService.decrypt(super.getObject(bucketName, nodeId));
     }
 
 }

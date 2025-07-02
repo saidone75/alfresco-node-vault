@@ -21,6 +21,7 @@ package org.saidone.repository;
 import org.alfresco.core.model.Node;
 
 import java.io.InputStream;
+import java.util.Map;
 
 /**
  * Abstraction over the minimal set of S3 operations required by the vault.
@@ -32,11 +33,12 @@ public interface S3Repository {
      * Uploads a node's content to the specified S3 bucket using the node id as
      * object key.
      *
-     * @param inputStream the stream providing the content to store
      * @param bucketName  name of the target S3 bucket
      * @param node        node whose identifier will be used as the object key
+     * @param metadata    metadata key/value pairs to associate with the object
+     * @param inputStream the stream providing the content to store
      */
-    void putObject(InputStream inputStream, String bucketName, Node node);
+    void putObject(String bucketName, Node node, Map<String, String> metadata, InputStream inputStream);
 
     /**
      * Retrieves an object from S3 previously stored for the given node id.
