@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.model.MetadataKeys;
 import software.amazon.awssdk.core.async.AsyncRequestBody;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -42,12 +43,9 @@ public class S3RepositoryImpl implements S3Repository {
 
     @Override
     public void putObject(InputStream inputStream, String bucketName, String nodeId) {
-        val clientConfig = s3Client.serviceClientConfiguration();
         @Cleanup val transferManager = S3TransferManager.builder()
                 .s3Client(S3AsyncClient.builder()
-                        .region(clientConfig.region())
-                        .endpointOverride(clientConfig.endpointOverride())
-                        .credentialsProvider(clientConfig.credentialsProvider())
+                        .region(Region.EU_CENTRAL_1)
                         .build())
                 .build();
         try {
