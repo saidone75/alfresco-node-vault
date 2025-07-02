@@ -17,6 +17,8 @@ import java.net.URI;
 @Data
 public class S3Config {
 
+    private String key;
+    private String secret;
     private String bucket;
     private String region;
     private String endpoint;
@@ -28,7 +30,7 @@ public class S3Config {
             builder.endpointOverride(URI.create(endpoint));
             if (endpoint.contains("localhost")) {
                 builder.credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create("test", "test")));
+                        AwsBasicCredentials.create(key, secret)));
             }
         }
         return builder.build();
