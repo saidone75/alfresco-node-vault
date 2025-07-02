@@ -23,6 +23,6 @@ package org.saidone.exception;
  */
 public class NodeNotFoundOnAlfrescoException extends NodeNotFoundException {
     public NodeNotFoundOnAlfrescoException(String message) {
-        super(String.format("Node %s not found on the vault", message));
+        super(String.format("Node %s not found on Alfresco", message));
     }
 }
