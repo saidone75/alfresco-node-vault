@@ -83,13 +83,7 @@ public class S3ContentService implements ContentService {
         metadata.put(MetadataKeys.FILENAME, node.getName());
         metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
         try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
-            val putRequest = PutObjectRequest.builder()
-                    .bucket(s3Config.getBucket())
-                    .key(node.getId())
-                    .contentType(node.getContent().getMimeType())
-                    .metadata(metadata)
-                    .build();
-            s3Repository.putObject(putRequest, digestInputStream, node.getContent().getSizeInBytes());
+            s3Repository.putObject(digestInputStream, s3Config.getBucket(), node.getId());
             val hash = digestInputStream.getHash();
             log.trace("{}: {}", checksumAlgorithm, hash);
             metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
@@ -157,8 +151,7 @@ public class S3ContentService implements ContentService {
     @SneakyThrows
     public String computeHash(String nodeId, String algorithm) {
         try {
-            try (val dis = new AnvDigestInputStream(s3Client.getObject(GetObjectRequest.builder()
-                    .bucket(s3Config.getBucket()).key(nodeId).build()), algorithm)) {
+            try (val dis = new AnvDigestInputStream(s3Repository.getObject(s3Config.getBucket(), nodeId), algorithm)) {
                 dis.transferTo(OutputStream.nullOutputStream());
                 return dis.getHash();
             }

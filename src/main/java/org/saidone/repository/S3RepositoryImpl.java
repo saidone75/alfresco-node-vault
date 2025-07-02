@@ -18,24 +18,63 @@
 
 package org.saidone.repository;
 
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import software.amazon.awssdk.core.sync.RequestBody;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
+import org.saidone.model.MetadataKeys;
+import software.amazon.awssdk.core.async.AsyncRequestBody;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.s3.S3AsyncClient;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import software.amazon.awssdk.transfer.s3.S3TransferManager;
+import software.amazon.awssdk.transfer.s3.model.UploadRequest;
 
 import java.io.InputStream;
+import java.util.HashMap;
 
 @RequiredArgsConstructor
 //@Service
+@Slf4j
 public class S3RepositoryImpl implements S3Repository {
 
     protected final S3Client s3Client;
 
     @Override
-    public void putObject(PutObjectRequest putObjectRequest, InputStream inputStream, Long size) {
-        s3Client.putObject(putObjectRequest,
-                RequestBody.fromInputStream(inputStream, size));
+    public void putObject(InputStream inputStream, String bucketName, String nodeId) {
+        @Cleanup val transferManager = S3TransferManager.builder()
+                .s3Client(S3AsyncClient.builder()
+                        .region(Region.EU_CENTRAL_1)
+                        .build())
+                .build();
+        try {
+           val metadata = new HashMap<String, String>();
+            metadata.put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString());
+            val putReq = PutObjectRequest.builder()
+                    .bucket(bucketName)
+                    .key(nodeId)
+                    .metadata(metadata)
+                    .build();
+            val body = AsyncRequestBody.forBlockingInputStream(null);
+            val uploadRequest = UploadRequest.builder()
+                    .putObjectRequest(putReq)
+                    .requestBody(body)
+                    .build();
+            val upload = transferManager.upload(uploadRequest);
+            body.writeInputStream(inputStream);
+            val response = upload.completionFuture().join();
+            log.debug("Upload succeeded. ETag: {}", response.response().eTag());
+        } catch (Exception e) {
+           log.error("Error during upload: {}", e.getMessage());
+        }
+
+    }
+
+    @Override
+    public InputStream getObject(String bucketName, String nodeId) {
+        // TODO implementation
+        return null;
     }
 
 }

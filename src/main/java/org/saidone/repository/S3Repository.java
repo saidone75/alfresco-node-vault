@@ -24,6 +24,8 @@ import java.io.InputStream;
 
 public interface S3Repository {
 
-    void putObject(PutObjectRequest putObjectRequest, InputStream inputStream, Long size);
+    void putObject(InputStream inputStream, String bucketName, String nodeId);
+
+    InputStream getObject(String bucketName, String nodeId);
 
 }
