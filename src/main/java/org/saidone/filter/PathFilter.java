@@ -46,9 +46,10 @@ import java.util.regex.Pattern;
  * retrieve the node's path attribute at event evaluation time. Log messages provide
  * traceability of the filter's decisions for debugging purposes.
  * <p>
- * Typical usage involves obtaining an instance via the static factory methods:
- * - {@code PathFilter.of(String path)} to filter by exact path name
- * - {@code PathFilter.of(Pattern pathPattern)} to filter by regular expression
+ * Typical usage involves obtaining a configured instance via the factory
+ * methods exposed by a Spring-managed {@link PathFilter} bean:
+ * - {@code pathFilter.of(String path)} to filter by exact path name
+ * - {@code pathFilter.of(Pattern pathPattern)} to filter by regular expression
  * <p>
  * Integration with Spring ensures that the required {@link NodesApi} dependency
  * is supplied at runtime. This filter is intended to be used as part of event processing
@@ -60,29 +61,31 @@ import java.util.regex.Pattern;
 @Slf4j
 public class PathFilter extends AbstractEventFilter {
 
-    private static NodesApi nodesApi;
+    private NodesApi nodesApi;
     private String path;
     private Pattern pathPattern;
 
     @Autowired
     public PathFilter(NodesApi nodesApi) {
-        PathFilter.nodesApi = nodesApi;
+        this.nodesApi = nodesApi;
     }
 
-    private PathFilter(String path) {
+    private PathFilter(NodesApi nodesApi, String path) {
+        this.nodesApi = nodesApi;
         this.path = path;
     }
 
-    private PathFilter(Pattern pathPattern) {
+    private PathFilter(NodesApi nodesApi, Pattern pathPattern) {
+        this.nodesApi = nodesApi;
         this.pathPattern = pathPattern;
     }
 
-    public static PathFilter of(final String path) {
-        return new PathFilter(path);
+    public PathFilter of(final String path) {
+        return new PathFilter(nodesApi, path);
     }
 
-    public static PathFilter of(final Pattern pathPattern) {
-        return new PathFilter(pathPattern);
+    public PathFilter of(final Pattern pathPattern) {
+        return new PathFilter(nodesApi, pathPattern);
     }
 
     @Override
