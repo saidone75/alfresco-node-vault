@@ -25,6 +25,7 @@ import lombok.val;
 import org.alfresco.core.model.Node;
 import org.saidone.config.S3Config;
 import org.saidone.exception.NodeNotFoundOnVaultException;
+import org.saidone.exception.VaultException;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
 import org.saidone.model.NodeContent;
@@ -114,7 +115,7 @@ public class S3ContentService implements ContentService {
             val object = s3Client.getObject(GetObjectRequest.builder()
                     .bucket(s3Config.getBucket()).key(nodeId).build());
             val nodeContent = new NodeContent();
-            nodeContent.setFileName(head.metadata().getOrDefault("filename", nodeId));
+            nodeContent.setFileName(head.metadata().getOrDefault(MetadataKeys.FILENAME, nodeId));
             nodeContent.setContentType(head.contentType());
             nodeContent.setLength(head.contentLength());
             nodeContent.setContentStream(object);
@@ -128,7 +129,7 @@ public class S3ContentService implements ContentService {
      * Removes the stored object associated with the given node id.
      */
     @Override
-    public void deleteFileById(String nodeId) {
+    public void deleteNodeContent(String nodeId) {
         s3Client.deleteObject(DeleteObjectRequest.builder()
                 .bucket(s3Config.getBucket()).key(nodeId).build());
     }
@@ -150,7 +151,7 @@ public class S3ContentService implements ContentService {
                 return dis.getHash();
             }
         } catch (S3Exception e) {
-            throw new NodeNotFoundOnVaultException(nodeId);
+            throw new VaultException(nodeId);
         }
     }
 

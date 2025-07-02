@@ -25,6 +25,7 @@ import org.alfresco.core.model.Node;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.http.ContentStreamProvider;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
@@ -59,7 +60,6 @@ public class S3RepositoryImpl implements S3Repository {
         val putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(node.getId())
-                // TODO set encrypted metadata if required
                 .metadata(new HashMap<>())
                 .build();
         s3Client.putObject(putObjectRequest, RequestBody.fromContentProvider(ContentStreamProvider.fromInputStream(inputStream), node.getContent().getMimeType()));
@@ -76,8 +76,8 @@ public class S3RepositoryImpl implements S3Repository {
      */
     @Override
     public InputStream getObject(String bucketName, String nodeId) {
-        // TODO implementation
-        return null;
+        return s3Client.getObject(GetObjectRequest.builder()
+                .bucket(bucketName).key(nodeId).build());
     }
 
 }

@@ -89,7 +89,7 @@ public class VaultService extends BaseComponent {
             // rollback
             log.debug("Rollback required for node: {}", nodeId);
             nodeService.deleteById(nodeId);
-            contentService.deleteFileById(nodeId);
+            contentService.deleteNodeContent(nodeId);
             throw new VaultException(String.format("Error archiving node %s: %s", nodeId, e.getMessage()));
         }
     }

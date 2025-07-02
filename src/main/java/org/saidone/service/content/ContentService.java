@@ -51,7 +51,7 @@ public interface ContentService {
      *
      * @param nodeId identifier of the node
      */
-    void deleteFileById(String nodeId);
+    void deleteNodeContent(String nodeId);
 
     /**
      * Computes the cryptographic hash of a stored node's content using the given algorithm.

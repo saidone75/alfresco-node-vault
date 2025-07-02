@@ -22,7 +22,6 @@ import org.alfresco.core.model.Node;
 import org.saidone.service.crypto.CryptoService;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 
 import java.io.InputStream;
 
@@ -64,8 +63,7 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
      */
     @Override
     public InputStream getObject(String bucketName, String nodeId) {
-        return cryptoService.decrypt(s3Client.getObject(GetObjectRequest.builder()
-                .bucket(bucketName).key(nodeId).build()));
+        return cryptoService.decrypt(super.getObject(bucketName, nodeId));
     }
 
 }

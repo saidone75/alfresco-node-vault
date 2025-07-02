@@ -116,7 +116,7 @@ public class GridFsContentService implements ContentService {
      * @param nodeId the id of the node whose content should be deleted
      */
     @Override
-    public void deleteFileById(String nodeId) {
+    public void deleteNodeContent(String nodeId) {
         gridFsRepository.deleteFileById(nodeId);
     }
 
