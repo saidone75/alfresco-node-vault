@@ -23,6 +23,7 @@ import org.saidone.model.MetadataKeys;
 import org.saidone.service.crypto.CryptoService;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
@@ -39,14 +40,14 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
     }
 
     @Override
-    public void putObject(PutObjectRequest putObjectRequest, InputStream inputStream, Long size) {
-        val metadata = putObjectRequest.metadata();
-        val updatedMetadata = new HashMap<>(metadata);
-        updatedMetadata.putAll(new HashMap<>(){{ put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString()); }});
-        val updatedPutObjectRequest = putObjectRequest.toBuilder()
-                .metadata(updatedMetadata)
-                .build();
-        super.putObject(updatedPutObjectRequest, cryptoService.encrypt(inputStream), size);
+    public void putObject(InputStream inputStream, String bucketName, String nodeId) {
+        super.putObject(cryptoService.encrypt(inputStream), bucketName, nodeId);
+    }
+
+    @Override
+    public InputStream getObject(String bucketName, String nodeId) {
+        return cryptoService.decrypt(s3Client.getObject(GetObjectRequest.builder()
+                .bucket(bucketName).key(nodeId).build()));
     }
 
 }
