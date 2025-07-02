@@ -18,22 +18,17 @@
 
 package org.saidone.repository;
 
-import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.saidone.model.MetadataKeys;
-import software.amazon.awssdk.core.async.AsyncRequestBody;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
+import org.alfresco.core.model.Node;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.http.ContentStreamProvider;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.transfer.s3.S3TransferManager;
-import software.amazon.awssdk.transfer.s3.model.UploadRequest;
 
 import java.io.InputStream;
 import java.util.HashMap;
-import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 //@Service
@@ -43,37 +38,14 @@ public class S3RepositoryImpl implements S3Repository {
     protected final S3Client s3Client;
 
     @Override
-    public void putObject(InputStream inputStream, String bucketName, String nodeId) {
-        val clientConfig = s3Client.serviceClientConfiguration();
-        val asyncClientBuilder = S3AsyncClient.builder()
-                .region(clientConfig.region())
-                .credentialsProvider(clientConfig.credentialsProvider());
-        clientConfig.endpointOverride().ifPresent(asyncClientBuilder::endpointOverride);
-        @Cleanup val transferManager = S3TransferManager.builder()
-                .s3Client(asyncClientBuilder.build())
+    public void putObject(InputStream inputStream, String bucketName, Node node) {
+        val putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(node.getId())
+                // TODO set encrypted metadata if required
+                .metadata(new HashMap<>())
                 .build();
-        try {
-           val metadata = new HashMap<String, String>();
-            metadata.put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString());
-            val putReq = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(nodeId)
-                    .metadata(metadata)
-                    .build();
-            val body = AsyncRequestBody.forBlockingInputStream(null);
-            val uploadRequest = UploadRequest.builder()
-                    .putObjectRequest(putReq)
-                    .requestBody(body)
-                    .build();
-            val upload = transferManager.upload(uploadRequest);
-            val writeFuture = CompletableFuture.runAsync(() -> body.writeInputStream(inputStream));
-            val response = upload.completionFuture().join();
-            writeFuture.join();
-            log.debug("Upload succeeded. ETag: {}", response.response().eTag());
-        } catch (Exception e) {
-           log.error("Error during upload: {}", e.getMessage());
-        }
-
+        s3Client.putObject(putObjectRequest, RequestBody.fromContentProvider(ContentStreamProvider.fromInputStream(inputStream), node.getContent().getMimeType()));
     }
 
     @Override

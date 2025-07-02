@@ -18,13 +18,13 @@
 
 package org.saidone.repository;
 
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
+import org.alfresco.core.model.Node;
 
 import java.io.InputStream;
 
 public interface S3Repository {
 
-    void putObject(InputStream inputStream, String bucketName, String nodeId);
+    void putObject(InputStream inputStream, String bucketName, Node node);
 
     InputStream getObject(String bucketName, String nodeId);
 

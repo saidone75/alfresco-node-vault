@@ -18,16 +18,13 @@
 
 package org.saidone.repository;
 
-import lombok.val;
-import org.saidone.model.MetadataKeys;
+import org.alfresco.core.model.Node;
 import org.saidone.service.crypto.CryptoService;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
-import java.util.HashMap;
 
 @Service
 public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
@@ -40,8 +37,8 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
     }
 
     @Override
-    public void putObject(InputStream inputStream, String bucketName, String nodeId) {
-        super.putObject(cryptoService.encrypt(inputStream), bucketName, nodeId);
+    public void putObject(InputStream inputStream, String bucketName, Node node) {
+        super.putObject(cryptoService.encrypt(inputStream), bucketName, node);
     }
 
     @Override
