@@ -88,6 +88,7 @@ public class S3ContentService implements ContentService {
             log.trace("{}: {}", checksumAlgorithm, hash);
             metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
             metadata.put(MetadataKeys.CHECKSUM_VALUE, hash);
+            // FIXME try to avoid deprecated methods
             val copyRequest = CopyObjectRequest.builder()
                     .copySource(String.format("%s/%s", s3Config.getBucket(), node.getId()))
                     .bucket(s3Config.getBucket())
