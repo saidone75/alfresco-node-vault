@@ -52,6 +52,15 @@ import java.util.HashMap;
 @Slf4j
 @ConfigurationProperties(prefix = "application.service.vault.storage")
 @ConditionalOnExpression("'${application.service.vault.storage.impl:}' == 's3'")
+/**
+ * {@link ContentService} implementation that stores node binaries in an Amazon S3 bucket.
+ * <p>
+ * Node content streams are uploaded as objects and checksums are calculated on the fly.
+ * The computed hash and other metadata are then stored alongside the object. This
+ * service is enabled when the configuration property
+ * {@code application.service.vault.storage.impl} is set to {@code s3}.
+ * </p>
+ */
 public class S3ContentService implements ContentService {
 
     @Value("${application.service.vault.hash-algorithm}")
