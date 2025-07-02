@@ -18,32 +18,50 @@
 
 package org.saidone.repository;
 
-import lombok.val;
-import org.saidone.model.MetadataKeys;
+import org.alfresco.core.model.Node;
 import org.saidone.service.crypto.CryptoService;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
-import java.util.HashMap;
 
+/**
+ * {@link S3RepositoryImpl} variant that transparently encrypts data before
+ * uploading to S3 and decrypts it when retrieved. Encryption is delegated to
+ * the provided {@link CryptoService}.
+ */
 @Service
 public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
 
+    /**
+     * Service used to perform stream encryption and decryption.
+     */
     private final CryptoService cryptoService;
 
+    /**
+     * Creates a new repository instance using the given AWS client and
+     * cryptographic service.
+     *
+     * @param s3Client      AWS S3 client
+     * @param cryptoService service responsible for encryption and decryption
+     */
     public EncryptedS3RepositoryImpl(S3Client s3Client, CryptoService cryptoService) {
         super(s3Client);
         this.cryptoService = cryptoService;
     }
 
+    /**
+     * Encrypts the provided stream before delegating to the parent implementation.
+     */
     @Override
-    public void putObject(InputStream inputStream, String bucketName, String nodeId) {
-        super.putObject(cryptoService.encrypt(inputStream), bucketName, nodeId);
+    public void putObject(InputStream inputStream, String bucketName, Node node) {
+        super.putObject(cryptoService.encrypt(inputStream), bucketName, node);
     }
 
+    /**
+     * Retrieves and decrypts the object content for the given node id.
+     */
     @Override
     public InputStream getObject(String bucketName, String nodeId) {
         return cryptoService.decrypt(s3Client.getObject(GetObjectRequest.builder()

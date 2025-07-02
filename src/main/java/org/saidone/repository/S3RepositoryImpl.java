@@ -18,59 +18,62 @@
 
 package org.saidone.repository;
 
-import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.saidone.model.MetadataKeys;
-import software.amazon.awssdk.core.async.AsyncRequestBody;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.s3.S3AsyncClient;
+import org.alfresco.core.model.Node;
+import software.amazon.awssdk.core.sync.RequestBody;
+import software.amazon.awssdk.http.ContentStreamProvider;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
-import software.amazon.awssdk.transfer.s3.S3TransferManager;
-import software.amazon.awssdk.transfer.s3.model.UploadRequest;
 
 import java.io.InputStream;
 import java.util.HashMap;
 
+/**
+ * Default {@link S3Repository} implementation relying on the AWS SDK
+ * {@link S3Client}. The class exposes basic methods to upload and download
+ * objects using a provided {@code S3Client} instance.
+ */
 @RequiredArgsConstructor
 //@Service
 @Slf4j
 public class S3RepositoryImpl implements S3Repository {
 
+    /**
+     * AWS S3 client used to perform the requests. It is injected by Spring and
+     * expected to be thread-safe.
+     */
     protected final S3Client s3Client;
 
+    /**
+     * Uploads the provided stream as an object to S3. The node id is used as
+     * the object key.
+     *
+     * @param inputStream stream of the content to store
+     * @param bucketName  destination bucket
+     * @param node        node whose id acts as the key
+     */
     @Override
-    public void putObject(InputStream inputStream, String bucketName, String nodeId) {
-        @Cleanup val transferManager = S3TransferManager.builder()
-                .s3Client(S3AsyncClient.builder()
-                        .region(Region.EU_CENTRAL_1)
-                        .build())
+    public void putObject(InputStream inputStream, String bucketName, Node node) {
+        val putObjectRequest = PutObjectRequest.builder()
+                .bucket(bucketName)
+                .key(node.getId())
+                // TODO set encrypted metadata if required
+                .metadata(new HashMap<>())
                 .build();
-        try {
-           val metadata = new HashMap<String, String>();
-            metadata.put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString());
-            val putReq = PutObjectRequest.builder()
-                    .bucket(bucketName)
-                    .key(nodeId)
-                    .metadata(metadata)
-                    .build();
-            val body = AsyncRequestBody.forBlockingInputStream(null);
-            val uploadRequest = UploadRequest.builder()
-                    .putObjectRequest(putReq)
-                    .requestBody(body)
-                    .build();
-            val upload = transferManager.upload(uploadRequest);
-            body.writeInputStream(inputStream);
-            val response = upload.completionFuture().join();
-            log.debug("Upload succeeded. ETag: {}", response.response().eTag());
-        } catch (Exception e) {
-           log.error("Error during upload: {}", e.getMessage());
-        }
-
+        s3Client.putObject(putObjectRequest, RequestBody.fromContentProvider(ContentStreamProvider.fromInputStream(inputStream), node.getContent().getMimeType()));
     }
 
+    /**
+     * Retrieves the object content for the given node id. This default
+     * implementation returns {@code null} as it is expected to be overridden by
+     * concrete subclasses.
+     *
+     * @param bucketName bucket containing the object
+     * @param nodeId     the node id / object key
+     * @return the object content stream or {@code null}
+     */
     @Override
     public InputStream getObject(String bucketName, String nodeId) {
         // TODO implementation

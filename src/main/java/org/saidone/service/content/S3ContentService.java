@@ -33,7 +33,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
-import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.*;
 
@@ -41,6 +40,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 
+/**
+ * {@link ContentService} implementation that stores node content in Amazon S3.
+ * <p>
+ * During archival the content stream is uploaded to S3 and metadata such as
+ * checksums are persisted as object metadata. Retrieval operations assemble a
+ * {@link NodeContent} descriptor using the AWS SDK.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -66,14 +72,11 @@ public class S3ContentService implements ContentService {
     private final S3Config s3Config;
 
     /**
-     * Archives the content of the given node by uploading it to the configured
-     * S3 bucket. The stream is wrapped in an {@link AnvDigestInputStream} so
-     * that a checksum can be calculated during the upload. After storing the
-     * object, the computed hash along with additional metadata is written back
-     * to the object using a second copy operation.
+     * Saves the content stream of the given node to S3. The method computes the
+     * checksum on the fly and stores it as object metadata.
      *
-     * @param node        the node whose content should be archived
-     * @param inputStream stream providing the node binary
+     * @param node        node whose content is being archived
+     * @param inputStream input stream providing the node content
      */
     @Override
     @SneakyThrows
@@ -83,7 +86,7 @@ public class S3ContentService implements ContentService {
         metadata.put(MetadataKeys.FILENAME, node.getName());
         metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
         try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
-            s3Repository.putObject(digestInputStream, s3Config.getBucket(), node.getId());
+            s3Repository.putObject(digestInputStream, s3Config.getBucket(), node);
             val hash = digestInputStream.getHash();
             log.trace("{}: {}", checksumAlgorithm, hash);
             metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
@@ -101,11 +104,11 @@ public class S3ContentService implements ContentService {
     }
 
     /**
-     * Retrieves a node's content from S3.
+     * Retrieves the content of a node from S3.
      *
-     * @param nodeId the identifier of the node
-     * @return the {@link NodeContent} descriptor with stream and metadata
-     * @throws NodeNotFoundOnVaultException if the object does not exist in S3
+     * @param nodeId identifier of the node
+     * @return descriptor containing file name, content type and the data stream
+     * @throws NodeNotFoundOnVaultException if the object is not found
      */
     @Override
     public NodeContent getNodeContent(String nodeId) {
@@ -126,9 +129,7 @@ public class S3ContentService implements ContentService {
     }
 
     /**
-     * Deletes the object associated with the given node id from the S3 bucket.
-     *
-     * @param nodeId id of the node whose content should be removed
+     * Removes the stored object associated with the given node id.
      */
     @Override
     public void deleteFileById(String nodeId) {
@@ -137,15 +138,12 @@ public class S3ContentService implements ContentService {
     }
 
     /**
-     * Computes the checksum of a stored object using the requested algorithm.
-     * If the checksum is already present in the object's metadata and matches
-     * the algorithm, that value is returned. Otherwise the object is streamed
-     * to calculate the hash.
+     * Computes the checksum of a stored object using the supplied algorithm.
      *
      * @param nodeId    identifier of the node
      * @param algorithm name of the hash algorithm
-     * @return the resulting hash string
-     * @throws NodeNotFoundOnVaultException if the object cannot be found
+     * @return hexadecimal encoded hash string
+     * @throws NodeNotFoundOnVaultException if the node cannot be found
      */
     @Override
     @SneakyThrows
