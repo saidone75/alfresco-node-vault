@@ -23,7 +23,7 @@ import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 @RequiredArgsConstructor
@@ -41,7 +41,7 @@ public class AuthenticationService {
             return false;
         }
         try {
-            val decoded = new String(Base64.getDecoder().decode(parts[1]), Charset.defaultCharset());
+            val decoded = new String(Base64.getDecoder().decode(parts[1]), StandardCharsets.UTF_8);
             val userIdAndPassword = decoded.split(":", 2);
             if (userIdAndPassword.length != 2) {
                 return false;
