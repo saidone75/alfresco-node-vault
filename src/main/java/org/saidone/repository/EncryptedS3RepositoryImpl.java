@@ -21,6 +21,7 @@ package org.saidone.repository;
 import org.alfresco.core.model.Node;
 import org.saidone.model.MetadataKeys;
 import org.saidone.service.crypto.CryptoService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
 
@@ -33,6 +34,7 @@ import java.util.Map;
  * the provided {@link CryptoService}.
  */
 @Service
+@ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "true")
 public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
 
     /**
