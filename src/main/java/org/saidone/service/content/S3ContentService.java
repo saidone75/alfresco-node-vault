@@ -41,26 +41,22 @@ import java.io.OutputStream;
 import java.util.HashMap;
 
 /**
- * {@link ContentService} implementation that stores node content in Amazon S3.
+ * {@link ContentService} implementation that stores node binaries in Amazon S3.
  * <p>
- * During archival the content stream is uploaded to S3 and metadata such as
- * checksums are persisted as object metadata. Retrieval operations assemble a
- * {@link NodeContent} descriptor using the AWS SDK.
+ * During archival the content stream is uploaded while a checksum is computed on the
+ * fly. The resulting hash and other metadata are stored as object metadata. Retrieval
+ * operations return a {@link NodeContent} descriptor using the AWS SDK.
+ * </p>
+ * <p>
+ * This service is enabled when {@code application.service.vault.storage.impl} is set to
+ * {@code s3}.
+ * </p>
  */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 @ConfigurationProperties(prefix = "application.service.vault.storage")
 @ConditionalOnExpression("'${application.service.vault.storage.impl:}' == 's3'")
-/**
- * {@link ContentService} implementation that stores node binaries in an Amazon S3 bucket.
- * <p>
- * Node content streams are uploaded as objects and checksums are calculated on the fly.
- * The computed hash and other metadata are then stored alongside the object. This
- * service is enabled when the configuration property
- * {@code application.service.vault.storage.impl} is set to {@code s3}.
- * </p>
- */
 public class S3ContentService implements ContentService {
 
     @Value("${application.service.vault.hash-algorithm}")
