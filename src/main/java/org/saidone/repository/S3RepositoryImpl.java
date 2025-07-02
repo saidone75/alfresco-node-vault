@@ -53,9 +53,10 @@ public class S3RepositoryImpl implements S3Repository {
      * Uploads the provided stream as an object to S3. The node id is used as
      * the object key.
      *
-     * @param inputStream stream of the content to store
      * @param bucketName  destination bucket
      * @param node        node whose id acts as the key
+     * @param metadata    metadata key/value pairs to associate with the object
+     * @param inputStream stream of the content to store
      */
     @Override
     public void putObject(String bucketName, Node node, Map<String, String> metadata, InputStream inputStream) {

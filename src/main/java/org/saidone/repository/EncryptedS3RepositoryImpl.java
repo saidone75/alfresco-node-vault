@@ -54,6 +54,11 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
 
     /**
      * Encrypts the provided stream before delegating to the parent implementation.
+     *
+     * @param bucketName  destination bucket
+     * @param node        node whose id acts as the key
+     * @param metadata    metadata key/value pairs to associate with the object
+     * @param inputStream content stream to encrypt and upload
      */
     @Override
     public void putObject(String bucketName, Node node, Map<String, String> metadata, InputStream inputStream) {
@@ -63,6 +68,10 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
 
     /**
      * Retrieves and decrypts the object content for the given node id.
+     *
+     * @param bucketName bucket containing the object
+     * @param nodeId     the node id / object key
+     * @return decrypted content stream
      */
     @Override
     public InputStream getObject(String bucketName, String nodeId) {
