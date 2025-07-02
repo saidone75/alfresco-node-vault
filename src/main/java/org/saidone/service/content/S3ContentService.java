@@ -83,13 +83,13 @@ public class S3ContentService implements ContentService {
         metadata.put(MetadataKeys.FILENAME, node.getName());
         metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
         try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
-            s3Repository.putObject(digestInputStream, s3Config.getBucket(), node);
+            s3Repository.putObject(s3Config.getBucket(), node, metadata, digestInputStream);
             val hash = digestInputStream.getHash();
             log.trace("{}: {}", checksumAlgorithm, hash);
             metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
             metadata.put(MetadataKeys.CHECKSUM_VALUE, hash);
             val copyRequest = CopyObjectRequest.builder()
-                    .copySource(s3Config.getBucket() + "/" + node.getId())
+                    .copySource(String.format("%s/%s", s3Config.getBucket(), node.getId()))
                     .bucket(s3Config.getBucket())
                     .key(node.getId())
                     .metadata(metadata)
