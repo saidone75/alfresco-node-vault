@@ -8,7 +8,7 @@ import com.mongodb.client.MongoClient;
 import org.alfresco.core.handler.NodesApi;
 import lombok.RequiredArgsConstructor;
 
-//@Component
+@Component
 @RequiredArgsConstructor
 public class TestCleanupService {
 
