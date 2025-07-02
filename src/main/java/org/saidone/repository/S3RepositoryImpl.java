@@ -72,13 +72,12 @@ public class S3RepositoryImpl implements S3Repository {
     }
 
     /**
-     * Retrieves the object content for the given node id. This default
-     * implementation returns {@code null} as it is expected to be overridden by
-     * concrete subclasses.
+     * Retrieves the object content for the given node id using the underlying
+     * {@link S3Client}.
      *
      * @param bucketName bucket containing the object
      * @param nodeId     the node id / object key
-     * @return the object content stream or {@code null}
+     * @return the object content stream
      */
     @Override
     public InputStream getObject(String bucketName, String nodeId) {
@@ -87,6 +86,14 @@ public class S3RepositoryImpl implements S3Repository {
                 .bucket(bucketName).key(nodeId).build());
     }
 
+    /**
+     * Checks whether the object stored for the given node id is marked as
+     * encrypted in its metadata.
+     *
+     * @param bucketName bucket containing the object
+     * @param nodeId     the object key / node id
+     * @return {@code true} if the object is encrypted, {@code false} otherwise
+     */
     private boolean isEncrypted(String bucketName, String nodeId) {
         val headObjectRequest = HeadObjectRequest.builder()
                 .bucket(bucketName)

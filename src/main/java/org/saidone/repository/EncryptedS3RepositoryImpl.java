@@ -55,7 +55,9 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
     }
 
     /**
-     * Encrypts the provided stream before delegating to the parent implementation.
+     * Encrypts the provided content stream and stores it in S3. The object's
+     * metadata is updated to mark it as encrypted before delegating to the
+     * parent implementation.
      *
      * @param bucketName  destination bucket
      * @param node        node whose id acts as the key
@@ -69,7 +71,8 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
     }
 
     /**
-     * Retrieves and decrypts the object content for the given node id.
+     * Retrieves the encrypted object content from S3 and returns a decrypted
+     * stream using the configured {@link CryptoService}.
      *
      * @param bucketName bucket containing the object
      * @param nodeId     the node id / object key
