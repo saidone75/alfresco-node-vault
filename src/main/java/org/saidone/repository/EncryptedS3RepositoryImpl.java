@@ -21,6 +21,7 @@ package org.saidone.repository;
 import org.alfresco.core.model.Node;
 import org.saidone.model.MetadataKeys;
 import org.saidone.service.crypto.CryptoService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
 
@@ -33,6 +34,7 @@ import java.util.Map;
  * the provided {@link CryptoService}.
  */
 @Service
+@ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "true")
 public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
 
     /**
@@ -53,7 +55,9 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
     }
 
     /**
-     * Encrypts the provided stream before delegating to the parent implementation.
+     * Encrypts the provided content stream and stores it in S3. The object's
+     * metadata is updated to mark it as encrypted before delegating to the
+     * parent implementation.
      *
      * @param bucketName  destination bucket
      * @param node        node whose id acts as the key
@@ -67,7 +71,8 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
     }
 
     /**
-     * Retrieves and decrypts the object content for the given node id.
+     * Retrieves the encrypted object content from S3 and returns a decrypted
+     * stream using the configured {@link CryptoService}.
      *
      * @param bucketName bucket containing the object
      * @param nodeId     the node id / object key
