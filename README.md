@@ -38,7 +38,8 @@ document accessibility.
 
 The application can archive nodes on-demand through a behavior or using a scheduled job.
 
-Nodes and binaries are archived on MongoDB with GridFS or can be stored on AWS S3, ensuring efficient and scalable storage.
+Nodes metadata are archived on MongoDB while binaries can be stored either on GridFS or on AWS S3, ensuring efficiency 
+and scalability.
 
 The application can also act as a proxy to allow applications using REST APIs to retrieve nodes that no longer exist in
 Alfresco, ensuring operational continuity without the need to modify legacy client applications.
@@ -61,7 +62,8 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Fully FOSS, released under an open license
 - Custom upload and download methods
 - Scheduled or on-demand archiving
-- MongoDB storage via GridFS with optional S3 backend
+- MongoDB storage for metadata and audit trail 
+- GridFS or S3 storage for binaries
 - Focus on [strong encryption](doc/Encryption.md) option for both content and metadata
 - Passwords securely stored in a secret engine
 - REST API with Alfresco proxy support
