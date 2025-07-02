@@ -33,6 +33,7 @@ import software.amazon.awssdk.transfer.s3.model.UploadRequest;
 
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.concurrent.CompletableFuture;
 
 @RequiredArgsConstructor
 //@Service
@@ -65,8 +66,9 @@ public class S3RepositoryImpl implements S3Repository {
                     .requestBody(body)
                     .build();
             val upload = transferManager.upload(uploadRequest);
-            body.writeInputStream(inputStream);
+            val writeFuture = CompletableFuture.runAsync(() -> body.writeInputStream(inputStream));
             val response = upload.completionFuture().join();
+            writeFuture.join();
             log.debug("Upload succeeded. ETag: {}", response.response().eTag());
         } catch (Exception e) {
            log.error("Error during upload: {}", e.getMessage());
