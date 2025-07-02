@@ -30,13 +30,30 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import java.io.InputStream;
 import java.util.HashMap;
 
+/**
+ * Default {@link S3Repository} implementation relying on the AWS SDK
+ * {@link S3Client}. The class exposes basic methods to upload and download
+ * objects using a provided {@code S3Client} instance.
+ */
 @RequiredArgsConstructor
 //@Service
 @Slf4j
 public class S3RepositoryImpl implements S3Repository {
 
+    /**
+     * AWS S3 client used to perform the requests. It is injected by Spring and
+     * expected to be thread-safe.
+     */
     protected final S3Client s3Client;
 
+    /**
+     * Uploads the provided stream as an object to S3. The node id is used as
+     * the object key.
+     *
+     * @param inputStream stream of the content to store
+     * @param bucketName  destination bucket
+     * @param node        node whose id acts as the key
+     */
     @Override
     public void putObject(InputStream inputStream, String bucketName, Node node) {
         val putObjectRequest = PutObjectRequest.builder()
@@ -48,6 +65,15 @@ public class S3RepositoryImpl implements S3Repository {
         s3Client.putObject(putObjectRequest, RequestBody.fromContentProvider(ContentStreamProvider.fromInputStream(inputStream), node.getContent().getMimeType()));
     }
 
+    /**
+     * Retrieves the object content for the given node id. This default
+     * implementation returns {@code null} as it is expected to be overridden by
+     * concrete subclasses.
+     *
+     * @param bucketName bucket containing the object
+     * @param nodeId     the node id / object key
+     * @return the object content stream or {@code null}
+     */
     @Override
     public InputStream getObject(String bucketName, String nodeId) {
         // TODO implementation

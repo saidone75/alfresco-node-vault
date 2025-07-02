@@ -40,6 +40,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 
+/**
+ * {@link ContentService} implementation that stores node content in Amazon S3.
+ * <p>
+ * During archival the content stream is uploaded to S3 and metadata such as
+ * checksums are persisted as object metadata. Retrieval operations assemble a
+ * {@link NodeContent} descriptor using the AWS SDK.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -55,6 +62,13 @@ public class S3ContentService implements ContentService {
     private final S3Client s3Client;
     private final S3Config s3Config;
 
+    /**
+     * Saves the content stream of the given node to S3. The method computes the
+     * checksum on the fly and stores it as object metadata.
+     *
+     * @param node        node whose content is being archived
+     * @param inputStream input stream providing the node content
+     */
     @Override
     @SneakyThrows
     public void archiveNodeContent(Node node, InputStream inputStream) {
@@ -80,6 +94,13 @@ public class S3ContentService implements ContentService {
         }
     }
 
+    /**
+     * Retrieves the content of a node from S3.
+     *
+     * @param nodeId identifier of the node
+     * @return descriptor containing file name, content type and the data stream
+     * @throws NodeNotFoundOnVaultException if the object is not found
+     */
     @Override
     public NodeContent getNodeContent(String nodeId) {
         try {
@@ -98,12 +119,23 @@ public class S3ContentService implements ContentService {
         }
     }
 
+    /**
+     * Removes the stored object associated with the given node id.
+     */
     @Override
     public void deleteFileById(String nodeId) {
         s3Client.deleteObject(DeleteObjectRequest.builder()
                 .bucket(s3Config.getBucket()).key(nodeId).build());
     }
 
+    /**
+     * Computes the checksum of a stored object using the supplied algorithm.
+     *
+     * @param nodeId    identifier of the node
+     * @param algorithm name of the hash algorithm
+     * @return hexadecimal encoded hash string
+     * @throws NodeNotFoundOnVaultException if the node cannot be found
+     */
     @Override
     @SneakyThrows
     public String computeHash(String nodeId, String algorithm) {

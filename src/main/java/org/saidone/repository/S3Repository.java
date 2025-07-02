@@ -22,10 +22,29 @@ import org.alfresco.core.model.Node;
 
 import java.io.InputStream;
 
+/**
+ * Abstraction over the minimal set of S3 operations required by the vault.
+ * Implementations store and retrieve node content using the AWS SDK.
+ */
 public interface S3Repository {
 
+    /**
+     * Uploads a node's content to the specified S3 bucket using the node id as
+     * object key.
+     *
+     * @param inputStream the stream providing the content to store
+     * @param bucketName  name of the target S3 bucket
+     * @param node        node whose identifier will be used as the object key
+     */
     void putObject(InputStream inputStream, String bucketName, Node node);
 
+    /**
+     * Retrieves an object from S3 previously stored for the given node id.
+     *
+     * @param bucketName the bucket where the object resides
+     * @param nodeId     identifier of the node / object key
+     * @return an {@link InputStream} for the object's content
+     */
     InputStream getObject(String bucketName, String nodeId);
 
 }
