@@ -1,0 +1,51 @@
+# Contributing and Onboarding
+
+This guide explains how to set up the project for local development.
+
+## Prerequisites
+
+Make sure these tools are installed on your workstation:
+
+- **Java 21**
+- **Maven**
+- **Docker** (with Docker Compose)
+- **Git**
+
+## Build
+
+To build the application without running the tests, execute:
+
+```bash
+mvn package -DskipTests -Dlicense.skip=true
+```
+
+## Start the full environment
+
+Use the helper script to build the Docker images and start all services:
+
+```bash
+./vault.sh build_start
+```
+
+On Windows the equivalent command is:
+
+```cmd
+vault.bat build_start
+```
+
+The script spins up the following services using Docker Compose:
+
+- **Alfresco Repository** and **Share**
+- **PostgreSQL** database
+- **Alfresco Search Services (Solr)**
+- **ActiveMQ** broker
+- **MongoDB** with **Mongo Express** UI
+- **HashiCorp Vault** (plus a small provisioner container)
+- **Alfresco Node Vault** application
+- **Prometheus**, **Grafana** and **Nginx** for monitoring
+
+## Configuration
+
+All environment variables are listed in the [configuration table](README.md#application-global-config) in the README.
+
+Pull requests are welcome!

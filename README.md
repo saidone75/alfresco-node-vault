@@ -107,7 +107,7 @@ Global configuration is stored in `application.yml` file, the relevant parameter
 
 ## Build
 
-Java and Maven required
+Java and Maven required. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions.
 
 `mvn package -DskipTests -Dlicense.skip=true`
 
