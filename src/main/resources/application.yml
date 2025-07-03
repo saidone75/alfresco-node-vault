@@ -134,6 +134,8 @@ application:
       storage:
         impl: s3
         s3:
+          key: ${S3_KEY:test}
+          secret: ${S3_SECRET:test}
           bucket: ${S3_BUCKET:anv}
           region: ${S3_REGION:eu-central-1}
           endpoint: ${S3_ENDPOINT:http://localhost:4566}
