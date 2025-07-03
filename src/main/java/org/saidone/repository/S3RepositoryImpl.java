@@ -81,7 +81,6 @@ public class S3RepositoryImpl implements S3Repository {
      */
     @Override
     public InputStream getObject(String bucketName, String nodeId) {
-        
         return s3Client.getObject(GetObjectRequest.builder()
                 .bucket(bucketName).key(nodeId).build());
     }
