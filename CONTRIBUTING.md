@@ -33,6 +33,13 @@ On Windows the equivalent command is:
 vault.bat build_start
 ```
 
+To start all services except the Vault container, append `novault` to the
+command. This works with both `build_start` and `start`:
+
+```bash
+./vault.sh build_start novault
+```
+
 The script spins up the following services using Docker Compose:
 
 - **Alfresco Content Services** and **Share**
@@ -44,6 +51,15 @@ The script spins up the following services using Docker Compose:
 - **HashiCorp Vault** (plus a small provisioner container)
 - **Prometheus**, **Grafana** and **Nginx** for monitoring
 - **Alfresco Node Vault** application itself
+
+If you need to rebuild only the `anv-vault` container without
+restarting the entire stack, use the helper scripts:
+
+```bash
+./update-vault.sh
+```
+
+On Windows run `update-vault.bat` instead.
 
 ## Configuration
 
