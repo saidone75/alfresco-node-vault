@@ -82,7 +82,7 @@ public class ResourceFileUtils {
                 }
                 val tempFile = destinationPath != null
                         ? new File(destinationPath)
-                        : Files.createTempFile("resource-", ".tmp").toFile();
+                        : Files.createTempFile("resource-", file.getName().replaceAll("^.*\\.", ".")).toFile();
                 tempFile.deleteOnExit();
                 try (val fos = new FileOutputStream(tempFile)) {
                     is.transferTo(fos);
