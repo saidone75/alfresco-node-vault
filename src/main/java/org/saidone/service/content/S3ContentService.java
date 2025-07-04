@@ -113,13 +113,11 @@ public class S3ContentService implements ContentService {
         try {
             val head = s3Client.headObject(HeadObjectRequest.builder()
                     .bucket(s3Config.getBucket()).key(nodeId).build());
-            val object = s3Client.getObject(GetObjectRequest.builder()
-                    .bucket(s3Config.getBucket()).key(nodeId).build());
             val nodeContent = new NodeContent();
             nodeContent.setFileName(head.metadata().getOrDefault(MetadataKeys.FILENAME, nodeId));
             nodeContent.setContentType(head.contentType());
             nodeContent.setLength(head.contentLength());
-            nodeContent.setContentStream(object);
+            nodeContent.setContentStream(s3Repository.getObject(s3Config.getBucket(), nodeId));
             return nodeContent;
         } catch (S3Exception e) {
             throw new NodeNotFoundOnVaultException(nodeId);
