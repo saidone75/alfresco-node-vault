@@ -35,14 +35,15 @@ vault.bat build_start
 
 The script spins up the following services using Docker Compose:
 
-- **Alfresco Repository** and **Share**
+- **Alfresco Content Services** and **Share**
 - **PostgreSQL** database
 - **Alfresco Search Services (Solr)**
 - **ActiveMQ** broker
 - **MongoDB** with **Mongo Express** UI
+- **LocalStack** for AWS S3 object storage
 - **HashiCorp Vault** (plus a small provisioner container)
-- **Alfresco Node Vault** application
 - **Prometheus**, **Grafana** and **Nginx** for monitoring
+- **Alfresco Node Vault** application itself
 
 ## Configuration
 
