@@ -24,8 +24,7 @@ import lombok.val;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
 import org.saidone.service.crypto.CryptoService;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
@@ -42,7 +41,9 @@ import java.util.Map;
  * {@code true}.
  */
 @Repository
-@ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "true")
+@ConditionalOnExpression(
+        "${application.service.vault.encryption.enabled}.equals(true) and '${application.service.vault.storage.impl}'.equals('gridfs')"
+)
 public class EncryptedGridFsRepositoryImpl extends GridFsRepositoryImpl {
 
     private final CryptoService cryptoService;

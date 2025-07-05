@@ -18,12 +18,15 @@
 
 package org.saidone.repository;
 
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.alfresco.core.model.Node;
 import org.saidone.model.MetadataKeys;
 import org.saidone.service.crypto.CryptoService;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 
 import java.io.InputStream;
 import java.util.Map;
@@ -34,7 +37,10 @@ import java.util.Map;
  * the provided {@link CryptoService}.
  */
 @Service
-@ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "true")
+@ConditionalOnExpression(
+        "${application.service.vault.encryption.enabled}.equals(true) and '${application.service.vault.storage.impl}'.equals('s3')"
+)
+@Slf4j
 public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
 
     /**
@@ -80,7 +86,29 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
      */
     @Override
     public InputStream getObject(String bucketName, String nodeId) {
-        return cryptoService.decrypt(super.getObject(bucketName, nodeId));
+        if (isEncrypted(bucketName, nodeId)) {
+            return cryptoService.decrypt(super.getObject(bucketName, nodeId));
+        } else {
+            log.warn("Object {} in bucket {} is not encrypted", nodeId, bucketName);
+            return super.getObject(bucketName, nodeId);
+        }
+    }
+
+    /**
+     * Checks whether the object stored for the given node id is marked as
+     * encrypted in its metadata.
+     *
+     * @param bucketName bucket containing the object
+     * @param nodeId     the object key / node id
+     * @return {@code true} if the object is encrypted, {@code false} otherwise
+     */
+    private boolean isEncrypted(String bucketName, String nodeId) {
+        val headObjectRequest = HeadObjectRequest.builder()
+                .bucket(bucketName)
+                .key(nodeId)
+                .build();
+        val metadata = s3Client.headObject(headObjectRequest).metadata();
+        return Boolean.parseBoolean(metadata.getOrDefault(MetadataKeys.ENCRYPTED, Boolean.FALSE.toString()));
     }
 
 }

@@ -22,14 +22,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.Node;
-import org.saidone.model.MetadataKeys;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.saidone.component.BaseComponent;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.http.ContentStreamProvider;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
@@ -41,10 +40,12 @@ import java.util.Map;
  * objects using a provided {@code S3Client} instance.
  */
 @Service
-@ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "false", matchIfMissing = true)
+@ConditionalOnExpression(
+        "${application.service.vault.encryption.enabled}.equals(false) and '${application.service.vault.storage.impl}'.equals('s3')"
+)
 @RequiredArgsConstructor
 @Slf4j
-public class S3RepositoryImpl implements S3Repository {
+public class S3RepositoryImpl extends BaseComponent implements S3Repository {
 
     /**
      * AWS S3 client used to perform the requests. It is injected by Spring and
@@ -83,23 +84,6 @@ public class S3RepositoryImpl implements S3Repository {
     public InputStream getObject(String bucketName, String nodeId) {
         return s3Client.getObject(GetObjectRequest.builder()
                 .bucket(bucketName).key(nodeId).build());
-    }
-
-    /**
-     * Checks whether the object stored for the given node id is marked as
-     * encrypted in its metadata.
-     *
-     * @param bucketName bucket containing the object
-     * @param nodeId     the object key / node id
-     * @return {@code true} if the object is encrypted, {@code false} otherwise
-     */
-    private boolean isEncrypted(String bucketName, String nodeId) {
-        val headObjectRequest = HeadObjectRequest.builder()
-                .bucket(bucketName)
-                .key(nodeId)
-                .build();
-        val metadata = s3Client.headObject(headObjectRequest).metadata();
-        return Boolean.parseBoolean(metadata.getOrDefault(MetadataKeys.ENCRYPTED, Boolean.FALSE.toString()));
     }
 
 }

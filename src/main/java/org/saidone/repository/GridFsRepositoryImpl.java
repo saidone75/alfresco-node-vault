@@ -26,7 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.bson.Document;
 import org.saidone.component.BaseComponent;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.index.Index;
@@ -78,7 +78,9 @@ import java.util.Map;
  * Spring container for all MongoDB operations.
  */
 @Repository
-@ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "false", matchIfMissing = true)
+@ConditionalOnExpression(
+        "${application.service.vault.encryption.enabled}.equals(false) and '${application.service.vault.storage.impl}'.equals('gridfs')"
+)
 @RequiredArgsConstructor
 @Slf4j
 public class GridFsRepositoryImpl extends BaseComponent implements GridFsRepository {
@@ -167,7 +169,7 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
      *
      * @param file the file retrieved from GridFS
      * @return input stream positioned at the beginning of the file or
-     *         {@code null} if {@code file} is {@code null}
+     * {@code null} if {@code file} is {@code null}
      */
     @SneakyThrows
     public InputStream getFileContent(GridFSFile file) {
