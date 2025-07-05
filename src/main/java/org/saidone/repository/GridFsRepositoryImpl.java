@@ -102,7 +102,7 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
         try {
             val indexOps = mongoTemplate.indexOps("fs.files");
             val index = new Index().on("metadata.uuid", Sort.Direction.ASC).named("metadata_uuid_index");
-            indexOps.ensureIndex(index);
+            indexOps.createIndex(index);
         } catch (Exception e) {
             log.error("Unable to start {}", this.getClass().getSimpleName());
             super.shutDown(0);
