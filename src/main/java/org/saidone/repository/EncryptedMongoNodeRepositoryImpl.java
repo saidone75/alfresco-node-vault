@@ -30,8 +30,10 @@ import java.util.Optional;
 
 /**
  * Repository implementation that encrypts node data before saving to MongoDB
- * and decrypts it when retrieving. This implementation is active only when
- * vault encryption and metadata encryption are enabled in the application properties.
+ * and decrypts it when retrieving. The bean is activated only when both
+ * {@code application.service.vault.encryption.enabled} and
+ * {@code application.service.vault.encryption.metadata} are set to
+ * {@code true} in the application properties.
  */
 @Repository
 @ConditionalOnProperty(name = {"application.service.vault.encryption.enabled", "application.service.vault.encryption.metadata"},

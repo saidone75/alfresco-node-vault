@@ -35,6 +35,10 @@ import java.util.Map;
  * {@link S3RepositoryImpl} variant that transparently encrypts data before
  * uploading to S3 and decrypts it when retrieved. Encryption is delegated to
  * the provided {@link CryptoService}.
+ * <p>
+ * The bean becomes active only when
+ * {@code application.service.vault.encryption.enabled} is {@code true} and
+ * {@code application.service.vault.storage.impl} equals {@code "s3"}.
  */
 @Service
 @ConditionalOnExpression(

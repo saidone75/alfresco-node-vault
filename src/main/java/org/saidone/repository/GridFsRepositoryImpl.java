@@ -67,9 +67,10 @@ import java.util.Map;
  *   the hash algorithm selectable at runtime.</li>
  * </ul>
  * <p>
- * This implementation is registered in the Spring context only if the property
- * {@code application.service.vault.encryption.enabled} is set to {@code false}
- * or is not defined.
+ * This implementation is registered in the Spring context only when the
+ * property {@code application.service.vault.encryption.enabled} is set to
+ * {@code false} (or is missing) <strong>and</strong>
+ * {@code application.service.vault.storage.impl} equals {@code "gridfs"}.
  * <p>
  * Extends {@link org.saidone.component.BaseComponent} to inherit standardized
  * component lifecycle logging.

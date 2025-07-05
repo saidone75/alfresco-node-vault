@@ -38,6 +38,10 @@ import java.util.Map;
  * Default {@link S3Repository} implementation relying on the AWS SDK
  * {@link S3Client}. The class exposes basic methods to upload and download
  * objects using a provided {@code S3Client} instance.
+ * <p>
+ * The bean is created only when {@code application.service.vault.encryption.enabled}
+ * is set to {@code false} and {@code application.service.vault.storage.impl}
+ * equals {@code "s3"}.
  */
 @Service
 @ConditionalOnExpression(
