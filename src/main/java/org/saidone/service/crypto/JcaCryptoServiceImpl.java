@@ -46,7 +46,9 @@ import java.security.SecureRandom;
 @Service
 @Setter
 @ConfigurationProperties(prefix = "application.service.vault.encryption.jca")
-@ConditionalOnExpression("${application.service.vault.encryption.enabled:true} == true && '${application.service.vault.encryption.impl:}' == 'jca'")
+@ConditionalOnExpression(
+        "${application.service.vault.encryption.enabled}.equals(true) and '${application.service.vault.encryption.impl}'.equals('jca')"
+)
 public class JcaCryptoServiceImpl extends AbstractCryptoService implements CryptoService {
 
     @Min(16)
