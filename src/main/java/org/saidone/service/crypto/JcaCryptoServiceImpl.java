@@ -38,8 +38,9 @@ import java.security.SecureRandom;
 
 /**
  * {@link CryptoService} implementation based on the JCA provider. It encrypts
- * and decrypts data using AES in GCM mode. The bean is active when
- * {@code application.service.vault.encryption.impl} is set to {@code jca}.
+ * and decrypts data using AES in GCM mode. The bean is active when both
+ * {@code application.service.vault.encryption.enabled} is set to {@code true}
+ * and {@code application.service.vault.encryption.impl} is set to {@code jca}.
  * Random salt and IV values are produced for every operation and the secret key
  * is derived using the configured KDF implementation.
  */
