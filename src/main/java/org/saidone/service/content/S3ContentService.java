@@ -18,11 +18,13 @@
 
 package org.saidone.service.content;
 
+import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.Node;
+import org.saidone.component.BaseComponent;
 import org.saidone.config.S3Config;
 import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.exception.VaultException;
@@ -58,7 +60,7 @@ import java.util.HashMap;
 @Slf4j
 @ConfigurationProperties(prefix = "application.service.vault.storage")
 @ConditionalOnExpression("'${application.service.vault.storage.impl:}' == 's3'")
-public class S3ContentService implements ContentService {
+public class S3ContentService extends BaseComponent implements ContentService {
 
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
@@ -152,6 +154,13 @@ public class S3ContentService implements ContentService {
         } catch (S3Exception e) {
             throw new VaultException(nodeId);
         }
+    }
+
+    @Override
+    @PreDestroy
+    public void stop() {
+        s3Client.close();
+        super.stop();
     }
 
 }
