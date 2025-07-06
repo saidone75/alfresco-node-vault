@@ -1,6 +1,9 @@
 services:
   localstack:
-    image: ${LOCALSTACK_IMAGE}
+    build:
+      context: ./localstack
+      args:
+        LOCALSTACK_IMAGE: ${LOCALSTACK_IMAGE}
     container_name: anv-localstack
     environment:
       - SERVICES=s3
@@ -9,5 +12,4 @@ services:
     ports:
       - "4566:4566"
     volumes:
-      - ./localstack/localstack-script.sh:/etc/localstack/init/ready.d/script.sh
       - '/var/run/docker.sock:/var/run/docker.sock'
