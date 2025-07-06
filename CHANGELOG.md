@@ -28,6 +28,5 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Transparent access via REST proxy, even after deletion from Alfresco.
 - Supports automatic document restoration if needed.
 - Monitoring with Prometheus.
-- 100% test coverage.
-- No installation required on the Alfresco instance – it's plug-and-play.
-
+- Vault integration for secure secrets storage.
+- Docker setup for easy development.
