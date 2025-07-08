@@ -114,7 +114,18 @@ Java and Maven required. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instru
 
 `mvn package -DskipTests -Dlicense.skip=true`
 
-Look at the `build.sh` or `build.bat` scripts for creating a convenient distribution package.
+To create a distribution package execute the build script for your platform:
+
+```bash
+./build.sh      # Linux / macOS
+```
+
+```bat
+build.bat       # Windows
+```
+
+The script creates an `anv/` directory containing `anv.jar` together with
+`config/` and `log/` folders.
 
 ## Testing
 
@@ -130,7 +141,10 @@ will run a load test.
 
 ## Run
 
-`$ java -jar anv.jar`
+```
+cd anv
+java -jar anv.jar
+```
 
 ## Documentation
 
