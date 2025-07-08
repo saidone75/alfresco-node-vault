@@ -128,6 +128,29 @@ will run the integration tests, and
 
 will run a load test.
 
+## Docker configuration
+
+The `docker` directory contains a `.env` file used by `docker-compose`.
+Copy this file to create your own overrides:
+
+```bash
+cp docker/.env docker/.env.local
+# edit docker/.env.local and override the desired variables
+```
+
+Both `docker-compose` and the helper scripts will automatically pick up
+variables from `docker/.env.local` if present.  Use this mechanism to
+adjust image versions or swap services when moving from local
+development to a production setup.  Key variables include:
+
+- `ACS_IMAGE` – Content Services image name
+- `MONGO_IMAGE` – MongoDB image used for metadata storage
+- `HASHICORP_VAULT_IMAGE_VERSION` – HashiCorp Vault version
+
+For local development you may rely on the defaults, while in
+production you will likely point to hardened images and possibly a
+different Vault version.
+
 ## Run
 
 `$ java -jar anv.jar`
