@@ -40,7 +40,7 @@ import software.amazon.awssdk.services.s3.model.ObjectIdentifier;
 import java.net.URI;
 import java.util.stream.Collectors;
 
-@Component
+//@Component
 @RequiredArgsConstructor
 @Slf4j
 public class TestCleanupService {

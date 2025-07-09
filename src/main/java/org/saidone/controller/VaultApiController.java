@@ -34,6 +34,7 @@ import org.saidone.exception.NodeNotFoundException;
 import org.saidone.exception.VaultException;
 import org.saidone.model.Entry;
 import org.saidone.service.AuthenticationService;
+import org.saidone.service.EthereumService;
 import org.saidone.service.content.ContentService;
 import org.saidone.service.VaultService;
 import org.springframework.core.io.InputStreamResource;
@@ -57,9 +58,10 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Vault API", description = "Vault operations")
 public class VaultApiController {
 
+    private final AuthenticationService authenticationService;
     private final VaultService vaultService;
     private final ContentService contentService;
-    private final AuthenticationService authenticationService;
+    private final EthereumService ethereumService;
 
     /**
      * Handles any unexpected exception thrown during request processing.
@@ -314,6 +316,8 @@ public class VaultApiController {
         }
 
         // TODO: call notarization service
+        val hash = ethereumService.storeHash(nodeId, "ciao");
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + hash);
         return ResponseEntity.ok().body(String.format("Node %s successfully notarized.", nodeId));
     }
 

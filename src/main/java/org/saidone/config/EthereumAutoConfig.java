@@ -20,8 +20,7 @@ public class EthereumAutoConfig {
         String address = "0x" + Keys.getAddress(keyPair.getPublicKey());
         
         // Log i dettagli (solo per sviluppo - in produzione questi dovrebbero essere protetti)
-        System.out.println("Account Ethereum generato automaticamente:");
-        System.out.println("Indirizzo: " + address);
+
         
         return new EthereumCredentials(address, privateKey.substring(2));
     }
