@@ -64,6 +64,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Scheduled or on-demand archiving
 - MongoDB storage for metadata and audit trail 
 - GridFS or S3 storage for binaries
+- Optional blockchain notarization of stored documents
 - Focus on [strong encryption](doc/Encryption.md) option for both content and metadata
 - Passwords securely stored in a secret engine
 - REST API with Alfresco proxy support
@@ -107,6 +108,11 @@ Global configuration is stored in `application.yml` file, the relevant parameter
 | VAULT_ENCRYPTION_SECRET_PATH  | AlfrescoNodeVault                          | Path of encryption secret in Vault secret engine                    |
 | VAULT_ENCRYPTION_SECRET_KEY   | anv.secret                                 | Key name of encryption secret                                       |
 | AUDIT_ENABLED                 | false                                      | Enable web request auditing                                         |
+| NOTARIZATION_JOB_ENABLED      | false                                      | Document notarization job switch                                    |
+| NOTARIZATION_JOB_CRON_EXPRESSION | 0 0/30 * * * ?                          | Cron expression for notarization job                                |
+| ETH_RPC_URL                   | http://localhost:8545                      | Ethereum RPC endpoint                                               |
+| ETH_PRIVATE_KEY               |                                           | Private key used to sign transactions                               |
+| ETH_ACCOUNT                   |                                           | Destination account for notarization transactions                   |
 
 ## Build
 

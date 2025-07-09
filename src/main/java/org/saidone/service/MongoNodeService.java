@@ -67,6 +67,16 @@ public class MongoNodeService extends BaseComponent implements NodeService {
         }
     }
 
+    @Override
+    public Iterable<NodeWrapper> findAll() {
+        return mongoNodeRepository.findAll();
+    }
+
+    @Override
+    public Iterable<NodeWrapper> findByTxId(String txId) {
+        return mongoNodeRepository.findByTxId(txId);
+    }
+
     /**
      * Deletes the node wrapper identified by the given ID.
      *
@@ -76,5 +86,4 @@ public class MongoNodeService extends BaseComponent implements NodeService {
     public void deleteById(String nodeId) {
         mongoNodeRepository.deleteById(nodeId);
     }
-
 }

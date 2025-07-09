@@ -43,6 +43,23 @@ public interface NodeService {
     NodeWrapper findById(String nodeId);
 
     /**
+     * Retrieves all stored node wrappers.
+     *
+     * @return iterable collection of {@link NodeWrapper}
+     */
+    Iterable<NodeWrapper> findAll();
+
+    /**
+     * Retrieves all node wrappers having the given notarization transaction ID.
+     * A {@code null} transaction ID is used to select nodes that have not yet
+     * been notarized.
+     *
+     * @param txId the notarization transaction ID to filter by
+     * @return iterable collection of {@link NodeWrapper}
+     */
+    Iterable<NodeWrapper> findByTxId(String txId);
+
+    /**
      * Removes the stored node metadata identified by the given ID.
      *
      * @param nodeId the Alfresco node identifier

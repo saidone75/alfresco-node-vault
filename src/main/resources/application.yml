@@ -88,6 +88,9 @@ application:
     cron-expression: ${ARCHIVING_JOB_CRON_EXPRESSION:0 0/5 2-6 * * ?}
     query: ${ARCHIVING_JOB_QUERY:TYPE:'cm:content' AND ASPECT:'anv:archive'}
     enabled: ${ARCHIVING_JOB_ENABLED:true}
+  notarization-job:
+    cron-expression: ${NOTARIZATION_JOB_CRON_EXPRESSION:0 0/30 * * * ?}
+    enabled: ${NOTARIZATION_JOB_ENABLED:false}
   service:
     alfresco:
       include:
@@ -139,6 +142,9 @@ application:
           bucket: ${S3_BUCKET:anv}
           region: ${S3_REGION:eu-central-1}
           endpoint: ${S3_ENDPOINT:http://localhost:4566}
+    ethereum:
+      rpc-url: ${ETH_RPC_URL:http://localhost:8545}
+      private-key: ${ETH_PRIVATE_KEY:}
+      account: ${ETH_ACCOUNT:}
   same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
-server:
-  port: 8086
+server:  port: 8086
