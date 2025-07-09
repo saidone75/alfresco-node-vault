@@ -282,4 +282,39 @@ public class VaultApiController {
         return ResponseEntity.ok().body(String.format("Node %s successfully archived.", nodeId));
     }
 
+    @SecurityRequirement(name = "basicAuth")
+    @PostMapping("/nodes/{nodeId}/notarize")
+    @Operation(
+            summary = "Notarize a node",
+            description = "Request notarization of the specified node.",
+            parameters = {
+                    @Parameter(name = "nodeId", description = "Identifier of the node to notarize", required = true, in = ParameterIn.PATH)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Notarization required",
+                            content = @Content(mediaType = "text/plain")),
+                    @ApiResponse(responseCode = "404", description = "Node not found",
+                            content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content)
+            })
+    /**
+     * Require notarization of a node.
+     *
+     * @param auth   optional Basic authentication header
+     * @param nodeId identifier of the node to notarize
+     * @return a confirmation message
+     */
+    public ResponseEntity<?> notarizeNode(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
+            @PathVariable String nodeId) {
+
+        if (!authenticationService.isAuthorized(auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // TODO: call notarization service
+        return ResponseEntity.ok().body(String.format("Node %s successfully notarized.", nodeId));
+    }
+
 }
