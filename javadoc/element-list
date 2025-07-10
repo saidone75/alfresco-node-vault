@@ -16,4 +16,5 @@ org.saidone.repository
 org.saidone.service
 org.saidone.service.content
 org.saidone.service.crypto
+org.saidone.service.notarization
 org.saidone.utils
