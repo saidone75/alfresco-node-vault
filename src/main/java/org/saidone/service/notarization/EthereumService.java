@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.EthereumConfig;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
@@ -46,7 +47,10 @@ import java.nio.charset.StandardCharsets;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class EthereumService extends BaseComponent {
+@ConditionalOnExpression(
+        "${application.service.vault.notarization.enabled}.equals(true) and '${application.service.vault.notarization.impl}'.equals('ethereum')"
+)
+public class EthereumService extends AbstractNotarizationService {
 
     private final EthereumConfig config;
 

@@ -22,6 +22,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.web3j.crypto.Keys;
@@ -32,7 +33,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
 @Configuration
-@ConfigurationProperties(prefix = "application.service.ethereum")
+@ConditionalOnExpression(
+        "${application.service.vault.notarization.enabled}.equals(true) and '${application.service.vault.notarization.impl}'.equals('ethereum')"
+)
+@ConfigurationProperties(prefix = "application.service.vault.notarization.ethereum")
 @Data
 @Slf4j
 /**

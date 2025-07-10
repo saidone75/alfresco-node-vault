@@ -18,10 +18,14 @@
 
 package org.saidone.service.notarization;
 
-public interface NotarizationService {
+import org.saidone.component.BaseComponent;
 
-    String storeHash(String nodeId, String hash);
+public abstract class AbstractNotarizationService extends BaseComponent implements NotarizationService {
 
-    void notarizeDocument(String nodeId);
+    public abstract String storeHash(String nodeId, String hash);
+
+    public void notarizeDocument(String nodeId) {
+
+    }
 
 }

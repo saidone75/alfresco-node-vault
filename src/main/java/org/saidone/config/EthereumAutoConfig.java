@@ -44,7 +44,7 @@ public class EthereumAutoConfig {
      * @throws Exception if key pair generation fails
      */
     @Bean
-    @ConditionalOnProperty(value = "application.service.ethereum.auto-generate", havingValue = "true")
+    @ConditionalOnProperty(value = "application.service.vault.notarization.ethereum.auto-generate", havingValue = "true")
     public EthereumCredentials ethereumCredentials() throws Exception {
         val keyPair = Keys.createEcKeyPair();
         val privateKey = Numeric.toHexStringWithPrefix(keyPair.getPrivateKey());

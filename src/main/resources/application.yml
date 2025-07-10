@@ -142,11 +142,14 @@ application:
           bucket: ${S3_BUCKET:anv}
           region: ${S3_REGION:eu-central-1}
           endpoint: ${S3_ENDPOINT:http://localhost:4566}
-    ethereum:
-      rpc-url: ${ETH_RPC_URL:http://localhost:8545}
-      private-key: ${ETH_PRIVATE_KEY:}
-      account: ${ETH_ACCOUNT:}
-      auto-generate: ${ETH_AUTO_GENERATE:true}
+      notarization:
+        enabled: true
+        impl: ethereum
+        ethereum:
+          rpc-url: ${ETH_RPC_URL:http://localhost:8545}
+          private-key: ${ETH_PRIVATE_KEY:}
+          account: ${ETH_ACCOUNT:}
+          auto-generate: ${ETH_AUTO_GENERATE:true}
   same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
 server:
   port: 8086
