@@ -34,7 +34,7 @@ import org.saidone.exception.NodeNotFoundException;
 import org.saidone.exception.VaultException;
 import org.saidone.model.Entry;
 import org.saidone.service.AuthenticationService;
-import org.saidone.service.EthereumService;
+import org.saidone.service.notarization.EthereumService;
 import org.saidone.service.content.ContentService;
 import org.saidone.service.VaultService;
 import org.springframework.core.io.InputStreamResource;
@@ -319,7 +319,7 @@ public class VaultApiController {
         // TODO: call notarization service
         val txHash = ethereumService.storeHash(nodeId, UUID.randomUUID().toString());
         log.debug("txHash: {}", txHash);
-        return ResponseEntity.ok().body(String.format("Node %s successfully notarized.", nodeId));
+        return ResponseEntity.ok().body(String.format("Notarization for node %s successfully required.", nodeId));
     }
 
 }
