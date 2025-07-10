@@ -42,7 +42,7 @@ public class EthereumAutoConfig {
     public static class EthereumCredentials {
         /** Ethereum account address beginning with {@code 0x}. */
         private String account;
-        /** Hex encoded private key without the {@code 0x} prefix. */
+        /** Hex encoded private key. */
         private String privateKey;
     }
 
