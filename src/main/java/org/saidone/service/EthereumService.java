@@ -19,6 +19,11 @@ import java.nio.charset.StandardCharsets;
 
 /**
  * Service responsible for interacting with an Ethereum node to store document hashes.
+ *
+ * <p>This component wraps the minimal Web3j interactions required by the
+ * application. It creates the {@link Web3j} client on startup and uses the
+ * provided {@link Credentials} to sign transactions that embed document
+ * hashes.</p>
  */
 @Service
 @RequiredArgsConstructor
@@ -30,6 +35,14 @@ public class EthereumService extends BaseComponent {
     private Web3j web3j;
     private Credentials credentials;
 
+    /**
+     * Initializes the Web3j client and credentials after dependency injection.
+     * <p>
+     * The client is built using the RPC URL from {@link EthereumConfig}. If a
+     * private key is configured, corresponding {@link Credentials} are loaded to
+     * allow signed transactions.
+     * </p>
+     */
     @PostConstruct
     @Override
     public void init() {
@@ -40,6 +53,9 @@ public class EthereumService extends BaseComponent {
         }
     }
 
+    /**
+     * Shuts down the Web3j client before the bean is destroyed.
+     */
     @PreDestroy
     @Override
     public void stop() {
@@ -51,10 +67,14 @@ public class EthereumService extends BaseComponent {
 
     /**
      * Sends a zero-value transaction containing the given hash as data.
+     * <p>
+     * The transaction is signed with the configured credentials and addressed
+     * to the account defined in {@link EthereumConfig}.
+     * </p>
      *
-     * @param nodeId the node identifier
+     * @param nodeId the Alfresco node identifier used for logging
      * @param hash   the hash to store on the blockchain
-     * @return the transaction hash
+     * @return the resulting Ethereum transaction hash
      */
     public String storeHash(String nodeId, String hash) {
         try {
