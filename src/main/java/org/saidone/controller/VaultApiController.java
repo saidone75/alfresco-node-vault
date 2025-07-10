@@ -44,6 +44,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 /**
  * REST controller that exposes operations for interacting with the vault.
  * <p>
@@ -314,10 +316,9 @@ public class VaultApiController {
         if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-
         // TODO: call notarization service
-        val hash = ethereumService.storeHash(nodeId, "ciao");
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>" + hash);
+        val txHash = ethereumService.storeHash(nodeId, UUID.randomUUID().toString());
+        log.debug("txHash: {}", txHash);
         return ResponseEntity.ok().body(String.format("Node %s successfully notarized.", nodeId));
     }
 
