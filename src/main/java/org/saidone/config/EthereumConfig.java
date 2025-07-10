@@ -17,13 +17,30 @@ import java.security.NoSuchProviderException;
 @ConfigurationProperties(prefix = "application.service.ethereum")
 @Data
 @Slf4j
+/**
+ * Configuration properties used to connect to an Ethereum node.
+ * <p>
+ * When {@code autoGenerate} is enabled a new key pair and account
+ * address are created at startup.
+ */
 public class EthereumConfig {
 
+    /** JSON-RPC endpoint of the Ethereum node. */
     private String rpcUrl;
+    /** Hex encoded private key used to sign transactions. */
     private String privateKey;
+    /** Ethereum account address used as transaction recipient. */
     private String account;
+    /** Whether to automatically generate a new Ethereum account at startup. */
     private boolean autoGenerate;
     
+    /**
+     * Generates an Ethereum account if {@link #autoGenerate} is enabled.
+     *
+     * @throws InvalidAlgorithmParameterException if the algorithm parameters are invalid
+     * @throws NoSuchAlgorithmException           if the algorithm cannot be found
+     * @throws NoSuchProviderException            if the security provider is unavailable
+     */
     @PostConstruct
     public void init() throws InvalidAlgorithmParameterException, NoSuchAlgorithmException, NoSuchProviderException {
      if (autoGenerate) {
