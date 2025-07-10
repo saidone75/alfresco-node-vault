@@ -1,4 +1,22 @@
-package org.saidone.service;
+/*
+ *  Alfresco Node Vault - archive today, accelerate tomorrow
+ *  Copyright (C) 2025 Saidone
+ *
+ *  This program is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This program is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package org.saidone.service.notarization;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
@@ -7,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.EthereumConfig;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
@@ -28,7 +47,10 @@ import java.nio.charset.StandardCharsets;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class EthereumService extends BaseComponent {
+@ConditionalOnExpression(
+        "${application.service.vault.notarization.enabled}.equals(true) and '${application.service.vault.notarization.impl}'.equals('ethereum')"
+)
+public class EthereumService extends AbstractNotarizationService {
 
     private final EthereumConfig config;
 
