@@ -57,6 +57,8 @@ public class NodeWrapper {
     private boolean encrypted;
     @Field("node")
     private String nodeJson;
+    @Field("ntx")
+    private String notarizationTxId;
 
     public NodeWrapper(Node node) throws IllegalArgumentException, JsonProcessingException {
         if (node == null) {

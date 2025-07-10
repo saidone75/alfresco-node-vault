@@ -44,7 +44,17 @@
             <appender-ref ref="FILE"/>
         </logger>
 
+        <logger name="org.saidone.config" additivity="false" level="debug">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </logger>
+
         <logger name="org.saidone.filter" additivity="false" level="debug">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </logger>
+
+        <logger name="org.saidone.controller" additivity="false" level="debug">
             <appender-ref ref="CONSOLE"/>
             <appender-ref ref="FILE"/>
         </logger>

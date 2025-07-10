@@ -15,6 +15,8 @@ System_Boundary(anv, "Alfresco Node Vault") {
   Component(anvCrypto, "CryptoService")
   Component(anvAlfresco, "AlfrescoService")
   ContainerDb(anvMongo, "Mongo DB")
+  ContainerDb(anvGrid, "GridFS")
+  ContainerDb(anvS3, "S3")
 }
 
 note right of [anvProxy]
@@ -37,6 +39,8 @@ Rel_D(anvJob, anvVault, "")
 Rel_D(anvJob, anvAlfresco, "")
 Rel_D(anvVault, anvCrypto, "")
 Rel_D(anvCrypto, anvMongo, "")
+Rel_D(anvCrypto, anvGrid, "")
+Rel_D(anvCrypto, anvS3, "")
 Rel_R(anvVault, anvAlfresco, "")
 Rel_R(anvAlfresco, acsApi, "")
 

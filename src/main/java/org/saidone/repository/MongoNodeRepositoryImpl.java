@@ -171,6 +171,18 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return mongoOperations.findAll(NodeWrapper.class);
     }
 
+    /**
+     * Retrieves node wrappers by notarization transaction ID. A {@code null} value
+     * matches nodes without a transaction ID.
+     *
+     * @param txId the transaction ID to filter by
+     * @return list of matching nodes
+     */
+    public List<NodeWrapper> findByTxId(String txId) {
+        val query = new Query(Criteria.where("ntx").is(txId));
+        return mongoOperations.find(query, NodeWrapper.class);
+    }
+
     @Override
     @NonNull
     public List<NodeWrapper> findAllById(@NonNull Iterable<String> ids) {
