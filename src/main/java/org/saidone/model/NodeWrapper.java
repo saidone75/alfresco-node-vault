@@ -43,6 +43,7 @@ import java.time.Instant;
 @Slf4j
 public class NodeWrapper {
 
+    @Getter
     @Transient
     @JsonIgnore
     private static final ObjectMapper objectMapper = createObjectMapper();
