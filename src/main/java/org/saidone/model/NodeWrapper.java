@@ -43,7 +43,6 @@ import java.time.Instant;
 @Slf4j
 public class NodeWrapper {
 
-    @Getter
     @Transient
     @JsonIgnore
     private static final ObjectMapper objectMapper = createObjectMapper();
@@ -58,6 +57,8 @@ public class NodeWrapper {
     private boolean encrypted;
     @Field("node")
     private String nodeJson;
+    @Field("hshc")
+    private String contentHash;
     @Field("ntx")
     private String notarizationTxId;
 
