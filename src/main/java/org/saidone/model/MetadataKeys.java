@@ -18,13 +18,23 @@
 
 package org.saidone.model;
 
+/**
+ * Standard metadata keys used when storing node content in various backends.
+ * These constants provide a common naming convention across implementations.
+ */
 public interface MetadataKeys {
 
+    /** Name of the checksum algorithm (e.g. SHA-256). */
     String CHECKSUM_ALGORITHM = "chkAlg";
+    /** Hex encoded checksum value. */
     String CHECKSUM_VALUE = "chkVal";
+    /** MIME type associated with the stored content. */
     String CONTENT_TYPE = "_contentType";
+    /** Flag marking content as encrypted. */
     String ENCRYPTED = "enc";
+    /** Original file name. */
     String FILENAME = "filename";
+    /** Unique identifier of the stored object. */
     String UUID = "uuid";
 
 }

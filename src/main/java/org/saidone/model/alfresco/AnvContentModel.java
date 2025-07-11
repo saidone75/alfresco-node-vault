@@ -18,6 +18,10 @@
 
 package org.saidone.model.alfresco;
 
+/**
+ * Constants for the Alfresco Node Vault custom content model. Generated using
+ * the Saidone content model tool.
+ */
 @SuppressWarnings("unused")
 public interface AnvContentModel {
 
