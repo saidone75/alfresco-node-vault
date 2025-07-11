@@ -38,11 +38,12 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.*;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
+import software.amazon.awssdk.services.s3.model.S3Exception;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.HashMap;
 
 /**
  * {@link ContentService} implementation that stores node binaries in Amazon S3.
@@ -63,6 +64,9 @@ import java.util.HashMap;
 @ConditionalOnExpression("'${application.service.vault.storage.impl:}' == 's3'")
 public class S3ContentService extends BaseComponent implements ContentService {
 
+    @Value("${application.service.vault.encryption.enabled}")
+    private boolean encryptionEnabled;
+
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
 
@@ -81,12 +85,8 @@ public class S3ContentService extends BaseComponent implements ContentService {
     @Override
     @SneakyThrows
     public NodeContentInfo archiveNodeContent(Node node, InputStream inputStream) {
-        val metadata = new HashMap<String, String>();
-        metadata.put(MetadataKeys.UUID, node.getId());
-        metadata.put(MetadataKeys.FILENAME, node.getName());
-        metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
         try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
-            s3Repository.putObject(s3Config.getBucket(), node, metadata, digestInputStream);
+            s3Repository.putObject(s3Config.getBucket(), node, digestInputStream);
             val hash = digestInputStream.getHash();
             log.trace("{}: {}", checksumAlgorithm, hash);
             val nodeContentInfo = new NodeContentInfo();
@@ -95,6 +95,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
             nodeContentInfo.setContentId(node.getId());
             nodeContentInfo.setContentHashAlgorithm(checksumAlgorithm);
             nodeContentInfo.setContentHash(hash);
+            nodeContentInfo.setEncrypted(encryptionEnabled);
             return nodeContentInfo;
         }
     }

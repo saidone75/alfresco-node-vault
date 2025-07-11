@@ -29,7 +29,6 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 
 import java.io.InputStream;
-import java.util.Map;
 
 /**
  * {@link S3RepositoryImpl} variant that transparently encrypts data before
@@ -71,13 +70,11 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
      *
      * @param bucketName  destination bucket
      * @param node        node whose id acts as the key
-     * @param metadata    metadata key/value pairs to associate with the object
      * @param inputStream content stream to encrypt and upload
      */
     @Override
-    public void putObject(String bucketName, Node node, Map<String, String> metadata, InputStream inputStream) {
-        metadata.put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString());
-        super.putObject(bucketName, node, metadata, cryptoService.encrypt(inputStream));
+    public void putObject(String bucketName, Node node, InputStream inputStream) {
+        super.putObject(bucketName, node, cryptoService.encrypt(inputStream));
     }
 
     /**
@@ -90,29 +87,7 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
      */
     @Override
     public InputStream getObject(String bucketName, String nodeId) {
-        if (isEncrypted(bucketName, nodeId)) {
-            return cryptoService.decrypt(super.getObject(bucketName, nodeId));
-        } else {
-            log.warn("Object {} in bucket {} is not encrypted", nodeId, bucketName);
-            return super.getObject(bucketName, nodeId);
-        }
-    }
-
-    /**
-     * Checks whether the object stored for the given node id is marked as
-     * encrypted in its metadata.
-     *
-     * @param bucketName bucket containing the object
-     * @param nodeId     the object key / node id
-     * @return {@code true} if the object is encrypted, {@code false} otherwise
-     */
-    private boolean isEncrypted(String bucketName, String nodeId) {
-        val headObjectRequest = HeadObjectRequest.builder()
-                .bucket(bucketName)
-                .key(nodeId)
-                .build();
-        val metadata = s3Client.headObject(headObjectRequest).metadata();
-        return Boolean.parseBoolean(metadata.getOrDefault(MetadataKeys.ENCRYPTED, Boolean.FALSE.toString()));
+        return cryptoService.decrypt(super.getObject(bucketName, nodeId));
     }
 
 }

@@ -25,8 +25,9 @@ import lombok.EqualsAndHashCode;
 @Data
 public class NodeContentInfo extends NodeContent {
 
-    public String contentId;
-    public String contentHashAlgorithm;
-    public String contentHash;
+    private String contentId;
+    private String contentHashAlgorithm;
+    private String contentHash;
+    private boolean encrypted;
 
 }

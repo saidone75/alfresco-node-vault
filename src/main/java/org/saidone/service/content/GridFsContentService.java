@@ -55,6 +55,9 @@ public class GridFsContentService implements ContentService {
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
 
+    @Value("${application.service.vault.encryption.enabled}")
+    private boolean encryptionEnabled;
+
     private final GridFsRepositoryImpl gridFsRepository;
 
     /**
@@ -83,8 +86,9 @@ public class GridFsContentService implements ContentService {
             nodeContentInfo.setFileName(node.getName());
             nodeContentInfo.setContentType(node.getContent().getMimeType());
             nodeContentInfo.setContentId(node.getId());
-            nodeContentInfo.setContentHashAlgorithm(checksumAlgorithm);
+            nodeContentInfo.setContentHashAlgorithm(hash);
             nodeContentInfo.setContentHash(checksumAlgorithm);
+            nodeContentInfo.setEncrypted(encryptionEnabled);
             return nodeContentInfo;
         }
     }
