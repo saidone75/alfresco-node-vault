@@ -42,7 +42,7 @@ import org.saidone.exception.ApiExceptionError;
 import org.saidone.exception.VaultException;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.misc.ProgressTrackingOutputStream;
-import org.saidone.model.NodeContent;
+import org.saidone.model.NodeContentStream;
 import org.saidone.model.SystemSearchRequest;
 import org.saidone.model.alfresco.AnvContentModel;
 import org.saidone.utils.CastUtils;
@@ -280,20 +280,20 @@ public class AlfrescoService extends BaseComponent {
      * Restores the content of a node by uploading the provided content stream.
      *
      * @param nodeId      the identifier of the node to update content for
-     * @param nodeContent the {@link NodeContent} containing the content stream and metadata
+     * @param nodeContentStream the {@link NodeContentStream} containing the content stream and metadata
      */
     @SneakyThrows
-    public void restoreNodeContent(String nodeId, NodeContent nodeContent) {
+    public void restoreNodeContent(String nodeId, NodeContentStream nodeContentStream) {
         val url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
         val conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod(HttpMethod.PUT.name());
         conn.setDoOutput(true);
         conn.setRequestProperty(HttpHeaders.AUTHORIZATION, basicAuth);
-        conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, nodeContent.getContentType());
+        conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, nodeContentStream.getContentType());
         conn.setChunkedStreamingMode(chunkSize);
 
-        try (val is = nodeContent.getContentStream();
-             val os = new ProgressTrackingOutputStream(conn.getOutputStream(), nodeId, nodeContent.getLength())) {
+        try (val is = nodeContentStream.getContentStream();
+             val os = new ProgressTrackingOutputStream(conn.getOutputStream(), nodeId, nodeContentStream.getLength())) {
             is.transferTo(os);
         }
 

@@ -19,11 +19,14 @@
 package org.saidone.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
-public abstract class NodeContent {
+public class NodeContentInfo extends NodeContent {
 
-     public String fileName;
-     public String contentType;
+    public String contentId;
+    public String contentHashAlgorithm;
+    public String contentHash;
 
 }

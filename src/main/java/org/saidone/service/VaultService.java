@@ -79,7 +79,8 @@ public class VaultService extends BaseComponent {
                     nodeId,
                     node.getContent().getSizeInBytes());
             nodeService.save(new NodeWrapper(node));
-            contentService.archiveNodeContent(node, nodeContentInputStream);
+            val nodeContentInfo = contentService.archiveNodeContent(node, nodeContentInputStream);
+            // TODO store content info on mongodb
             if (doubleCheck) doubleCheck(nodeId);
             alfrescoService.deleteNode(nodeId);
         } catch (FeignException.NotFound e) {

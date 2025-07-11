@@ -19,7 +19,8 @@
 package org.saidone.service.content;
 
 import org.alfresco.core.model.Node;
-import org.saidone.model.NodeContent;
+import org.saidone.model.NodeContentInfo;
+import org.saidone.model.NodeContentStream;
 
 import java.io.InputStream;
 
@@ -36,15 +37,15 @@ public interface ContentService {
      * @param node        node whose content should be archived
      * @param inputStream stream providing the node content
      */
-    void archiveNodeContent(Node node, InputStream inputStream);
+    NodeContentInfo archiveNodeContent(Node node, InputStream inputStream);
 
     /**
      * Retrieves previously archived content for the given node id.
      *
      * @param nodeId identifier of the node
-     * @return a {@link NodeContent} descriptor containing stream and metadata
+     * @return a {@link NodeContentStream} descriptor containing stream and metadata
      */
-    NodeContent getNodeContent(String nodeId);
+    NodeContentStream getNodeContent(String nodeId);
 
     /**
      * Deletes content associated with the given node id from the store.

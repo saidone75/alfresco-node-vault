@@ -18,14 +18,30 @@
 
 package org.saidone.service.notarization;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.saidone.component.BaseComponent;
+import org.saidone.service.VaultService;
+import org.saidone.model.NodeWrapper;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+
+@RequiredArgsConstructor
+@Slf4j
 public abstract class AbstractNotarizationService extends BaseComponent implements NotarizationService {
+
+    private final VaultService vaultService;
 
     public abstract String storeHash(String nodeId, String hash);
 
+    @SneakyThrows
     public void notarizeDocument(String nodeId) {
-
+        storeHash(nodeId,"hash");
+        log.debug("notarizing document {}", nodeId);
     }
 
 }

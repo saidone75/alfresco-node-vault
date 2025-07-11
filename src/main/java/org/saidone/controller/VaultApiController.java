@@ -34,9 +34,9 @@ import org.saidone.exception.NodeNotFoundException;
 import org.saidone.exception.VaultException;
 import org.saidone.model.Entry;
 import org.saidone.service.AuthenticationService;
-import org.saidone.service.notarization.EthereumService;
-import org.saidone.service.content.ContentService;
 import org.saidone.service.VaultService;
+import org.saidone.service.content.ContentService;
+import org.saidone.service.notarization.NotarizationService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -63,7 +63,7 @@ public class VaultApiController {
     private final AuthenticationService authenticationService;
     private final VaultService vaultService;
     private final ContentService contentService;
-    private final EthereumService ethereumService;
+    private final NotarizationService notarizationService;
 
     /**
      * Handles any unexpected exception thrown during request processing.
@@ -317,7 +317,7 @@ public class VaultApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         // TODO: call notarization service
-        val txHash = ethereumService.storeHash(nodeId, UUID.randomUUID().toString());
+        val txHash = notarizationService.storeHash(nodeId, UUID.randomUUID().toString());
         log.debug("txHash: {}", txHash);
         return ResponseEntity.ok().body(String.format("Notarization for node %s successfully required.", nodeId));
     }

@@ -19,11 +19,15 @@
 package org.saidone.model;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+import java.io.InputStream;
+
+@EqualsAndHashCode(callSuper = true)
 @Data
-public abstract class NodeContent {
+public class NodeContentStream extends NodeContent {
 
-     public String fileName;
-     public String contentType;
+    private long length;
+    private InputStream contentStream;
 
 }
