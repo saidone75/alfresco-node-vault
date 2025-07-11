@@ -26,7 +26,8 @@ import org.alfresco.core.model.Node;
 import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
-import org.saidone.model.NodeContent;
+import org.saidone.model.NodeContentInfo;
+import org.saidone.model.NodeContentStream;
 import org.saidone.repository.GridFsRepositoryImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -67,7 +68,7 @@ public class GridFsContentService implements ContentService {
      */
     @Override
     @SneakyThrows
-    public void archiveNodeContent(Node node, InputStream inputStream) {
+    public NodeContentInfo archiveNodeContent(Node node, InputStream inputStream) {
         try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
             gridFsRepository.saveFile(
                     digestInputStream,
@@ -78,12 +79,13 @@ public class GridFsContentService implements ContentService {
                     }});
             val hash = digestInputStream.getHash();
             log.trace("{}: {}", checksumAlgorithm, hash);
-            gridFsRepository.updateFileMetadata(
-                    node.getId(),
-                    new HashMap<>() {{
-                        put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
-                        put(MetadataKeys.CHECKSUM_VALUE, hash);
-                    }});
+            val nodeContentInfo = new NodeContentInfo();
+            nodeContentInfo.setFileName(node.getName());
+            nodeContentInfo.setContentType(node.getContent().getMimeType());
+            nodeContentInfo.setContentId(node.getId());
+            nodeContentInfo.setContentHashAlgorithm(checksumAlgorithm);
+            nodeContentInfo.setContentHash(checksumAlgorithm);
+            return nodeContentInfo;
         }
     }
 
@@ -91,16 +93,16 @@ public class GridFsContentService implements ContentService {
      * Retrieves the content of a node stored in GridFS by node ID.
      *
      * @param nodeId the ID of the node
-     * @return the {@link NodeContent} containing file name, content type, length and the content stream
+     * @return the {@link NodeContentStream} containing file name, content type, length and the content stream
      * @throws NodeNotFoundOnVaultException if the node content is not found in the vault
      */
     @Override
-    public NodeContent getNodeContent(String nodeId) {
+    public NodeContentStream getNodeContent(String nodeId) {
         val gridFSFile = gridFsRepository.findFileById(nodeId);
         if (gridFSFile == null) {
             throw new NodeNotFoundOnVaultException(nodeId);
         }
-        val nodeContent = new NodeContent();
+        val nodeContent = new NodeContentStream();
         nodeContent.setFileName(gridFSFile.getFilename());
         if (gridFSFile.getMetadata() != null && gridFSFile.getMetadata().containsKey(MetadataKeys.CONTENT_TYPE)) {
             nodeContent.setContentType(gridFSFile.getMetadata().getString(MetadataKeys.CONTENT_TYPE));

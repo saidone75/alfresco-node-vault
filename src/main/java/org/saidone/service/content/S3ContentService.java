@@ -30,7 +30,8 @@ import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.exception.VaultException;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
-import org.saidone.model.NodeContent;
+import org.saidone.model.NodeContentInfo;
+import org.saidone.model.NodeContentStream;
 import org.saidone.repository.S3Repository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -48,7 +49,7 @@ import java.util.HashMap;
  * <p>
  * During archival the content stream is uploaded while a checksum is computed on the
  * fly. The resulting hash and other metadata are stored as object metadata. Retrieval
- * operations return a {@link NodeContent} descriptor using the AWS SDK.
+ * operations return a {@link NodeContentStream} descriptor using the AWS SDK.
  * </p>
  * <p>
  * This service is enabled when {@code application.service.vault.storage.impl} is set to
@@ -79,7 +80,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
      */
     @Override
     @SneakyThrows
-    public void archiveNodeContent(Node node, InputStream inputStream) {
+    public NodeContentInfo archiveNodeContent(Node node, InputStream inputStream) {
         val metadata = new HashMap<String, String>();
         metadata.put(MetadataKeys.UUID, node.getId());
         metadata.put(MetadataKeys.FILENAME, node.getName());
@@ -88,18 +89,13 @@ public class S3ContentService extends BaseComponent implements ContentService {
             s3Repository.putObject(s3Config.getBucket(), node, metadata, digestInputStream);
             val hash = digestInputStream.getHash();
             log.trace("{}: {}", checksumAlgorithm, hash);
-            metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
-            metadata.put(MetadataKeys.CHECKSUM_VALUE, hash);
-            val copyRequest = CopyObjectRequest.builder()
-                    .sourceBucket(s3Config.getBucket())
-                    .sourceKey(node.getId())
-                    .destinationBucket(s3Config.getBucket())
-                    .destinationKey(node.getId())
-                    .metadata(metadata)
-                    .metadataDirective(MetadataDirective.REPLACE)
-                    .contentType(node.getContent().getMimeType())
-                    .build();
-            s3Client.copyObject(copyRequest);
+            val nodeContentInfo = new NodeContentInfo();
+            nodeContentInfo.setFileName(node.getName());
+            nodeContentInfo.setContentType(node.getContent().getMimeType());
+            nodeContentInfo.setContentId(node.getId());
+            nodeContentInfo.setContentHashAlgorithm(checksumAlgorithm);
+            nodeContentInfo.setContentHash(checksumAlgorithm);
+            return nodeContentInfo;
         }
     }
 
@@ -111,11 +107,11 @@ public class S3ContentService extends BaseComponent implements ContentService {
      * @throws NodeNotFoundOnVaultException if the object is not found
      */
     @Override
-    public NodeContent getNodeContent(String nodeId) {
+    public NodeContentStream getNodeContent(String nodeId) {
         try {
             val head = s3Client.headObject(HeadObjectRequest.builder()
                     .bucket(s3Config.getBucket()).key(nodeId).build());
-            val nodeContent = new NodeContent();
+            val nodeContent = new NodeContentStream();
             nodeContent.setFileName(head.metadata().getOrDefault(MetadataKeys.FILENAME, nodeId));
             nodeContent.setContentType(head.contentType());
             nodeContent.setLength(head.contentLength());
