@@ -94,7 +94,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
             nodeContentInfo.setContentType(node.getContent().getMimeType());
             nodeContentInfo.setContentId(node.getId());
             nodeContentInfo.setContentHashAlgorithm(checksumAlgorithm);
-            nodeContentInfo.setContentHash(checksumAlgorithm);
+            nodeContentInfo.setContentHash(hash);
             return nodeContentInfo;
         }
     }

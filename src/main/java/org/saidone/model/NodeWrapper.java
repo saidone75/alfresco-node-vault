@@ -57,18 +57,23 @@ public class NodeWrapper {
     private boolean encrypted;
     @Field("node")
     private String nodeJson;
-    @Field("hshc")
-    private String contentHash;
+    @Field("cinf")
+    private NodeContentInfo contentInfo;
     @Field("ntx")
     private String notarizationTxId;
 
     public NodeWrapper(Node node) throws IllegalArgumentException, JsonProcessingException {
+        new NodeWrapper(node, null);
+    }
+
+    public NodeWrapper(Node node, NodeContentInfo contentInfo) throws IllegalArgumentException, JsonProcessingException {
         if (node == null) {
             throw new IllegalArgumentException("Node cannot be null");
         }
         this.id = node.getId();
         this.archiveDate = java.time.Instant.now();
         this.nodeJson = objectMapper.writeValueAsString(node);
+        this.contentInfo = contentInfo;
     }
 
     @SneakyThrows
