@@ -35,6 +35,12 @@ import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Instant;
 
+/**
+ * MongoDB wrapper entity storing an Alfresco {@link Node} together with
+ * additional vault specific metadata. The JSON representation of the
+ * {@code Node} is persisted in the {@code nodeJson} field while metadata such
+ * as archival date or notarization id are stored in dedicated properties.
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -62,10 +68,28 @@ public class NodeWrapper {
     @Field("ntx")
     private String notarizationTxId;
 
+    /**
+     * Convenience constructor creating a wrapper for the given node without
+     * any content information. It simply delegates to the two argument
+     * constructor.
+     *
+     * @param node the Alfresco node to wrap
+     * @throws IllegalArgumentException if {@code node} is {@code null}
+     * @throws JsonProcessingException  if the node cannot be serialized
+     */
     public NodeWrapper(Node node) throws IllegalArgumentException, JsonProcessingException {
         new NodeWrapper(node, null);
     }
 
+    /**
+     * Creates a wrapper for the provided Alfresco {@link Node} optionally
+     * carrying content metadata.
+     *
+     * @param node        the node to persist
+     * @param contentInfo optional content information or {@code null}
+     * @throws IllegalArgumentException if {@code node} is {@code null}
+     * @throws JsonProcessingException  if the node cannot be serialized to JSON
+     */
     public NodeWrapper(Node node, NodeContentInfo contentInfo) throws IllegalArgumentException, JsonProcessingException {
         if (node == null) {
             throw new IllegalArgumentException("Node cannot be null");
@@ -76,6 +100,13 @@ public class NodeWrapper {
         this.contentInfo = contentInfo;
     }
 
+    /**
+     * Deserializes the JSON stored in {@link #nodeJson} back into an
+     * {@link Node} instance.
+     *
+     * @return the deserialized Alfresco node
+     * @throws JsonProcessingException if the JSON cannot be parsed
+     */
     @SneakyThrows
     public Node getNode() {
         try {
@@ -87,6 +118,11 @@ public class NodeWrapper {
         }
     }
 
+    /**
+     * Creates a preconfigured {@link ObjectMapper} instance used to
+     * serialize and deserialize nodes. Dates are written in ISO format and
+     * unknown properties are ignored when reading.
+     */
     private static ObjectMapper createObjectMapper() {
         val mapper = new ObjectMapper();
         mapper.registerModule(new JavaTimeModule());
