@@ -20,6 +20,10 @@ package org.saidone.model;
 
 import lombok.Data;
 
+/**
+ * DTO used for invoking the Alfresco System API search endpoint. It mirrors
+ * the minimal set of parameters supported by the service.
+ */
 @Data
 public class SystemSearchRequest {
 	

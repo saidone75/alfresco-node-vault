@@ -23,6 +23,10 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.alfresco.core.model.Node;
 
+/**
+ * Simple wrapper used when communicating with the Alfresco public API where
+ * responses are typically wrapped inside an {@code entry} JSON object.
+ */
 @AllArgsConstructor
 @Data
 public class Entry {

@@ -23,11 +23,18 @@ import lombok.EqualsAndHashCode;
 
 import java.io.InputStream;
 
+/**
+ * Descriptor representing a node's binary data as an {@link InputStream} along
+ * with its length. Extends {@link NodeContent} to also expose the file name and
+ * content type.
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class NodeContentStream extends NodeContent {
 
+    /** Size of the content in bytes. */
     private long length;
+    /** Stream providing access to the binary content. */
     private InputStream contentStream;
 
 }

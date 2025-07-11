@@ -21,12 +21,18 @@ package org.saidone.model;
 import lombok.Data;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+/**
+ * Base class containing minimal information about node binary content. It is
+ * extended by descriptors carrying additional metadata or a content stream.
+ */
 @Data
 public abstract class NodeContent {
 
-     @Field("name")
-     public String fileName;
-     @Field("ct")
-     public String contentType;
+    /** Original file name. */
+    @Field("name")
+    public String fileName;
+    /** MIME type of the content. */
+    @Field("ct")
+    public String contentType;
 
 }

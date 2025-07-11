@@ -18,6 +18,11 @@
 
 package org.saidone.model.alfresco;
 
+/**
+ * Constants representing the standard Alfresco content model. The file is
+ * generated using the Saidone content model tool and contains both type and
+ * aspect QNames.
+ */
 @SuppressWarnings("unused")
 public interface AlfrescoContentModel {
 

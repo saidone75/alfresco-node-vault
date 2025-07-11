@@ -22,16 +22,25 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+/**
+ * Metadata describing the archived content of a node. Extends
+ * {@link NodeContent} with additional information such as checksum and
+ * encryption status.
+ */
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class NodeContentInfo extends NodeContent {
 
+    /** Identifier of the stored content (e.g. GridFS id). */
     @Field("cid")
     private String contentId;
+    /** Hash algorithm used to generate {@link #contentHash}. */
     @Field("alg")
     private String contentHashAlgorithm;
+    /** Hexadecimal checksum of the content. */
     @Field("hash")
     private String contentHash;
+    /** Flag indicating whether the binary data is encrypted. */
     @Field("enc")
     private boolean encrypted;
 
