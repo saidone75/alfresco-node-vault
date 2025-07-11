@@ -19,11 +19,14 @@
 package org.saidone.model;
 
 import lombok.Data;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @Data
 public abstract class NodeContent {
 
+     @Field("name")
      public String fileName;
+     @Field("ct")
      public String contentType;
 
 }

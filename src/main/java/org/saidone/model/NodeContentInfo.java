@@ -20,14 +20,19 @@ package org.saidone.model;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.springframework.data.mongodb.core.mapping.Field;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class NodeContentInfo extends NodeContent {
 
+    @Field("cid")
     private String contentId;
+    @Field("alg")
     private String contentHashAlgorithm;
+    @Field("hash")
     private String contentHash;
+    @Field("enc")
     private boolean encrypted;
 
 }
