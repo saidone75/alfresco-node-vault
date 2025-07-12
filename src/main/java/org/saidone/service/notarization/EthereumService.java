@@ -57,6 +57,13 @@ public class EthereumService extends AbstractNotarizationService {
     private Web3j web3j;
     private Credentials credentials;
 
+    /**
+     * Creates the service with required dependencies.
+     *
+     * @param nodeService    service used to interact with Alfresco nodes
+     * @param contentService service computing document hashes
+     * @param config         Ethereum configuration properties
+     */
     public EthereumService(NodeService nodeService, ContentService contentService, EthereumConfig config) {
         super(nodeService, contentService);
         this.config = config;
@@ -93,6 +100,12 @@ public class EthereumService extends AbstractNotarizationService {
     }
 
     @Override
+    /**
+     * Fetches the hash data stored in the given Ethereum transaction.
+     *
+     * @param txHash the transaction identifier
+     * @return the string stored in the transaction input data
+     */
     public String getHash(String txHash) {
         try {
             val ethTransaction = web3j.ethGetTransactionByHash(txHash).send();

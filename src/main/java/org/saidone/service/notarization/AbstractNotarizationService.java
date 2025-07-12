@@ -17,6 +17,12 @@
  */
 
 package org.saidone.service.notarization;
+/**
+ * Base implementation for services performing document notarization.
+ *
+ * <p>This component provides the common logic for computing document hashes
+ * and updating Alfresco nodes after the hash has been persisted.</p>
+ */
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -37,10 +43,28 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
 
+    /**
+     * Persists the given hash.
+     *
+     * @param nodeId the Alfresco node identifier used for logging
+     * @param hash   the hash value to store
+     * @return an implementation specific transaction id
+     */
     public abstract String putHash(String nodeId, String hash);
 
+    /**
+     * Retrieves the stored hash for the given transaction id.
+     *
+     * @param txId the transaction identifier
+     * @return the stored hash value
+     */
     public abstract String getHash(String txId);
 
+    /**
+     * Computes the hash of the node content and stores it through {@link #putHash}.
+     *
+     * @param nodeId the identifier of the node to notarize
+     */
     @SneakyThrows
     public void notarizeDocument(String nodeId) {
         log.debug("Notarizing document {}", nodeId);
