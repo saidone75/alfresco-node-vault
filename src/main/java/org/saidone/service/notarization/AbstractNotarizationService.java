@@ -18,30 +18,38 @@
 
 package org.saidone.service.notarization;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.component.BaseComponent;
+import org.saidone.service.NodeService;
 import org.saidone.service.VaultService;
-import org.saidone.model.NodeWrapper;
-
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
+import org.saidone.service.content.ContentService;
+import org.springframework.beans.factory.annotation.Value;
 
 @RequiredArgsConstructor
 @Slf4j
 public abstract class AbstractNotarizationService extends BaseComponent implements NotarizationService {
 
-    private final VaultService vaultService;
+    private final NodeService nodeService;
+    private final ContentService contentService;
 
-    public abstract String storeHash(String nodeId, String hash);
+    @Value("${application.service.vault.hash-algorithm}")
+    private String checksumAlgorithm;
+
+    public abstract String putHash(String nodeId, String hash);
+
+    public abstract String getHash(String txId);
 
     @SneakyThrows
     public void notarizeDocument(String nodeId) {
-        storeHash(nodeId,"hash");
-        log.debug("notarizing document {}", nodeId);
+        log.debug("Notarizing document {}", nodeId);
+        val hash = contentService.computeHash(nodeId, checksumAlgorithm);
+        val txHash = putHash(nodeId, hash);
+        val nodeWrapper = nodeService.findById(nodeId);
+        nodeWrapper.setNotarizationTxId(txHash);
+        nodeService.save(nodeWrapper);
     }
 
 }

@@ -45,6 +45,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * REST controller that exposes operations for interacting with the vault.
@@ -316,10 +317,8 @@ public class VaultApiController {
         if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        // TODO: call notarization service
-        val txHash = notarizationService.storeHash(nodeId, UUID.randomUUID().toString());
-        log.debug("txHash: {}", txHash);
-        return ResponseEntity.ok().body(String.format("Notarization for node %s successfully required.", nodeId));
+        CompletableFuture.runAsync(() -> notarizationService.notarizeDocument(nodeId));
+        return ResponseEntity.ok().body(String.format("Notarization for node %s required.", nodeId));
     }
 
 }

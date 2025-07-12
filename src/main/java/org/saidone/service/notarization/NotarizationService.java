@@ -20,7 +20,9 @@ package org.saidone.service.notarization;
 
 public interface NotarizationService {
 
-    String storeHash(String nodeId, String hash);
+    String getHash(String txHash);
+
+    String putHash(String nodeId, String hash);
 
     void notarizeDocument(String nodeId);
 

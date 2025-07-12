@@ -38,7 +38,7 @@ public class DocumentNotarizationJob extends BaseComponent {
     private synchronized void doNotarize() {
         for (val node : nodeService.findByTxId(null)) {
             val checksum = contentService.computeHash(node.getId(), algorithm);
-            val txId = ethereumService.storeHash(node.getId(), checksum);
+            val txId = ethereumService.putHash(node.getId(), checksum);
             node.setNotarizationTxId(txId);
             nodeService.save(node);
         }
