@@ -15,6 +15,9 @@ import java.net.URI;
 @Configuration
 @ConfigurationProperties(prefix = "application.service.vault.storage.s3")
 @Data
+/**
+ * Configuration for the Amazon S3 client used as storage backend.
+ */
 public class S3Config {
 
     private String key;

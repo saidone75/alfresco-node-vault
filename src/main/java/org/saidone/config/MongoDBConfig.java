@@ -33,6 +33,9 @@ import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
 
 @Configuration
+/**
+ * Configures the MongoDB client used to store vault metadata.
+ */
 public class MongoDBConfig extends AbstractMongoClientConfiguration {
 
     @Value("${spring.data.mongodb.uri}")

@@ -30,5 +30,8 @@ import org.springframework.context.annotation.Configuration;
         scheme = "basic"
 )
 @SecurityRequirement(name = "basicAuth")
+/**
+ * Registers OpenAPI components and security scheme for the REST API.
+ */
 public class OpenApiConfig {
 }
