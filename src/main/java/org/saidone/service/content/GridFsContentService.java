@@ -114,10 +114,37 @@ public class GridFsContentService implements ContentService {
         return nodeContent;
     }
 
+    /**
+     * Retrieves metadata information about a node's content stored in GridFS.
+     *
+     * @param nodeId identifier of the node
+     * @return a {@link NodeContentInfo} describing the stored content
+     * @throws NodeNotFoundOnVaultException if the node content cannot be found
+     */
     @Override
     public NodeContentInfo getNodeContentInfo(String nodeId) {
-        // TODO implementation
-        return null;
+        val gridFSFile = gridFsRepository.findFileById(nodeId);
+        if (gridFSFile == null) {
+            throw new NodeNotFoundOnVaultException(nodeId);
+        }
+        val info = new NodeContentInfo();
+        info.setContentId(nodeId);
+        info.setFileName(gridFSFile.getFilename());
+        if (gridFSFile.getMetadata() != null) {
+            if (gridFSFile.getMetadata().containsKey(MetadataKeys.CONTENT_TYPE)) {
+                info.setContentType(gridFSFile.getMetadata().getString(MetadataKeys.CONTENT_TYPE));
+            }
+            if (gridFSFile.getMetadata().containsKey(MetadataKeys.CHECKSUM_ALGORITHM)) {
+                info.setContentHashAlgorithm(gridFSFile.getMetadata().getString(MetadataKeys.CHECKSUM_ALGORITHM));
+            }
+            if (gridFSFile.getMetadata().containsKey(MetadataKeys.CHECKSUM_VALUE)) {
+                info.setContentHash(gridFSFile.getMetadata().getString(MetadataKeys.CHECKSUM_VALUE));
+            }
+            if (gridFSFile.getMetadata().containsKey(MetadataKeys.ENCRYPTED)) {
+                info.setEncrypted(Boolean.TRUE.equals(gridFSFile.getMetadata().getBoolean(MetadataKeys.ENCRYPTED)));
+            }
+        }
+        return info;
     }
 
     /**

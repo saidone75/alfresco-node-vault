@@ -35,7 +35,8 @@ public interface S3Repository {
      *
      * @param bucketName  name of the target S3 bucket
      * @param node        node whose identifier will be used as the object key
-     * @param metadata
+     * @param metadata    optional object metadata to store alongside the binary
+     *                    content
      * @param inputStream the stream providing the content to store
      */
     void putObject(String bucketName, Node node, HashMap<String, String> metadata, InputStream inputStream);

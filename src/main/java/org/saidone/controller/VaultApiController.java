@@ -329,10 +329,11 @@ public class VaultApiController {
     }
 
     /**
-     * Check notarization of a node.
+     * Checks the notarization status of a node and returns the current result.
      *
      * @param auth   optional Basic authentication header
      * @param nodeId identifier of the node to be checked
+     * @return confirmation message or an empty body if not yet notarized
      */
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/nodes/{nodeId}/notarize")

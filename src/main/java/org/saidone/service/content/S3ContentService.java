@@ -130,6 +130,14 @@ public class S3ContentService extends BaseComponent implements ContentService {
         }
     }
 
+    /**
+     * Retrieves only the metadata of a node's content stored in S3 without
+     * streaming the actual binary.
+     *
+     * @param nodeId identifier of the node
+     * @return a populated {@link NodeContentInfo}
+     * @throws NodeNotFoundOnVaultException if the object does not exist in S3
+     */
     @Override
     public NodeContentInfo getNodeContentInfo(String nodeId) {
         try {
