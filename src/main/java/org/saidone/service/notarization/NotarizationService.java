@@ -18,10 +18,30 @@
 
 package org.saidone.service.notarization;
 
+/**
+ * Contract for services capable of notarizing archived documents.
+ * <p>
+ * Implementations typically store a cryptographic hash of a node's content
+ * into an immutable data structure such as a blockchain. The returned value of
+ * {@link #storeHash(String, String)} can be used as a reference to the proof
+ * (for example, a transaction ID).
+ */
 public interface NotarizationService {
 
+    /**
+     * Persists the provided hash in the underlying notarization backend.
+     *
+     * @param nodeId the Alfresco node identifier, used for logging purposes
+     * @param hash   the hexadecimal or base64 encoded hash value to persist
+     * @return a reference to the stored proof (e.g. a transaction hash)
+     */
     String storeHash(String nodeId, String hash);
 
+    /**
+     * Generates and stores the hash for the given node.
+     *
+     * @param nodeId the Alfresco node identifier
+     */
     void notarizeDocument(String nodeId);
 
 }

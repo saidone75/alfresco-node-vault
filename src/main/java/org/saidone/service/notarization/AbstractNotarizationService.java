@@ -30,17 +30,39 @@ import org.saidone.model.NodeWrapper;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 
+/**
+ * Base implementation providing shared functionality for notarization services.
+ * <p>
+ * This class exposes the {@link VaultService} used to retrieve {@link NodeWrapper}
+ * instances and offers a default implementation of {@link #notarizeDocument(String)}
+ * that computes the document hash and delegates to {@link #storeHash(String, String)}.
+ * Subclasses only need to implement the storage logic specific to the chosen
+ * backend (e.g. blockchain, database...).
+ */
 @RequiredArgsConstructor
 @Slf4j
 public abstract class AbstractNotarizationService extends BaseComponent implements NotarizationService {
 
+    /** Service used to access nodes archived in the vault. */
     private final VaultService vaultService;
 
+    /**
+     * Persists the given hash using the concrete notarization backend.
+     *
+     * @param nodeId the Alfresco node identifier
+     * @param hash   the hash value to persist
+     * @return a reference to the stored proof
+     */
     public abstract String storeHash(String nodeId, String hash);
 
+    /**
+     * Computes the document hash and stores it via {@link #storeHash(String, String)}.
+     *
+     * @param nodeId the Alfresco node identifier
+     */
     @SneakyThrows
     public void notarizeDocument(String nodeId) {
-        storeHash(nodeId,"hash");
+        storeHash(nodeId, "hash");
         log.debug("notarizing document {}", nodeId);
     }
 
