@@ -60,7 +60,7 @@ public class EthereumService extends AbstractNotarizationService {
     /**
      * Creates the service with required dependencies.
      *
-     * @param nodeService    service used to interact with Alfresco nodes
+     * @param nodeService    service used to interact with nodes
      * @param contentService service computing document hashes
      * @param config         Ethereum configuration properties
      */
@@ -131,7 +131,7 @@ public class EthereumService extends AbstractNotarizationService {
      * to the account defined in {@link EthereumConfig}.
      * </p>
      *
-     * @param nodeId the Alfresco node identifier used for logging
+     * @param nodeId the node identifier
      * @param hash   the hash to store on the blockchain
      * @return the resulting Ethereum transaction hash
      */
