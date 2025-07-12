@@ -68,7 +68,8 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
      *
      * @param bucketName  destination bucket
      * @param node        node whose id acts as the key
-     * @param metadata
+     * @param metadata    optional object metadata to associate with the stored
+     *                    object
      * @param inputStream content stream to encrypt and upload
      */
     @Override

@@ -63,7 +63,8 @@ public class S3RepositoryImpl extends BaseComponent implements S3Repository {
      *
      * @param bucketName  destination bucket
      * @param node        node whose id acts as the key
-     * @param metadata
+     * @param metadata    optional object metadata to associate with the stored
+     *                    content
      * @param inputStream stream of the content to store
      */
     @Override

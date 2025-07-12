@@ -47,6 +47,14 @@ public interface ContentService {
      */
     NodeContentStream getNodeContent(String nodeId);
 
+    /**
+     * Retrieves only metadata information about the stored content of the given
+     * node without returning the binary stream.
+     *
+     * @param nodeId identifier of the node
+     * @return a {@link NodeContentInfo} descriptor populated with file name,
+     *         content type and checksum details
+     */
     NodeContentInfo getNodeContentInfo(String nodeId);
 
     /**
