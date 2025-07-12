@@ -162,6 +162,8 @@ public class VaultApiController {
                     @ApiResponse(responseCode = "200", description = "Node metadata retrieved successfully",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = Entry.class))),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized",
+                            content = @Content),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -193,6 +195,8 @@ public class VaultApiController {
                     @ApiResponse(responseCode = "200", description = "Node content streamed successfully",
                             content = @Content(mediaType = "application/octet-stream",
                                     schema = @Schema(type = "string", format = "binary"))),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized",
+                            content = @Content),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -250,6 +254,8 @@ public class VaultApiController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Node successfully restored",
                             content = @Content(mediaType = "text/plain")),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized",
+                            content = @Content),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -287,6 +293,8 @@ public class VaultApiController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Node successfully archived",
                             content = @Content(mediaType = "text/plain")),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized",
+                            content = @Content),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -322,6 +330,8 @@ public class VaultApiController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Notarization required",
                             content = @Content(mediaType = "text/plain")),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized",
+                            content = @Content),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -339,11 +349,12 @@ public class VaultApiController {
     }
 
     /**
-     * Checks the notarization status of a node and returns the current result.
+     * Checks the notarization status of a node and returns a human readable
+     * message describing the result.
      *
      * @param auth   optional Basic authentication header
      * @param nodeId identifier of the node to be checked
-     * @return fixme
+     * @return textual description of the current notarization status
      */
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/nodes/{nodeId}/notarize")
@@ -356,6 +367,8 @@ public class VaultApiController {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Notarization check succeeded",
                             content = @Content(mediaType = "text/plain")),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized",
+                            content = @Content),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
