@@ -24,7 +24,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.service.NodeService;
-import org.saidone.service.VaultService;
 import org.saidone.service.content.ContentService;
 import org.springframework.beans.factory.annotation.Value;
 
