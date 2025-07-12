@@ -32,6 +32,7 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
+import java.util.HashMap;
 
 /**
  * Default {@link S3Repository} implementation relying on the AWS SDK
@@ -62,10 +63,11 @@ public class S3RepositoryImpl extends BaseComponent implements S3Repository {
      *
      * @param bucketName  destination bucket
      * @param node        node whose id acts as the key
+     * @param metadata
      * @param inputStream stream of the content to store
      */
     @Override
-    public void putObject(String bucketName, Node node, InputStream inputStream) {
+    public void putObject(String bucketName, Node node, HashMap<String, String> metadata, InputStream inputStream) {
         val putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(node.getId())

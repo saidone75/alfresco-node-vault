@@ -71,7 +71,7 @@ public class GridFsContentService implements ContentService {
      */
     @Override
     @SneakyThrows
-    public NodeContentInfo archiveNodeContent(Node node, InputStream inputStream) {
+    public void archiveNodeContent(Node node, InputStream inputStream) {
         try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
             gridFsRepository.saveFile(
                     digestInputStream,
@@ -82,14 +82,12 @@ public class GridFsContentService implements ContentService {
                     }});
             val hash = digestInputStream.getHash();
             log.trace("{}: {}", checksumAlgorithm, hash);
-            val nodeContentInfo = new NodeContentInfo();
-            nodeContentInfo.setFileName(node.getName());
-            nodeContentInfo.setContentType(node.getContent().getMimeType());
-            nodeContentInfo.setContentId(node.getId());
-            nodeContentInfo.setContentHashAlgorithm(hash);
-            nodeContentInfo.setContentHash(checksumAlgorithm);
-            nodeContentInfo.setEncrypted(encryptionEnabled);
-            return nodeContentInfo;
+            gridFsRepository.updateFileMetadata(
+                    node.getId(),
+                    new HashMap<>() {{
+                        put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
+                        put(MetadataKeys.CHECKSUM_VALUE, hash);
+                    }});
         }
     }
 
@@ -114,6 +112,12 @@ public class GridFsContentService implements ContentService {
         nodeContent.setLength(gridFSFile.getLength());
         nodeContent.setContentStream(gridFsRepository.getFileContent(gridFSFile));
         return nodeContent;
+    }
+
+    @Override
+    public NodeContentInfo getNodeContentInfo(String nodeId) {
+        // TODO implementation
+        return null;
     }
 
     /**

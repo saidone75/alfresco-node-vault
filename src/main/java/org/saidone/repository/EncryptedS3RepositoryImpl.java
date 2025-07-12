@@ -19,16 +19,14 @@
 package org.saidone.repository;
 
 import lombok.extern.slf4j.Slf4j;
-import lombok.val;
 import org.alfresco.core.model.Node;
-import org.saidone.model.MetadataKeys;
 import org.saidone.service.crypto.CryptoService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 
 import java.io.InputStream;
+import java.util.HashMap;
 
 /**
  * {@link S3RepositoryImpl} variant that transparently encrypts data before
@@ -70,11 +68,12 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
      *
      * @param bucketName  destination bucket
      * @param node        node whose id acts as the key
+     * @param metadata
      * @param inputStream content stream to encrypt and upload
      */
     @Override
-    public void putObject(String bucketName, Node node, InputStream inputStream) {
-        super.putObject(bucketName, node, cryptoService.encrypt(inputStream));
+    public void putObject(String bucketName, Node node, HashMap<String, String> metadata, InputStream inputStream) {
+        super.putObject(bucketName, node, metadata, cryptoService.encrypt(inputStream));
     }
 
     /**

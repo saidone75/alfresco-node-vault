@@ -19,7 +19,6 @@
 package org.saidone.model;
 
 import lombok.Data;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 /**
  * Base class containing minimal information about node binary content. It is
@@ -28,11 +27,7 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @Data
 public abstract class NodeContent {
 
-    /** Original file name. */
-    @Field("name")
     public String fileName;
-    /** MIME type of the content. */
-    @Field("ct")
     public String contentType;
 
 }
