@@ -62,15 +62,25 @@ import java.util.concurrent.CompletableFuture;
 @Tag(name = "Vault API", description = "Vault operations")
 public class VaultApiController {
 
-    /** Service used to verify Basic authentication credentials. */
+    /**
+     * Service used to verify Basic authentication credentials.
+     */
     private final AuthenticationService authenticationService;
-    /** Provides high level vault operations. */
+    /**
+     * Provides high level vault operations.
+     */
     private final VaultService vaultService;
-    /** Service responsible for interacting with nodes. */
+    /**
+     * Service responsible for interacting with nodes.
+     */
     private final NodeService nodeService;
-    /** Service responsible for retrieving binary content. */
+    /**
+     * Service responsible for retrieving binary content.
+     */
     private final ContentService contentService;
-    /** Handles notarization requests for archived nodes. */
+    /**
+     * Handles notarization requests for archived nodes.
+     */
     private final NotarizationService notarizationService;
 
     /**
@@ -333,18 +343,18 @@ public class VaultApiController {
      *
      * @param auth   optional Basic authentication header
      * @param nodeId identifier of the node to be checked
-     * @return confirmation message or an empty body if not yet notarized
+     * @return fixme
      */
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/nodes/{nodeId}/notarize")
     @Operation(
-            summary = "Notarize a node",
-            description = "Request notarization of the specified node.",
+            summary = "Check notarization",
+            description = "Check notarization of the specified node.",
             parameters = {
-                    @Parameter(name = "nodeId", description = "Identifier of the node to notarize", required = true, in = ParameterIn.PATH)
+                    @Parameter(name = "nodeId", description = "Identifier of the node to check", required = true, in = ParameterIn.PATH)
             },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Notarization required",
+                    @ApiResponse(responseCode = "200", description = "Notarization check succeeded",
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
@@ -358,21 +368,20 @@ public class VaultApiController {
         if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        CompletableFuture.runAsync(() -> notarizationService.notarizeDocument(nodeId));
 
         val nodeWrapper = nodeService.findById(nodeId);
         if (Strings.isNotBlank(nodeWrapper.getNotarizationTxId())) {
-            val hash = notarizationService.getHash(nodeWrapper.getNotarizationTxId());
+            val notarizationHash = notarizationService.getHash(nodeWrapper.getNotarizationTxId());
             val nodeContentInfo = contentService.getNodeContentInfo(nodeId);
-            val algorithm = contentService.getNodeContentInfo(nodeId).getContentHashAlgorithm();
-            log.debug(hash);
+            val contentHash = contentService.computeHash(nodeId, nodeContentInfo.getContentHashAlgorithm());
+            if (notarizationHash.equals(contentHash)) {
+                return ResponseEntity.ok(String.format("Node %s has been notarized and all hashes match.", nodeId));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(String.format("Node %s is notarized, but detected hash inconsistencies. Please investigate.", nodeId));
+            }
         } else {
-            return ResponseEntity.ok("");
+            return ResponseEntity.ok(String.format("Node %s has not been notarized yet.", nodeId));
         }
-
-
-
-        return ResponseEntity.ok().body(String.format("Notarization for node %s required.", nodeId));
     }
 
 }
