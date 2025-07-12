@@ -141,7 +141,7 @@ public class GridFsContentService implements ContentService {
                 info.setContentHash(gridFSFile.getMetadata().getString(MetadataKeys.CHECKSUM_VALUE));
             }
             if (gridFSFile.getMetadata().containsKey(MetadataKeys.ENCRYPTED)) {
-                info.setEncrypted(Boolean.TRUE.equals(gridFSFile.getMetadata().getBoolean(MetadataKeys.ENCRYPTED)));
+                info.setEncrypted(Boolean.TRUE.toString().equals(gridFSFile.getMetadata().getString(MetadataKeys.ENCRYPTED)));
             }
         }
         return info;
