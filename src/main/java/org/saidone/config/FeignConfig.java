@@ -24,6 +24,9 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 @Configuration
+/**
+ * Customizes Feign HTTP message converters used by the Alfresco client.
+ */
 public class FeignConfig {
 
     @Bean
