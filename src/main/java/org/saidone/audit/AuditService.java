@@ -33,14 +33,14 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Map;
 
-@Service
-@RequiredArgsConstructor
 /**
  * Service for persisting and retrieving {@link AuditEntry} instances.
- * <p>
- * Audit entries are stored in MongoDB via the configured {@link MongoTemplate}
- * and can be queried by type and timestamp range.
+ *
+ * <p>Audit entries are stored in MongoDB via the configured {@link MongoTemplate}
+ * and can be queried by type and timestamp range.</p>
  */
+@Service
+@RequiredArgsConstructor
 public class AuditService extends BaseComponent {
 
     private final MongoTemplate mongoTemplate;
