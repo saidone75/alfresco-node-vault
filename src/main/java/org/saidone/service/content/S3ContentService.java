@@ -38,12 +38,11 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
-import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
-import software.amazon.awssdk.services.s3.model.S3Exception;
+import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
 
 /**
  * {@link ContentService} implementation that stores node binaries in Amazon S3.
@@ -84,19 +83,27 @@ public class S3ContentService extends BaseComponent implements ContentService {
      */
     @Override
     @SneakyThrows
-    public NodeContentInfo archiveNodeContent(Node node, InputStream inputStream) {
+    public void archiveNodeContent(Node node, InputStream inputStream) {
+        val metadata = new HashMap<String, String>();
+        metadata.put(MetadataKeys.UUID, node.getId());
+        metadata.put(MetadataKeys.FILENAME, node.getName());
+        metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
         try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
-            s3Repository.putObject(s3Config.getBucket(), node, digestInputStream);
+            s3Repository.putObject(s3Config.getBucket(), node, metadata, digestInputStream);
             val hash = digestInputStream.getHash();
             log.trace("{}: {}", checksumAlgorithm, hash);
-            val nodeContentInfo = new NodeContentInfo();
-            nodeContentInfo.setFileName(node.getName());
-            nodeContentInfo.setContentType(node.getContent().getMimeType());
-            nodeContentInfo.setContentId(node.getId());
-            nodeContentInfo.setContentHashAlgorithm(checksumAlgorithm);
-            nodeContentInfo.setContentHash(hash);
-            nodeContentInfo.setEncrypted(encryptionEnabled);
-            return nodeContentInfo;
+            metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
+            metadata.put(MetadataKeys.CHECKSUM_VALUE, hash);
+            val copyRequest = CopyObjectRequest.builder()
+                    .sourceBucket(s3Config.getBucket())
+                    .sourceKey(node.getId())
+                    .destinationBucket(s3Config.getBucket())
+                    .destinationKey(node.getId())
+                    .metadata(metadata)
+                    .metadataDirective(MetadataDirective.REPLACE)
+                    .contentType(node.getContent().getMimeType())
+                    .build();
+            s3Client.copyObject(copyRequest);
         }
     }
 
@@ -118,6 +125,31 @@ public class S3ContentService extends BaseComponent implements ContentService {
             nodeContent.setLength(head.contentLength());
             nodeContent.setContentStream(s3Repository.getObject(s3Config.getBucket(), nodeId));
             return nodeContent;
+        } catch (S3Exception e) {
+            throw new NodeNotFoundOnVaultException(nodeId);
+        }
+    }
+
+    /**
+     * Retrieves only the metadata of a node's content stored in S3 without
+     * streaming the actual binary.
+     *
+     * @param nodeId identifier of the node
+     * @return a populated {@link NodeContentInfo}
+     * @throws NodeNotFoundOnVaultException if the object does not exist in S3
+     */
+    @Override
+    public NodeContentInfo getNodeContentInfo(String nodeId) {
+        try {
+            val head = s3Client.headObject(HeadObjectRequest.builder()
+                    .bucket(s3Config.getBucket()).key(nodeId).build());
+            val nodeContentInfo = new NodeContentInfo();
+            nodeContentInfo.setFileName(head.metadata().getOrDefault(MetadataKeys.FILENAME, nodeId));
+            nodeContentInfo.setContentType(head.contentType());
+            nodeContentInfo.setContentId(nodeId);
+            nodeContentInfo.setContentHashAlgorithm(head.metadata().get(MetadataKeys.CHECKSUM_ALGORITHM));
+            nodeContentInfo.setContentHash(head.metadata().get(MetadataKeys.CHECKSUM_VALUE));
+            return nodeContentInfo;
         } catch (S3Exception e) {
             throw new NodeNotFoundOnVaultException(nodeId);
         }

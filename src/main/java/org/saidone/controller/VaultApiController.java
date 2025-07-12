@@ -30,10 +30,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.logging.log4j.util.Strings;
 import org.saidone.exception.NodeNotFoundException;
 import org.saidone.exception.VaultException;
 import org.saidone.model.Entry;
 import org.saidone.service.AuthenticationService;
+import org.saidone.service.NodeService;
 import org.saidone.service.VaultService;
 import org.saidone.service.content.ContentService;
 import org.saidone.service.notarization.NotarizationService;
@@ -60,13 +62,25 @@ import java.util.concurrent.CompletableFuture;
 @Tag(name = "Vault API", description = "Vault operations")
 public class VaultApiController {
 
-    /** Service used to verify Basic authentication credentials. */
+    /**
+     * Service used to verify Basic authentication credentials.
+     */
     private final AuthenticationService authenticationService;
-    /** Provides high level vault operations. */
+    /**
+     * Provides high level vault operations.
+     */
     private final VaultService vaultService;
-    /** Service responsible for retrieving binary content. */
+    /**
+     * Service responsible for interacting with nodes.
+     */
+    private final NodeService nodeService;
+    /**
+     * Service responsible for retrieving binary content.
+     */
     private final ContentService contentService;
-    /** Handles notarization requests for archived nodes. */
+    /**
+     * Handles notarization requests for archived nodes.
+     */
     private final NotarizationService notarizationService;
 
     /**
@@ -322,6 +336,52 @@ public class VaultApiController {
         }
         CompletableFuture.runAsync(() -> notarizationService.notarizeDocument(nodeId));
         return ResponseEntity.ok().body(String.format("Notarization for node %s required.", nodeId));
+    }
+
+    /**
+     * Checks the notarization status of a node and returns the current result.
+     *
+     * @param auth   optional Basic authentication header
+     * @param nodeId identifier of the node to be checked
+     * @return fixme
+     */
+    @SecurityRequirement(name = "basicAuth")
+    @GetMapping("/nodes/{nodeId}/notarize")
+    @Operation(
+            summary = "Check notarization",
+            description = "Check notarization of the specified node.",
+            parameters = {
+                    @Parameter(name = "nodeId", description = "Identifier of the node to check", required = true, in = ParameterIn.PATH)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Notarization check succeeded",
+                            content = @Content(mediaType = "text/plain")),
+                    @ApiResponse(responseCode = "404", description = "Node not found",
+                            content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content)
+            })
+    public ResponseEntity<?> checkNotarization(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
+            @PathVariable String nodeId) {
+
+        if (!authenticationService.isAuthorized(auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        val nodeWrapper = nodeService.findById(nodeId);
+        if (Strings.isNotBlank(nodeWrapper.getNotarizationTxId())) {
+            val notarizationHash = notarizationService.getHash(nodeWrapper.getNotarizationTxId());
+            val nodeContentInfo = contentService.getNodeContentInfo(nodeId);
+            val contentHash = contentService.computeHash(nodeId, nodeContentInfo.getContentHashAlgorithm());
+            if (notarizationHash.equals(contentHash)) {
+                return ResponseEntity.ok(String.format("Node %s has been notarized and all hashes match.", nodeId));
+            } else {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(String.format("Node %s is notarized, but detected hash inconsistencies. Please investigate.", nodeId));
+            }
+        } else {
+            return ResponseEntity.ok(String.format("Node %s has not been notarized yet.", nodeId));
+        }
     }
 
 }

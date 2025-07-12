@@ -55,49 +55,32 @@ public class NodeWrapper {
 
     @Id
     private String id;
-    @Field("arcDt")
+    @Field("adt")
     private Instant archiveDate;
     @Field("res")
     private boolean restored;
     @Field("enc")
     private boolean encrypted;
-    @Field("node")
+    @Field("nod")
     private String nodeJson;
-    @Field("cinf")
-    private NodeContentInfo contentInfo;
     @Field("ntx")
     private String notarizationTxId;
-
-    /**
-     * Convenience constructor creating a wrapper for the given node without
-     * any content information. It simply delegates to the two argument
-     * constructor.
-     *
-     * @param node the Alfresco node to wrap
-     * @throws IllegalArgumentException if {@code node} is {@code null}
-     * @throws JsonProcessingException  if the node cannot be serialized
-     */
-    public NodeWrapper(Node node) throws IllegalArgumentException, JsonProcessingException {
-        new NodeWrapper(node, null);
-    }
 
     /**
      * Creates a wrapper for the provided Alfresco {@link Node} optionally
      * carrying content metadata.
      *
      * @param node        the node to persist
-     * @param contentInfo optional content information or {@code null}
      * @throws IllegalArgumentException if {@code node} is {@code null}
      * @throws JsonProcessingException  if the node cannot be serialized to JSON
      */
-    public NodeWrapper(Node node, NodeContentInfo contentInfo) throws IllegalArgumentException, JsonProcessingException {
+    public NodeWrapper(Node node) throws IllegalArgumentException, JsonProcessingException {
         if (node == null) {
             throw new IllegalArgumentException("Node cannot be null");
         }
         this.id = node.getId();
         this.archiveDate = java.time.Instant.now();
         this.nodeJson = objectMapper.writeValueAsString(node);
-        this.contentInfo = contentInfo;
     }
 
     /**

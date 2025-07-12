@@ -37,7 +37,7 @@ public interface ContentService {
      * @param node        node whose content should be archived
      * @param inputStream stream providing the node content
      */
-    NodeContentInfo archiveNodeContent(Node node, InputStream inputStream);
+    void archiveNodeContent(Node node, InputStream inputStream);
 
     /**
      * Retrieves previously archived content for the given node id.
@@ -46,6 +46,16 @@ public interface ContentService {
      * @return a {@link NodeContentStream} descriptor containing stream and metadata
      */
     NodeContentStream getNodeContent(String nodeId);
+
+    /**
+     * Retrieves only metadata information about the stored content of the given
+     * node without returning the binary stream.
+     *
+     * @param nodeId identifier of the node
+     * @return a {@link NodeContentInfo} descriptor populated with file name,
+     *         content type and checksum details
+     */
+    NodeContentInfo getNodeContentInfo(String nodeId);
 
     /**
      * Deletes content associated with the given node id from the store.
