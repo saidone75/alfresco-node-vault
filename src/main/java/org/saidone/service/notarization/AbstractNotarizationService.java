@@ -21,7 +21,7 @@ package org.saidone.service.notarization;
  * Base implementation for services performing document notarization.
  *
  * <p>This component provides the common logic for computing document hashes
- * and updating Alfresco nodes after the hash has been persisted.</p>
+ * and updating nodes after the hash has been persisted.</p>
  */
 
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,7 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
     /**
      * Persists the given hash.
      *
-     * @param nodeId the Alfresco node identifier used for logging
+     * @param nodeId the node identifier
      * @param hash   the hash value to store
      * @return an implementation specific transaction id
      */

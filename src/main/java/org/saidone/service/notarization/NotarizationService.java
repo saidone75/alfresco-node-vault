@@ -18,7 +18,7 @@
 
 package org.saidone.service.notarization;
 /**
- * Contract for components able to notarize Alfresco documents.
+ * Contract for components able to notarize documents.
  *
  * <p>Implementations store document hashes in an external system such as a
  * blockchain and later retrieve them.</p>
@@ -37,14 +37,14 @@ public interface NotarizationService {
     /**
      * Stores the supplied hash in the underlying notarization system.
      *
-     * @param nodeId the Alfresco node identifier used for logging
+     * @param nodeId the node identifier
      * @param hash   the hash to store
      * @return an implementation specific transaction id
      */
     String putHash(String nodeId, String hash);
 
     /**
-     * Computes and stores the hash for the given Alfresco node.
+     * Computes and stores the hash for the given node.
      *
      * @param nodeId the node whose content should be notarized
      */
