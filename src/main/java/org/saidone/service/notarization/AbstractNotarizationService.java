@@ -17,31 +17,62 @@
  */
 
 package org.saidone.service.notarization;
+/**
+ * Base implementation for services performing document notarization.
+ *
+ * <p>This component provides the common logic for computing document hashes
+ * and updating Alfresco nodes after the hash has been persisted.</p>
+ */
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.component.BaseComponent;
-import org.saidone.service.VaultService;
-import org.saidone.model.NodeWrapper;
-
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
+import org.saidone.service.NodeService;
+import org.saidone.service.content.ContentService;
+import org.springframework.beans.factory.annotation.Value;
 
 @RequiredArgsConstructor
 @Slf4j
 public abstract class AbstractNotarizationService extends BaseComponent implements NotarizationService {
 
-    private final VaultService vaultService;
+    private final NodeService nodeService;
+    private final ContentService contentService;
 
-    public abstract String storeHash(String nodeId, String hash);
+    @Value("${application.service.vault.hash-algorithm}")
+    private String checksumAlgorithm;
 
+    /**
+     * Persists the given hash.
+     *
+     * @param nodeId the Alfresco node identifier used for logging
+     * @param hash   the hash value to store
+     * @return an implementation specific transaction id
+     */
+    public abstract String putHash(String nodeId, String hash);
+
+    /**
+     * Retrieves the stored hash for the given transaction id.
+     *
+     * @param txId the transaction identifier
+     * @return the stored hash value
+     */
+    public abstract String getHash(String txId);
+
+    /**
+     * Computes the hash of the node content and stores it through {@link #putHash}.
+     *
+     * @param nodeId the identifier of the node to notarize
+     */
     @SneakyThrows
     public void notarizeDocument(String nodeId) {
-        storeHash(nodeId,"hash");
-        log.debug("notarizing document {}", nodeId);
+        log.debug("Notarizing document {}", nodeId);
+        val hash = contentService.computeHash(nodeId, checksumAlgorithm);
+        val txHash = putHash(nodeId, hash);
+        val nodeWrapper = nodeService.findById(nodeId);
+        nodeWrapper.setNotarizationTxId(txHash);
+        nodeService.save(nodeWrapper);
     }
 
 }

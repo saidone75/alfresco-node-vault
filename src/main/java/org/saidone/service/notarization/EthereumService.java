@@ -20,12 +20,11 @@ package org.saidone.service.notarization;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.saidone.component.BaseComponent;
 import org.saidone.config.EthereumConfig;
-import org.saidone.service.VaultService;
+import org.saidone.service.NodeService;
+import org.saidone.service.content.ContentService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
@@ -34,6 +33,7 @@ import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.utils.Numeric;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 
@@ -57,8 +57,15 @@ public class EthereumService extends AbstractNotarizationService {
     private Web3j web3j;
     private Credentials credentials;
 
-    public EthereumService(VaultService vaultService, EthereumConfig config) {
-        super(vaultService);
+    /**
+     * Creates the service with required dependencies.
+     *
+     * @param nodeService    service used to interact with Alfresco nodes
+     * @param contentService service computing document hashes
+     * @param config         Ethereum configuration properties
+     */
+    public EthereumService(NodeService nodeService, ContentService contentService, EthereumConfig config) {
+        super(nodeService, contentService);
         this.config = config;
     }
 
@@ -92,6 +99,31 @@ public class EthereumService extends AbstractNotarizationService {
         super.stop();
     }
 
+    @Override
+    /**
+     * Fetches the hash data stored in the given Ethereum transaction.
+     *
+     * @param txHash the transaction identifier
+     * @return the string stored in the transaction input data
+     */
+    public String getHash(String txHash) {
+        try {
+            val ethTransaction = web3j.ethGetTransactionByHash(txHash).send();
+            val transactionOptional = ethTransaction.getTransaction();
+            if (transactionOptional.isPresent()) {
+                val tx = transactionOptional.get();
+                val inputData = tx.getInput();
+                byte[] inputBytes = Numeric.hexStringToByteArray(inputData);
+                return new String(inputBytes, StandardCharsets.UTF_8);
+            } else {
+                throw new RuntimeException("Transaction not found");
+            }
+        } catch (IOException e) {
+            log.error("Error fetching transaction {}", txHash, e);
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Sends a zero-value transaction containing the given hash as data.
      * <p>
@@ -103,7 +135,8 @@ public class EthereumService extends AbstractNotarizationService {
      * @param hash   the hash to store on the blockchain
      * @return the resulting Ethereum transaction hash
      */
-    public String storeHash(String nodeId, String hash) {
+    @Override
+    public String putHash(String nodeId, String hash) {
         try {
             val chainId = web3j.ethChainId().send().getChainId();
             val txManager = new RawTransactionManager(web3j, credentials, chainId.longValue());
@@ -117,7 +150,7 @@ public class EthereumService extends AbstractNotarizationService {
                     data,
                     BigInteger.ZERO);
             val txHash = tx.getTransactionHash();
-            log.debug("Notarized node {} with tx {}", nodeId, txHash);
+            log.debug("Notarized node {} with tx id {}", nodeId, txHash);
             return txHash;
         } catch (Exception e) {
             log.error("Error sending transaction for node {}: {}", nodeId, e.getMessage());

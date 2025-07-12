@@ -44,7 +44,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * REST controller that exposes operations for interacting with the vault.
@@ -60,9 +60,13 @@ import java.util.UUID;
 @Tag(name = "Vault API", description = "Vault operations")
 public class VaultApiController {
 
+    /** Service used to verify Basic authentication credentials. */
     private final AuthenticationService authenticationService;
+    /** Provides high level vault operations. */
     private final VaultService vaultService;
+    /** Service responsible for retrieving binary content. */
     private final ContentService contentService;
+    /** Handles notarization requests for archived nodes. */
     private final NotarizationService notarizationService;
 
     /**
@@ -125,6 +129,13 @@ public class VaultApiController {
                 .body("Server memory limit exceeded. Please try with a smaller file or contact administrator.");
     }
 
+    /**
+     * Returns the metadata of a node stored in the vault.
+     *
+     * @param auth   optional Basic authentication header
+     * @param nodeId identifier of the node to retrieve
+     * @return the node metadata wrapped in an {@link Entry} object
+     */
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/nodes/{nodeId}")
     @Operation(
@@ -143,13 +154,6 @@ public class VaultApiController {
                             content = @Content)
             })
     @SneakyThrows
-    /**
-     * Returns the metadata of a node stored in the vault.
-     *
-     * @param auth   optional Basic authentication header
-     * @param nodeId identifier of the node to retrieve
-     * @return the node metadata wrapped in an {@link Entry} object
-     */
     public ResponseEntity<?> getNode(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
@@ -212,6 +216,14 @@ public class VaultApiController {
                 .body(new InputStreamResource(nodeContent.getContentStream()));
     }
 
+    /**
+     * Restores a node previously archived in the vault.
+     *
+     * @param auth               optional Basic authentication header
+     * @param nodeId             identifier of the node to restore
+     * @param restorePermissions {@code true} to also restore permissions
+     * @return a textual confirmation message
+     */
     @SecurityRequirement(name = "basicAuth")
     @PostMapping("/nodes/{nodeId}/restore")
     @Operation(
@@ -230,14 +242,6 @@ public class VaultApiController {
                             content = @Content)
             })
     @SneakyThrows
-    /**
-     * Restores a node previously archived in the vault.
-     *
-     * @param auth               optional Basic authentication header
-     * @param nodeId             identifier of the node to restore
-     * @param restorePermissions {@code true} to also restore permissions
-     * @return a textual confirmation message
-     */
     public ResponseEntity<?> restoreNode(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId,
@@ -251,6 +255,13 @@ public class VaultApiController {
         return ResponseEntity.ok().body(String.format("Node %s successfully restored as %s", nodeId, newNodeId));
     }
 
+    /**
+     * Archives an Alfresco node and removes it from the repository.
+     *
+     * @param auth   optional Basic authentication header
+     * @param nodeId identifier of the node to archive
+     * @return a confirmation message
+     */
     @SecurityRequirement(name = "basicAuth")
     @PostMapping("/nodes/{nodeId}/archive")
     @Operation(
@@ -267,13 +278,6 @@ public class VaultApiController {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
-    /**
-     * Archives an Alfresco node and removes it from the repository.
-     *
-     * @param auth   optional Basic authentication header
-     * @param nodeId identifier of the node to archive
-     * @return a confirmation message
-     */
     public ResponseEntity<?> archiveNode(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
@@ -286,6 +290,13 @@ public class VaultApiController {
         return ResponseEntity.ok().body(String.format("Node %s successfully archived.", nodeId));
     }
 
+    /**
+     * Require notarization of a node.
+     *
+     * @param auth   optional Basic authentication header
+     * @param nodeId identifier of the node to notarize
+     * @return a confirmation message
+     */
     @SecurityRequirement(name = "basicAuth")
     @PostMapping("/nodes/{nodeId}/notarize")
     @Operation(
@@ -302,13 +313,6 @@ public class VaultApiController {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
-    /**
-     * Require notarization of a node.
-     *
-     * @param auth   optional Basic authentication header
-     * @param nodeId identifier of the node to notarize
-     * @return a confirmation message
-     */
     public ResponseEntity<?> notarizeNode(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
@@ -316,10 +320,8 @@ public class VaultApiController {
         if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        // TODO: call notarization service
-        val txHash = notarizationService.storeHash(nodeId, UUID.randomUUID().toString());
-        log.debug("txHash: {}", txHash);
-        return ResponseEntity.ok().body(String.format("Notarization for node %s successfully required.", nodeId));
+        CompletableFuture.runAsync(() -> notarizationService.notarizeDocument(nodeId));
+        return ResponseEntity.ok().body(String.format("Notarization for node %s required.", nodeId));
     }
 
 }

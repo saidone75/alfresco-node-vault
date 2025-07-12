@@ -28,13 +28,6 @@ import org.web3j.crypto.Keys;
 import org.web3j.utils.Numeric;
 
 @Configuration
-/**
- * Auto-configuration that generates temporary Ethereum credentials.
- * <p>
- * When the property {@code application.service.ethereum.auto-generate} is set
- * to {@code true}, an {@link EthereumCredentials} bean containing a newly
- * created account address and private key is exposed.
- */
 public class EthereumAutoConfig {
 
     /**
@@ -54,9 +47,6 @@ public class EthereumAutoConfig {
     
     @Data
     @AllArgsConstructor
-    /**
-     * Holder for an Ethereum account address and its private key.
-     */
     public static class EthereumCredentials {
         /** Ethereum account address beginning with {@code 0x}. */
         private String account;
