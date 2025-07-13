@@ -182,6 +182,14 @@ public class VaultApiController {
         return ResponseEntity.ok(new Entry(node));
     }
 
+    /**
+     * Streams the binary content of a node.
+     *
+     * @param auth       optional Basic authentication header
+     * @param nodeId     identifier of the node
+     * @param attachment {@code true} if the content should be sent as a download attachment
+     * @return the streamed content wrapped as an {@link InputStreamResource}
+     */
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/nodes/{nodeId}/content")
     @Operation(
@@ -202,14 +210,6 @@ public class VaultApiController {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
-    /**
-     * Streams the binary content of a node.
-     *
-     * @param auth       optional Basic authentication header
-     * @param nodeId     identifier of the node
-     * @param attachment {@code true} if the content should be sent as a download attachment
-     * @return the streamed content wrapped as an {@link InputStreamResource}
-     */
     public ResponseEntity<InputStreamResource> getNodeContent(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId,
@@ -344,6 +344,10 @@ public class VaultApiController {
         if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+        val nodeWrapper = nodeService.findById(nodeId);
+        if (Strings.isNotBlank(nodeWrapper.getNotarizationTxId())) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(String.format("Node %s is already notarized.", nodeId));
+        }
         CompletableFuture.runAsync(() -> notarizationService.notarizeDocument(nodeId));
         return ResponseEntity.ok().body(String.format("Notarization for node %s required.", nodeId));
     }
@@ -390,7 +394,7 @@ public class VaultApiController {
             if (notarizationHash.equals(contentHash)) {
                 return ResponseEntity.ok(String.format("Node %s has been notarized and all hashes match.", nodeId));
             } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(String.format("Node %s is notarized, but detected hash inconsistencies. Please investigate.", nodeId));
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(String.format("Node %s is notarized, but detected hash inconsistencies. Please investigate.", nodeId));
             }
         } else {
             return ResponseEntity.ok(String.format("Node %s has not been notarized yet.", nodeId));
