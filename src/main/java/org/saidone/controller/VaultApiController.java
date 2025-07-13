@@ -182,6 +182,14 @@ public class VaultApiController {
         return ResponseEntity.ok(new Entry(node));
     }
 
+    /**
+     * Streams the binary content of a node.
+     *
+     * @param auth       optional Basic authentication header
+     * @param nodeId     identifier of the node
+     * @param attachment {@code true} if the content should be sent as a download attachment
+     * @return the streamed content wrapped as an {@link InputStreamResource}
+     */
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/nodes/{nodeId}/content")
     @Operation(
@@ -202,14 +210,6 @@ public class VaultApiController {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
-    /**
-     * Streams the binary content of a node.
-     *
-     * @param auth       optional Basic authentication header
-     * @param nodeId     identifier of the node
-     * @param attachment {@code true} if the content should be sent as a download attachment
-     * @return the streamed content wrapped as an {@link InputStreamResource}
-     */
     public ResponseEntity<InputStreamResource> getNodeContent(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId,
