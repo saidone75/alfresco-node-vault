@@ -30,8 +30,6 @@ import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.request.Transaction;
-import org.web3j.protocol.core.methods.response.EthEstimateGas;
-import org.web3j.protocol.core.methods.response.EthGasPrice;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.utils.Numeric;
@@ -59,6 +57,8 @@ public class EthereumService extends AbstractNotarizationService {
 
     private Web3j web3j;
     private Credentials credentials;
+
+    private static final String TO = "0x0000000000000000000000000000000000000000";
 
     /**
      * Creates the service with required dependencies.
@@ -145,29 +145,24 @@ public class EthereumService extends AbstractNotarizationService {
             val txManager = new RawTransactionManager(web3j, credentials, chainId.longValue());
             val data = Numeric.toHexString(hash.getBytes(StandardCharsets.UTF_8));
 
-
-            val to = "0x0000000000000000000000000000000000000000"; // indirizzo fittizio
-
-            EthGasPrice gasPriceResponse = web3j.ethGasPrice().send();
-            BigInteger gasPrice = gasPriceResponse.getGasPrice();
-
-            EthEstimateGas estimateGas = web3j.ethEstimateGas(
+            // estimate gas needed
+            val gasPriceResponse = web3j.ethGasPrice().send();
+            val gasPrice = gasPriceResponse.getGasPrice();
+            val estimateGas = web3j.ethEstimateGas(
                     Transaction.createFunctionCallTransaction(
                             config.getAccount(),
                             null,
                             gasPrice,
                             null,
-                            to,
+                            TO,
                             BigInteger.ZERO,
                             data
                     )
             ).send();
 
-            val gasLimit = estimateGas.getAmountUsed();
-
             val tx = txManager.sendTransaction(
                     gasPrice,
-                    gasLimit,
+                    estimateGas.getAmountUsed(),
                     config.getAccount(),
                     data,
                     BigInteger.ZERO);
