@@ -1,0 +1,10 @@
+services:
+  ganache:
+    image: trufflesuite/ganache
+    container_name: ganache
+    ports:
+      - "8545:8545"
+    command:
+      - --accounts=10
+      - --defaultBalanceEther=100
+      - --deterministic
