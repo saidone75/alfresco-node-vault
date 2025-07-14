@@ -29,6 +29,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.RawTransactionManager;
 import org.web3j.utils.Numeric;
@@ -52,10 +53,26 @@ import java.nio.charset.StandardCharsets;
 )
 public class EthereumService extends AbstractNotarizationService {
 
+    /**
+     * Configuration properties describing the Ethereum connection.
+     */
     private final EthereumConfig config;
 
+    /**
+     * Client used to interact with the Ethereum node.
+     */
     private Web3j web3j;
+
+    /**
+     * Credentials used to sign transactions sent by this service.
+     */
     private Credentials credentials;
+
+    /**
+     * Null-recipient address used when sending transactions containing only
+     * notarization data.
+     */
+    private static final String TO = "0x0000000000000000000000000000000000000000";
 
     /**
      * Creates the service with required dependencies.
@@ -141,11 +158,25 @@ public class EthereumService extends AbstractNotarizationService {
             val chainId = web3j.ethChainId().send().getChainId();
             val txManager = new RawTransactionManager(web3j, credentials, chainId.longValue());
             val data = Numeric.toHexString(hash.getBytes(StandardCharsets.UTF_8));
+
+            // estimate gas needed
+            val gasPriceResponse = web3j.ethGasPrice().send();
+            val gasPrice = gasPriceResponse.getGasPrice();
+            val estimateGas = web3j.ethEstimateGas(
+                    Transaction.createFunctionCallTransaction(
+                            config.getAccount(),
+                            null,
+                            gasPrice,
+                            null,
+                            TO,
+                            BigInteger.ZERO,
+                            data
+                    )
+            ).send();
+
             val tx = txManager.sendTransaction(
-                    // FIXME get gas price
-                    BigInteger.ZERO,
-                    // FIXME estimate gas limit
-                    BigInteger.valueOf(50000L),
+                    gasPrice,
+                    estimateGas.getAmountUsed(),
                     config.getAccount(),
                     data,
                     BigInteger.ZERO);

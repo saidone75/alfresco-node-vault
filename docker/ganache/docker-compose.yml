@@ -1,0 +1,8 @@
+services:
+  ganache:
+    image: trufflesuite/ganache
+    container_name: ganache
+    ports:
+      - "8545:8545"
+    command:
+      - --wallet.accounts=0x4f3edf983ac636a65a842ce7c78d9aa706d3b113b37c7e9c79fc75a2e96c3e6a,100000000000000000000
