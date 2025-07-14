@@ -53,11 +53,25 @@ import java.nio.charset.StandardCharsets;
 )
 public class EthereumService extends AbstractNotarizationService {
 
+    /**
+     * Configuration properties describing the Ethereum connection.
+     */
     private final EthereumConfig config;
 
+    /**
+     * Client used to interact with the Ethereum node.
+     */
     private Web3j web3j;
+
+    /**
+     * Credentials used to sign transactions sent by this service.
+     */
     private Credentials credentials;
 
+    /**
+     * Null-recipient address used when sending transactions containing only
+     * notarization data.
+     */
     private static final String TO = "0x0000000000000000000000000000000000000000";
 
     /**

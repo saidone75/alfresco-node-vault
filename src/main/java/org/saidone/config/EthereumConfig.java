@@ -42,9 +42,11 @@ import java.security.NoSuchProviderException;
 @Slf4j
 /**
  * Configuration properties used to connect to an Ethereum node.
- * <p>
- * When {@code autoGenerate} is enabled a new key pair and account
- * address are created at startup.
+ *
+ * <p>When {@code autoGenerate} is enabled a new key pair and account
+ * address are created at startup. Otherwise the {@code privateKey} and
+ * {@code account} values must be provided and will be used to sign and
+ * send transactions.</p>
  */
 public class EthereumConfig {
 
