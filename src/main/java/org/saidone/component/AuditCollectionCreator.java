@@ -25,6 +25,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.saidone.audit.AuditMetadataKeys;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
@@ -55,8 +56,8 @@ public class AuditCollectionCreator extends BaseComponent {
     public void init() {
         super.init();
         if (!mongoTemplate.collectionExists(COLLECTION_NAME)) {
-            val timeSeriesOptions = new TimeSeriesOptions("timestamp")
-                    .metaField("metadata")
+            val timeSeriesOptions = new TimeSeriesOptions(AuditMetadataKeys.TIMESTAMP)
+                    .metaField(AuditMetadataKeys.METADATA)
                     .granularity(TimeSeriesGranularity.SECONDS);
 
             val options = new CreateCollectionOptions()

@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -53,7 +54,7 @@ public class AuditService extends BaseComponent {
         mongoTemplate.insert(entry);
     }
 
-    public java.util.List<AuditEntry> findEntries(String type, Instant from, Instant to, Pageable pageable) {
+    public List<AuditEntry> findEntries(String type, Instant from, Instant to, Pageable pageable) {
         val criteriaList = new ArrayList<Criteria>();
         if (type != null) {
             criteriaList.add(Criteria.where("type").is(type));
