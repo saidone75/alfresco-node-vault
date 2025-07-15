@@ -85,34 +85,33 @@ Pull requests are welcome!
 
 Global configuration is stored in `application.yml` file, the relevant parameters are:
 
-| Parameter/env variable        | Default value                              | Purpose                                                             |
-|-------------------------------|--------------------------------------------|---------------------------------------------------------------------|
-| ALFRESCO_BASE_PATH            | http://localhost:8080                      | Scheme, host and port of the Alfresco server                        |
-| ALFRESCO_USERNAME             | admin                                      | Alfresco user                                                       |
-| ALFRESCO_PASSWORD             | admin                                      | Password for the Alfresco user                                      |
-| ACTIVE_MQ_URL                 | tcp://localhost:61616                      | ActiveMQ broker URL                                                 |
-| MONGODB_URL                   | mongodb://localhost:27017                  | MongoDB connection string                                           |
-| S3_ENDPOINT                   | http://localhost:4566                      | S3 object storage endpoint                                          |
-| S3_KEY                        | test                                       | Key for S3 authentication                                           |
-| S3_SECRET                     | test                                       | Secret for S3 authentication                                        |
-| EVENT_HANDLER_ENABLED         | false                                      | Event based archive behaviour switch                                |
-| ARCHIVING_JOB_ENABLED         | true                                       | Archiving scheduled job switch                                      |
-| ARCHIVING_JOB_CRON_EXPRESSION | 0 0/5 2-6 * * ?                            | Scheduled job cron expression                                       |
-| ARCHIVING_JOB_QUERY           | TYPE:'cm:content' AND ASPECT:'anv:archive' | Query for selecting documents to be archived                        |
-| VAULT_HASH_ALGORITHM          | SHA-256                                    | Hash stored as metadata on GridFS or S3 object metadata             |
-| VAULT_DOUBLE_CHECK            | true                                       | Double check content integrity before removing document on Alfresco |
-| VAULT_ENCRYPTION_ENABLED      | true                                       | Enable content encryption                                           |
-| VAULT_ENCRYPT_METADATA        | true                                       | Encrypt also metadata                                               |
-| VAULT_URL                     | http://localhost:8200                      | Vault secret engine URI                                             |
-| VAULT_ENCRYPTION_KV_MOUNT     | secret                                     | Vault secret engine mount path                                      |
-| VAULT_ENCRYPTION_SECRET_PATH  | AlfrescoNodeVault                          | Path of encryption secret in Vault secret engine                    |
-| VAULT_ENCRYPTION_SECRET_KEY   | anv.secret                                 | Key name of encryption secret                                       |
-| AUDIT_ENABLED                 | false                                      | Enable web request auditing                                         |
-| NOTARIZATION_JOB_ENABLED      | false                                      | Document notarization job switch                                    |
-| NOTARIZATION_JOB_CRON_EXPRESSION | 0 0/30 * * * ?                          | Cron expression for notarization job                                |
-| ETH_RPC_URL                   | http://localhost:8545                      | Ethereum RPC endpoint                                               |
-| ETH_PRIVATE_KEY               |                                           | Private key used to sign transactions                               |
-| ETH_ACCOUNT                   |                                           | Destination account for notarization transactions                   |
+| Parameter/env variable            | Default value                              | Purpose                                                             |
+|-----------------------------------|--------------------------------------------|---------------------------------------------------------------------|
+| ALFRESCO_BASE_PATH                | http://localhost:8080                      | Scheme, host and port of the Alfresco server                        |
+| ALFRESCO_USERNAME                 | admin                                      | Alfresco user                                                       |
+| ALFRESCO_PASSWORD                 | admin                                      | Password for the Alfresco user                                      |
+| ACTIVE_MQ_URL                     | tcp://localhost:61616                      | ActiveMQ broker URL                                                 |
+| MONGODB_URL                       | mongodb://localhost:27017                  | MongoDB connection string                                           |
+| S3_ENDPOINT                       | http://localhost:4566                      | S3 object storage endpoint                                          |
+| S3_KEY                            | test                                       | Key for S3 authentication                                           |
+| S3_SECRET                         | test                                       | Secret for S3 authentication                                        |
+| EVENT_HANDLER_ENABLED             | false                                      | Event based archive behaviour switch                                |
+| ARCHIVING_JOB_ENABLED             | true                                       | Archiving scheduled job switch                                      |
+| ARCHIVING_JOB_CRON_EXPRESSION     | 0 0/5 2-6 * * ?                            | Scheduled job cron expression                                       |
+| ARCHIVING_JOB_QUERY               | TYPE:'cm:content' AND ASPECT:'anv:archive' | Query for selecting documents to be archived                        |
+| VAULT_HASH_ALGORITHM              | SHA-256                                    | Hash stored as metadata on GridFS or S3 object metadata             |
+| VAULT_DOUBLE_CHECK                | true                                       | Double check content integrity before removing document on Alfresco |
+| VAULT_ENCRYPTION_ENABLED          | true                                       | Enable content encryption                                           |
+| VAULT_ENCRYPT_METADATA            | true                                       | Encrypt also metadata                                               |
+| VAULT_URL                         | http://localhost:8200                      | Vault secret engine URI                                             |
+| VAULT_ENCRYPTION_KV_MOUNT         | secret                                     | Vault secret engine mount path                                      |
+| VAULT_ENCRYPTION_SECRET_PATH      | AlfrescoNodeVault                          | Path of encryption secret in Vault secret engine                    |
+| VAULT_ENCRYPTION_SECRET_KEY       | anv.secret                                 | Key name of encryption secret                                       |
+| AUDIT_ENABLED                     | false                                      | Enable web request auditing                                         |
+| NOTARIZATION_JOB_ENABLED          | false                                      | Document notarization job switch                                    |
+| NOTARIZATION_JOB_CRON_EXPRESSION  | 0 0/30 * * * ?                             | Cron expression for notarization job                                |
+| ETH_RPC_URL                       | http://localhost:8545                      | Ethereum RPC endpoint                                               |
+| ETH_PRIVATE_KEY                   | 4f3edf983ac636a65a842ce7c78d9aa7...        | Private key used to sign transactions                               |
 
 ## Build
 

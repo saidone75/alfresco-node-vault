@@ -53,18 +53,18 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
         val request = exchange.getRequest();
         val metadata = new HashMap<String, Serializable>();
         if (request.getRemoteAddress() != null) {
-            metadata.put("ip", request.getRemoteAddress().getAddress().getHostAddress());
+            metadata.put(AuditMetadataKeys.IP, request.getRemoteAddress().getAddress().getHostAddress());
         }
-        metadata.put("userAgent", request.getHeaders().getFirst(HttpHeaders.USER_AGENT));
-        metadata.put("path", request.getPath().value());
-        metadata.put("method", request.getMethod().toString());
-        auditService.saveEntry(metadata, "request");
+        metadata.put(AuditMetadataKeys.USER_AGENT, request.getHeaders().getFirst(HttpHeaders.USER_AGENT));
+        metadata.put(AuditMetadataKeys.PATH, request.getPath().value());
+        metadata.put(AuditMetadataKeys.METHOD, request.getMethod().toString());
+        auditService.saveEntry(metadata, AuditMetadataKeys.REQUEST);
         return chain.filter(exchange).doFinally(signal -> {
             val responseData = new HashMap<String, Serializable>();
-            responseData.put("status", exchange.getResponse().getStatusCode() != null ?
+            responseData.put(AuditMetadataKeys.STATUS, exchange.getResponse().getStatusCode() != null ?
                     exchange.getResponse().getStatusCode().value() : null);
-            responseData.put("path", request.getPath().value());
-            auditService.saveEntry(responseData, "response");
+            responseData.put(AuditMetadataKeys.PATH, request.getPath().value());
+            auditService.saveEntry(responseData, AuditMetadataKeys.RESPONSE);
         });
     }
 
