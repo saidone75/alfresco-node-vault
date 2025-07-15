@@ -36,7 +36,7 @@ public interface AuditMetadataKeys {
     /** Client IP address. */
     String IP = "ip";
     /** HTTP {@code User-Agent} header value. */
-    String USER_AGENT = "usrag";
+    String USER_AGENT = "usag";
     /** Requested path. */
     String PATH = "path";
     /** HTTP method. */
