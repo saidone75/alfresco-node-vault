@@ -21,6 +21,9 @@ package org.saidone.audit;
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import static org.saidone.audit.AuditMetadataKeys.*;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -38,8 +41,14 @@ public class AuditEntry {
 
     @Id
     private String id;
+
+    @Field(TIMESTAMP)
     private Instant timestamp;
+
+    @Field(METADATA)
     private Map<String, Serializable> metadata;
+
+    @Field(TYPE)
     private String type;
 
 }

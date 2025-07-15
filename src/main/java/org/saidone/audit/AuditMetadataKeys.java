@@ -18,17 +18,35 @@
 
 package org.saidone.audit;
 
+/**
+ * Abbreviated MongoDB field names and audit metadata keys used throughout the
+ * auditing subsystem. These constants keep the stored documents small while
+ * providing a single point of reference for the mapping between Java fields and
+ * their persisted counterparts.
+ */
 public interface AuditMetadataKeys {
 
+    /** Field name for the audit entry timestamp. */
     String TIMESTAMP = "ts";
+    /** Field name for the metadata document. */
     String METADATA = "md";
+    /** Field name for the entry type. */
+    String TYPE = "typ";
 
+    /** Client IP address. */
     String IP = "ip";
+    /** HTTP {@code User-Agent} header value. */
     String USER_AGENT = "usrag";
+    /** Requested path. */
     String PATH = "path";
+    /** HTTP method. */
     String METHOD = "meth";
+
+    /** Constant identifying request audit entries. */
     String REQUEST = "req";
+    /** HTTP response status code. */
     String STATUS = "st";
+    /** Constant identifying response audit entries. */
     String RESPONSE = "res";
 
 }
