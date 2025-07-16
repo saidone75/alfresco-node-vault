@@ -36,11 +36,11 @@ public interface AuditMetadataKeys {
     /** Client IP address. */
     String IP = "ip";
     /** HTTP {@code User-Agent} header value. */
-    String USER_AGENT = "usag";
+    String USER_AGENT = "ua";
     /** Requested path. */
     String PATH = "path";
     /** HTTP method. */
-    String METHOD = "meth";
+    String METHOD = "mth";
 
     /** Constant identifying request audit entries. */
     String REQUEST = "req";

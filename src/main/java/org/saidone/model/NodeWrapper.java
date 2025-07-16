@@ -61,7 +61,7 @@ public class NodeWrapper {
     private boolean restored;
     @Field("enc")
     private boolean encrypted;
-    @Field("nod")
+    @Field("nj")
     private String nodeJson;
     @Field("ntx")
     private String notarizationTxId;
