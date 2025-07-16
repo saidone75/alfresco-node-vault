@@ -17,12 +17,6 @@
  */
 
 package org.saidone.service.notarization;
-/**
- * Base implementation for services performing document notarization.
- *
- * <p>This component provides the common logic for computing document hashes
- * and updating nodes after the hash has been persisted.</p>
- */
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -35,6 +29,12 @@ import org.springframework.beans.factory.annotation.Value;
 
 @RequiredArgsConstructor
 @Slf4j
+/**
+ * Base implementation for services performing document notarization.
+ *
+ * <p>This component provides the common logic for computing document hashes
+ * and updating nodes after the hash has been persisted.</p>
+ */
 public abstract class AbstractNotarizationService extends BaseComponent implements NotarizationService {
 
     private final NodeService nodeService;
