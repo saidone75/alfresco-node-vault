@@ -24,6 +24,13 @@ import org.springframework.web.bind.annotation.*;
 import java.time.Instant;
 import java.util.List;
 
+/**
+ * REST controller exposing read-only operations for the audit log.
+ * <p>
+ * All endpoints require basic authentication and delegate the retrieval of
+ * entries to {@link AuditService}.
+ * </p>
+ */
 @RestController
 @RequestMapping("/api/audit")
 @RequiredArgsConstructor
@@ -33,6 +40,17 @@ public class AuditApiController {
     private final AuditService auditService;
     private final AuthenticationService authenticationService;
 
+    /**
+     * Retrieves audit entries optionally filtered by type and timestamp range.
+     *
+     * @param auth optional Basic authentication header
+     * @param type filter by entry type
+     * @param from start timestamp (inclusive)
+     * @param to   end timestamp (inclusive)
+     * @param page zero-based page number
+     * @param size maximum number of entries per page
+     * @return the list of matching audit entries
+     */
     @SecurityRequirement(name = "basicAuth")
     @GetMapping
     @Operation(
