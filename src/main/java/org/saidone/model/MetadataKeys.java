@@ -25,16 +25,16 @@ package org.saidone.model;
 public interface MetadataKeys {
 
     /** Name of the checksum algorithm (e.g. SHA-256). */
-    String CHECKSUM_ALGORITHM = "chkalg";
+    String CHECKSUM_ALGORITHM = "ca";
     /** Hex encoded checksum value. */
-    String CHECKSUM_VALUE = "chkval";
+    String CHECKSUM_VALUE = "cv";
     /** MIME type associated with the stored content. */
-    String CONTENT_TYPE = "_contentType";
+    String CONTENT_TYPE = "ct";
     /** Flag marking content as encrypted. */
     String ENCRYPTED = "enc";
     /** Original file name. */
-    String FILENAME = "filename";
+    String FILENAME = "fn";
     /** Unique identifier of the stored object. */
-    String UUID = "uuid";
+    String UUID = "id";
 
 }
