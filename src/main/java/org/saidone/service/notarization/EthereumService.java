@@ -23,6 +23,7 @@ import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.config.EthereumConfig;
+import org.saidone.exception.NotarizationException;
 import org.saidone.service.NodeService;
 import org.saidone.service.content.ContentService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -136,8 +137,8 @@ public class EthereumService extends AbstractNotarizationService {
                 throw new RuntimeException("Transaction not found");
             }
         } catch (IOException e) {
-            log.error("Error fetching transaction {}", txHash, e);
-            throw new RuntimeException(e);
+            log.trace(e.getMessage(), e);
+            throw new NotarizationException(String.format("Error fetching transaction %s", txHash));
         }
     }
 
@@ -184,8 +185,8 @@ public class EthereumService extends AbstractNotarizationService {
             log.debug("Notarized node {} with tx id {}", nodeId, txHash);
             return txHash;
         } catch (Exception e) {
-            log.error("Error sending transaction for node {}: {}", nodeId, e.getMessage());
-            throw new RuntimeException(e);
+            log.trace(e.getMessage(), e);
+            throw new NotarizationException(String.format("Error sending transaction for node %s: %s", nodeId, e.getMessage()));
         }
     }
 
