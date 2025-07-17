@@ -117,13 +117,13 @@ public class EthereumService extends AbstractNotarizationService {
         super.stop();
     }
 
-    @Override
     /**
      * Fetches the hash data stored in the given Ethereum transaction.
      *
      * @param txHash the transaction identifier
      * @return the string stored in the transaction input data
      */
+    @Override
     public String getHash(String txHash) {
         try {
             val ethTransaction = web3j.ethGetTransactionByHash(txHash).send();

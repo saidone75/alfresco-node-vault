@@ -18,7 +18,21 @@
 
 package org.saidone.exception;
 
+/**
+ * Raised to signal a failure while persisting or retrieving notarization data.
+ * <p>
+ * It wraps any lower level exception coming from the underlying blockchain or
+ * storage implementation so that callers can react uniformly to notarization
+ * errors.
+ * </p>
+ */
 public class NotarizationException extends VaultException {
+
+    /**
+     * Creates a new instance with the provided error message.
+     *
+     * @param message description of the failure
+     */
     public NotarizationException(String message) {
         super(message);
     }
