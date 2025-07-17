@@ -43,4 +43,5 @@ public class DocumentNotarizationJob extends BaseComponent {
             nodeService.save(node);
         }
     }
+
 }
