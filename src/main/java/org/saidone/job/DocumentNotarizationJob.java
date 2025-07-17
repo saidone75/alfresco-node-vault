@@ -14,7 +14,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * Periodically computes document hashes and stores them on the blockchain.
+ * Schedules the periodic notarization of all nodes missing a transaction id.
+ * <p>
+ * At each execution the job computes a checksum of the node content using the
+ * configured algorithm and stores the result on the blockchain via the
+ * {@link EthereumService}. The returned transaction id is then saved back on
+ * the node. Execution is synchronized and enabled only when the property
+ * {@code application.notarization-job.enabled} is set to {@code true}.
+ * </p>
  */
 @Component
 @RequiredArgsConstructor
@@ -30,11 +37,18 @@ public class DocumentNotarizationJob extends BaseComponent {
     @Value("${application.service.vault.hash-algorithm}")
     private String algorithm;
 
+    /**
+     * Scheduled entry point triggered according to the configured cron expression.
+     */
     @Scheduled(cron = "${application.notarization-job.cron-expression}")
     void notarize() {
         doNotarize();
     }
 
+    /**
+     * Performs the notarization of all nodes currently lacking a transaction id.
+     * This method is synchronized to avoid concurrent executions.
+     */
     private synchronized void doNotarize() {
         for (val node : nodeService.findByTxId(null)) {
             try {
