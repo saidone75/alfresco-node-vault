@@ -89,7 +89,7 @@ application:
     query: ${ARCHIVING_JOB_QUERY:TYPE:'cm:content' AND ASPECT:'anv:archive'}
     enabled: ${ARCHIVING_JOB_ENABLED:true}
   notarization-job:
-    cron-expression: ${NOTARIZATION_JOB_CRON_EXPRESSION:0 0/30 * * * ?}
+    cron-expression: ${NOTARIZATION_JOB_CRON_EXPRESSION:0 0/5 * * * ?}
     enabled: ${NOTARIZATION_JOB_ENABLED:false}
   service:
     alfresco:
