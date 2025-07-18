@@ -18,9 +18,17 @@
 
 package org.saidone.misc;
 
+/**
+ * Collection of simple string constants shared across the application.
+ * <p>
+ * The prefixes are used by {@link org.saidone.component.BaseComponent} to
+ * clearly mark lifecycle events in the log output.
+ */
 public interface Constants {
 
+    /** Prefix displayed when a component is starting. */
     String START_PREFIX = ">>>>>";
+    /** Prefix displayed when a component is stopping. */
     String STOP_PREFIX = "<<<<<";
 
 }
