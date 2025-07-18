@@ -34,13 +34,13 @@ import org.springframework.security.web.server.SecurityWebFilterChain;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
+/**
+ * Basic security configuration securing the actuator endpoints.
+ */
 @Configuration
 @ConfigurationProperties(prefix = "management.security.basic-auth")
 @Setter
 @EnableWebFluxSecurity
-/**
- * Basic security configuration securing the actuator endpoints.
- */
 public class SecurityConfig {
 
     private String username;

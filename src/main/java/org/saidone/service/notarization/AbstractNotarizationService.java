@@ -66,7 +66,7 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
      * @param nodeId the identifier of the node to notarize
      */
     @SneakyThrows
-    public void notarizeDocument(String nodeId) {
+    public void notarizeNode(String nodeId) {
         log.debug("Notarizing document {}", nodeId);
         val hash = contentService.computeHash(nodeId, checksumAlgorithm);
         val txHash = putHash(nodeId, hash);

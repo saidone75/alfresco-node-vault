@@ -48,6 +48,6 @@ public interface NotarizationService {
      *
      * @param nodeId the node whose content should be notarized
      */
-    void notarizeDocument(String nodeId);
+    void notarizeNode(String nodeId);
 
 }

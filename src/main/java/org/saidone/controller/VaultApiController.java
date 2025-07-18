@@ -348,7 +348,7 @@ public class VaultApiController {
         if (Strings.isNotBlank(nodeWrapper.getNotarizationTxId())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(String.format("Node %s is already notarized.", nodeId));
         }
-        CompletableFuture.runAsync(() -> notarizationService.notarizeDocument(nodeId));
+        CompletableFuture.runAsync(() -> notarizationService.notarizeNode(nodeId));
         return ResponseEntity.ok().body(String.format("Notarization for node %s required.", nodeId));
     }
 

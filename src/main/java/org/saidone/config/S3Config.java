@@ -12,12 +12,12 @@ import software.amazon.awssdk.services.s3.S3Client;
 
 import java.net.URI;
 
-@Configuration
-@ConfigurationProperties(prefix = "application.service.vault.storage.s3")
-@Data
 /**
  * Configuration for the Amazon S3 client used as storage backend.
  */
+@Configuration
+@ConfigurationProperties(prefix = "application.service.vault.storage.s3")
+@Data
 public class S3Config {
 
     private String key;

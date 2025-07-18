@@ -24,15 +24,15 @@ import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-@Configuration
-@ConfigurationProperties(prefix = "application.service.alfresco")
-@Data
 /**
  * Configuration properties used to access the Alfresco repository.
  * <p>
  * These values configure how nodes are fetched and deleted when
  * interacting with Alfresco.
  */
+@Configuration
+@ConfigurationProperties(prefix = "application.service.alfresco")
+@Data
 public class AlfrescoServiceConfig {
 
     /** Number of nodes retrieved per REST request. */

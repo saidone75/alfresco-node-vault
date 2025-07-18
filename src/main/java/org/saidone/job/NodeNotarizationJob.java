@@ -28,7 +28,7 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty(name = "application.notarization-job.enabled", havingValue = "true")
 @EnableScheduling
 @Slf4j
-public class DocumentNotarizationJob extends BaseComponent {
+public class NodeNotarizationJob extends BaseComponent {
 
     private final NodeService nodeService;
     private final ContentService contentService;
