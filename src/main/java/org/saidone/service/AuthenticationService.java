@@ -26,12 +26,28 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
+/**
+ * Service responsible for validating Basic authentication headers.
+ * <p>
+ * The provided credentials are decoded and checked against Alfresco via
+ * {@link AlfrescoService} to verify that the user has administrative
+ * privileges.
+ * </p>
+ */
 @RequiredArgsConstructor
 @Service
 public class AuthenticationService {
 
     private final AlfrescoService alfrescoService;
 
+    /**
+     * Determines whether the given HTTP Authorization header contains valid
+     * Basic credentials for an Alfresco administrator.
+     *
+     * @param authHeader the Authorization header value received from the client
+     * @return {@code true} if the credentials are valid and belong to an admin;
+     * {@code false} otherwise
+     */
     public boolean isAuthorized(String authHeader) {
         if (Strings.isBlank(authHeader)) {
             return false;
