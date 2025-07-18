@@ -28,16 +28,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
-@Component
-@Data
-@ConfigurationProperties(prefix = "application.service.vault.encryption")
-@Validated
 /**
  * Configuration properties for content encryption managed through Vault.
  * <p>
  * These settings define which secret to use for encryption and how key
  * derivation is performed.
  */
+@Component
+@Data
+@ConfigurationProperties(prefix = "application.service.vault.encryption")
+@Validated
 public class EncryptionConfig {
 
     /** Vault key/value mount path. */

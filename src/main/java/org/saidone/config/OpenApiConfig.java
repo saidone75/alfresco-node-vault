@@ -23,6 +23,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Registers OpenAPI components and security scheme for the REST API.
+ */
 @Configuration
 @SecurityScheme(
         name = "basicAuth",
@@ -30,8 +33,5 @@ import org.springframework.context.annotation.Configuration;
         scheme = "basic"
 )
 @SecurityRequirement(name = "basicAuth")
-/**
- * Registers OpenAPI components and security scheme for the REST API.
- */
 public class OpenApiConfig {
 }

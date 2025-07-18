@@ -33,13 +33,6 @@ import java.security.InvalidAlgorithmParameterException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 
-@Configuration
-@ConditionalOnExpression(
-        "${application.service.vault.notarization.enabled}.equals(true) and '${application.service.vault.notarization.impl}'.equals('ethereum')"
-)
-@ConfigurationProperties(prefix = "application.service.vault.notarization.ethereum")
-@Data
-@Slf4j
 /**
  * Configuration properties used to connect to an Ethereum node.
  *
@@ -48,6 +41,13 @@ import java.security.NoSuchProviderException;
  * {@code account} values must be provided and will be used to sign and
  * send transactions.</p>
  */
+@Configuration
+@ConditionalOnExpression(
+        "${application.service.vault.notarization.enabled}.equals(true) and '${application.service.vault.notarization.impl}'.equals('ethereum')"
+)
+@ConfigurationProperties(prefix = "application.service.vault.notarization.ethereum")
+@Data
+@Slf4j
 public class EthereumConfig {
 
     /**
