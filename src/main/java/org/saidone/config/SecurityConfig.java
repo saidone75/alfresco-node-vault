@@ -46,6 +46,12 @@ public class SecurityConfig {
     private String username;
     private String password;
 
+    /**
+     * Configures security for actuator endpoints.
+     *
+     * @param http {@link ServerHttpSecurity} to configure
+     * @return the security web filter chain
+     */
     @Bean
     public SecurityWebFilterChain securityWebFilterChain(ServerHttpSecurity http) {
         return http
@@ -58,6 +64,11 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * Defines the in-memory user securing the actuator endpoints.
+     *
+     * @return reactive user details service
+     */
     @Bean
     public ReactiveUserDetailsService userDetailsService() {
         UserDetails user = User.builder()
@@ -68,6 +79,11 @@ public class SecurityConfig {
         return new MapReactiveUserDetailsService(user);
     }
 
+    /**
+     * Password encoder used for the actuator admin user.
+     *
+     * @return encoder instance
+     */
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();

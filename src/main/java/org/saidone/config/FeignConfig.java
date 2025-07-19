@@ -29,6 +29,11 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 @Configuration
 public class FeignConfig {
 
+    /**
+     * Provides the HTTP message converters used by Feign clients.
+     *
+     * @return converters configured with Jackson support
+     */
     @Bean
     public HttpMessageConverters messageConverters() {
         return new HttpMessageConverters(new MappingJackson2HttpMessageConverter());

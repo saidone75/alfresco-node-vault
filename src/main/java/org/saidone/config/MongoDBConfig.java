@@ -49,6 +49,11 @@ public class MongoDBConfig extends AbstractMongoClientConfiguration {
     @Value("${spring.data.mongodb.password}")
     private String password;
 
+    /**
+     * Creates the MongoDB client configured with credentials and codecs.
+     *
+     * @return the configured {@link MongoClient}
+     */
     @Bean
     @NonNull
     public MongoClient mongoClient() {
