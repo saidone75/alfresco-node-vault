@@ -60,11 +60,11 @@ and the indefinite retention of all documents in the active repository (unsustai
 ## Key Features
 - Lean and elegant code architecture
 - Fully FOSS, released under an open license
-- Custom upload and download methods
 - Scheduled or on-demand archiving
 - MongoDB storage for metadata and audit trail 
 - GridFS or S3 storage for binaries
-- Optional blockchain notarization of stored documents
+- Optional blockchain node notarization to ensure tamper-proof integrity
+- Secure and decoupled design that suits zero trust environments
 - Focus on [strong encryption](doc/Encryption.md) option for both content and metadata
 - Passwords securely stored in a secret engine
 - REST API with Alfresco proxy support
@@ -72,6 +72,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - No installation or changes required on Alfresco
 - 100% test coverage
 - Prometheus monitoring support for metrics and health checks
+- Custom upload and download methods
 - Minimal memory footprint
 - Robust, enterprise-grade reliability and performance
 
