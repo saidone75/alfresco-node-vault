@@ -134,6 +134,7 @@ application:
             iterations: 3
       audit:
         enabled: true
+        ttl-days: ${AUDIT_TTL_DAYS:60}
       storage:
         impl: s3
         s3:

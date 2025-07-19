@@ -26,8 +26,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.audit.AuditMetadataKeys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Creates the MongoDB collection used for persisting {@code AuditEntry} records.
@@ -43,6 +46,9 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class AuditCollectionCreator extends BaseComponent {
+
+    @Value("${AUDIT_TTL_DAYS:60}")
+    private int ttlDays;
 
     private final MongoTemplate mongoTemplate;
 
@@ -61,13 +67,14 @@ public class AuditCollectionCreator extends BaseComponent {
                     .granularity(TimeSeriesGranularity.SECONDS);
 
             val options = new CreateCollectionOptions()
-                    .timeSeriesOptions(timeSeriesOptions);
+                    .timeSeriesOptions(timeSeriesOptions).expireAfter(ttlDays, TimeUnit.DAYS);
 
             mongoTemplate.getDb().createCollection(COLLECTION_NAME, options);
-           log.info("Time series collection '{}' successfully created.", COLLECTION_NAME);
+            log.info("Time series collection '{}' successfully created.", COLLECTION_NAME);
         } else {
             log.info("Collection '{}' already exists.", COLLECTION_NAME);
         }
+        super.stop();
     }
 
 }
