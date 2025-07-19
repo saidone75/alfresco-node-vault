@@ -22,6 +22,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
+/**
+ * Entry point of the Alfresco Node Vault application.
+ *
+ * <p>This class bootstraps the Spring Boot context and loads the
+ * configuration properties required by the service.</p>
+ */
 @SpringBootApplication
 @EnableConfigurationProperties
 public class AlfrescoNodeVaultApplication {
