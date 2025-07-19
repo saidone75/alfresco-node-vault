@@ -26,6 +26,14 @@ public class S3Config {
     private String region;
     private String endpoint;
 
+    /**
+     * Builds the Amazon S3 client used as storage backend.
+     *
+     * <p>If a custom endpoint is provided, it is configured and basic
+     * credentials are set when the endpoint targets localhost.</p>
+     *
+     * @return configured {@link S3Client}
+     */
     @Bean
     public S3Client s3Client() {
         val builder = S3Client.builder().region(Region.of(region)).forcePathStyle(true);
