@@ -323,7 +323,7 @@ public class VaultApiController {
     @PostMapping("/nodes/{nodeId}/notarize")
     @Operation(
             summary = "Notarize a node",
-            description = "Request notarization of the specified node.",
+            description = "Require notarization of the specified node.",
             parameters = {
                     @Parameter(name = "nodeId", description = "Identifier of the node to notarize", required = true, in = ParameterIn.PATH)
             },
@@ -392,7 +392,7 @@ public class VaultApiController {
             val nodeContentInfo = contentService.getNodeContentInfo(nodeId);
             val contentHash = contentService.computeHash(nodeId, nodeContentInfo.getContentHashAlgorithm());
             if (notarizationHash.equals(contentHash)) {
-                return ResponseEntity.ok(String.format("Node %s has been notarized and all hashes match.", nodeId));
+                return ResponseEntity.ok(String.format("Node %s is notarized and all hashes match.", nodeId));
             } else {
                 return ResponseEntity.status(HttpStatus.CONFLICT).body(String.format("Node %s is notarized, but detected hash inconsistencies. Please investigate.", nodeId));
             }
