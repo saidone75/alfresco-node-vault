@@ -134,7 +134,7 @@ public class EthereumService extends AbstractNotarizationService {
                 byte[] inputBytes = Numeric.hexStringToByteArray(inputData);
                 return new String(inputBytes, StandardCharsets.UTF_8);
             } else {
-                throw new RuntimeException("Transaction not found");
+                throw new NotarizationException("Transaction not found");
             }
         } catch (IOException e) {
             log.trace(e.getMessage(), e);

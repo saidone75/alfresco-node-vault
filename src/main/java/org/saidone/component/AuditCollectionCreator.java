@@ -26,8 +26,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.audit.AuditMetadataKeys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * Creates the MongoDB collection used for persisting {@code AuditEntry} records.
@@ -37,6 +40,9 @@ import org.springframework.stereotype.Component;
  * collection with the {@code timestamp} field as its time key. The created
  * collection stores additional audit metadata in the {@code metadata} sub
  * document and uses a seconds granularity.
+ * Documents automatically expire after {@link #ttlDays} days. The TTL value
+ * can be overridden via the {@code AUDIT_TTL_DAYS} environment variable or the
+ * {@code application.audit.ttl-days} property.
  * </p>
  */
 @RequiredArgsConstructor
@@ -44,12 +50,21 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class AuditCollectionCreator extends BaseComponent {
 
+    /**
+     * Number of days an audit entry is retained before expiration. The default
+     * value is 60 days but it can be configured using the {@code AUDIT_TTL_DAYS}
+     * environment variable or the {@code application.audit.ttl-days} property.
+     */
+    @Value("${AUDIT_TTL_DAYS:60}")
+    private int ttlDays;
+
     private final MongoTemplate mongoTemplate;
 
     private static final String COLLECTION_NAME = "vault_audit";
 
     /**
-     * Creates the audit collection if it does not already exist.
+     * Creates the audit collection if it does not already exist and configures
+     * the collection to expire entries after {@link #ttlDays} days.
      */
     @PostConstruct
     @Override
@@ -61,13 +76,14 @@ public class AuditCollectionCreator extends BaseComponent {
                     .granularity(TimeSeriesGranularity.SECONDS);
 
             val options = new CreateCollectionOptions()
-                    .timeSeriesOptions(timeSeriesOptions);
+                    .timeSeriesOptions(timeSeriesOptions).expireAfter(ttlDays, TimeUnit.DAYS);
 
             mongoTemplate.getDb().createCollection(COLLECTION_NAME, options);
-           log.info("Time series collection '{}' successfully created.", COLLECTION_NAME);
+            log.info("Time series collection '{}' successfully created.", COLLECTION_NAME);
         } else {
             log.info("Collection '{}' already exists.", COLLECTION_NAME);
         }
+        super.stop();
     }
 
 }

@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.0.3] - 2025-07-18
+
+### Added
+- Introduced node notarization: records content checksums on the blockchain to ensure tamper-proof integrity.
+- `NodeContentInfo` and `NodeContentStream` models with encryption metadata.
+
+### Changed
+- Refactored content services to use `NodeContentInfo`.
+- Updated dependencies (AWS SDK, Datafaker, Web3j, etc.).
+- Added numerous Javadoc comments and documentation improvements.
+
+### Fixed
+- Corrected encryption flag parsing in `GridFsContentService`.
+- Fixed typos and Javadoc placement issues.
+
 ## [0.2.0] - 2025-07-07
 
 ### Added
