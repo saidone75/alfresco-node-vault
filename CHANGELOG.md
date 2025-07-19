@@ -7,18 +7,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [0.0.3] - 2025-07-18
 
 ### Added
-- Node notarization endpoint and scheduled job backed by Ethereum.
-- Automatic generation of Ethereum credentials and Ganache docker setup.
+- Introduced node notarization: records content checksums on the blockchain to ensure tamper-proof integrity.
 - `NodeContentInfo` and `NodeContentStream` models with encryption metadata.
-- Metadata support for S3 content storage and notarization check API.
 
 ### Changed
-- Replaced `EthereumService` with generic `NotarizationService`.
 - Refactored content services to use `NodeContentInfo`.
-- Renamed notarization classes from Document to Node for consistency.
-- Increased notarization job frequency to run every 5 minutes.
 - Updated dependencies (AWS SDK, Datafaker, Web3j, etc.).
-- Improved Ethereum transaction management and error handling.
 - Added numerous Javadoc comments and documentation improvements.
 
 ### Fixed
