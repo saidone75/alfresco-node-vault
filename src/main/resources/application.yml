@@ -144,8 +144,8 @@ application:
           region: ${S3_REGION:eu-central-1}
           endpoint: ${S3_ENDPOINT:http://localhost:4566}
       notarization:
-        enabled: true
-        impl: ethereum
+        enabled: ${NOTARIZATION_ENABLED:true}
+        impl: ${NOTARIZATION_IMPL:ethereum}
         ethereum:
           rpc-url: ${ETH_RPC_URL:http://localhost:8545}
           private-key: ${ETH_PRIVATE_KEY:4f3edf983ac636a65a842ce7c78d9aa706d3b113b37c7e9c79fc75a2e96c3e6a}
