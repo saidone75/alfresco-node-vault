@@ -40,6 +40,9 @@ import java.util.concurrent.TimeUnit;
  * collection with the {@code timestamp} field as its time key. The created
  * collection stores additional audit metadata in the {@code metadata} sub
  * document and uses a seconds granularity.
+ * Documents automatically expire after {@link #ttlDays} days. The TTL value
+ * can be overridden via the {@code AUDIT_TTL_DAYS} environment variable or the
+ * {@code application.audit.ttl-days} property.
  * </p>
  */
 @RequiredArgsConstructor
@@ -47,6 +50,11 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 public class AuditCollectionCreator extends BaseComponent {
 
+    /**
+     * Number of days an audit entry is retained before expiration. The default
+     * value is 60 days but it can be configured using the {@code AUDIT_TTL_DAYS}
+     * environment variable or the {@code application.audit.ttl-days} property.
+     */
     @Value("${AUDIT_TTL_DAYS:60}")
     private int ttlDays;
 
@@ -55,7 +63,8 @@ public class AuditCollectionCreator extends BaseComponent {
     private static final String COLLECTION_NAME = "vault_audit";
 
     /**
-     * Creates the audit collection if it does not already exist.
+     * Creates the audit collection if it does not already exist and configures
+     * the collection to expire entries after {@link #ttlDays} days.
      */
     @PostConstruct
     @Override
