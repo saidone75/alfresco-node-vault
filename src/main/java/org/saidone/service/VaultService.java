@@ -91,6 +91,17 @@ public class VaultService extends BaseComponent {
         }
     }
 
+    /**
+     * Removes any partially persisted data for the provided node.
+     * <p>
+     * If an error occurs during archiving, this method is invoked to clean up
+     * both the stored binary content and the node metadata entry in the vault.
+     * Any exception thrown by the underlying services is logged but otherwise
+     * ignored to avoid masking the original failure.
+     * </p>
+     *
+     * @param nodeId identifier of the node being rolled back
+     */
     private void rollback(String nodeId) {
         log.debug("Rollback required for node: {}", nodeId);
         try {
