@@ -48,6 +48,7 @@ The script spins up the following services using Docker Compose:
 - **ActiveMQ** broker
 - **MongoDB** with **Mongo Express** UI
 - **LocalStack** for AWS S3 object storage
+- **Ganache** for Ethereum blockchain simulation
 - **HashiCorp Vault** (plus a small provisioner container)
 - **Prometheus**, **Grafana** and **Nginx** for monitoring
 - **Alfresco Node Vault** application itself
