@@ -86,11 +86,19 @@ public class VaultService extends BaseComponent {
             throw new NodeNotFoundOnAlfrescoException(nodeId);
         } catch (Exception e) {
             log.trace(e.getMessage(), e);
-            // rollback
-            log.debug("Rollback required for node: {}", nodeId);
-            nodeService.deleteById(nodeId);
-            contentService.deleteNodeContent(nodeId);
+            rollback(nodeId);
             throw new VaultException(String.format("Error archiving node %s: %s", nodeId, e.getMessage()));
+        }
+    }
+
+    private void rollback(String nodeId) {
+        log.debug("Rollback required for node: {}", nodeId);
+        try {
+            contentService.deleteNodeContent(nodeId);
+            nodeService.deleteById(nodeId);
+        } catch (Exception e) {
+            log.trace(e.getMessage(), e);
+            log.debug("Rollback failed for node: {}", nodeId);
         }
     }
 
