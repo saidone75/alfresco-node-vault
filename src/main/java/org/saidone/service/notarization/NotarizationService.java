@@ -50,4 +50,6 @@ public interface NotarizationService {
      */
     void notarizeNode(String nodeId);
 
+    void checkNotarization(String nodeId);
+
 }

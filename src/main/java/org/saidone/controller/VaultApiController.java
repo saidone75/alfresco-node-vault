@@ -32,6 +32,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.exception.NodeNotFoundException;
+import org.saidone.exception.NotarizationException;
 import org.saidone.exception.VaultException;
 import org.saidone.model.Entry;
 import org.saidone.service.AuthenticationService;
@@ -141,6 +142,15 @@ public class VaultApiController {
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body("Server memory limit exceeded. Please try with a smaller file or contact administrator.");
+    }
+
+    @ExceptionHandler(NotarizationException.class)
+    @Operation(hidden = true)
+    public ResponseEntity<String> handleNotarizationException(NotarizationException e) {
+        log.error(e.getMessage());
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(e.getMessage());
     }
 
     /**
@@ -386,19 +396,8 @@ public class VaultApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        val nodeWrapper = nodeService.findById(nodeId);
-        if (Strings.isNotBlank(nodeWrapper.getNotarizationTxId())) {
-            val notarizationHash = notarizationService.getHash(nodeWrapper.getNotarizationTxId());
-            val nodeContentInfo = contentService.getNodeContentInfo(nodeId);
-            val contentHash = contentService.computeHash(nodeId, nodeContentInfo.getContentHashAlgorithm());
-            if (notarizationHash.equals(contentHash)) {
-                return ResponseEntity.ok(String.format("Node %s is notarized and hashes match.", nodeId));
-            } else {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(String.format(String.format("Node %s is notarized but hashes does not match.", nodeId)));
-            }
-        } else {
-            return ResponseEntity.ok(String.format("Node %s has not been notarized yet.", nodeId));
-        }
+        notarizationService.checkNotarization(nodeId);
+        return ResponseEntity.ok(String.format("Node %s is notarized and hashes match.", nodeId));
     }
 
 }
