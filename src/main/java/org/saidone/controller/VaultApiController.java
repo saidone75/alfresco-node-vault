@@ -144,6 +144,12 @@ public class VaultApiController {
                 .body("Server memory limit exceeded. Please try with a smaller file or contact administrator.");
     }
 
+    /**
+     * Handles errors related to the notarization process.
+     *
+     * @param e the thrown {@link NotarizationException}
+     * @return an internal server error response containing the exception message
+     */
     @ExceptionHandler(NotarizationException.class)
     @Operation(hidden = true)
     public ResponseEntity<String> handleNotarizationException(NotarizationException e) {
