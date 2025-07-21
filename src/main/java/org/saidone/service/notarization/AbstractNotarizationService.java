@@ -29,14 +29,14 @@ import org.saidone.service.NodeService;
 import org.saidone.service.content.ContentService;
 import org.springframework.beans.factory.annotation.Value;
 
-@RequiredArgsConstructor
-@Slf4j
 /**
  * Base implementation for services performing document notarization.
  *
  * <p>This component provides the common logic for computing document hashes
  * and updating nodes after the hash has been persisted.</p>
  */
+@RequiredArgsConstructor
+@Slf4j
 public abstract class AbstractNotarizationService extends BaseComponent implements NotarizationService {
 
     private final NodeService nodeService;
@@ -77,6 +77,16 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
         nodeService.save(nodeWrapper);
     }
 
+    /**
+     * Validates that the notarization for the specified node is still valid.
+     *
+     * <p>The method retrieves the stored transaction id from the node,
+     * fetches the hash back from the notarization system and compares it with
+     * the hash computed from the current content.</p>
+     *
+     * @param nodeId the identifier of the node to check
+     * @throws NotarizationException if the node is not notarized or hashes do not match
+     */
     @SneakyThrows
     public void checkNotarization(String nodeId) {
         log.debug("Checking notarization for document {}", nodeId);

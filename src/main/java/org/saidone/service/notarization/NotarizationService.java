@@ -50,6 +50,14 @@ public interface NotarizationService {
      */
     void notarizeNode(String nodeId);
 
+    /**
+     * Verifies that the stored hash for the given node matches the hash of its
+     * current content.
+     *
+     * @param nodeId the node whose notarization should be validated
+     * @throws org.saidone.exception.NotarizationException if the node is not
+     *                                                      notarized or hashes do not match
+     */
     void checkNotarization(String nodeId);
 
 }
