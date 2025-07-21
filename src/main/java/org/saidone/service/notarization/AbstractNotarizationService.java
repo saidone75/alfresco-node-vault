@@ -77,7 +77,8 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
         nodeService.save(nodeWrapper);
     }
 
-    public boolean checkNotarization(String nodeId) {
+    @SneakyThrows
+    public void checkNotarization(String nodeId) {
         log.debug("Checking notarization for document {}", nodeId);
         val notarizationTransactionId = nodeService.findById(nodeId).getNotarizationTxId();
         if (Strings.isBlank(notarizationTransactionId)) {
@@ -87,7 +88,6 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
         if (!hashesMatch) {
             throw new NotarizationException(String.format("Node %s is notarized but hashes do not match.", nodeId));
         }
-        return true;
     }
 
 }
