@@ -22,7 +22,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
+import org.saidone.exception.NotarizationException;
 import org.saidone.service.NodeService;
 import org.saidone.service.content.ContentService;
 import org.springframework.beans.factory.annotation.Value;
@@ -73,6 +75,19 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
         val nodeWrapper = nodeService.findById(nodeId);
         nodeWrapper.setNotarizationTxId(txHash);
         nodeService.save(nodeWrapper);
+    }
+
+    public boolean checkNotarization(String nodeId) {
+        log.debug("Checking notarization for document {}", nodeId);
+        val notarizationTransactionId = nodeService.findById(nodeId).getNotarizationTxId();
+        if (Strings.isBlank(notarizationTransactionId)) {
+            throw new NotarizationException(String.format("Node %s is not notarized", nodeId));
+        }
+        boolean hashesMatch = getHash(notarizationTransactionId).equals(contentService.computeHash(nodeId, checksumAlgorithm));
+        if (!hashesMatch) {
+            throw new NotarizationException(String.format("Node %s is notarized but hashes do not match.", nodeId));
+        }
+        return true;
     }
 
 }

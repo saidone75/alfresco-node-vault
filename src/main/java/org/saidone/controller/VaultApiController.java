@@ -392,9 +392,9 @@ public class VaultApiController {
             val nodeContentInfo = contentService.getNodeContentInfo(nodeId);
             val contentHash = contentService.computeHash(nodeId, nodeContentInfo.getContentHashAlgorithm());
             if (notarizationHash.equals(contentHash)) {
-                return ResponseEntity.ok(String.format("Node %s is notarized and all hashes match.", nodeId));
+                return ResponseEntity.ok(String.format("Node %s is notarized and hashes match.", nodeId));
             } else {
-                return ResponseEntity.status(HttpStatus.CONFLICT).body(String.format("Node %s is notarized, but detected hash inconsistencies. Please investigate.", nodeId));
+                return ResponseEntity.status(HttpStatus.CONFLICT).body(String.format(String.format("Node %s is notarized but hashes does not match.", nodeId)));
             }
         } else {
             return ResponseEntity.ok(String.format("Node %s has not been notarized yet.", nodeId));
