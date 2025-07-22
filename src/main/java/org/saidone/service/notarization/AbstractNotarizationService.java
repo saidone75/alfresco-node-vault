@@ -32,16 +32,28 @@ import org.springframework.beans.factory.annotation.Value;
 /**
  * Base implementation for services performing document notarization.
  *
- * <p>This component provides the common logic for computing document hashes
- * and updating nodes after the hash has been persisted.</p>
+ * <p>
+ *   Concrete implementations only need to provide the mechanisms used to
+ *   persist and read back document hashes via {@link #putHash(String, String)}
+ *   and {@link #getHash(String)}. All other operations such as computing the
+ *   hash of a node's content and updating the node metadata are handled here.
+ * </p>
  */
 @RequiredArgsConstructor
 @Slf4j
 public abstract class AbstractNotarizationService extends BaseComponent implements NotarizationService {
 
+    /** Service used to access nodes and their metadata. */
     private final NodeService nodeService;
+
+    /** Service providing access to node content for hashing. */
     private final ContentService contentService;
 
+    /**
+     * Algorithm used when computing hashes of node content. Value is read from
+     * the {@code application.service.vault.hash-algorithm} configuration
+     * property.
+     */
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
 

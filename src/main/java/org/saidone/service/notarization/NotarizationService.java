@@ -21,8 +21,12 @@ package org.saidone.service.notarization;
 /**
  * Contract for components able to notarize documents.
  *
- * <p>Implementations store document hashes in an external system such as a
- * blockchain and later retrieve them.</p>
+ * <p>
+ *     Implementations are responsible for persisting hashes of a node's
+ *     content to an external store (for example a blockchain) and for
+ *     retrieving them afterwards. {@link AbstractNotarizationService} provides
+ *     a base implementation of the common logic.
+ * </p>
  */
 
 public interface NotarizationService {
