@@ -52,7 +52,7 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
      * @param hash   the hash value to store
      * @return an implementation specific transaction id
      */
-    public abstract String putHash(String nodeId, String hash);
+    protected abstract String putHash(String nodeId, String hash);
 
     /**
      * Retrieves the stored hash for the given transaction id.
@@ -60,7 +60,7 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
      * @param txId the transaction identifier
      * @return the stored hash value
      */
-    public abstract String getHash(String txId);
+    protected abstract String getHash(String txId);
 
     /**
      * Computes the hash of the node content and stores it through {@link #putHash}.
@@ -94,8 +94,9 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
         if (Strings.isBlank(notarizationTransactionId)) {
             throw new NotarizationException(String.format("Node %s is not notarized", nodeId));
         }
-        boolean hashesMatch = getHash(notarizationTransactionId).equals(contentService.computeHash(nodeId, checksumAlgorithm));
-        if (!hashesMatch) {
+        val notarizedHash = getHash(notarizationTransactionId);
+        val actualHash = contentService.computeHash(nodeId, checksumAlgorithm);
+        if (!notarizedHash.equals(actualHash)) {
             throw new NotarizationException(String.format("Node %s is notarized but hashes do not match.", nodeId));
         }
     }

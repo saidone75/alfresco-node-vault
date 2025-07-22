@@ -17,6 +17,7 @@
  */
 
 package org.saidone.service.notarization;
+
 /**
  * Contract for components able to notarize documents.
  *
@@ -25,23 +26,6 @@ package org.saidone.service.notarization;
  */
 
 public interface NotarizationService {
-
-    /**
-     * Retrieves the hash stored within the transaction identified by the given id.
-     *
-     * @param txHash the transaction identifier returned by {@link #putHash(String, String)}
-     * @return the persisted hash
-     */
-    String getHash(String txHash);
-
-    /**
-     * Stores the supplied hash in the underlying notarization system.
-     *
-     * @param nodeId the node identifier
-     * @param hash   the hash to store
-     * @return an implementation specific transaction id
-     */
-    String putHash(String nodeId, String hash);
 
     /**
      * Computes and stores the hash for the given node.
@@ -56,7 +40,7 @@ public interface NotarizationService {
      *
      * @param nodeId the node whose notarization should be validated
      * @throws org.saidone.exception.NotarizationException if the node is not
-     *                                                      notarized or hashes do not match
+     *                                                     notarized or hashes do not match
      */
     void checkNotarization(String nodeId);
 

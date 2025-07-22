@@ -124,7 +124,7 @@ public class EthereumService extends AbstractNotarizationService {
      * @return the string stored in the transaction input data
      */
     @Override
-    public String getHash(String txHash) {
+    protected String getHash(String txHash) {
         try {
             val ethTransaction = web3j.ethGetTransactionByHash(txHash).send();
             val transactionOptional = ethTransaction.getTransaction();
@@ -154,7 +154,7 @@ public class EthereumService extends AbstractNotarizationService {
      * @return the resulting Ethereum transaction hash
      */
     @Override
-    public String putHash(String nodeId, String hash) {
+    protected String putHash(String nodeId, String hash) {
         try {
             val chainId = web3j.ethChainId().send().getChainId();
             val txManager = new RawTransactionManager(web3j, credentials, chainId.longValue());

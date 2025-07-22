@@ -76,11 +76,8 @@ public class NotarizationServiceTests extends BaseTest {
         vaultService.archiveNode(nodeId);
         // notarize node
         notarizationService.notarizeNode(nodeId);
-        // check if hashes match
-        val notarizationTransactionId = nodeService.findById(nodeId).getNotarizationTxId();
-        val txHash = notarizationService.getHash(notarizationTransactionId);
-        val hash = contentService.computeHash(nodeId, checksumAlgorithm);
-        assertEquals(txHash, hash);
+        // check notarization
+        assertDoesNotThrow(() -> notarizationService.checkNotarization(nodeId));
     }
 
 }
