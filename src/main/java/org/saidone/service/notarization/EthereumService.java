@@ -42,10 +42,13 @@ import java.nio.charset.StandardCharsets;
 /**
  * Service responsible for interacting with an Ethereum node to store document hashes.
  *
- * <p>This component wraps the minimal Web3j interactions required by the
- * application. It creates the {@link Web3j} client on startup and uses the
- * provided {@link Credentials} to sign transactions that embed document
- * hashes.</p>
+ * <p>
+ *     This component wraps the minimal Web3j interactions required by the
+ *     application. It creates the {@link Web3j} client on startup and uses the
+ *     provided {@link Credentials} to sign transactions that embed document
+ *     hashes. The bean is instantiated only when the application is configured
+ *     to use the {@code ethereum} implementation of the notarization service.
+ * </p>
  */
 @Service
 @Slf4j
@@ -70,8 +73,9 @@ public class EthereumService extends AbstractNotarizationService {
     private Credentials credentials;
 
     /**
-     * Null-recipient address used when sending transactions containing only
-     * notarization data.
+     * Null-recipient address used when broadcasting transactions that solely
+     * contain notarization data. The Ethereum network ignores the recipient when
+     * no value is transferred, therefore this placeholder is sufficient.
      */
     private static final String TO = "0x0000000000000000000000000000000000000000";
 
@@ -124,7 +128,7 @@ public class EthereumService extends AbstractNotarizationService {
      * @return the string stored in the transaction input data
      */
     @Override
-    public String getHash(String txHash) {
+    protected String getHash(String txHash) {
         try {
             val ethTransaction = web3j.ethGetTransactionByHash(txHash).send();
             val transactionOptional = ethTransaction.getTransaction();
@@ -154,7 +158,7 @@ public class EthereumService extends AbstractNotarizationService {
      * @return the resulting Ethereum transaction hash
      */
     @Override
-    public String putHash(String nodeId, String hash) {
+    protected String putHash(String nodeId, String hash) {
         try {
             val chainId = web3j.ethChainId().send().getChainId();
             val txManager = new RawTransactionManager(web3j, credentials, chainId.longValue());

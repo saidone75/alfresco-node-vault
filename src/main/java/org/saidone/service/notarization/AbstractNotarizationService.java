@@ -32,16 +32,28 @@ import org.springframework.beans.factory.annotation.Value;
 /**
  * Base implementation for services performing document notarization.
  *
- * <p>This component provides the common logic for computing document hashes
- * and updating nodes after the hash has been persisted.</p>
+ * <p>
+ *   Concrete implementations only need to provide the mechanisms used to
+ *   persist and read back document hashes via {@link #putHash(String, String)}
+ *   and {@link #getHash(String)}. All other operations such as computing the
+ *   hash of a node's content and updating the node metadata are handled here.
+ * </p>
  */
 @RequiredArgsConstructor
 @Slf4j
 public abstract class AbstractNotarizationService extends BaseComponent implements NotarizationService {
 
+    /** Service used to access nodes and their metadata. */
     private final NodeService nodeService;
+
+    /** Service providing access to node content for hashing. */
     private final ContentService contentService;
 
+    /**
+     * Algorithm used when computing hashes of node content. Value is read from
+     * the {@code application.service.vault.hash-algorithm} configuration
+     * property.
+     */
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
 
@@ -52,7 +64,7 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
      * @param hash   the hash value to store
      * @return an implementation specific transaction id
      */
-    public abstract String putHash(String nodeId, String hash);
+    protected abstract String putHash(String nodeId, String hash);
 
     /**
      * Retrieves the stored hash for the given transaction id.
@@ -60,7 +72,7 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
      * @param txId the transaction identifier
      * @return the stored hash value
      */
-    public abstract String getHash(String txId);
+    protected abstract String getHash(String txId);
 
     /**
      * Computes the hash of the node content and stores it through {@link #putHash}.
@@ -94,8 +106,9 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
         if (Strings.isBlank(notarizationTransactionId)) {
             throw new NotarizationException(String.format("Node %s is not notarized", nodeId));
         }
-        boolean hashesMatch = getHash(notarizationTransactionId).equals(contentService.computeHash(nodeId, checksumAlgorithm));
-        if (!hashesMatch) {
+        val notarizedHash = getHash(notarizationTransactionId);
+        val actualHash = contentService.computeHash(nodeId, checksumAlgorithm);
+        if (!notarizedHash.equals(actualHash)) {
             throw new NotarizationException(String.format("Node %s is notarized but hashes do not match.", nodeId));
         }
     }
