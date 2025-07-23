@@ -22,17 +22,15 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Service for persisting and retrieving {@link AuditEntry} instances.
@@ -46,12 +44,8 @@ public class AuditService extends BaseComponent {
 
     private final MongoTemplate mongoTemplate;
 
-    public void saveEntry(Map<String, Serializable> metadata, String type) {
-        val entry = new AuditEntry();
-        entry.setTimestamp(Instant.now());
-        entry.setMetadata(metadata);
-        entry.setType(type);
-        mongoTemplate.insert(entry);
+    public void saveEntry(AuditEntry auditEntry) {
+        mongoTemplate.insert(auditEntry);
     }
 
     public List<AuditEntry> findEntries(String type, Instant from, Instant to, Pageable pageable) {

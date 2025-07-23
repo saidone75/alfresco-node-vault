@@ -33,6 +33,7 @@ public interface AuditMetadataKeys {
     /** Field name for the entry type. */
     String TYPE = "typ";
 
+    String ID = "id";
     /** Client IP address. */
     String IP = "ip";
     /** HTTP {@code User-Agent} header value. */
