@@ -24,6 +24,8 @@ import lombok.val;
 import org.apache.http.HttpHeaders;
 import org.saidone.component.BaseComponent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.server.reactive.ServerHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -50,22 +52,38 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        val request = exchange.getRequest();
+        val requestEntry = createRequestAuditEntry(exchange.getRequest());
+        auditService.saveEntry(requestEntry);
+        return chain.filter(exchange).doFinally(signal -> {
+            val responseEntry = createResponseAuditEntry(requestEntry.getId(), exchange.getResponse());
+            auditService.saveEntry(responseEntry);
+        });
+    }
+
+    public static AuditEntry createRequestAuditEntry(ServerHttpRequest request) {
         val metadata = new HashMap<String, Serializable>();
+        metadata.put(AuditMetadataKeys.ID, request.getId());
         if (request.getRemoteAddress() != null) {
             metadata.put(AuditMetadataKeys.IP, request.getRemoteAddress().getAddress().getHostAddress());
         }
         metadata.put(AuditMetadataKeys.USER_AGENT, request.getHeaders().getFirst(HttpHeaders.USER_AGENT));
         metadata.put(AuditMetadataKeys.PATH, request.getPath().value());
         metadata.put(AuditMetadataKeys.METHOD, request.getMethod().toString());
-        auditService.saveEntry(metadata, AuditMetadataKeys.REQUEST);
-        return chain.filter(exchange).doFinally(signal -> {
-            val responseData = new HashMap<String, Serializable>();
-            responseData.put(AuditMetadataKeys.STATUS, exchange.getResponse().getStatusCode() != null ?
-                    exchange.getResponse().getStatusCode().value() : null);
-            responseData.put(AuditMetadataKeys.PATH, request.getPath().value());
-            auditService.saveEntry(responseData, AuditMetadataKeys.RESPONSE);
-        });
+        val entry = new AuditEntry();
+        entry.setMetadata(metadata);
+        entry.setType(AuditMetadataKeys.REQUEST);
+        return entry;
+    }
+
+    public static AuditEntry createResponseAuditEntry(String id, ServerHttpResponse response) {
+        val metadata = new HashMap<String, Serializable>();
+        metadata.put(AuditMetadataKeys.ID, id);
+        metadata.put(AuditMetadataKeys.STATUS, response.getStatusCode() != null ?
+                response.getStatusCode().value() : null);
+        val entry = new AuditEntry();
+        entry.setMetadata(metadata);
+        entry.setType(AuditMetadataKeys.RESPONSE);
+        return entry;
     }
 
 }

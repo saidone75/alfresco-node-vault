@@ -51,4 +51,8 @@ public class AuditEntry {
     @Field(TYPE)
     private String type;
 
+    public AuditEntry() {
+        this.timestamp = Instant.now();
+    }
+
 }
