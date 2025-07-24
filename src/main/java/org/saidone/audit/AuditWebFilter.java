@@ -41,6 +41,9 @@ import java.util.HashMap;
  * <p>For each request the filter collects basic metadata (IP address, user agent,
  * path, HTTP method) and stores it via {@link AuditService}. When the response
  * is completed a second audit entry is stored containing the status code.</p>
+ *
+ * <p>The filter is active only when the property
+ * {@code application.service.vault.audit.enabled} is set to {@code true}.</p>
  */
 @Component
 @ConditionalOnProperty(name = "application.service.vault.audit.enabled", havingValue = "true")
@@ -48,8 +51,17 @@ import java.util.HashMap;
 @Slf4j
 public class AuditWebFilter extends BaseComponent implements WebFilter {
 
+    /** Service used to persist {@link AuditEntry} instances. */
     private final AuditService auditService;
 
+    /**
+     * Intercepts the request/response exchange to persist basic audit
+     * information.
+     *
+     * @param exchange the current server exchange
+     * @param chain    the remaining web filter chain
+     * @return completion signal for the filter chain
+     */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         val requestEntry = createRequestAuditEntry(exchange.getRequest());
@@ -60,29 +72,43 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
         });
     }
 
+    /**
+     * Build an audit entry representing an incoming HTTP request.
+     *
+     * @param request the server request
+     * @return populated audit entry for the request
+     */
     public static AuditEntry createRequestAuditEntry(ServerHttpRequest request) {
         val metadata = new HashMap<String, Serializable>();
-        metadata.put(AuditMetadataKeys.ID, request.getId());
+        metadata.put(AuditEntryKeys.METADATA_ID, request.getId());
         if (request.getRemoteAddress() != null) {
-            metadata.put(AuditMetadataKeys.IP, request.getRemoteAddress().getAddress().getHostAddress());
+            metadata.put(AuditEntryKeys.METADATA_IP, request.getRemoteAddress().getAddress().getHostAddress());
         }
-        metadata.put(AuditMetadataKeys.USER_AGENT, request.getHeaders().getFirst(HttpHeaders.USER_AGENT));
-        metadata.put(AuditMetadataKeys.PATH, request.getPath().value());
-        metadata.put(AuditMetadataKeys.METHOD, request.getMethod().toString());
+        metadata.put(AuditEntryKeys.METADATA_USER_AGENT, request.getHeaders().getFirst(HttpHeaders.USER_AGENT));
+        metadata.put(AuditEntryKeys.METADATA_PATH, request.getPath().value());
+        metadata.put(AuditEntryKeys.METADATA_METHOD, request.getMethod().toString());
         val entry = new AuditEntry();
         entry.setMetadata(metadata);
-        entry.setType(AuditMetadataKeys.REQUEST);
+        entry.setBody(request.getBody().toString());
+        entry.setType(AuditEntryKeys.REQUEST);
         return entry;
     }
 
+    /**
+     * Build an audit entry representing an HTTP response.
+     *
+     * @param id       identifier of the related request
+     * @param response the server response
+     * @return populated audit entry for the response
+     */
     public static AuditEntry createResponseAuditEntry(String id, ServerHttpResponse response) {
         val metadata = new HashMap<String, Serializable>();
-        metadata.put(AuditMetadataKeys.ID, id);
-        metadata.put(AuditMetadataKeys.STATUS, response.getStatusCode() != null ?
+        metadata.put(AuditEntryKeys.METADATA_ID, id);
+        metadata.put(AuditEntryKeys.METADATA_STATUS, response.getStatusCode() != null ?
                 response.getStatusCode().value() : null);
         val entry = new AuditEntry();
         entry.setMetadata(metadata);
-        entry.setType(AuditMetadataKeys.RESPONSE);
+        entry.setType(AuditEntryKeys.RESPONSE);
         return entry;
     }
 

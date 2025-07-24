@@ -25,7 +25,7 @@ import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.saidone.audit.AuditMetadataKeys;
+import org.saidone.audit.AuditEntryKeys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
@@ -58,8 +58,10 @@ public class AuditCollectionCreator extends BaseComponent {
     @Value("${AUDIT_TTL_DAYS:60}")
     private int ttlDays;
 
+    /** Template used to execute MongoDB operations. */
     private final MongoTemplate mongoTemplate;
 
+    /** Name of the MongoDB collection storing audit entries. */
     private static final String COLLECTION_NAME = "vault_audit";
 
     /**
@@ -71,8 +73,8 @@ public class AuditCollectionCreator extends BaseComponent {
     public void init() {
         super.init();
         if (!mongoTemplate.collectionExists(COLLECTION_NAME)) {
-            val timeSeriesOptions = new TimeSeriesOptions(AuditMetadataKeys.TIMESTAMP)
-                    .metaField(AuditMetadataKeys.METADATA)
+            val timeSeriesOptions = new TimeSeriesOptions(AuditEntryKeys.TIMESTAMP)
+                    .metaField(AuditEntryKeys.METADATA)
                     .granularity(TimeSeriesGranularity.SECONDS);
 
             val options = new CreateCollectionOptions()

@@ -23,7 +23,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import static org.saidone.audit.AuditMetadataKeys.*;
+import static org.saidone.audit.AuditEntryKeys.*;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -39,18 +39,43 @@ import java.util.Map;
 @Document(collection = "vault_audit")
 public class AuditEntry {
 
+    /**
+     * Unique identifier of the audit entry.
+     */
     @Id
     private String id;
 
-    @Field(TIMESTAMP)
-    private Instant timestamp;
-
-    @Field(METADATA)
-    private Map<String, Serializable> metadata;
-
+    /**
+     * Type of the audited event. Typical values are
+     * {@link AuditEntryKeys#REQUEST} or {@link AuditEntryKeys#RESPONSE}.
+     */
     @Field(TYPE)
     private String type;
 
+    /**
+     * Moment in time when the event occurred.
+     */
+    @Field(TIMESTAMP)
+    private Instant timestamp;
+
+    /**
+     * Additional metadata describing the request or response.
+     * The keys used in this map are defined in {@link AuditEntryKeys}.
+     */
+    @Field(METADATA)
+    private Map<String, Serializable> metadata;
+
+    /**
+     * Serialized body of the request or response, if available.
+     */
+    @Field(BODY)
+    private String body;
+
+    /**
+     * Creates a new {@code AuditEntry} with its timestamp set to the
+     * current instant. The metadata and type can be populated later
+     * before persisting the entry.
+     */
     public AuditEntry() {
         this.timestamp = Instant.now();
     }

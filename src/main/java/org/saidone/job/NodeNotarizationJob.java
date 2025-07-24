@@ -4,9 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.component.BaseComponent;
-import org.saidone.service.notarization.EthereumService;
 import org.saidone.service.NodeService;
-import org.saidone.service.content.ContentService;
+import org.saidone.service.notarization.EthereumService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -31,9 +30,13 @@ import org.springframework.stereotype.Component;
 public class NodeNotarizationJob extends BaseComponent {
 
     private final NodeService nodeService;
-    private final ContentService contentService;
     private final EthereumService ethereumService;
 
+    /**
+     * Hash algorithm used to generate the checksum that will be notarised.
+     * The value is injected from the
+     * {@code application.service.vault.hash-algorithm} property.
+     */
     @Value("${application.service.vault.hash-algorithm}")
     private String algorithm;
 
@@ -52,10 +55,7 @@ public class NodeNotarizationJob extends BaseComponent {
     private synchronized void doNotarize() {
         for (val node : nodeService.findByTxId(null)) {
             try {
-                val checksum = contentService.computeHash(node.getId(), algorithm);
-                val txId = ethereumService.putHash(node.getId(), checksum);
-                node.setNotarizationTxId(txId);
-                nodeService.save(node);
+                ethereumService.notarizeNode(node.getId());
             } catch (Exception e) {
                 log.warn(e.getMessage(), e);
             }
