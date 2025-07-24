@@ -50,6 +50,14 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
 
     private final AuditService auditService;
 
+    /**
+     * Intercepts the request/response exchange to persist basic audit
+     * information.
+     *
+     * @param exchange the current server exchange
+     * @param chain    the remaining web filter chain
+     * @return completion signal for the filter chain
+     */
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         val requestEntry = createRequestAuditEntry(exchange.getRequest());
@@ -60,6 +68,12 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
         });
     }
 
+    /**
+     * Build an audit entry representing an incoming HTTP request.
+     *
+     * @param request the server request
+     * @return populated audit entry for the request
+     */
     public static AuditEntry createRequestAuditEntry(ServerHttpRequest request) {
         val metadata = new HashMap<String, Serializable>();
         metadata.put(AuditMetadataKeys.ID, request.getId());
@@ -75,6 +89,13 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
         return entry;
     }
 
+    /**
+     * Build an audit entry representing an HTTP response.
+     *
+     * @param id       identifier of the related request
+     * @param response the server response
+     * @return populated audit entry for the response
+     */
     public static AuditEntry createResponseAuditEntry(String id, ServerHttpResponse response) {
         val metadata = new HashMap<String, Serializable>();
         metadata.put(AuditMetadataKeys.ID, id);

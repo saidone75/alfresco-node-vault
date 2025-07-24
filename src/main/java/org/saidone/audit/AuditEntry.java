@@ -51,6 +51,11 @@ public class AuditEntry {
     @Field(TYPE)
     private String type;
 
+    /**
+     * Creates a new {@code AuditEntry} with its timestamp set to the
+     * current instant. The metadata and type can be populated later
+     * before persisting the entry.
+     */
     public AuditEntry() {
         this.timestamp = Instant.now();
     }
