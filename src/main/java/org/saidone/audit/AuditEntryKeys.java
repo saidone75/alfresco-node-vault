@@ -24,7 +24,7 @@ package org.saidone.audit;
  * providing a single point of reference for the mapping between Java fields and
  * their persisted counterparts.
  */
-public interface AuditMetadataKeys {
+public interface AuditEntryKeys {
 
     /** Field name for the audit entry timestamp. */
     String TIMESTAMP = "ts";
@@ -33,22 +33,24 @@ public interface AuditMetadataKeys {
     /** Field name for the entry type. */
     String TYPE = "typ";
 
-    /** Request/response identifier. */
-    String ID = "id";
-    /** Client IP address. */
-    String IP = "ip";
-    /** HTTP {@code User-Agent} header value. */
-    String USER_AGENT = "ua";
-    /** Requested path. */
-    String PATH = "path";
-    /** HTTP method. */
-    String METHOD = "mth";
-
     /** Constant identifying request audit entries. */
     String REQUEST = "req";
-    /** HTTP response status code. */
-    String STATUS = "st";
     /** Constant identifying response audit entries. */
     String RESPONSE = "res";
+
+    /** Request/response identifier. */
+    String METADATA_ID = "id";
+    /** Client IP address. */
+    String METADATA_IP = "ip";
+    /** HTTP {@code User-Agent} header value. */
+    String METADATA_USER_AGENT = "ua";
+    /** Requested path. */
+    String METADATA_PATH = "path";
+    /** HTTP method. */
+    String METADATA_METHOD = "mth";
+    /** HTTP response status code. */
+    String METADATA_STATUS = "st";
+
+    String BODY = "body";
 
 }

@@ -23,7 +23,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import static org.saidone.audit.AuditMetadataKeys.*;
+import static org.saidone.audit.AuditEntryKeys.*;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -42,14 +42,17 @@ public class AuditEntry {
     @Id
     private String id;
 
+    @Field(TYPE)
+    private String type;
+
     @Field(TIMESTAMP)
     private Instant timestamp;
 
     @Field(METADATA)
     private Map<String, Serializable> metadata;
 
-    @Field(TYPE)
-    private String type;
+    @Field(BODY)
+    private String body;
 
     /**
      * Creates a new {@code AuditEntry} with its timestamp set to the

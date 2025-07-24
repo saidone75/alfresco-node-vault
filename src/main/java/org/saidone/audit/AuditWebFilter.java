@@ -76,16 +76,17 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
      */
     public static AuditEntry createRequestAuditEntry(ServerHttpRequest request) {
         val metadata = new HashMap<String, Serializable>();
-        metadata.put(AuditMetadataKeys.ID, request.getId());
+        metadata.put(AuditEntryKeys.METADATA_ID, request.getId());
         if (request.getRemoteAddress() != null) {
-            metadata.put(AuditMetadataKeys.IP, request.getRemoteAddress().getAddress().getHostAddress());
+            metadata.put(AuditEntryKeys.METADATA_IP, request.getRemoteAddress().getAddress().getHostAddress());
         }
-        metadata.put(AuditMetadataKeys.USER_AGENT, request.getHeaders().getFirst(HttpHeaders.USER_AGENT));
-        metadata.put(AuditMetadataKeys.PATH, request.getPath().value());
-        metadata.put(AuditMetadataKeys.METHOD, request.getMethod().toString());
+        metadata.put(AuditEntryKeys.METADATA_USER_AGENT, request.getHeaders().getFirst(HttpHeaders.USER_AGENT));
+        metadata.put(AuditEntryKeys.METADATA_PATH, request.getPath().value());
+        metadata.put(AuditEntryKeys.METADATA_METHOD, request.getMethod().toString());
         val entry = new AuditEntry();
         entry.setMetadata(metadata);
-        entry.setType(AuditMetadataKeys.REQUEST);
+        entry.setBody(request.getBody().toString());
+        entry.setType(AuditEntryKeys.REQUEST);
         return entry;
     }
 
@@ -98,12 +99,12 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
      */
     public static AuditEntry createResponseAuditEntry(String id, ServerHttpResponse response) {
         val metadata = new HashMap<String, Serializable>();
-        metadata.put(AuditMetadataKeys.ID, id);
-        metadata.put(AuditMetadataKeys.STATUS, response.getStatusCode() != null ?
+        metadata.put(AuditEntryKeys.METADATA_ID, id);
+        metadata.put(AuditEntryKeys.METADATA_STATUS, response.getStatusCode() != null ?
                 response.getStatusCode().value() : null);
         val entry = new AuditEntry();
         entry.setMetadata(metadata);
-        entry.setType(AuditMetadataKeys.RESPONSE);
+        entry.setType(AuditEntryKeys.RESPONSE);
         return entry;
     }
 
