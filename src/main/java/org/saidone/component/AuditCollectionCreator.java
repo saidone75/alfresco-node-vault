@@ -58,8 +58,10 @@ public class AuditCollectionCreator extends BaseComponent {
     @Value("${AUDIT_TTL_DAYS:60}")
     private int ttlDays;
 
+    /** Template used to execute MongoDB operations. */
     private final MongoTemplate mongoTemplate;
 
+    /** Name of the MongoDB collection storing audit entries. */
     private static final String COLLECTION_NAME = "vault_audit";
 
     /**

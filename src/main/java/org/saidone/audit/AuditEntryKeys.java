@@ -51,6 +51,7 @@ public interface AuditEntryKeys {
     /** HTTP response status code. */
     String METADATA_STATUS = "st";
 
+    /** Field name for the request or response body. */
     String BODY = "body";
 
 }

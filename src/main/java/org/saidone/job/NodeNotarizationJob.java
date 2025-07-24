@@ -32,6 +32,11 @@ public class NodeNotarizationJob extends BaseComponent {
     private final NodeService nodeService;
     private final EthereumService ethereumService;
 
+    /**
+     * Hash algorithm used to generate the checksum that will be notarised.
+     * The value is injected from the
+     * {@code application.service.vault.hash-algorithm} property.
+     */
     @Value("${application.service.vault.hash-algorithm}")
     private String algorithm;
 

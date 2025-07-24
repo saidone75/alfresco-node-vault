@@ -41,6 +41,9 @@ import java.util.HashMap;
  * <p>For each request the filter collects basic metadata (IP address, user agent,
  * path, HTTP method) and stores it via {@link AuditService}. When the response
  * is completed a second audit entry is stored containing the status code.</p>
+ *
+ * <p>The filter is active only when the property
+ * {@code application.service.vault.audit.enabled} is set to {@code true}.</p>
  */
 @Component
 @ConditionalOnProperty(name = "application.service.vault.audit.enabled", havingValue = "true")
@@ -48,6 +51,7 @@ import java.util.HashMap;
 @Slf4j
 public class AuditWebFilter extends BaseComponent implements WebFilter {
 
+    /** Service used to persist {@link AuditEntry} instances. */
     private final AuditService auditService;
 
     /**
