@@ -16,14 +16,14 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.audit;
+package org.saidone.service.audit;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import static org.saidone.audit.AuditEntryKeys.*;
+import static org.saidone.service.audit.AuditEntryKeys.*;
 
 import java.io.Serializable;
 import java.time.Instant;

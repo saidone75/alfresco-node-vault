@@ -11,11 +11,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
-import org.saidone.audit.AuditEntry;
-import org.saidone.audit.AuditService;
 import org.saidone.service.AuthenticationService;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.saidone.service.audit.AuditEntry;
+import org.saidone.service.audit.AuditServiceImpl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +26,7 @@ import java.util.List;
  * REST controller exposing read-only operations for the audit log.
  * <p>
  * All endpoints require basic authentication and delegate the retrieval of
- * entries to {@link AuditService}.
+ * entries to {@link AuditServiceImpl}.
  * </p>
  */
 @RestController
@@ -37,7 +35,7 @@ import java.util.List;
 @Tag(name = "Audit API", description = "Audit log operations")
 public class AuditApiController {
 
-    private final AuditService auditService;
+    private final AuditServiceImpl auditService;
     private final AuthenticationService authenticationService;
 
     /**
@@ -47,8 +45,6 @@ public class AuditApiController {
      * @param type filter by entry type
      * @param from start timestamp (inclusive)
      * @param to   end timestamp (inclusive)
-     * @param page zero-based page number
-     * @param size maximum number of entries per page
      * @return the list of matching audit entries
      */
     @SecurityRequirement(name = "basicAuth")
@@ -74,15 +70,14 @@ public class AuditApiController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Instant from,
             @RequestParam(required = false) Instant to,
-            @RequestParam(required = false, defaultValue = "0") int page,
-            @RequestParam(required = false, defaultValue = "20") int size) {
+            @RequestParam(required = false, defaultValue = "20") int maxItems,
+            @RequestParam(required = false, defaultValue = "0") int skipCount) {
 
         if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "timestamp"));
-        val list = auditService.findEntries(type, from, to, pageable);
+        val list = auditService.findEntries(type, from, to, maxItems, skipCount);
         return ResponseEntity.ok(list);
     }
 

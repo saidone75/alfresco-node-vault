@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.audit;
+package org.saidone.service.audit;
 
 import lombok.RequiredArgsConstructor;
 import lombok.val;
@@ -40,7 +40,7 @@ import java.util.List;
  */
 @Service
 @RequiredArgsConstructor
-public class AuditService extends BaseComponent {
+public class AuditServiceImpl extends BaseComponent implements AuditService {
 
     private final MongoTemplate mongoTemplate;
 
@@ -59,10 +59,10 @@ public class AuditService extends BaseComponent {
      * @param type     optional entry type to filter by
      * @param from     lower bound of the timestamp range (inclusive)
      * @param to       upper bound of the timestamp range (inclusive)
-     * @param pageable paging information
      * @return list of matching audit entries ordered by timestamp descending
      */
-    public List<AuditEntry> findEntries(String type, Instant from, Instant to, Pageable pageable) {
+    @Override
+    public List<AuditEntry> findEntries(String type, Instant from, Instant to, int maxItems, int skipCount) {
         val criteriaList = new ArrayList<Criteria>();
         if (type != null) {
             criteriaList.add(Criteria.where("type").is(type));
@@ -77,6 +77,7 @@ public class AuditService extends BaseComponent {
         if (!criteriaList.isEmpty()) {
             query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
         }
+        var pageable = Pageable.ofSize((int) maxItems).withPage((int) skipCount);
         query.with(pageable);
         query.with(Sort.by(Sort.Direction.DESC, "timestamp"));
         return mongoTemplate.find(query, AuditEntry.class);

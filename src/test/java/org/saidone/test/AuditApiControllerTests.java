@@ -22,18 +22,17 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.saidone.service.audit.AuditEntry;
+import org.saidone.service.audit.AuditServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.saidone.audit.AuditEntry;
-import org.saidone.audit.AuditService;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
-import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -45,7 +44,7 @@ class AuditApiControllerTests extends BaseTest {
     @Autowired
     private WebTestClient webTestClient;
     @Autowired
-    private AuditService auditService;
+    private AuditServiceImpl auditService;
 
     @Value("${content.service.security.basicAuth.username}")
     private String userName;
@@ -65,8 +64,8 @@ class AuditApiControllerTests extends BaseTest {
     @Test
     @SneakyThrows
     void getAuditEntries() {
-        auditService.saveEntry(new HashMap<>(), "test");
-        auditService.saveEntry(new HashMap<>(), "test");
+        auditService.saveEntry(new AuditEntry());
+        auditService.saveEntry(new AuditEntry());
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/api/audit")
                         .queryParam("type", "test")
