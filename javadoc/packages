@@ -8,6 +8,7 @@ org.saidone.exception
 org.saidone.service.content
 org.saidone.service
 org.saidone.service.notarization
+org.saidone.service.audit
 org.saidone.service.crypto
 org.saidone.monitor
 org.saidone.job
@@ -16,5 +17,4 @@ org.saidone.config
 org.saidone.utils
 org.saidone.controller
 org.saidone.filter
-org.saidone.audit
 org.saidone.repository
