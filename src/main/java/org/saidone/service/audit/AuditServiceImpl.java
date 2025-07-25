@@ -56,9 +56,11 @@ public class AuditServiceImpl extends BaseComponent implements AuditService {
     /**
      * Retrieve audit entries filtered by type and timestamp.
      *
-     * @param type     optional entry type to filter by
-     * @param from     lower bound of the timestamp range (inclusive)
-     * @param to       upper bound of the timestamp range (inclusive)
+     * @param type      optional entry type to filter by
+     * @param from      lower bound of the timestamp range (inclusive)
+     * @param to        upper bound of the timestamp range (inclusive)
+     * @param maxItems  maximum number of items to return
+     * @param skipCount number of items to skip (for pagination)
      * @return list of matching audit entries ordered by timestamp descending
      */
     @Override
