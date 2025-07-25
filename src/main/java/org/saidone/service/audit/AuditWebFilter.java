@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.audit;
+package org.saidone.service.audit;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +39,7 @@ import java.util.HashMap;
  * Web filter that audits incoming requests and outgoing responses.
  *
  * <p>For each request the filter collects basic metadata (IP address, user agent,
- * path, HTTP method) and stores it via {@link AuditService}. When the response
+ * path, HTTP method) and stores it via {@link AuditServiceImpl}. When the response
  * is completed a second audit entry is stored containing the status code.</p>
  *
  * <p>The filter is active only when the property
@@ -52,7 +52,7 @@ import java.util.HashMap;
 public class AuditWebFilter extends BaseComponent implements WebFilter {
 
     /** Service used to persist {@link AuditEntry} instances. */
-    private final AuditService auditService;
+    private final AuditServiceImpl auditService;
 
     /**
      * Intercepts the request/response exchange to persist basic audit

@@ -16,7 +16,7 @@
  *  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.audit;
+package org.saidone.service.audit;
 
 /**
  * Abbreviated MongoDB field names and audit metadata keys used throughout the
