@@ -22,6 +22,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.HttpHeaders;
+import org.jetbrains.annotations.NotNull;
 import org.saidone.component.BaseComponent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -62,6 +63,7 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
      * @param chain    the remaining web filter chain
      * @return completion signal for the filter chain
      */
+    @NotNull
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         val requestEntry = createRequestAuditEntry(exchange.getRequest());
