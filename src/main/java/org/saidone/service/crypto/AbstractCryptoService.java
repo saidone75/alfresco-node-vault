@@ -77,10 +77,10 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     private Pair<SecretKeySpec, Integer> derivePbkdf2SecretKey(String algorithm, byte[] salt, Integer version) {
         try {
             val secret = secretService.getSecret(version);
-            val spec = new PBEKeySpec(new String(secret.getLeft(), StandardCharsets.UTF_8).toCharArray(), salt, kdf.pbkdf2.getIterations(), 256);
-            Arrays.fill(secret.getLeft(), (byte) 0);
+            val spec = new PBEKeySpec(new String(secret.getData(), StandardCharsets.UTF_8).toCharArray(), salt, kdf.pbkdf2.getIterations(), 256);
+            Arrays.fill(secret.getData(), (byte) 0);
             val skf = SecretKeyFactory.getInstance(Kdf.Pbkdf2.PBKDF2_KEY_FACTORY_ALGORITHM);
-            return Pair.of(new SecretKeySpec(skf.generateSecret(spec).getEncoded(), algorithm), secret.getRight());
+            return Pair.of(new SecretKeySpec(skf.generateSecret(spec).getEncoded(), algorithm), secret.getVersion());
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new IllegalStateException("Unable to derive secret key", e);
         }
@@ -92,12 +92,12 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     private Pair<SecretKeySpec, Integer> deriveHkdfSecretKey(String algorithm, byte[] salt, Integer version) {
         val hkdf = new HKDFBytesGenerator(new SHA256Digest());
         val secret = secretService.getSecret(version);
-        val hkdfParams = new HKDFParameters(secret.getLeft(), salt, kdf.hkdf.getInfo().getBytes(StandardCharsets.UTF_8));
+        val hkdfParams = new HKDFParameters(secret.getData(), salt, kdf.hkdf.getInfo().getBytes(StandardCharsets.UTF_8));
         hkdf.init(hkdfParams);
         byte[] keyBytes = new byte[32];
         hkdf.generateBytes(keyBytes, 0, keyBytes.length);
-        Arrays.fill(secret.getLeft(), (byte) 0);
-        return Pair.of(new SecretKeySpec(keyBytes, algorithm), secret.getRight());
+        Arrays.fill(secret.getData(), (byte) 0);
+        return Pair.of(new SecretKeySpec(keyBytes, algorithm), secret.getVersion());
     }
 
     /**
@@ -113,9 +113,9 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
         generator.init(builder.build());
         byte[] keyBytes = new byte[32];
         val secret = secretService.getSecret(version);
-        generator.generateBytes(secret.getLeft(), keyBytes);
-        Arrays.fill(secret.getLeft(), (byte) 0);
-        return Pair.of(new SecretKeySpec(keyBytes, algorithm), secret.getRight());
+        generator.generateBytes(secret.getData(), keyBytes);
+        Arrays.fill(secret.getData(), (byte) 0);
+        return Pair.of(new SecretKeySpec(keyBytes, algorithm), secret.getVersion());
     }
 
     /**
