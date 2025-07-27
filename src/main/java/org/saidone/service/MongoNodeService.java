@@ -67,14 +67,20 @@ public class MongoNodeService extends BaseComponent implements NodeService {
         }
     }
 
-    @Override
-    public Iterable<NodeWrapper> findAll() {
-        return mongoNodeRepository.findAll();
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Iterable<NodeWrapper> findByTxId(String txId) {
         return mongoNodeRepository.findByTxId(txId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterable<NodeWrapper> findAll() {
+        return mongoNodeRepository.findAll();
     }
 
     /**
@@ -86,4 +92,5 @@ public class MongoNodeService extends BaseComponent implements NodeService {
     public void deleteById(String nodeId) {
         mongoNodeRepository.deleteById(nodeId);
     }
+
 }

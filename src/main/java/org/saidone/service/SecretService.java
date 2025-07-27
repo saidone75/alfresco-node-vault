@@ -21,9 +21,9 @@ package org.saidone.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.apache.commons.lang3.tuple.Pair;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.EncryptionConfig;
+import org.saidone.service.crypto.Secret;
 import org.springframework.stereotype.Service;
 import org.springframework.vault.core.VaultTemplate;
 import org.springframework.vault.core.VaultVersionedKeyValueOperations;
@@ -51,6 +51,14 @@ public class SecretService extends BaseComponent {
 
     private static VaultVersionedKeyValueOperations vaultVersionedKeyValueOperations;
 
+    /**
+     * Initializes the service after dependency injection.
+     * <p>
+     * Sets up the {@link VaultVersionedKeyValueOperations} instance used to
+     * retrieve secrets and verifies that Vault is initialized. If Vault is not
+     * initialized, the application is gracefully shut down.
+     * </p>
+     */
     @Override
     public void init() {
         super.init();
@@ -63,13 +71,31 @@ public class SecretService extends BaseComponent {
     }
 
     /**
+     * Retrieves the latest version of the secret from Vault.
+     *
+     * <p>This is a convenience method that delegates to
+     * {@link #getSecret(Integer)} with a {@code null} version</p>
+     * to fetch the most recent secret value.</p>
+     *
+     * @return the secret containing the raw bytes and version information
+     * @throws RuntimeException if the secret cannot be retrieved
+     */
+    public Secret getSecret() {
+        try {
+            return getSecretAsync(null).get();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
      * Retrieves the secret from Vault for the specified version.
      *
      * @param version the version of the secret to retrieve; if null, retrieves the latest version
      * @return a Pair containing the secret bytes and the version number
      * @throws RuntimeException if unable to retrieve the secret or if an error occurs during retrieval
      */
-    public Pair<byte[], Integer> getSecret(Integer version) {
+    public Secret getSecret(Integer version) {
         try {
             return getSecretAsync(version).get();
         } catch (ExecutionException | InterruptedException e) {
@@ -77,7 +103,14 @@ public class SecretService extends BaseComponent {
         }
     }
 
-    private CompletableFuture<Pair<byte[], Integer>> getSecretAsync(Integer version) {
+    /**
+     * Asynchronously fetches a secret from Vault.
+     *
+     * @param version version of the secret to retrieve; {@code null} for the
+     *                latest version
+     * @return a future yielding the secret data and version
+     */
+    private CompletableFuture<Secret> getSecretAsync(Integer version) {
         return CompletableFuture.supplyAsync(() -> {
             Versioned<Map<String, Object>> response;
             if (version == null) {
@@ -86,11 +119,13 @@ public class SecretService extends BaseComponent {
                 response = vaultVersionedKeyValueOperations.get(properties.getVaultSecretPath(), Versioned.Version.from(version));
             }
             if (response != null && response.getData() != null && response.getMetadata() != null) {
-                return Pair.of(
-                        ((Map<?, ?>) response.getData()).get(properties.getVaultSecretKey()).toString().getBytes(StandardCharsets.UTF_8),
-                        response.getMetadata().getVersion().getVersion()
-                );
-            } else throw new RuntimeException("Unable to retrieve secret from vault");
+                return Secret.builder()
+                        .version(response.getMetadata().getVersion().getVersion())
+                        .data(((Map<?, ?>) response.getData()).get(properties.getVaultSecretKey()).toString().getBytes(StandardCharsets.UTF_8))
+                        .build();
+            } else {
+                throw new RuntimeException("Unable to retrieve secret from vault");
+            }
         });
     }
 
