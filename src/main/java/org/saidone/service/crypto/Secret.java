@@ -27,7 +27,7 @@ import lombok.Data;
  */
 @Builder
 @Data
-public class Key {
+public class Secret {
 
     /**
      * Version of the secret stored in Vault.

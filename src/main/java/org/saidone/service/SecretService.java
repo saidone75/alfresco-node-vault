@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.EncryptionConfig;
-import org.saidone.service.crypto.Key;
+import org.saidone.service.crypto.Secret;
 import org.springframework.stereotype.Service;
 import org.springframework.vault.core.VaultTemplate;
 import org.springframework.vault.core.VaultVersionedKeyValueOperations;
@@ -70,6 +70,14 @@ public class SecretService extends BaseComponent {
         }
     }
 
+    public Secret getSecret() {
+        try {
+            return getSecretAsync(null).get();
+        } catch (ExecutionException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     /**
      * Retrieves the secret from Vault for the specified version.
      *
@@ -77,7 +85,7 @@ public class SecretService extends BaseComponent {
      * @return a Pair containing the secret bytes and the version number
      * @throws RuntimeException if unable to retrieve the secret or if an error occurs during retrieval
      */
-    public Key getSecret(Integer version) {
+    public Secret getSecret(Integer version) {
         try {
             return getSecretAsync(version).get();
         } catch (ExecutionException | InterruptedException e) {
@@ -92,7 +100,7 @@ public class SecretService extends BaseComponent {
      *                latest version
      * @return a future yielding the secret data and version
      */
-    private CompletableFuture<Key> getSecretAsync(Integer version) {
+    private CompletableFuture<Secret> getSecretAsync(Integer version) {
         return CompletableFuture.supplyAsync(() -> {
             Versioned<Map<String, Object>> response;
             if (version == null) {
@@ -101,7 +109,7 @@ public class SecretService extends BaseComponent {
                 response = vaultVersionedKeyValueOperations.get(properties.getVaultSecretPath(), Versioned.Version.from(version));
             }
             if (response != null && response.getData() != null && response.getMetadata() != null) {
-                return Key.builder()
+                return Secret.builder()
                         .version(response.getMetadata().getVersion().getVersion())
                         .data(((Map<?, ?>) response.getData()).get(properties.getVaultSecretKey()).toString().getBytes(StandardCharsets.UTF_8))
                         .build();
