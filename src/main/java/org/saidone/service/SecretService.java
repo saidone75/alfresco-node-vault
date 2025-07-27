@@ -51,6 +51,14 @@ public class SecretService extends BaseComponent {
 
     private static VaultVersionedKeyValueOperations vaultVersionedKeyValueOperations;
 
+    /**
+     * Initializes the service after dependency injection.
+     * <p>
+     * Sets up the {@link VaultVersionedKeyValueOperations} instance used to
+     * retrieve secrets and verifies that Vault is initialized. If Vault is not
+     * initialized, the application is gracefully shut down.
+     * </p>
+     */
     @Override
     public void init() {
         super.init();
@@ -77,6 +85,13 @@ public class SecretService extends BaseComponent {
         }
     }
 
+    /**
+     * Asynchronously fetches a secret from Vault.
+     *
+     * @param version version of the secret to retrieve; {@code null} for the
+     *                latest version
+     * @return a future yielding the secret data and version
+     */
     private CompletableFuture<Key> getSecretAsync(Integer version) {
         return CompletableFuture.supplyAsync(() -> {
             Versioned<Map<String, Object>> response;
@@ -90,7 +105,9 @@ public class SecretService extends BaseComponent {
                         .version(response.getMetadata().getVersion().getVersion())
                         .data(((Map<?, ?>) response.getData()).get(properties.getVaultSecretKey()).toString().getBytes(StandardCharsets.UTF_8))
                         .build();
-            } else throw new RuntimeException("Unable to retrieve secret from vault");
+            } else {
+                throw new RuntimeException("Unable to retrieve secret from vault");
+            }
         });
     }
 
