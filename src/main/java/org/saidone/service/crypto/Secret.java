@@ -22,15 +22,19 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * Simple data holder for a secret retrieved from Vault.
- * Contains the raw secret bytes and the version they belong to.
+ * Container for a secret value retrieved from Vault.
+ * <p>
+ * Instances of this class are produced by {@link org.saidone.service.SecretService}
+ * when fetching encryption material. The {@link #version} corresponds to the
+ * version number reported by Vault while {@link #data} holds the secret bytes.
+ * </p>
  */
 @Builder
 @Data
 public class Secret {
 
     /**
-     * Version of the secret stored in Vault.
+     * Version of the secret as stored in Vault metadata.
      */
     public int version;
 

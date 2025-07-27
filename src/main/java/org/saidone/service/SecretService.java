@@ -70,6 +70,16 @@ public class SecretService extends BaseComponent {
         }
     }
 
+    /**
+     * Retrieves the latest version of the secret from Vault.
+     *
+     * <p>This is a convenience method that delegates to
+     * {@link #getSecret(Integer)} with a {@code null} version</p>
+     * to fetch the most recent secret value.</p>
+     *
+     * @return the secret containing the raw bytes and version information
+     * @throws RuntimeException if the secret cannot be retrieved
+     */
     public Secret getSecret() {
         try {
             return getSecretAsync(null).get();
