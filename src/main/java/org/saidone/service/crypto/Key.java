@@ -21,11 +21,22 @@ package org.saidone.service.crypto;
 import lombok.Builder;
 import lombok.Data;
 
+/**
+ * Simple data holder for a secret retrieved from Vault.
+ * Contains the raw secret bytes and the version they belong to.
+ */
 @Builder
 @Data
 public class Key {
 
+    /**
+     * Version of the secret stored in Vault.
+     */
     public int version;
+
+    /**
+     * Raw secret bytes retrieved from Vault.
+     */
     public byte[] data;
 
 }
