@@ -43,13 +43,6 @@ public interface NodeService {
     NodeWrapper findById(String nodeId);
 
     /**
-     * Retrieves all stored node wrappers.
-     *
-     * @return iterable collection of {@link NodeWrapper}
-     */
-    Iterable<NodeWrapper> findAll();
-
-    /**
      * Retrieves all node wrappers having the given notarization transaction ID.
      * A {@code null} transaction ID is used to select nodes that have not yet
      * been notarized.
@@ -58,6 +51,13 @@ public interface NodeService {
      * @return iterable collection of {@link NodeWrapper}
      */
     Iterable<NodeWrapper> findByTxId(String txId);
+
+    /**
+     * Retrieves all stored node wrappers.
+     *
+     * @return iterable collection of {@link NodeWrapper}
+     */
+    Iterable<NodeWrapper> findAll();
 
     /**
      * Removes the stored node metadata identified by the given ID.
