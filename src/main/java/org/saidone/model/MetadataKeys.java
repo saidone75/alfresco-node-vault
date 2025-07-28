@@ -32,6 +32,7 @@ public interface MetadataKeys {
     String CONTENT_TYPE = "ct";
     /** Flag marking content as encrypted. */
     String ENCRYPTED = "enc";
+    String KEY_VERSION = "kv";
     /** Original file name. */
     String FILENAME = "fn";
     /** Unique identifier of the stored object. */
