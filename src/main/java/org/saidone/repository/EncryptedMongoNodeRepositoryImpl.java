@@ -21,6 +21,7 @@ package org.saidone.repository;
 import lombok.NonNull;
 import lombok.val;
 import org.saidone.model.NodeWrapper;
+import org.saidone.service.SecretService;
 import org.saidone.service.crypto.CryptoService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -40,19 +41,23 @@ import java.util.Optional;
         havingValue = "true")
 public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
 
+    private final SecretService secretService;
     private final CryptoService cryptoService;
 
     /**
      * Constructs an EncryptedMongoNodeRepositoryImpl with the given MongoOperations and CryptoService.
      *
      * @param mongoOperations the MongoDB operations instance
+     * @param secretService   service providing encryption material
      * @param cryptoService   the service used for encryption and decryption
      */
     public EncryptedMongoNodeRepositoryImpl(
             MongoOperations mongoOperations,
+            SecretService secretService,
             CryptoService cryptoService
     ) {
         super(mongoOperations);
+        this.secretService = secretService;
         this.cryptoService = cryptoService;
     }
 
@@ -90,7 +95,7 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
      */
     private <S extends NodeWrapper> void encryptNode(S node) {
         if (node != null && node.getNodeJson() != null) {
-            node.setNodeJson(cryptoService.encryptText(node.getNodeJson()));
+            node.setNodeJson(cryptoService.encryptText(node.getNodeJson(), secretService.getSecret()));
             node.setEncrypted(true);
         }
     }

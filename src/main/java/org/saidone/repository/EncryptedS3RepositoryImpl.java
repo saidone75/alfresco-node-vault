@@ -20,6 +20,7 @@ package org.saidone.repository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.model.Node;
+import org.saidone.service.SecretService;
 import org.saidone.service.crypto.CryptoService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
@@ -44,6 +45,7 @@ import java.util.HashMap;
 @Slf4j
 public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
 
+    private final SecretService secretService;
     /**
      * Service used to perform stream encryption and decryption.
      */
@@ -54,10 +56,12 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
      * cryptographic service.
      *
      * @param s3Client      AWS S3 client
+     * @param secretService service providing encryption material
      * @param cryptoService service responsible for encryption and decryption
      */
-    public EncryptedS3RepositoryImpl(S3Client s3Client, CryptoService cryptoService) {
+    public EncryptedS3RepositoryImpl(S3Client s3Client, SecretService secretService, CryptoService cryptoService) {
         super(s3Client);
+        this.secretService = secretService;
         this.cryptoService = cryptoService;
     }
 
@@ -74,7 +78,7 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
      */
     @Override
     public void putObject(String bucketName, Node node, HashMap<String, String> metadata, InputStream inputStream) {
-        super.putObject(bucketName, node, metadata, cryptoService.encrypt(inputStream));
+        super.putObject(bucketName, node, metadata, cryptoService.encrypt(inputStream, secretService.getSecret()));
     }
 
     /**

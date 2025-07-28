@@ -23,6 +23,7 @@ import lombok.Setter;
 import lombok.val;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.saidone.config.EncryptionConfig;
+import org.saidone.service.SecretService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -54,6 +55,9 @@ import java.security.Security;
 )
 public class BcCryptoServiceImpl extends AbstractCryptoService implements CryptoService {
 
+    @Autowired
+    private SecretService secretService;
+
     static {
         if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
             Security.addProvider(new BouncyCastleProvider());
@@ -70,6 +74,11 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
+    /**
+     * Injects encryption configuration properties.
+     *
+     * @param properties resolved encryption configuration
+     */
     @Autowired
     public void configure(EncryptionConfig properties) {
         this.kdf = properties.getKdf();
@@ -89,11 +98,12 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
      * The output stream format is: [key version][salt][nonce][encrypted data]
      *
      * @param inputStream The plaintext input data to be encrypted
+     * @param secret      secret material used to derive the encryption key
      * @return An InputStream containing concatenated salt, nonce and encrypted data
      * @throws RuntimeException if any error occurs during the encryption process
      */
     @Override
-    public InputStream encrypt(InputStream inputStream) {
+    public InputStream encrypt(InputStream inputStream, Secret secret) {
         try {
             // Generate random salt and nonce
             byte[] salt = new byte[saltLength];
@@ -103,7 +113,7 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
             secureRandom.nextBytes(nonce);
 
             // Derive key using configured KDF
-            val secretKey = deriveSecretKey(KEY_ALGORITHM, salt);
+            val secretKey = deriveSecretKey(secret, KEY_ALGORITHM, salt);
 
             // Initialize ChaCha20-Poly1305 cipher
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION, BouncyCastleProvider.PROVIDER_NAME);
@@ -151,6 +161,8 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
             // Read key version from stream
             val keyVersion = ByteBuffer.wrap(inputStream.readNBytes(4)).getInt();
 
+            val secret = secretService.getSecret(keyVersion);
+
             // Read salt from stream
             byte[] salt = inputStream.readNBytes(saltLength);
 
@@ -158,7 +170,7 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
             byte[] nonce = inputStream.readNBytes(nonceLength);
 
             // Derive key using configured KDF
-            val secretKey = deriveSecretKey(KEY_ALGORITHM, salt, keyVersion);
+            val secretKey = deriveSecretKey(secret, KEY_ALGORITHM, salt);
 
             // Initialize ChaCha20-Poly1305 cipher for decryption
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION, BouncyCastleProvider.PROVIDER_NAME);

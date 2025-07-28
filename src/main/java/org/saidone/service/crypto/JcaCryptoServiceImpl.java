@@ -22,6 +22,7 @@ import jakarta.validation.constraints.Min;
 import lombok.Setter;
 import lombok.val;
 import org.saidone.config.EncryptionConfig;
+import org.saidone.service.SecretService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -52,6 +53,9 @@ import java.security.SecureRandom;
 )
 public class JcaCryptoServiceImpl extends AbstractCryptoService implements CryptoService {
 
+    @Autowired
+    private SecretService secretService;
+
     @Min(16)
     private int saltLength;
     @Min(12)
@@ -62,6 +66,11 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
+    /**
+     * Injects encryption configuration properties.
+     *
+     * @param properties resolved encryption configuration
+     */
     @Autowired
     public void configure(EncryptionConfig properties) {
         this.kdf = properties.getKdf();
@@ -81,11 +90,12 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
      * The output stream format is: [key version][salt][IV][encrypted data]
      *
      * @param inputStream The plaintext input data to be encrypted
+     * @param secret      secret material used to derive the encryption key
      * @return An InputStream containing concatenated salt, IV and encrypted data
      * @throws RuntimeException if any error occurs during the encryption process
      */
     @Override
-    public InputStream encrypt(InputStream inputStream) {
+    public InputStream encrypt(InputStream inputStream, Secret secret) {
         try {
             // Generate random salt for PBKDF2
             byte[] salt = new byte[saltLength];
@@ -97,7 +107,7 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
 
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             val spec = new GCMParameterSpec(TAG_LENGTH, iv);
-            val secretKey = deriveSecretKey(KEY_ALGORITHM, salt);
+            val secretKey = deriveSecretKey(secret, KEY_ALGORITHM, salt);
             cipher.init(Cipher.ENCRYPT_MODE, secretKey.getLeft(), spec);
 
             // Concatenate key version, salt and IV
@@ -141,6 +151,8 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
             // Read key version from stream
             val keyVersion = ByteBuffer.wrap(inputStream.readNBytes(4)).getInt();
 
+            val secret = secretService.getSecret(keyVersion);
+
             // Read salt from stream
             byte[] salt = inputStream.readNBytes(saltLength);
 
@@ -148,7 +160,7 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
             byte[] iv = inputStream.readNBytes(ivLength);
 
             // Derive key using configured KDF
-            val secretKey = deriveSecretKey(KEY_ALGORITHM, salt, keyVersion);
+            val secretKey = deriveSecretKey(secret, KEY_ALGORITHM, salt);
 
             // Initialize AES-GCM cipher for decryption
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);

@@ -23,6 +23,7 @@ import lombok.SneakyThrows;
 import lombok.val;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
+import org.saidone.service.SecretService;
 import org.saidone.service.crypto.CryptoService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -46,6 +47,7 @@ import java.util.Map;
 )
 public class EncryptedGridFsRepositoryImpl extends GridFsRepositoryImpl {
 
+    private final SecretService secretService;
     private final CryptoService cryptoService;
 
     /**
@@ -54,15 +56,18 @@ public class EncryptedGridFsRepositoryImpl extends GridFsRepositoryImpl {
      * @param gridFsTemplate   the GridFsTemplate for GridFS operations
      * @param gridFsOperations the GridFsOperations for GridFS operations
      * @param mongoTemplate    the MongoTemplate for MongoDB operations
+     * @param secretService    service providing encryption material
      * @param cryptoService    the CryptoService used for encryption and decryption
      */
     public EncryptedGridFsRepositoryImpl(
             GridFsTemplate gridFsTemplate,
             GridFsOperations gridFsOperations,
             MongoTemplate mongoTemplate,
+            SecretService secretService,
             CryptoService cryptoService
     ) {
         super(gridFsTemplate, gridFsOperations, mongoTemplate);
+        this.secretService = secretService;
         this.cryptoService = cryptoService;
     }
 
@@ -78,7 +83,9 @@ public class EncryptedGridFsRepositoryImpl extends GridFsRepositoryImpl {
     @Override
     @SneakyThrows
     public void saveFile(InputStream inputStream, String fileName, String contentType, Map<String, String> metadata) {
-        val encryptedInputStream = cryptoService.encrypt(new AnvDigestInputStream(inputStream));
+        val secret = secretService.getSecret();
+        val encryptedInputStream = cryptoService.encrypt(new AnvDigestInputStream(inputStream), secret);
+        metadata.put(MetadataKeys.KEY_VERSION, String.valueOf(secret.getVersion()));
         metadata.put(MetadataKeys.ENCRYPTED, String.valueOf(true));
         super.saveFile(encryptedInputStream, fileName, contentType, metadata);
     }
