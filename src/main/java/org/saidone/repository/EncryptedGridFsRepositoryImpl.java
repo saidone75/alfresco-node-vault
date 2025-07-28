@@ -56,6 +56,7 @@ public class EncryptedGridFsRepositoryImpl extends GridFsRepositoryImpl {
      * @param gridFsTemplate   the GridFsTemplate for GridFS operations
      * @param gridFsOperations the GridFsOperations for GridFS operations
      * @param mongoTemplate    the MongoTemplate for MongoDB operations
+     * @param secretService    service providing encryption material
      * @param cryptoService    the CryptoService used for encryption and decryption
      */
     public EncryptedGridFsRepositoryImpl(

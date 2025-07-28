@@ -56,6 +56,7 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
      * cryptographic service.
      *
      * @param s3Client      AWS S3 client
+     * @param secretService service providing encryption material
      * @param cryptoService service responsible for encryption and decryption
      */
     public EncryptedS3RepositoryImpl(S3Client s3Client, SecretService secretService, CryptoService cryptoService) {

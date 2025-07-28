@@ -74,6 +74,11 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
 
     private static final SecureRandom secureRandom = new SecureRandom();
 
+    /**
+     * Injects encryption configuration properties.
+     *
+     * @param properties resolved encryption configuration
+     */
     @Autowired
     public void configure(EncryptionConfig properties) {
         this.kdf = properties.getKdf();
@@ -93,6 +98,7 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
      * The output stream format is: [key version][salt][nonce][encrypted data]
      *
      * @param inputStream The plaintext input data to be encrypted
+     * @param secret      secret material used to derive the encryption key
      * @return An InputStream containing concatenated salt, nonce and encrypted data
      * @throws RuntimeException if any error occurs during the encryption process
      */

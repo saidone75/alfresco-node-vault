@@ -32,6 +32,7 @@ public interface CryptoService {
      * Encrypts the provided data stream.
      *
      * @param inputStream plaintext data to encrypt
+     * @param secret      secret material used to derive the encryption key
      * @return a stream containing the encrypted data
      */
     InputStream encrypt(InputStream inputStream, Secret secret);
@@ -47,7 +48,8 @@ public interface CryptoService {
     /**
      * Encrypts a text value and returns the Base64 encoded result.
      *
-     * @param text the text to encrypt
+     * @param text   the text to encrypt
+     * @param secret secret material used to derive the encryption key
      * @return encrypted text encoded in Base64
      */
     String encryptText(String text, Secret secret);

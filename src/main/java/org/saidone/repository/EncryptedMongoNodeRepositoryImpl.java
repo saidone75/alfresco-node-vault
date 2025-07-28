@@ -48,6 +48,7 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
      * Constructs an EncryptedMongoNodeRepositoryImpl with the given MongoOperations and CryptoService.
      *
      * @param mongoOperations the MongoDB operations instance
+     * @param secretService   service providing encryption material
      * @param cryptoService   the service used for encryption and decryption
      */
     public EncryptedMongoNodeRepositoryImpl(

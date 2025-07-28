@@ -50,6 +50,7 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
      * and derives a secret key accordingly. Supported KDF implementations include HKDF, Argon2,
      * and PBKDF2 (default).</p>
      *
+     * @param secret    the secret fetched from Vault
      * @param algorithm the name of the cryptographic algorithm for which the secret key is derived
      * @param salt      the salt value used in the key derivation process
      * @return a {@code Pair} containing the derived {@link javax.crypto.spec.SecretKeySpec} and an {@link Integer} representing the key version
@@ -65,6 +66,7 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     /**
      * Derives a secret key using the PBKDF2 algorithm.
      *
+     * @param secret    the secret fetched from Vault
      * @param algorithm the target algorithm of the resulting key
      * @param salt      the salt to use for key derivation
      * @return a pair containing the derived key and the version number
@@ -83,6 +85,7 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     /**
      * Derives a secret key using the HKDF key derivation function.
      *
+     * @param secret    the secret fetched from Vault
      * @param algorithm the target algorithm of the resulting key
      * @param salt      the salt value used for the HKDF extraction phase
      * @return a pair containing the derived key and the version number
@@ -100,6 +103,7 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     /**
      * Derives a secret key using the Argon2 key derivation function.
      *
+     * @param secret    the secret fetched from Vault
      * @param algorithm the target algorithm of the resulting key
      * @param salt      the salt to use for key derivation
      * @return a pair containing the derived key and the version number
@@ -196,9 +200,10 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     }
 
     /**
-     * Encrypts a plain text string and returns Base64 encoded result
+     * Encrypts a plain text string and returns a Base64 encoded result.
      *
-     * @param text The text to encrypt
+     * @param text   The text to encrypt
+     * @param secret secret material used to derive the encryption key
      * @return Base64 encoded encrypted text
      */
     public String encryptText(String text, Secret secret) {
