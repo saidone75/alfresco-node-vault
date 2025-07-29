@@ -33,6 +33,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Creates and configures the MongoDB time series collection used to persist
+ * audit entries.
+ *
+ * <p>The collection is initialised on startup if it does not already exist
+ * and is configured with a TTL index so that documents expire automatically
+ * after {@link #ttlDays} days.</p>
+ */
 @RequiredArgsConstructor
 @Component
 @Slf4j
