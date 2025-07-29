@@ -42,6 +42,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuditServiceImpl extends BaseComponent implements AuditService {
 
+    /**
+     * Template used to perform MongoDB operations.
+     */
     private final MongoTemplate mongoTemplate;
 
     /**
@@ -79,7 +82,7 @@ public class AuditServiceImpl extends BaseComponent implements AuditService {
         if (!criteriaList.isEmpty()) {
             query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
         }
-        var pageable = Pageable.ofSize((int) maxItems).withPage((int) skipCount);
+        var pageable = Pageable.ofSize(maxItems).withPage(skipCount);
         query.with(pageable);
         query.with(Sort.by(Sort.Direction.DESC, "timestamp"));
         return mongoTemplate.find(query, AuditEntry.class);

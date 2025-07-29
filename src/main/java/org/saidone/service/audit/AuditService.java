@@ -31,6 +31,11 @@ import java.util.List;
 public interface AuditService {
 
     /**
+     * Name of the MongoDB collection used to store audit entries.
+     */
+    String AUDIT_COLLECTION_NAME = "audit";
+
+    /**
      * Persist the provided audit entry.
      *
      * @param auditEntry the entry to store
