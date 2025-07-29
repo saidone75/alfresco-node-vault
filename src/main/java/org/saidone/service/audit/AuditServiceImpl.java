@@ -42,6 +42,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class AuditServiceImpl extends BaseComponent implements AuditService {
 
+    /**
+     * Template used to perform MongoDB operations.
+     */
     private final MongoTemplate mongoTemplate;
 
     /**
