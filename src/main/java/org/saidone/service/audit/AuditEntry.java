@@ -36,7 +36,7 @@ import java.util.Map;
  * (typically request or response details) and the type of the event.</p>
  */
 @Data
-@Document(collection = "vault_audit")
+@Document(collection = AuditService.AUDIT_COLLECTION_NAME)
 public class AuditEntry {
 
     /**

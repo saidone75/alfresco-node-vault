@@ -30,6 +30,8 @@ import java.util.List;
  */
 public interface AuditService {
 
+    String AUDIT_COLLECTION_NAME = "audit";
+
     /**
      * Persist the provided audit entry.
      *

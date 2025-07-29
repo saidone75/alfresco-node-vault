@@ -26,25 +26,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.service.audit.AuditEntryKeys;
+import org.saidone.service.audit.AuditService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * Creates the MongoDB collection used for persisting {@code AuditEntry} records.
- * <p>
- * On application startup this component checks whether the collection
- * {@value COLLECTION_NAME} exists and, if not, creates it as a time series
- * collection with the {@code timestamp} field as its time key. The created
- * collection stores additional audit metadata in the {@code metadata} sub
- * document and uses a seconds granularity.
- * Documents automatically expire after {@link #ttlDays} days. The TTL value
- * can be overridden via the {@code AUDIT_TTL_DAYS} environment variable or the
- * {@code application.audit.ttl-days} property.
- * </p>
- */
 @RequiredArgsConstructor
 @Component
 @Slf4j
@@ -61,9 +49,6 @@ public class AuditCollectionCreator extends BaseComponent {
     /** Template used to execute MongoDB operations. */
     private final MongoTemplate mongoTemplate;
 
-    /** Name of the MongoDB collection storing audit entries. */
-    private static final String COLLECTION_NAME = "vault_audit";
-
     /**
      * Creates the audit collection if it does not already exist and configures
      * the collection to expire entries after {@link #ttlDays} days.
@@ -72,7 +57,7 @@ public class AuditCollectionCreator extends BaseComponent {
     @Override
     public void init() {
         super.init();
-        if (!mongoTemplate.collectionExists(COLLECTION_NAME)) {
+        if (!mongoTemplate.collectionExists(AuditService.AUDIT_COLLECTION_NAME)) {
             val timeSeriesOptions = new TimeSeriesOptions(AuditEntryKeys.TIMESTAMP)
                     .metaField(AuditEntryKeys.METADATA)
                     .granularity(TimeSeriesGranularity.SECONDS);
@@ -80,10 +65,10 @@ public class AuditCollectionCreator extends BaseComponent {
             val options = new CreateCollectionOptions()
                     .timeSeriesOptions(timeSeriesOptions).expireAfter(ttlDays, TimeUnit.DAYS);
 
-            mongoTemplate.getDb().createCollection(COLLECTION_NAME, options);
-            log.info("Time series collection '{}' successfully created.", COLLECTION_NAME);
+            mongoTemplate.getDb().createCollection(AuditService.AUDIT_COLLECTION_NAME, options);
+            log.info("Time series collection '{}' successfully created.", AuditService.AUDIT_COLLECTION_NAME);
         } else {
-            log.info("Collection '{}' already exists.", COLLECTION_NAME);
+            log.info("Collection '{}' already exists.", AuditService.AUDIT_COLLECTION_NAME);
         }
         super.stop();
     }
