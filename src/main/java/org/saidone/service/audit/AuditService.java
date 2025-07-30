@@ -30,6 +30,9 @@ import java.util.List;
  */
 public interface AuditService {
 
+    /**
+     * Name of the MongoDB collection used to store audit entries.
+     */
     String AUDIT_COLLECTION_NAME = "audit";
 
     /**
