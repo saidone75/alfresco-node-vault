@@ -20,6 +20,7 @@ package org.saidone.test;
 
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.saidone.service.audit.AuditEntry;
@@ -67,8 +68,10 @@ class AuditApiControllerTests extends BaseTest {
     @Test
     @SneakyThrows
     void getAuditEntries() {
-        auditService.saveEntry(new AuditEntry());
-        auditService.saveEntry(new AuditEntry());
+        val auditEntry = new AuditEntry();
+        auditEntry.setType("test");
+        auditService.saveEntry(auditEntry);
+        auditService.saveEntry(auditEntry);
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path("/api/audit")
                         .queryParam("type", "test")
