@@ -32,8 +32,10 @@ import java.util.Map;
 /**
  * Entity representing a single audit entry stored in MongoDB.
  *
- * <p>An entry records the timestamp of the event, a map of associated metadata
- * (typically request or response details) and the type of the event.</p>
+ * <p>An entry records the timestamp of an audited event along with a small
+ * metadata map describing the request or response. The entry {@linkplain #type
+ * type} and metadata keys are kept short using the constants defined in
+ * {@link AuditEntryKeys} so that the persisted documents remain compact.</p>
  */
 @Data
 @Document(collection = AuditService.AUDIT_COLLECTION_NAME)
@@ -59,16 +61,20 @@ public class AuditEntry {
     private Instant timestamp;
 
     /**
-     * Additional metadata describing the request or response.
-     * The keys used in this map are defined in {@link AuditEntryKeys}.
+     * Additional metadata describing the request or response. Typical keys are
+     * {@link AuditEntryKeys#METADATA_IP IP address},
+     * {@link AuditEntryKeys#METADATA_USER_AGENT User-Agent} and
+     * {@link AuditEntryKeys#METADATA_STATUS response status}. The exact
+     * information stored depends on whether the entry represents a request or
+     * a response.
      */
     @Field(METADATA)
     private Map<String, Serializable> metadata;
 
     /**
-     * Creates a new {@code AuditEntry} with its timestamp set to the
-     * current instant. The metadata and type can be populated later
-     * before persisting the entry.
+     * Creates a new {@code AuditEntry} with its {@linkplain #timestamp
+     * timestamp} set to the current instant. Other properties can be populated
+     * later before the entry is persisted via {@link AuditService}.
      */
     public AuditEntry() {
         this.timestamp = Instant.now();
