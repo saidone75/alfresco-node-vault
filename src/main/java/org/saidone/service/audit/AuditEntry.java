@@ -66,12 +66,6 @@ public class AuditEntry {
     private Map<String, Serializable> metadata;
 
     /**
-     * Serialized body of the request or response, if available.
-     */
-    @Field(BODY)
-    private String body;
-
-    /**
      * Creates a new {@code AuditEntry} with its timestamp set to the
      * current instant. The metadata and type can be populated later
      * before persisting the entry.

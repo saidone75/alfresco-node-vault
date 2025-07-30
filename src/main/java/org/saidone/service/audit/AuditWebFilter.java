@@ -22,10 +22,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.http.HttpHeaders;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.core.io.buffer.DataBufferUtils;
-import org.springframework.http.server.reactive.ServerHttpRequestDecorator;
-import reactor.core.publisher.Flux;
 import org.jetbrains.annotations.NotNull;
 import org.saidone.component.BaseComponent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -36,8 +32,6 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
-
-import java.nio.charset.StandardCharsets;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -72,31 +66,12 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
     @NotNull
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-        val bufferFactory = exchange.getResponse().bufferFactory();
-        return DataBufferUtils.join(exchange.getRequest().getBody())
-                .defaultIfEmpty(bufferFactory.allocateBuffer(0))
-                .flatMap(dataBuffer -> {
-                    byte[] bytes = new byte[dataBuffer.readableByteCount()];
-                    dataBuffer.read(bytes);
-                    DataBufferUtils.release(dataBuffer);
-                    String body = new String(bytes, StandardCharsets.UTF_8);
-
-                    val requestEntry = createRequestAuditEntry(exchange.getRequest(), body);
-                    auditService.saveEntry(requestEntry);
-
-                    ServerHttpRequest mutatedRequest = new ServerHttpRequestDecorator(exchange.getRequest()) {
-                        @Override
-                        public Flux<DataBuffer> getBody() {
-                            return Flux.defer(() -> Flux.just(bufferFactory.wrap(bytes)));
-                        }
-                    };
-                    val mutatedExchange = exchange.mutate().request(mutatedRequest).build();
-
-                    return chain.filter(mutatedExchange).doFinally(signal -> {
-                        val responseEntry = createResponseAuditEntry(requestEntry.getId(), mutatedExchange.getResponse());
-                        auditService.saveEntry(responseEntry);
-                    });
-                });
+        val requestEntry = createRequestAuditEntry(exchange.getRequest());
+        auditService.saveEntry(requestEntry);
+        return chain.filter(exchange).doFinally(signal -> {
+            val responseEntry = createResponseAuditEntry(requestEntry.getId(), exchange.getResponse());
+            auditService.saveEntry(responseEntry);
+        });
     }
 
     /**
@@ -105,7 +80,7 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
      * @param request the server request
      * @return populated audit entry for the request
      */
-    public static AuditEntry createRequestAuditEntry(ServerHttpRequest request, String body) {
+    public static AuditEntry createRequestAuditEntry(ServerHttpRequest request) {
         val metadata = new HashMap<String, Serializable>();
         metadata.put(AuditEntryKeys.METADATA_ID, request.getId());
         if (request.getRemoteAddress() != null) {
@@ -116,7 +91,6 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
         metadata.put(AuditEntryKeys.METADATA_METHOD, request.getMethod().toString());
         val entry = new AuditEntry();
         entry.setMetadata(metadata);
-        entry.setBody(body);
         entry.setType(AuditEntryKeys.REQUEST);
         return entry;
     }
