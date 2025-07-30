@@ -39,11 +39,12 @@ import java.util.HashMap;
 /**
  * Web filter that audits incoming requests and outgoing responses.
  *
- * <p>For each request the filter collects basic metadata (IP address, user agent,
- * path, HTTP method) and stores it via {@link AuditServiceImpl}. When the response
- * is completed a second audit entry is stored containing the status code.</p>
+ * <p>For each request the filter collects basic metadata such as IP address,
+ * {@code User-Agent}, request path and HTTP method and persists it using
+ * {@link AuditServiceImpl}. After the response has been sent another audit
+ * entry is stored containing at least the HTTP status code.</p>
  *
- * <p>The filter is active only when the property
+ * <p>The filter is active only when the configuration property
  * {@code application.service.vault.audit.enabled} is set to {@code true}.</p>
  */
 @Component
@@ -58,6 +59,10 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
     /**
      * Intercepts the request/response exchange to persist basic audit
      * information.
+     *
+     * <p>The request is audited before the rest of the filter chain executes.
+     * After the chain completes, a second entry is stored describing the
+     * response.</p>
      *
      * @param exchange the current server exchange
      * @param chain    the remaining web filter chain
@@ -77,6 +82,10 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
     /**
      * Build an audit entry representing an incoming HTTP request.
      *
+     * <p>The metadata map of the returned entry contains information such as
+     * the request identifier, client IP, {@code User-Agent}, path and HTTP
+     * method.</p>
+     *
      * @param request the server request
      * @return populated audit entry for the request
      */
@@ -91,13 +100,15 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
         metadata.put(AuditEntryKeys.METADATA_METHOD, request.getMethod().toString());
         val entry = new AuditEntry();
         entry.setMetadata(metadata);
-        entry.setBody(request.getBody().toString());
         entry.setType(AuditEntryKeys.REQUEST);
         return entry;
     }
 
     /**
      * Build an audit entry representing an HTTP response.
+     *
+     * <p>The metadata map of the returned entry contains the identifier of the
+     * original request and the response status code.</p>
      *
      * @param id       identifier of the related request
      * @param response the server response
