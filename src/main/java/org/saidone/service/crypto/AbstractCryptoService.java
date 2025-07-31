@@ -16,8 +16,6 @@ import org.bouncycastle.crypto.params.Argon2Parameters;
 import org.bouncycastle.crypto.params.HKDFParameters;
 import org.saidone.component.BaseComponent;
 import org.saidone.misc.AnvDigestInputStream;
-import org.saidone.service.SecretService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 
 import javax.crypto.SecretKeyFactory;
