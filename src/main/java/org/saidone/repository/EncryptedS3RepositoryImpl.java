@@ -47,6 +47,7 @@ import java.util.HashMap;
 @Slf4j
 public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
 
+    /** Provides encryption keys used for securing S3 objects. */
     private final SecretService secretService;
     /**
      * Service used to perform stream encryption and decryption.
