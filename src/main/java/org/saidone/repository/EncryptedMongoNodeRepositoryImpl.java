@@ -41,7 +41,9 @@ import java.util.Optional;
         havingValue = "true")
 public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
 
+    /** Provides encryption material for node metadata. */
     private final SecretService secretService;
+    /** Service used to encrypt and decrypt node JSON. */
     private final CryptoService cryptoService;
 
     /**
@@ -95,8 +97,10 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
      */
     private <S extends NodeWrapper> void encryptNode(S node) {
         if (node != null && node.getNodeJson() != null) {
-            node.setNodeJson(cryptoService.encryptText(node.getNodeJson(), secretService.getSecret()));
+            val secret = secretService.getSecret();
+            node.setNodeJson(cryptoService.encryptText(node.getNodeJson(), secret));
             node.setEncrypted(true);
+            node.setKeyVersion(secret.getVersion());
         }
     }
 

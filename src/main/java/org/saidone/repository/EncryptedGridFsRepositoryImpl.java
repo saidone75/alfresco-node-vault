@@ -47,7 +47,9 @@ import java.util.Map;
 )
 public class EncryptedGridFsRepositoryImpl extends GridFsRepositoryImpl {
 
+    /** Service providing encryption secrets for content. */
     private final SecretService secretService;
+    /** Component performing the actual encryption/decryption. */
     private final CryptoService cryptoService;
 
     /**
@@ -85,8 +87,8 @@ public class EncryptedGridFsRepositoryImpl extends GridFsRepositoryImpl {
     public void saveFile(InputStream inputStream, String fileName, String contentType, Map<String, String> metadata) {
         val secret = secretService.getSecret();
         val encryptedInputStream = cryptoService.encrypt(new AnvDigestInputStream(inputStream), secret);
-        metadata.put(MetadataKeys.KEY_VERSION, String.valueOf(secret.getVersion()));
         metadata.put(MetadataKeys.ENCRYPTED, String.valueOf(true));
+        metadata.put(MetadataKeys.KEY_VERSION, String.valueOf(secret.getVersion()));
         super.saveFile(encryptedInputStream, fileName, contentType, metadata);
     }
 
