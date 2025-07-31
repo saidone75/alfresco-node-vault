@@ -47,7 +47,9 @@ import java.util.Map;
 )
 public class EncryptedGridFsRepositoryImpl extends GridFsRepositoryImpl {
 
+    /** Service providing encryption secrets for content. */
     private final SecretService secretService;
+    /** Component performing the actual encryption/decryption. */
     private final CryptoService cryptoService;
 
     /**

@@ -51,21 +51,32 @@ public class NodeWrapper {
 
     @Transient
     @JsonIgnore
+    /**
+     * Shared {@link ObjectMapper} used for serializing and deserializing
+     * the wrapped {@link Node}. It is configured via {@link #createObjectMapper()}.
+     */
     private static final ObjectMapper objectMapper = createObjectMapper();
 
     @Id
+    /** Identifier of the wrapped Alfresco node. */
     private String id;
     @Field("adt")
+    /** Timestamp when the node was archived. */
     private Instant archiveDate;
     @Field("res")
+    /** Flag indicating whether the node has been restored. */
     private boolean restored;
     @Field("enc")
+    /** Flag signalling that {@link #nodeJson} is encrypted. */
     private boolean encrypted;
     @Field("kv")
+    /** Version of the key used to encrypt {@link #nodeJson}. */
     private int keyVersion;
     @Field("nj")
+    /** JSON representation of the node. May be encrypted. */
     private String nodeJson;
     @Field("ntx")
+    /** Transaction id returned from notarization, if any. */
     private String notarizationTxId;
 
     /**
@@ -107,6 +118,8 @@ public class NodeWrapper {
      * Creates a preconfigured {@link ObjectMapper} instance used to
      * serialize and deserialize nodes. Dates are written in ISO format and
      * unknown properties are ignored when reading.
+     *
+     * @return a fully configured mapper for node (de)serialization
      */
     private static ObjectMapper createObjectMapper() {
         val mapper = new ObjectMapper();
