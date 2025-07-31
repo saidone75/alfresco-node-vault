@@ -19,7 +19,9 @@
 package org.saidone.repository;
 
 import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import org.alfresco.core.model.Node;
+import org.saidone.model.MetadataKeys;
 import org.saidone.service.SecretService;
 import org.saidone.service.crypto.CryptoService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -78,6 +80,9 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
      */
     @Override
     public void putObject(String bucketName, Node node, HashMap<String, String> metadata, InputStream inputStream) {
+        val secret = secretService.getSecret();
+        metadata.put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString());
+        metadata.put(MetadataKeys.KEY_VERSION, String.valueOf(secret.getVersion()));
         super.putObject(bucketName, node, metadata, cryptoService.encrypt(inputStream, secretService.getSecret()));
     }
 

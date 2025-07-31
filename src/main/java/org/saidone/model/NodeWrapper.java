@@ -61,6 +61,8 @@ public class NodeWrapper {
     private boolean restored;
     @Field("enc")
     private boolean encrypted;
+    @Field("kv")
+    private int keyVersion;
     @Field("nj")
     private String nodeJson;
     @Field("ntx")

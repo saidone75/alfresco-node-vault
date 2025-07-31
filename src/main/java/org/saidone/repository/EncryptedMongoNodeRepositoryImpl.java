@@ -95,8 +95,10 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
      */
     private <S extends NodeWrapper> void encryptNode(S node) {
         if (node != null && node.getNodeJson() != null) {
-            node.setNodeJson(cryptoService.encryptText(node.getNodeJson(), secretService.getSecret()));
+            val secret = secretService.getSecret();
+            node.setNodeJson(cryptoService.encryptText(node.getNodeJson(), secret));
             node.setEncrypted(true);
+            node.setKeyVersion(secret.getVersion());
         }
     }
 
