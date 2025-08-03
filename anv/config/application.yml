@@ -1,0 +1,103 @@
+spring:
+  output:
+    ansi:
+      enabled: always
+  application:
+    name: AlfrescoNodeVault
+  profiles:
+    active: dev
+  cloud:
+    gateway:
+      routes:
+        - id: vault_node_route
+          uri: http://localhost:8086
+          predicates:
+            - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}
+            - Method=GET
+            - name: IsOnVaultPredicate
+          filters:
+            - SetPath=/api/vault/nodes/{nodeId}
+        - id: vault_node_content_route
+          uri: http://localhost:8086
+          predicates:
+            - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}/content
+            - Method=GET
+            - name: IsOnVaultPredicate
+          filters:
+            - SetPath=/api/vault/nodes/{nodeId}/content
+        - id: alfresco_default_route
+          uri: ${ALFRESCO_BASE_PATH:http://localhost:8080}
+          predicates:
+            - Path=/alfresco/**,/api-explorer/**
+  activemq:
+    brokerUrl: ${ACTIVE_MQ_URL:tcp://localhost:61616}
+  jms:
+    cache:
+      enabled: false
+  data:
+    mongodb:
+      uri: ${MONGODB_URL:mongodb://localhost:27017}
+      auth-database: admin
+      database: vault
+      username: root
+      password: example
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger
+    operations-sorter: method
+management:
+  security:
+    basic-auth:
+      username: admin
+      password: admin
+  endpoints:
+    web:
+      exposure:
+        include: "prometheus,health,info,metrics,env,loggers"
+  endpoint:
+    health:
+      show-details: always
+content:
+  service:
+    url: ${ALFRESCO_BASE_PATH:http://localhost:8080}
+    security:
+      basicAuth:
+        username: ${ALFRESCO_USERNAME:admin}
+        password: ${ALFRESCO_PASSWORD:admin}
+    path: /alfresco/api/-default-/public/alfresco/versions/1
+search:
+  service:
+    path: /alfresco/api/-default-/public/search/versions/1
+application:
+  event-handler:
+    enabled: ${EVENT_HANDLER_ENABLED:false}
+  archiving-job:
+    cron-expression: ${ARCHIVING_JOB_CRON_EXPRESSION:0 0/1 * * * ?}
+    #query: TYPE:'cm:content' AND cm:created:[MIN TO NOW-10YEARS]
+    query: ${ARCHIVING_JOB_QUERY:TYPE:'cm:content' AND ASPECT:'anv:archive'}
+    enabled: ${ARCHIVING_JOB_ENABLED:true}
+  service:
+    alfresco:
+      include:
+        - allowableOperations
+        - association
+        - isLink
+        - isFavorite
+        - isLocked
+        - path
+        - permissions
+        - definition
+      permanently-delete-nodes: true
+      search-batch-size: 100
+      chunk-size: 8192
+    vault:
+      hash-algorithm: ${VAULT_HASH_ALGORITHM:SHA-256}
+      double-check: ${VAULT_DOUBLE_CHECK:true}
+      encryption:
+        enabled: true
+        metadata: true
+        key: testkey
+  same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
+server:
+  port: 8086
