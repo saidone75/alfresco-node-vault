@@ -1,0 +1,1114 @@
+2025-07-18 07:38:54,528 INFO  org.saidone.test.VaultServiceTests - Starting VaultServiceTests using Java 21.0.7 with PID 27657 (started by saidone in /home/saidone/workspace-alfresco/alfresco-node-vault)
+2025-07-18 07:38:54,531 DEBUG org.saidone.test.VaultServiceTests - Running with Spring Boot v3.5.3, Spring v6.2.8
+2025-07-18 07:38:54,532 INFO  org.saidone.test.VaultServiceTests - The following 1 profile is active: "test"
+2025-07-18 07:38:54,573 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/AlfrescoNodeVault/test] not resolvable: Not found
+2025-07-18 07:38:54,574 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/application/test] not resolvable: Not found
+2025-07-18 07:38:54,574 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/application] not resolvable: Not found
+2025-07-18 07:38:56,247 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+2025-07-18 07:38:56,271 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 14 ms. Found 0 MongoDB repository interfaces.
+2025-07-18 07:38:56,381 INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2025-07-18 07:38:56,393 INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2025-07-18 07:38:56,546 INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=1095e749-2dd1-3d6a-bc92-d978491b198e
+2025-07-18 07:38:58,063 INFO  org.mongodb.driver.client - MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync", "version": "5.5.1"}, "os": {"type": "Linux", "name": "Linux", "architecture": "amd64", "version": "6.8.0-64-generic"}, "platform": "Java/Ubuntu/21.0.7+6-Ubuntu-0ubuntu124.04"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=majority, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=MongoCredential{mechanism=null, userName='root', source='admin', password=<hidden>, mechanismProperties=<hidden>}, transportSettings=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.client.model.mql.ExpressionCodecProvider@57d5c04, com.mongodb.Jep395RecordCodecProvider@23b046a8, com.mongodb.KotlinCodecProvider@73dd61ca]}, ProvidersCodecRegistry{codecProviders=[org.bson.codecs.pojo.PojoCodecProvider@330bba7c]}]}, loggerSettings=LoggerSettings{maxDocumentLength=1000}, clusterSettings={hosts=[localhost:27017], srvServiceName=mongodb, mode=SINGLE, requiredClusterType=UNKNOWN, requiredReplicaSetName='null', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='15 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverMonitoringMode=AUTO, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=false, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=UNSPECIFIED, serverApi=ServerApi{version=V1, deprecationErrors=null, strict=null}, autoEncryptionSettings=null, dnsClient=null, inetAddressResolver=null, contextProvider=null, timeoutMS=null}
+2025-07-18 07:38:58,069 INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=localhost:27017, type=STANDALONE, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=40431718, minRoundTripTimeNanos=0}
+2025-07-18 07:38:58,444 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditService
+2025-07-18 07:38:58,448 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditWebFilter
+2025-07-18 07:38:58,450 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditCollectionCreator
+2025-07-18 07:38:58,747 INFO  o.s.component.AuditCollectionCreator - Time series collection 'vault_audit' successfully created.
+2025-07-18 07:38:59,206 DEBUG org.saidone.config.EthereumConfig - Ethereum account loaded: 0x9c5b620ca0d9493f870388016fd86c16d2503302
+2025-07-18 07:38:59,931 INFO  org.saidone.component.BaseComponent - >>>>> Starting SecretService
+2025-07-18 07:38:59,958 INFO  org.saidone.component.BaseComponent - >>>>> Starting BcCryptoServiceImpl
+2025-07-18 07:38:59,960 INFO  org.saidone.component.BaseComponent - >>>>> Starting EncryptedMongoNodeRepositoryImpl
+2025-07-18 07:39:00,121 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [IsOnVaultPredicate]
+2025-07-18 07:39:00,121 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [After]
+2025-07-18 07:39:00,122 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Before]
+2025-07-18 07:39:00,122 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Between]
+2025-07-18 07:39:00,122 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Cookie]
+2025-07-18 07:39:00,122 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Header]
+2025-07-18 07:39:00,122 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Host]
+2025-07-18 07:39:00,122 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Method]
+2025-07-18 07:39:00,123 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Path]
+2025-07-18 07:39:00,123 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Query]
+2025-07-18 07:39:00,123 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [ReadBody]
+2025-07-18 07:39:00,123 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [RemoteAddr]
+2025-07-18 07:39:00,123 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2025-07-18 07:39:00,123 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Weight]
+2025-07-18 07:39:00,123 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2025-07-18 07:39:00,751 INFO  org.saidone.component.BaseComponent - >>>>> Starting AlfrescoService
+2025-07-18 07:39:00,768 INFO  org.saidone.component.BaseComponent - >>>>> Starting MongoNodeService
+2025-07-18 07:39:02,995 INFO  org.saidone.component.BaseComponent - >>>>> Starting EncryptedS3RepositoryImpl
+2025-07-18 07:39:03,003 INFO  org.saidone.component.BaseComponent - >>>>> Starting S3ContentService
+2025-07-18 07:39:03,005 INFO  org.saidone.component.BaseComponent - >>>>> Starting VaultService
+2025-07-18 07:39:03,011 INFO  org.saidone.component.BaseComponent - >>>>> Starting EthereumService
+2025-07-18 07:39:04,262 INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 5 endpoints beneath base path '/actuator'
+2025-07-18 07:39:05,065 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-07-18 07:39:05,066 INFO  o.s.i.c.PublishSubscribeChannel - Channel 'AlfrescoNodeVault.errorChannel' has 1 subscriber(s).
+2025-07-18 07:39:05,066 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2025-07-18 07:39:05,066 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {recipient-list-router} as a subscriber to the 'acsEventsListeningFlow.channel#1' channel
+2025-07-18 07:39:05,066 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#1' has 1 subscriber(s).
+2025-07-18 07:39:05,066 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:05,067 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsHandlersFlow.channel#1' has 1 subscriber(s).
+2025-07-18 07:39:05,067 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-07-18 07:39:05,067 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {transformer} as a subscriber to the 'acsEventsListeningFlow.channel#0' channel
+2025-07-18 07:39:05,067 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#0' has 1 subscriber(s).
+2025-07-18 07:39:05,067 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:05,067 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'alfresco.events.si.channel' channel
+2025-07-18 07:39:05,067 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.si.channel' has 1 subscriber(s).
+2025-07-18 07:39:05,067 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-07-18 07:39:05,067 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'acsEventsSpringIntegrationFlow.channel#1' channel
+2025-07-18 07:39:05,068 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsSpringIntegrationFlow.channel#1' has 1 subscriber(s).
+2025-07-18 07:39:05,068 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-07-18 07:39:05,068 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'alfresco.events.handlers.channel' channel
+2025-07-18 07:39:05,068 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.handlers.channel' has 1 subscriber(s).
+2025-07-18 07:39:05,068 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-07-18 07:39:05,068 INFO  o.s.i.j.ChannelPublishingJmsMessageListener$GatewayDelegate - started org.springframework.integration.jms.ChannelPublishingJmsMessageListener$GatewayDelegate@27274299
+2025-07-18 07:39:05,247 INFO  o.s.i.jms.JmsMessageDrivenEndpoint - started bean 'acsEventsListeningFlow.jms:message-driven-channel-adapter#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:05,274 INFO  org.saidone.test.VaultServiceTests - Started VaultServiceTests in 13.348 seconds (process running for 16.617)
+2025-07-18 07:39:06,586 DEBUG org.saidone.service.AlfrescoService - Guest Home: 46e0ed0c-3fd5-4f22-a0ed-0c3fd5cf22ac
+2025-07-18 07:39:06,738 INFO  org.saidone.test.BaseTest - Running --> archiveNodeTest()
+2025-07-18 07:39:06,741 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:06,963 DEBUG org.saidone.test.BaseTest - Node 4dd6cb03-09dc-4180-96cb-0309dc4180c4 created with name: muskrat_1.pdf
+2025-07-18 07:39:06,967 INFO  org.saidone.service.VaultService - Archiving node: 4dd6cb03-09dc-4180-96cb-0309dc4180c4
+2025-07-18 07:39:07,477 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4dd6cb03-09dc-4180-96cb-0309dc4180c4: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:07,478 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4dd6cb03-09dc-4180-96cb-0309dc4180c4: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:07,479 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4dd6cb03-09dc-4180-96cb-0309dc4180c4: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:07,480 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4dd6cb03-09dc-4180-96cb-0309dc4180c4: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:07,480 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4dd6cb03-09dc-4180-96cb-0309dc4180c4: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:07,481 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4dd6cb03-09dc-4180-96cb-0309dc4180c4: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:07,481 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4dd6cb03-09dc-4180-96cb-0309dc4180c4: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:07,482 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4dd6cb03-09dc-4180-96cb-0309dc4180c4: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:07,482 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4dd6cb03-09dc-4180-96cb-0309dc4180c4: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:07,482 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4dd6cb03-09dc-4180-96cb-0309dc4180c4: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:07,763 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 4dd6cb03-09dc-4180-96cb-0309dc4180c4
+2025-07-18 07:39:07,902 DEBUG org.saidone.service.VaultService - Digest check passed for node: 4dd6cb03-09dc-4180-96cb-0309dc4180c4
+2025-07-18 07:39:08,084 INFO  org.saidone.test.BaseTest - Running --> nonExistentNodeTest()
+2025-07-18 07:39:08,088 INFO  org.saidone.service.VaultService - Archiving node: 1d3b2c5a-f845-49fb-8aa6-96d3306c68ca
+2025-07-18 07:39:08,178 INFO  org.saidone.test.BaseTest - Running --> restoreNodeTest()
+2025-07-18 07:39:08,179 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:08,357 DEBUG org.saidone.test.BaseTest - Node 730542cd-a8a4-4ee3-8542-cda8a4aee39f created with name: monkey_1.pdf
+2025-07-18 07:39:08,357 INFO  org.saidone.service.VaultService - Archiving node: 730542cd-a8a4-4ee3-8542-cda8a4aee39f
+2025-07-18 07:39:08,548 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 730542cd-a8a4-4ee3-8542-cda8a4aee39f: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:08,548 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 730542cd-a8a4-4ee3-8542-cda8a4aee39f: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:08,548 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 730542cd-a8a4-4ee3-8542-cda8a4aee39f: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:08,549 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 730542cd-a8a4-4ee3-8542-cda8a4aee39f: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:08,549 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 730542cd-a8a4-4ee3-8542-cda8a4aee39f: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:08,549 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 730542cd-a8a4-4ee3-8542-cda8a4aee39f: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:08,549 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 730542cd-a8a4-4ee3-8542-cda8a4aee39f: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:08,550 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 730542cd-a8a4-4ee3-8542-cda8a4aee39f: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:08,550 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 730542cd-a8a4-4ee3-8542-cda8a4aee39f: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:08,550 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 730542cd-a8a4-4ee3-8542-cda8a4aee39f: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:08,592 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 730542cd-a8a4-4ee3-8542-cda8a4aee39f
+2025-07-18 07:39:08,714 DEBUG org.saidone.service.VaultService - Digest check passed for node: 730542cd-a8a4-4ee3-8542-cda8a4aee39f
+2025-07-18 07:39:09,079 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 89e12843-ee1b-4ac5-a128-43ee1b4ac55c: 1984 bytes written (10% out of 18858 bytes)
+2025-07-18 07:39:09,079 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 89e12843-ee1b-4ac5-a128-43ee1b4ac55c: 4032 bytes written (21% out of 18858 bytes)
+2025-07-18 07:39:09,079 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 89e12843-ee1b-4ac5-a128-43ee1b4ac55c: 6080 bytes written (32% out of 18858 bytes)
+2025-07-18 07:39:09,080 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 89e12843-ee1b-4ac5-a128-43ee1b4ac55c: 7936 bytes written (42% out of 18858 bytes)
+2025-07-18 07:39:09,080 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 89e12843-ee1b-4ac5-a128-43ee1b4ac55c: 9984 bytes written (52% out of 18858 bytes)
+2025-07-18 07:39:09,080 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 89e12843-ee1b-4ac5-a128-43ee1b4ac55c: 12032 bytes written (63% out of 18858 bytes)
+2025-07-18 07:39:09,080 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 89e12843-ee1b-4ac5-a128-43ee1b4ac55c: 14080 bytes written (74% out of 18858 bytes)
+2025-07-18 07:39:09,080 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 89e12843-ee1b-4ac5-a128-43ee1b4ac55c: 16128 bytes written (85% out of 18858 bytes)
+2025-07-18 07:39:09,081 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 89e12843-ee1b-4ac5-a128-43ee1b4ac55c: 18176 bytes written (96% out of 18858 bytes)
+2025-07-18 07:39:09,162 DEBUG org.saidone.service.AlfrescoService - Upload completed successfully for node: 89e12843-ee1b-4ac5-a128-43ee1b4ac55c
+2025-07-18 07:39:09,277 INFO  org.saidone.test.BaseTest - Running --> archiveNodesTest()
+2025-07-18 07:39:09,278 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:09,278 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:09,278 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:09,279 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:09,279 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:09,279 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:09,279 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:09,279 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:09,588 DEBUG org.saidone.test.BaseTest - Node 5f10dac5-ff05-4590-90da-c5ff059590cd created with name: mole_1.pdf
+2025-07-18 07:39:09,588 INFO  org.saidone.service.VaultService - Archiving node: 5f10dac5-ff05-4590-90da-c5ff059590cd
+2025-07-18 07:39:09,598 DEBUG org.saidone.test.BaseTest - Node ae768ca9-f915-4b4a-b68c-a9f915eb4ad4 created with name: mammoth_1.pdf
+2025-07-18 07:39:09,599 INFO  org.saidone.service.VaultService - Archiving node: ae768ca9-f915-4b4a-b68c-a9f915eb4ad4
+2025-07-18 07:39:09,617 DEBUG org.saidone.test.BaseTest - Node 291b7654-1ca9-424a-9b76-541ca9a24a7f created with name: mouse_1.pdf
+2025-07-18 07:39:09,617 INFO  org.saidone.service.VaultService - Archiving node: 291b7654-1ca9-424a-9b76-541ca9a24a7f
+2025-07-18 07:39:09,619 DEBUG org.saidone.test.BaseTest - Node fe2a462c-5811-40db-aa46-2c5811e0db78 created with name: antelope_1.pdf
+2025-07-18 07:39:09,619 INFO  org.saidone.service.VaultService - Archiving node: fe2a462c-5811-40db-aa46-2c5811e0db78
+2025-07-18 07:39:09,619 DEBUG org.saidone.test.BaseTest - Node 872d20b0-30de-4e00-ad20-b030de9e00dc created with name: beaver_1.pdf
+2025-07-18 07:39:09,620 INFO  org.saidone.service.VaultService - Archiving node: 872d20b0-30de-4e00-ad20-b030de9e00dc
+2025-07-18 07:39:09,651 DEBUG org.saidone.test.BaseTest - Node b290ef67-cae7-4e8b-90ef-67cae7ee8b54 created with name: hamster_1.pdf
+2025-07-18 07:39:09,652 INFO  org.saidone.service.VaultService - Archiving node: b290ef67-cae7-4e8b-90ef-67cae7ee8b54
+2025-07-18 07:39:09,682 DEBUG org.saidone.test.BaseTest - Node 99567874-0b93-4b0e-9678-740b938b0e4e created with name: mammoth_2.pdf
+2025-07-18 07:39:09,682 INFO  org.saidone.service.VaultService - Archiving node: 99567874-0b93-4b0e-9678-740b938b0e4e
+2025-07-18 07:39:09,698 DEBUG org.saidone.test.BaseTest - Node 46f79040-25d9-4ae4-b790-4025d9cae447 created with name: leopard_1.pdf
+2025-07-18 07:39:09,699 INFO  org.saidone.service.VaultService - Archiving node: 46f79040-25d9-4ae4-b790-4025d9cae447
+2025-07-18 07:39:09,992 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:10,249 DEBUG org.saidone.test.BaseTest - Node 020ba656-147d-42de-8ba6-56147d32de9b created with name: mammoth_3.pdf
+2025-07-18 07:39:10,249 INFO  org.saidone.service.VaultService - Archiving node: 020ba656-147d-42de-8ba6-56147d32de9b
+2025-07-18 07:39:10,462 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:10,723 DEBUG org.saidone.test.BaseTest - Node b420aff1-587a-4c23-a0af-f1587afc23e9 created with name: buffalo_1.pdf
+2025-07-18 07:39:10,723 INFO  org.saidone.service.VaultService - Archiving node: b420aff1-587a-4c23-a0af-f1587afc23e9
+2025-07-18 07:39:10,947 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:11,166 DEBUG org.saidone.test.BaseTest - Node 1073c691-1938-4f37-b3c6-911938cf37ec created with name: macaw_1.pdf
+2025-07-18 07:39:11,167 INFO  org.saidone.service.VaultService - Archiving node: 1073c691-1938-4f37-b3c6-911938cf37ec
+2025-07-18 07:39:11,377 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1073c691-1938-4f37-b3c6-911938cf37ec: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:11,377 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1073c691-1938-4f37-b3c6-911938cf37ec: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:11,377 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1073c691-1938-4f37-b3c6-911938cf37ec: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:11,377 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1073c691-1938-4f37-b3c6-911938cf37ec: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:11,377 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1073c691-1938-4f37-b3c6-911938cf37ec: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:11,377 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1073c691-1938-4f37-b3c6-911938cf37ec: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:11,377 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1073c691-1938-4f37-b3c6-911938cf37ec: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:11,378 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1073c691-1938-4f37-b3c6-911938cf37ec: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:11,378 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1073c691-1938-4f37-b3c6-911938cf37ec: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:11,378 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1073c691-1938-4f37-b3c6-911938cf37ec: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:11,435 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 1073c691-1938-4f37-b3c6-911938cf37ec
+2025-07-18 07:39:11,555 DEBUG org.saidone.service.VaultService - Digest check passed for node: 1073c691-1938-4f37-b3c6-911938cf37ec
+2025-07-18 07:39:11,694 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:11,724 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b420aff1-587a-4c23-a0af-f1587afc23e9: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:11,724 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b420aff1-587a-4c23-a0af-f1587afc23e9: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:11,725 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b420aff1-587a-4c23-a0af-f1587afc23e9: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:11,725 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b420aff1-587a-4c23-a0af-f1587afc23e9: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:11,725 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b420aff1-587a-4c23-a0af-f1587afc23e9: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:11,725 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b420aff1-587a-4c23-a0af-f1587afc23e9: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:11,725 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b420aff1-587a-4c23-a0af-f1587afc23e9: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:11,725 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b420aff1-587a-4c23-a0af-f1587afc23e9: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:11,725 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b420aff1-587a-4c23-a0af-f1587afc23e9: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:11,726 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b420aff1-587a-4c23-a0af-f1587afc23e9: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:11,772 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: b420aff1-587a-4c23-a0af-f1587afc23e9
+2025-07-18 07:39:11,900 DEBUG org.saidone.service.VaultService - Digest check passed for node: b420aff1-587a-4c23-a0af-f1587afc23e9
+2025-07-18 07:39:11,917 DEBUG org.saidone.test.BaseTest - Node 247c5145-a046-4e97-bc51-45a0461e97a1 created with name: frog_1.pdf
+2025-07-18 07:39:11,918 INFO  org.saidone.service.VaultService - Archiving node: 247c5145-a046-4e97-bc51-45a0461e97a1
+2025-07-18 07:39:12,051 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:12,267 DEBUG org.saidone.test.BaseTest - Node f6490e27-9bfe-4b7a-890e-279bfe6b7ac1 created with name: muskrat_2.pdf
+2025-07-18 07:39:12,267 INFO  org.saidone.service.VaultService - Archiving node: f6490e27-9bfe-4b7a-890e-279bfe6b7ac1
+2025-07-18 07:39:12,459 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:12,647 DEBUG org.saidone.test.BaseTest - Node fdb83590-5fc5-4d7a-b835-905fc57d7a51 created with name: turtle_1.pdf
+2025-07-18 07:39:12,647 INFO  org.saidone.service.VaultService - Archiving node: fdb83590-5fc5-4d7a-b835-905fc57d7a51
+2025-07-18 07:39:12,794 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:12,952 DEBUG org.saidone.test.BaseTest - Node 55877dcf-e8ad-44b9-877d-cfe8ad64b953 created with name: cricket_1.pdf
+2025-07-18 07:39:12,952 INFO  org.saidone.service.VaultService - Archiving node: 55877dcf-e8ad-44b9-877d-cfe8ad64b953
+2025-07-18 07:39:13,102 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:13,269 DEBUG org.saidone.test.BaseTest - Node 696cd3a5-d660-415e-acd3-a5d660615ede created with name: elk_1.pdf
+2025-07-18 07:39:13,269 INFO  org.saidone.service.VaultService - Archiving node: 696cd3a5-d660-415e-acd3-a5d660615ede
+2025-07-18 07:39:13,447 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 696cd3a5-d660-415e-acd3-a5d660615ede: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:13,447 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 696cd3a5-d660-415e-acd3-a5d660615ede: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:13,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 696cd3a5-d660-415e-acd3-a5d660615ede: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:13,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 696cd3a5-d660-415e-acd3-a5d660615ede: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:13,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 696cd3a5-d660-415e-acd3-a5d660615ede: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:13,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 696cd3a5-d660-415e-acd3-a5d660615ede: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:13,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 696cd3a5-d660-415e-acd3-a5d660615ede: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:13,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 696cd3a5-d660-415e-acd3-a5d660615ede: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:13,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 696cd3a5-d660-415e-acd3-a5d660615ede: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:13,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 696cd3a5-d660-415e-acd3-a5d660615ede: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:13,498 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 696cd3a5-d660-415e-acd3-a5d660615ede
+2025-07-18 07:39:13,609 DEBUG org.saidone.service.VaultService - Digest check passed for node: 696cd3a5-d660-415e-acd3-a5d660615ede
+2025-07-18 07:39:13,727 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:13,751 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f6490e27-9bfe-4b7a-890e-279bfe6b7ac1: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:13,751 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f6490e27-9bfe-4b7a-890e-279bfe6b7ac1: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:13,751 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f6490e27-9bfe-4b7a-890e-279bfe6b7ac1: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:13,751 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f6490e27-9bfe-4b7a-890e-279bfe6b7ac1: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:13,752 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f6490e27-9bfe-4b7a-890e-279bfe6b7ac1: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:13,752 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f6490e27-9bfe-4b7a-890e-279bfe6b7ac1: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:13,752 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f6490e27-9bfe-4b7a-890e-279bfe6b7ac1: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:13,752 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f6490e27-9bfe-4b7a-890e-279bfe6b7ac1: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:13,752 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f6490e27-9bfe-4b7a-890e-279bfe6b7ac1: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:13,752 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f6490e27-9bfe-4b7a-890e-279bfe6b7ac1: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:13,752 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 99567874-0b93-4b0e-9678-740b938b0e4e: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:13,752 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 99567874-0b93-4b0e-9678-740b938b0e4e: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:13,752 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 99567874-0b93-4b0e-9678-740b938b0e4e: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:13,752 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 99567874-0b93-4b0e-9678-740b938b0e4e: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:13,752 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 99567874-0b93-4b0e-9678-740b938b0e4e: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:13,753 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 99567874-0b93-4b0e-9678-740b938b0e4e: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:13,753 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 99567874-0b93-4b0e-9678-740b938b0e4e: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:13,753 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 99567874-0b93-4b0e-9678-740b938b0e4e: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:13,753 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 99567874-0b93-4b0e-9678-740b938b0e4e: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:13,753 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 99567874-0b93-4b0e-9678-740b938b0e4e: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:13,791 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: f6490e27-9bfe-4b7a-890e-279bfe6b7ac1
+2025-07-18 07:39:13,807 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 99567874-0b93-4b0e-9678-740b938b0e4e
+2025-07-18 07:39:13,907 DEBUG org.saidone.test.BaseTest - Node e23ad0f6-4c8e-40ee-bad0-f64c8e40ee9b created with name: cicada_1.pdf
+2025-07-18 07:39:13,907 INFO  org.saidone.service.VaultService - Archiving node: e23ad0f6-4c8e-40ee-bad0-f64c8e40ee9b
+2025-07-18 07:39:13,911 DEBUG org.saidone.service.VaultService - Digest check passed for node: f6490e27-9bfe-4b7a-890e-279bfe6b7ac1
+2025-07-18 07:39:13,919 DEBUG org.saidone.service.VaultService - Digest check passed for node: 99567874-0b93-4b0e-9678-740b938b0e4e
+2025-07-18 07:39:14,058 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:14,066 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:14,119 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e23ad0f6-4c8e-40ee-bad0-f64c8e40ee9b: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:14,120 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e23ad0f6-4c8e-40ee-bad0-f64c8e40ee9b: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:14,120 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e23ad0f6-4c8e-40ee-bad0-f64c8e40ee9b: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:14,120 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e23ad0f6-4c8e-40ee-bad0-f64c8e40ee9b: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:14,120 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e23ad0f6-4c8e-40ee-bad0-f64c8e40ee9b: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:14,120 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e23ad0f6-4c8e-40ee-bad0-f64c8e40ee9b: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:14,120 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e23ad0f6-4c8e-40ee-bad0-f64c8e40ee9b: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:14,120 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e23ad0f6-4c8e-40ee-bad0-f64c8e40ee9b: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:14,120 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e23ad0f6-4c8e-40ee-bad0-f64c8e40ee9b: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:14,120 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e23ad0f6-4c8e-40ee-bad0-f64c8e40ee9b: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:14,171 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: e23ad0f6-4c8e-40ee-bad0-f64c8e40ee9b
+2025-07-18 07:39:14,281 DEBUG org.saidone.test.BaseTest - Node 1ebd594b-3d07-4fff-bd59-4b3d073fffa9 created with name: spider_1.pdf
+2025-07-18 07:39:14,281 INFO  org.saidone.service.VaultService - Archiving node: 1ebd594b-3d07-4fff-bd59-4b3d073fffa9
+2025-07-18 07:39:14,282 DEBUG org.saidone.test.BaseTest - Node 9db65441-9615-4f57-b654-4196151f5780 created with name: mule_1.pdf
+2025-07-18 07:39:14,283 INFO  org.saidone.service.VaultService - Archiving node: 9db65441-9615-4f57-b654-4196151f5780
+2025-07-18 07:39:14,309 DEBUG org.saidone.service.VaultService - Digest check passed for node: e23ad0f6-4c8e-40ee-bad0-f64c8e40ee9b
+2025-07-18 07:39:14,475 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:14,507 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b290ef67-cae7-4e8b-90ef-67cae7ee8b54: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:14,507 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b290ef67-cae7-4e8b-90ef-67cae7ee8b54: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:14,507 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b290ef67-cae7-4e8b-90ef-67cae7ee8b54: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:14,507 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b290ef67-cae7-4e8b-90ef-67cae7ee8b54: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:14,507 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b290ef67-cae7-4e8b-90ef-67cae7ee8b54: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:14,507 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b290ef67-cae7-4e8b-90ef-67cae7ee8b54: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:14,507 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b290ef67-cae7-4e8b-90ef-67cae7ee8b54: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:14,508 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b290ef67-cae7-4e8b-90ef-67cae7ee8b54: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:14,508 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b290ef67-cae7-4e8b-90ef-67cae7ee8b54: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:14,508 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node b290ef67-cae7-4e8b-90ef-67cae7ee8b54: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:14,517 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 9db65441-9615-4f57-b654-4196151f5780: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:14,517 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 9db65441-9615-4f57-b654-4196151f5780: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:14,518 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 9db65441-9615-4f57-b654-4196151f5780: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:14,518 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 9db65441-9615-4f57-b654-4196151f5780: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:14,518 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 9db65441-9615-4f57-b654-4196151f5780: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:14,518 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 9db65441-9615-4f57-b654-4196151f5780: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:14,518 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 9db65441-9615-4f57-b654-4196151f5780: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:14,518 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 9db65441-9615-4f57-b654-4196151f5780: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:14,518 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 9db65441-9615-4f57-b654-4196151f5780: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:14,518 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 9db65441-9615-4f57-b654-4196151f5780: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:14,566 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: b290ef67-cae7-4e8b-90ef-67cae7ee8b54
+2025-07-18 07:39:14,578 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 9db65441-9615-4f57-b654-4196151f5780
+2025-07-18 07:39:14,672 DEBUG org.saidone.test.BaseTest - Node 3fe671cb-5cd7-498a-a671-cb5cd7d98ae4 created with name: gnu_1.pdf
+2025-07-18 07:39:14,672 INFO  org.saidone.service.VaultService - Archiving node: 3fe671cb-5cd7-498a-a671-cb5cd7d98ae4
+2025-07-18 07:39:14,695 DEBUG org.saidone.service.VaultService - Digest check passed for node: b290ef67-cae7-4e8b-90ef-67cae7ee8b54
+2025-07-18 07:39:14,725 DEBUG org.saidone.service.VaultService - Digest check passed for node: 9db65441-9615-4f57-b654-4196151f5780
+2025-07-18 07:39:14,840 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:14,871 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fe2a462c-5811-40db-aa46-2c5811e0db78: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:14,871 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fe2a462c-5811-40db-aa46-2c5811e0db78: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:14,871 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fe2a462c-5811-40db-aa46-2c5811e0db78: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:14,871 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fe2a462c-5811-40db-aa46-2c5811e0db78: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:14,872 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fe2a462c-5811-40db-aa46-2c5811e0db78: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:14,872 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fe2a462c-5811-40db-aa46-2c5811e0db78: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:14,872 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fe2a462c-5811-40db-aa46-2c5811e0db78: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:14,872 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fe2a462c-5811-40db-aa46-2c5811e0db78: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:14,872 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fe2a462c-5811-40db-aa46-2c5811e0db78: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:14,872 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fe2a462c-5811-40db-aa46-2c5811e0db78: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:14,890 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:14,907 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 3fe671cb-5cd7-498a-a671-cb5cd7d98ae4: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:14,907 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 3fe671cb-5cd7-498a-a671-cb5cd7d98ae4: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:14,907 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 3fe671cb-5cd7-498a-a671-cb5cd7d98ae4: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:14,907 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 3fe671cb-5cd7-498a-a671-cb5cd7d98ae4: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:14,907 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 3fe671cb-5cd7-498a-a671-cb5cd7d98ae4: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:14,907 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 3fe671cb-5cd7-498a-a671-cb5cd7d98ae4: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:14,907 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 3fe671cb-5cd7-498a-a671-cb5cd7d98ae4: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:14,907 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 3fe671cb-5cd7-498a-a671-cb5cd7d98ae4: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:14,907 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 3fe671cb-5cd7-498a-a671-cb5cd7d98ae4: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:14,907 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 3fe671cb-5cd7-498a-a671-cb5cd7d98ae4: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:14,920 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: fe2a462c-5811-40db-aa46-2c5811e0db78
+2025-07-18 07:39:14,963 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 3fe671cb-5cd7-498a-a671-cb5cd7d98ae4
+2025-07-18 07:39:15,044 DEBUG org.saidone.test.BaseTest - Node 4c2a0ef3-d098-41a3-aa0e-f3d09811a39a created with name: crocodile_1.pdf
+2025-07-18 07:39:15,045 INFO  org.saidone.service.VaultService - Archiving node: 4c2a0ef3-d098-41a3-aa0e-f3d09811a39a
+2025-07-18 07:39:15,069 DEBUG org.saidone.service.VaultService - Digest check passed for node: fe2a462c-5811-40db-aa46-2c5811e0db78
+2025-07-18 07:39:15,094 DEBUG org.saidone.service.VaultService - Digest check passed for node: 3fe671cb-5cd7-498a-a671-cb5cd7d98ae4
+2025-07-18 07:39:15,111 DEBUG org.saidone.test.BaseTest - Node 1d866ffc-f2f5-4539-866f-fcf2f55539f6 created with name: platypus_1.pdf
+2025-07-18 07:39:15,111 INFO  org.saidone.service.VaultService - Archiving node: 1d866ffc-f2f5-4539-866f-fcf2f55539f6
+2025-07-18 07:39:15,222 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:15,262 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:15,335 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4c2a0ef3-d098-41a3-aa0e-f3d09811a39a: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:15,335 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4c2a0ef3-d098-41a3-aa0e-f3d09811a39a: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:15,335 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4c2a0ef3-d098-41a3-aa0e-f3d09811a39a: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:15,335 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4c2a0ef3-d098-41a3-aa0e-f3d09811a39a: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:15,336 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4c2a0ef3-d098-41a3-aa0e-f3d09811a39a: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:15,336 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4c2a0ef3-d098-41a3-aa0e-f3d09811a39a: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:15,336 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4c2a0ef3-d098-41a3-aa0e-f3d09811a39a: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:15,336 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4c2a0ef3-d098-41a3-aa0e-f3d09811a39a: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:15,336 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4c2a0ef3-d098-41a3-aa0e-f3d09811a39a: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:15,336 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4c2a0ef3-d098-41a3-aa0e-f3d09811a39a: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:15,365 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1d866ffc-f2f5-4539-866f-fcf2f55539f6: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:15,365 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1d866ffc-f2f5-4539-866f-fcf2f55539f6: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:15,365 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1d866ffc-f2f5-4539-866f-fcf2f55539f6: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:15,366 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1d866ffc-f2f5-4539-866f-fcf2f55539f6: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:15,366 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1d866ffc-f2f5-4539-866f-fcf2f55539f6: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:15,366 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1d866ffc-f2f5-4539-866f-fcf2f55539f6: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:15,366 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1d866ffc-f2f5-4539-866f-fcf2f55539f6: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:15,366 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1d866ffc-f2f5-4539-866f-fcf2f55539f6: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:15,366 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1d866ffc-f2f5-4539-866f-fcf2f55539f6: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:15,366 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1d866ffc-f2f5-4539-866f-fcf2f55539f6: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:15,390 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 4c2a0ef3-d098-41a3-aa0e-f3d09811a39a
+2025-07-18 07:39:15,429 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 1d866ffc-f2f5-4539-866f-fcf2f55539f6
+2025-07-18 07:39:15,452 DEBUG org.saidone.test.BaseTest - Node 600b8f0f-e3db-4134-8b8f-0fe3dbc13441 created with name: mole_2.pdf
+2025-07-18 07:39:15,452 INFO  org.saidone.service.VaultService - Archiving node: 600b8f0f-e3db-4134-8b8f-0fe3dbc13441
+2025-07-18 07:39:15,492 DEBUG org.saidone.test.BaseTest - Node 8bddd4e9-f31c-48ae-9dd4-e9f31c48aeed created with name: reindeer_1.pdf
+2025-07-18 07:39:15,492 INFO  org.saidone.service.VaultService - Archiving node: 8bddd4e9-f31c-48ae-9dd4-e9f31c48aeed
+2025-07-18 07:39:15,545 DEBUG org.saidone.service.VaultService - Digest check passed for node: 4c2a0ef3-d098-41a3-aa0e-f3d09811a39a
+2025-07-18 07:39:15,566 DEBUG org.saidone.service.VaultService - Digest check passed for node: 1d866ffc-f2f5-4539-866f-fcf2f55539f6
+2025-07-18 07:39:15,713 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:15,724 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 8bddd4e9-f31c-48ae-9dd4-e9f31c48aeed: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:15,724 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 8bddd4e9-f31c-48ae-9dd4-e9f31c48aeed: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:15,724 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 8bddd4e9-f31c-48ae-9dd4-e9f31c48aeed: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:15,725 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 8bddd4e9-f31c-48ae-9dd4-e9f31c48aeed: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:15,725 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 8bddd4e9-f31c-48ae-9dd4-e9f31c48aeed: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:15,725 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 8bddd4e9-f31c-48ae-9dd4-e9f31c48aeed: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:15,725 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 8bddd4e9-f31c-48ae-9dd4-e9f31c48aeed: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:15,725 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 8bddd4e9-f31c-48ae-9dd4-e9f31c48aeed: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:15,725 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 8bddd4e9-f31c-48ae-9dd4-e9f31c48aeed: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:15,725 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 8bddd4e9-f31c-48ae-9dd4-e9f31c48aeed: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:15,729 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:15,748 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 291b7654-1ca9-424a-9b76-541ca9a24a7f: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:15,748 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 291b7654-1ca9-424a-9b76-541ca9a24a7f: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:15,748 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 291b7654-1ca9-424a-9b76-541ca9a24a7f: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:15,749 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 291b7654-1ca9-424a-9b76-541ca9a24a7f: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:15,749 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 291b7654-1ca9-424a-9b76-541ca9a24a7f: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:15,749 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 291b7654-1ca9-424a-9b76-541ca9a24a7f: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:15,749 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 291b7654-1ca9-424a-9b76-541ca9a24a7f: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:15,749 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 291b7654-1ca9-424a-9b76-541ca9a24a7f: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:15,749 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 291b7654-1ca9-424a-9b76-541ca9a24a7f: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:15,749 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 291b7654-1ca9-424a-9b76-541ca9a24a7f: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:15,780 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1ebd594b-3d07-4fff-bd59-4b3d073fffa9: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:15,780 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1ebd594b-3d07-4fff-bd59-4b3d073fffa9: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:15,780 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1ebd594b-3d07-4fff-bd59-4b3d073fffa9: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:15,781 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1ebd594b-3d07-4fff-bd59-4b3d073fffa9: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:15,781 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1ebd594b-3d07-4fff-bd59-4b3d073fffa9: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:15,781 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1ebd594b-3d07-4fff-bd59-4b3d073fffa9: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:15,781 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1ebd594b-3d07-4fff-bd59-4b3d073fffa9: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:15,781 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1ebd594b-3d07-4fff-bd59-4b3d073fffa9: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:15,781 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1ebd594b-3d07-4fff-bd59-4b3d073fffa9: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:15,781 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 1ebd594b-3d07-4fff-bd59-4b3d073fffa9: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:15,792 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 8bddd4e9-f31c-48ae-9dd4-e9f31c48aeed
+2025-07-18 07:39:15,831 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 1ebd594b-3d07-4fff-bd59-4b3d073fffa9
+2025-07-18 07:39:15,933 DEBUG org.saidone.test.BaseTest - Node d03a8ad5-a167-499d-ba8a-d5a167f99dc7 created with name: cockroach_1.pdf
+2025-07-18 07:39:15,933 INFO  org.saidone.service.VaultService - Archiving node: d03a8ad5-a167-499d-ba8a-d5a167f99dc7
+2025-07-18 07:39:15,951 DEBUG org.saidone.service.VaultService - Digest check passed for node: 8bddd4e9-f31c-48ae-9dd4-e9f31c48aeed
+2025-07-18 07:39:15,952 DEBUG org.saidone.test.BaseTest - Node a9cc53b1-9af1-40e4-8c53-b19af180e469 created with name: wallaby_1.pdf
+2025-07-18 07:39:15,952 INFO  org.saidone.service.VaultService - Archiving node: a9cc53b1-9af1-40e4-8c53-b19af180e469
+2025-07-18 07:39:15,989 DEBUG org.saidone.service.VaultService - Digest check passed for node: 1ebd594b-3d07-4fff-bd59-4b3d073fffa9
+2025-07-18 07:39:16,119 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:16,147 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:16,158 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fdb83590-5fc5-4d7a-b835-905fc57d7a51: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:16,159 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fdb83590-5fc5-4d7a-b835-905fc57d7a51: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:16,159 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fdb83590-5fc5-4d7a-b835-905fc57d7a51: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:16,159 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fdb83590-5fc5-4d7a-b835-905fc57d7a51: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:16,159 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fdb83590-5fc5-4d7a-b835-905fc57d7a51: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:16,159 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fdb83590-5fc5-4d7a-b835-905fc57d7a51: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:16,160 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fdb83590-5fc5-4d7a-b835-905fc57d7a51: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:16,160 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fdb83590-5fc5-4d7a-b835-905fc57d7a51: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:16,160 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fdb83590-5fc5-4d7a-b835-905fc57d7a51: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:16,160 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fdb83590-5fc5-4d7a-b835-905fc57d7a51: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:16,175 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d03a8ad5-a167-499d-ba8a-d5a167f99dc7: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:16,175 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d03a8ad5-a167-499d-ba8a-d5a167f99dc7: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:16,175 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d03a8ad5-a167-499d-ba8a-d5a167f99dc7: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:16,175 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d03a8ad5-a167-499d-ba8a-d5a167f99dc7: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:16,176 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d03a8ad5-a167-499d-ba8a-d5a167f99dc7: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:16,176 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d03a8ad5-a167-499d-ba8a-d5a167f99dc7: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:16,176 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d03a8ad5-a167-499d-ba8a-d5a167f99dc7: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:16,176 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d03a8ad5-a167-499d-ba8a-d5a167f99dc7: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:16,176 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d03a8ad5-a167-499d-ba8a-d5a167f99dc7: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:16,176 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d03a8ad5-a167-499d-ba8a-d5a167f99dc7: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:16,187 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a9cc53b1-9af1-40e4-8c53-b19af180e469: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:16,187 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a9cc53b1-9af1-40e4-8c53-b19af180e469: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:16,187 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a9cc53b1-9af1-40e4-8c53-b19af180e469: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:16,187 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a9cc53b1-9af1-40e4-8c53-b19af180e469: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:16,187 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a9cc53b1-9af1-40e4-8c53-b19af180e469: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:16,188 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a9cc53b1-9af1-40e4-8c53-b19af180e469: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:16,188 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a9cc53b1-9af1-40e4-8c53-b19af180e469: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:16,188 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a9cc53b1-9af1-40e4-8c53-b19af180e469: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:16,188 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a9cc53b1-9af1-40e4-8c53-b19af180e469: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:16,188 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a9cc53b1-9af1-40e4-8c53-b19af180e469: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:16,199 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 291b7654-1ca9-424a-9b76-541ca9a24a7f
+2025-07-18 07:39:16,252 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: fdb83590-5fc5-4d7a-b835-905fc57d7a51
+2025-07-18 07:39:16,263 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: a9cc53b1-9af1-40e4-8c53-b19af180e469
+2025-07-18 07:39:16,279 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: d03a8ad5-a167-499d-ba8a-d5a167f99dc7
+2025-07-18 07:39:16,378 DEBUG org.saidone.test.BaseTest - Node 7fdff2b7-63b4-4f3d-9ff2-b763b45f3d02 created with name: muskrat_3.pdf
+2025-07-18 07:39:16,378 INFO  org.saidone.service.VaultService - Archiving node: 7fdff2b7-63b4-4f3d-9ff2-b763b45f3d02
+2025-07-18 07:39:16,392 DEBUG org.saidone.test.BaseTest - Node 0c2572df-61ad-4ba9-a572-df61ad1ba907 created with name: cheetah_1.pdf
+2025-07-18 07:39:16,392 INFO  org.saidone.service.VaultService - Archiving node: 0c2572df-61ad-4ba9-a572-df61ad1ba907
+2025-07-18 07:39:16,426 DEBUG org.saidone.service.VaultService - Digest check passed for node: fdb83590-5fc5-4d7a-b835-905fc57d7a51
+2025-07-18 07:39:16,439 DEBUG org.saidone.service.VaultService - Digest check passed for node: a9cc53b1-9af1-40e4-8c53-b19af180e469
+2025-07-18 07:39:16,443 DEBUG org.saidone.service.VaultService - Digest check passed for node: d03a8ad5-a167-499d-ba8a-d5a167f99dc7
+2025-07-18 07:39:16,616 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:16,619 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:16,633 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:16,672 DEBUG org.saidone.service.VaultService - Digest check passed for node: 291b7654-1ca9-424a-9b76-541ca9a24a7f
+2025-07-18 07:39:16,677 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 0c2572df-61ad-4ba9-a572-df61ad1ba907: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:16,677 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 0c2572df-61ad-4ba9-a572-df61ad1ba907: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:16,677 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 0c2572df-61ad-4ba9-a572-df61ad1ba907: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:16,678 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 0c2572df-61ad-4ba9-a572-df61ad1ba907: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:16,678 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 0c2572df-61ad-4ba9-a572-df61ad1ba907: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:16,678 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 0c2572df-61ad-4ba9-a572-df61ad1ba907: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:16,678 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 0c2572df-61ad-4ba9-a572-df61ad1ba907: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:16,678 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 0c2572df-61ad-4ba9-a572-df61ad1ba907: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:16,678 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 0c2572df-61ad-4ba9-a572-df61ad1ba907: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:16,678 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 0c2572df-61ad-4ba9-a572-df61ad1ba907: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:16,697 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 7fdff2b7-63b4-4f3d-9ff2-b763b45f3d02: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:16,697 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 7fdff2b7-63b4-4f3d-9ff2-b763b45f3d02: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:16,697 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 7fdff2b7-63b4-4f3d-9ff2-b763b45f3d02: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:16,697 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 7fdff2b7-63b4-4f3d-9ff2-b763b45f3d02: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:16,697 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 7fdff2b7-63b4-4f3d-9ff2-b763b45f3d02: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:16,698 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 7fdff2b7-63b4-4f3d-9ff2-b763b45f3d02: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:16,698 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 7fdff2b7-63b4-4f3d-9ff2-b763b45f3d02: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:16,698 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 7fdff2b7-63b4-4f3d-9ff2-b763b45f3d02: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:16,698 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 7fdff2b7-63b4-4f3d-9ff2-b763b45f3d02: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:16,698 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 7fdff2b7-63b4-4f3d-9ff2-b763b45f3d02: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:16,703 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 5f10dac5-ff05-4590-90da-c5ff059590cd: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:16,703 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 5f10dac5-ff05-4590-90da-c5ff059590cd: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:16,703 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 5f10dac5-ff05-4590-90da-c5ff059590cd: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:16,703 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 5f10dac5-ff05-4590-90da-c5ff059590cd: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:16,703 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 5f10dac5-ff05-4590-90da-c5ff059590cd: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:16,703 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 5f10dac5-ff05-4590-90da-c5ff059590cd: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:16,703 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 5f10dac5-ff05-4590-90da-c5ff059590cd: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:16,704 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 5f10dac5-ff05-4590-90da-c5ff059590cd: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:16,704 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 5f10dac5-ff05-4590-90da-c5ff059590cd: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:16,704 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 5f10dac5-ff05-4590-90da-c5ff059590cd: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:16,719 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 55877dcf-e8ad-44b9-877d-cfe8ad64b953: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:16,719 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 55877dcf-e8ad-44b9-877d-cfe8ad64b953: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:16,719 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 55877dcf-e8ad-44b9-877d-cfe8ad64b953: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:16,719 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 55877dcf-e8ad-44b9-877d-cfe8ad64b953: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:16,719 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 55877dcf-e8ad-44b9-877d-cfe8ad64b953: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:16,719 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 55877dcf-e8ad-44b9-877d-cfe8ad64b953: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:16,719 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 55877dcf-e8ad-44b9-877d-cfe8ad64b953: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:16,719 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 55877dcf-e8ad-44b9-877d-cfe8ad64b953: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:16,719 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 55877dcf-e8ad-44b9-877d-cfe8ad64b953: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:16,720 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 55877dcf-e8ad-44b9-877d-cfe8ad64b953: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:16,754 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 247c5145-a046-4e97-bc51-45a0461e97a1: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:16,754 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 247c5145-a046-4e97-bc51-45a0461e97a1: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:16,755 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 247c5145-a046-4e97-bc51-45a0461e97a1: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:16,755 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 247c5145-a046-4e97-bc51-45a0461e97a1: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:16,755 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 247c5145-a046-4e97-bc51-45a0461e97a1: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:16,755 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 247c5145-a046-4e97-bc51-45a0461e97a1: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:16,755 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 247c5145-a046-4e97-bc51-45a0461e97a1: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:16,755 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 247c5145-a046-4e97-bc51-45a0461e97a1: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:16,755 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 247c5145-a046-4e97-bc51-45a0461e97a1: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:16,755 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 247c5145-a046-4e97-bc51-45a0461e97a1: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:16,792 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 0c2572df-61ad-4ba9-a572-df61ad1ba907
+2025-07-18 07:39:16,808 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 7fdff2b7-63b4-4f3d-9ff2-b763b45f3d02
+2025-07-18 07:39:16,826 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 5f10dac5-ff05-4590-90da-c5ff059590cd
+2025-07-18 07:39:16,830 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 55877dcf-e8ad-44b9-877d-cfe8ad64b953
+2025-07-18 07:39:16,837 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 247c5145-a046-4e97-bc51-45a0461e97a1
+2025-07-18 07:39:16,997 DEBUG org.saidone.test.BaseTest - Node d6e715eb-9eaa-4392-a715-eb9eaa639248 created with name: beaver_2.pdf
+2025-07-18 07:39:16,997 INFO  org.saidone.service.VaultService - Archiving node: d6e715eb-9eaa-4392-a715-eb9eaa639248
+2025-07-18 07:39:17,001 DEBUG org.saidone.service.VaultService - Digest check passed for node: 0c2572df-61ad-4ba9-a572-df61ad1ba907
+2025-07-18 07:39:17,003 DEBUG org.saidone.test.BaseTest - Node a47ee014-1de5-4904-bee0-141de5b904ad created with name: ox_1.pdf
+2025-07-18 07:39:17,005 INFO  org.saidone.service.VaultService - Archiving node: a47ee014-1de5-4904-bee0-141de5b904ad
+2025-07-18 07:39:17,025 DEBUG org.saidone.service.VaultService - Digest check passed for node: 5f10dac5-ff05-4590-90da-c5ff059590cd
+2025-07-18 07:39:17,032 DEBUG org.saidone.test.BaseTest - Node 871f4d85-3910-4351-9f4d-853910d3511e created with name: butterfly_1.pdf
+2025-07-18 07:39:17,032 INFO  org.saidone.service.VaultService - Archiving node: 871f4d85-3910-4351-9f4d-853910d3511e
+2025-07-18 07:39:17,032 DEBUG org.saidone.service.VaultService - Digest check passed for node: 7fdff2b7-63b4-4f3d-9ff2-b763b45f3d02
+2025-07-18 07:39:17,051 DEBUG org.saidone.service.VaultService - Digest check passed for node: 247c5145-a046-4e97-bc51-45a0461e97a1
+2025-07-18 07:39:17,081 DEBUG org.saidone.service.VaultService - Digest check passed for node: 55877dcf-e8ad-44b9-877d-cfe8ad64b953
+2025-07-18 07:39:17,218 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:17,246 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:17,312 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:17,321 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:17,337 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:17,344 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:17,350 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 872d20b0-30de-4e00-ad20-b030de9e00dc: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:17,350 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 872d20b0-30de-4e00-ad20-b030de9e00dc: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:17,350 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 872d20b0-30de-4e00-ad20-b030de9e00dc: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:17,353 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 872d20b0-30de-4e00-ad20-b030de9e00dc: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:17,353 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 872d20b0-30de-4e00-ad20-b030de9e00dc: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:17,353 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 872d20b0-30de-4e00-ad20-b030de9e00dc: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:17,353 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 872d20b0-30de-4e00-ad20-b030de9e00dc: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:17,353 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 872d20b0-30de-4e00-ad20-b030de9e00dc: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:17,353 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 872d20b0-30de-4e00-ad20-b030de9e00dc: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:17,359 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 872d20b0-30de-4e00-ad20-b030de9e00dc: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:17,359 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 46f79040-25d9-4ae4-b790-4025d9cae447: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:17,360 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 46f79040-25d9-4ae4-b790-4025d9cae447: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:17,360 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 46f79040-25d9-4ae4-b790-4025d9cae447: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:17,360 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 46f79040-25d9-4ae4-b790-4025d9cae447: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:17,360 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 46f79040-25d9-4ae4-b790-4025d9cae447: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:17,360 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 46f79040-25d9-4ae4-b790-4025d9cae447: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:17,360 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 46f79040-25d9-4ae4-b790-4025d9cae447: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:17,360 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 46f79040-25d9-4ae4-b790-4025d9cae447: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:17,360 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 46f79040-25d9-4ae4-b790-4025d9cae447: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:17,360 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 46f79040-25d9-4ae4-b790-4025d9cae447: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:17,398 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d6e715eb-9eaa-4392-a715-eb9eaa639248: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:17,399 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d6e715eb-9eaa-4392-a715-eb9eaa639248: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:17,399 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d6e715eb-9eaa-4392-a715-eb9eaa639248: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:17,400 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d6e715eb-9eaa-4392-a715-eb9eaa639248: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:17,400 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d6e715eb-9eaa-4392-a715-eb9eaa639248: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:17,400 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d6e715eb-9eaa-4392-a715-eb9eaa639248: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:17,400 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d6e715eb-9eaa-4392-a715-eb9eaa639248: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:17,400 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d6e715eb-9eaa-4392-a715-eb9eaa639248: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:17,400 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d6e715eb-9eaa-4392-a715-eb9eaa639248: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:17,400 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d6e715eb-9eaa-4392-a715-eb9eaa639248: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:17,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 871f4d85-3910-4351-9f4d-853910d3511e: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:17,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 871f4d85-3910-4351-9f4d-853910d3511e: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:17,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 871f4d85-3910-4351-9f4d-853910d3511e: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:17,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 871f4d85-3910-4351-9f4d-853910d3511e: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:17,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 871f4d85-3910-4351-9f4d-853910d3511e: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:17,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 871f4d85-3910-4351-9f4d-853910d3511e: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:17,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a47ee014-1de5-4904-bee0-141de5b904ad: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:17,448 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 871f4d85-3910-4351-9f4d-853910d3511e: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:17,449 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a47ee014-1de5-4904-bee0-141de5b904ad: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:17,449 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 871f4d85-3910-4351-9f4d-853910d3511e: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:17,449 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a47ee014-1de5-4904-bee0-141de5b904ad: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:17,449 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 871f4d85-3910-4351-9f4d-853910d3511e: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:17,449 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 871f4d85-3910-4351-9f4d-853910d3511e: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:17,449 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a47ee014-1de5-4904-bee0-141de5b904ad: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:17,449 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a47ee014-1de5-4904-bee0-141de5b904ad: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:17,449 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a47ee014-1de5-4904-bee0-141de5b904ad: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:17,449 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a47ee014-1de5-4904-bee0-141de5b904ad: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:17,449 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a47ee014-1de5-4904-bee0-141de5b904ad: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:17,449 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a47ee014-1de5-4904-bee0-141de5b904ad: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:17,449 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node a47ee014-1de5-4904-bee0-141de5b904ad: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:17,464 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 46f79040-25d9-4ae4-b790-4025d9cae447
+2025-07-18 07:39:17,486 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 872d20b0-30de-4e00-ad20-b030de9e00dc
+2025-07-18 07:39:17,506 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: d6e715eb-9eaa-4392-a715-eb9eaa639248
+2025-07-18 07:39:17,532 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 871f4d85-3910-4351-9f4d-853910d3511e
+2025-07-18 07:39:17,608 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: a47ee014-1de5-4904-bee0-141de5b904ad
+2025-07-18 07:39:17,691 DEBUG org.saidone.service.VaultService - Digest check passed for node: 872d20b0-30de-4e00-ad20-b030de9e00dc
+2025-07-18 07:39:17,697 DEBUG org.saidone.test.BaseTest - Node 051781c2-54fe-49ea-9781-c254feb9ea57 created with name: wolf_1.pdf
+2025-07-18 07:39:17,697 INFO  org.saidone.service.VaultService - Archiving node: 051781c2-54fe-49ea-9781-c254feb9ea57
+2025-07-18 07:39:17,710 DEBUG org.saidone.test.BaseTest - Node e776d0f2-5e27-4cdb-b6d0-f25e27bcdbbd created with name: goose_1.pdf
+2025-07-18 07:39:17,710 INFO  org.saidone.service.VaultService - Archiving node: e776d0f2-5e27-4cdb-b6d0-f25e27bcdbbd
+2025-07-18 07:39:17,722 DEBUG org.saidone.service.VaultService - Digest check passed for node: d6e715eb-9eaa-4392-a715-eb9eaa639248
+2025-07-18 07:39:17,734 DEBUG org.saidone.test.BaseTest - Node fb587454-b0e7-46f7-9874-54b0e7a6f7d5 created with name: rhinoceros_1.pdf
+2025-07-18 07:39:17,734 INFO  org.saidone.service.VaultService - Archiving node: fb587454-b0e7-46f7-9874-54b0e7a6f7d5
+2025-07-18 07:39:17,738 DEBUG org.saidone.test.BaseTest - Node c68344ff-d822-4734-8344-ffd822073413 created with name: wasp_1.pdf
+2025-07-18 07:39:17,738 INFO  org.saidone.service.VaultService - Archiving node: c68344ff-d822-4734-8344-ffd822073413
+2025-07-18 07:39:17,772 DEBUG org.saidone.test.BaseTest - Node e81df7cd-2045-4327-9df7-cd2045632795 created with name: macaw_2.pdf
+2025-07-18 07:39:17,772 INFO  org.saidone.service.VaultService - Archiving node: e81df7cd-2045-4327-9df7-cd2045632795
+2025-07-18 07:39:17,776 DEBUG org.saidone.service.VaultService - Digest check passed for node: 46f79040-25d9-4ae4-b790-4025d9cae447
+2025-07-18 07:39:17,788 DEBUG org.saidone.test.BaseTest - Node cd8ad1d6-3d63-4821-8ad1-d63d63682151 created with name: lizard_1.pdf
+2025-07-18 07:39:17,788 INFO  org.saidone.service.VaultService - Archiving node: cd8ad1d6-3d63-4821-8ad1-d63d63682151
+2025-07-18 07:39:17,799 DEBUG org.saidone.service.VaultService - Digest check passed for node: 871f4d85-3910-4351-9f4d-853910d3511e
+2025-07-18 07:39:17,896 DEBUG org.saidone.service.VaultService - Digest check passed for node: a47ee014-1de5-4904-bee0-141de5b904ad
+2025-07-18 07:39:18,094 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:18,107 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:18,116 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:18,135 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:18,156 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node ae768ca9-f915-4b4a-b68c-a9f915eb4ad4: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:18,157 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node ae768ca9-f915-4b4a-b68c-a9f915eb4ad4: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:18,157 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node ae768ca9-f915-4b4a-b68c-a9f915eb4ad4: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:18,157 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node ae768ca9-f915-4b4a-b68c-a9f915eb4ad4: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:18,157 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node ae768ca9-f915-4b4a-b68c-a9f915eb4ad4: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:18,157 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node ae768ca9-f915-4b4a-b68c-a9f915eb4ad4: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:18,157 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node ae768ca9-f915-4b4a-b68c-a9f915eb4ad4: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:18,157 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node ae768ca9-f915-4b4a-b68c-a9f915eb4ad4: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:18,157 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node ae768ca9-f915-4b4a-b68c-a9f915eb4ad4: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:18,157 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node ae768ca9-f915-4b4a-b68c-a9f915eb4ad4: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:18,188 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 020ba656-147d-42de-8ba6-56147d32de9b: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:18,188 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 020ba656-147d-42de-8ba6-56147d32de9b: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:18,188 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 020ba656-147d-42de-8ba6-56147d32de9b: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:18,188 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 020ba656-147d-42de-8ba6-56147d32de9b: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:18,189 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 020ba656-147d-42de-8ba6-56147d32de9b: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:18,189 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 020ba656-147d-42de-8ba6-56147d32de9b: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:18,189 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 020ba656-147d-42de-8ba6-56147d32de9b: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:18,190 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 020ba656-147d-42de-8ba6-56147d32de9b: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:18,190 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 020ba656-147d-42de-8ba6-56147d32de9b: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:18,190 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 020ba656-147d-42de-8ba6-56147d32de9b: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:18,232 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:18,280 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e776d0f2-5e27-4cdb-b6d0-f25e27bcdbbd: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:18,281 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e776d0f2-5e27-4cdb-b6d0-f25e27bcdbbd: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:18,281 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e776d0f2-5e27-4cdb-b6d0-f25e27bcdbbd: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:18,281 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e776d0f2-5e27-4cdb-b6d0-f25e27bcdbbd: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:18,281 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e776d0f2-5e27-4cdb-b6d0-f25e27bcdbbd: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:18,288 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node c68344ff-d822-4734-8344-ffd822073413: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:18,288 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node c68344ff-d822-4734-8344-ffd822073413: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:18,289 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node c68344ff-d822-4734-8344-ffd822073413: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:18,289 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node c68344ff-d822-4734-8344-ffd822073413: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:18,289 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node c68344ff-d822-4734-8344-ffd822073413: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:18,289 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node c68344ff-d822-4734-8344-ffd822073413: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:18,289 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node c68344ff-d822-4734-8344-ffd822073413: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:18,289 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node c68344ff-d822-4734-8344-ffd822073413: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:18,289 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node c68344ff-d822-4734-8344-ffd822073413: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:18,289 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node c68344ff-d822-4734-8344-ffd822073413: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:18,292 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e776d0f2-5e27-4cdb-b6d0-f25e27bcdbbd: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:18,292 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e776d0f2-5e27-4cdb-b6d0-f25e27bcdbbd: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:18,292 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e776d0f2-5e27-4cdb-b6d0-f25e27bcdbbd: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:18,292 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e776d0f2-5e27-4cdb-b6d0-f25e27bcdbbd: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:18,292 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e776d0f2-5e27-4cdb-b6d0-f25e27bcdbbd: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:18,307 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 600b8f0f-e3db-4134-8b8f-0fe3dbc13441: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:18,308 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fb587454-b0e7-46f7-9874-54b0e7a6f7d5: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:18,312 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 600b8f0f-e3db-4134-8b8f-0fe3dbc13441: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:18,312 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 600b8f0f-e3db-4134-8b8f-0fe3dbc13441: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:18,312 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 600b8f0f-e3db-4134-8b8f-0fe3dbc13441: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:18,312 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 600b8f0f-e3db-4134-8b8f-0fe3dbc13441: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:18,312 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 600b8f0f-e3db-4134-8b8f-0fe3dbc13441: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:18,312 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 600b8f0f-e3db-4134-8b8f-0fe3dbc13441: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:18,313 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 600b8f0f-e3db-4134-8b8f-0fe3dbc13441: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:18,313 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 600b8f0f-e3db-4134-8b8f-0fe3dbc13441: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:18,313 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 600b8f0f-e3db-4134-8b8f-0fe3dbc13441: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:18,312 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fb587454-b0e7-46f7-9874-54b0e7a6f7d5: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:18,314 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fb587454-b0e7-46f7-9874-54b0e7a6f7d5: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:18,314 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fb587454-b0e7-46f7-9874-54b0e7a6f7d5: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:18,314 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fb587454-b0e7-46f7-9874-54b0e7a6f7d5: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:18,314 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fb587454-b0e7-46f7-9874-54b0e7a6f7d5: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:18,314 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fb587454-b0e7-46f7-9874-54b0e7a6f7d5: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:18,314 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fb587454-b0e7-46f7-9874-54b0e7a6f7d5: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:18,314 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fb587454-b0e7-46f7-9874-54b0e7a6f7d5: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:18,314 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node fb587454-b0e7-46f7-9874-54b0e7a6f7d5: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:18,320 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: ae768ca9-f915-4b4a-b68c-a9f915eb4ad4
+2025-07-18 07:39:18,379 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 051781c2-54fe-49ea-9781-c254feb9ea57: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:18,379 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 051781c2-54fe-49ea-9781-c254feb9ea57: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:18,383 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 051781c2-54fe-49ea-9781-c254feb9ea57: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:18,383 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 051781c2-54fe-49ea-9781-c254feb9ea57: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:18,383 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 051781c2-54fe-49ea-9781-c254feb9ea57: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:18,383 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 051781c2-54fe-49ea-9781-c254feb9ea57: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:18,383 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 051781c2-54fe-49ea-9781-c254feb9ea57: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:18,384 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 051781c2-54fe-49ea-9781-c254feb9ea57: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:18,384 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 051781c2-54fe-49ea-9781-c254feb9ea57: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:18,384 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 051781c2-54fe-49ea-9781-c254feb9ea57: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:18,402 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: c68344ff-d822-4734-8344-ffd822073413
+2025-07-18 07:39:18,413 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 020ba656-147d-42de-8ba6-56147d32de9b
+2025-07-18 07:39:18,426 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node cd8ad1d6-3d63-4821-8ad1-d63d63682151: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:18,426 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node cd8ad1d6-3d63-4821-8ad1-d63d63682151: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:18,426 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node cd8ad1d6-3d63-4821-8ad1-d63d63682151: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:18,426 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node cd8ad1d6-3d63-4821-8ad1-d63d63682151: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:18,427 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node cd8ad1d6-3d63-4821-8ad1-d63d63682151: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:18,427 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node cd8ad1d6-3d63-4821-8ad1-d63d63682151: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:18,427 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node cd8ad1d6-3d63-4821-8ad1-d63d63682151: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:18,427 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node cd8ad1d6-3d63-4821-8ad1-d63d63682151: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:18,427 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node cd8ad1d6-3d63-4821-8ad1-d63d63682151: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:18,427 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node cd8ad1d6-3d63-4821-8ad1-d63d63682151: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:18,504 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 600b8f0f-e3db-4134-8b8f-0fe3dbc13441
+2025-07-18 07:39:18,512 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 051781c2-54fe-49ea-9781-c254feb9ea57
+2025-07-18 07:39:18,529 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: fb587454-b0e7-46f7-9874-54b0e7a6f7d5
+2025-07-18 07:39:18,547 DEBUG org.saidone.test.BaseTest - Node 6598676c-4075-4030-9867-6c40758030b0 created with name: armadillo_1.pdf
+2025-07-18 07:39:18,547 INFO  org.saidone.service.VaultService - Archiving node: 6598676c-4075-4030-9867-6c40758030b0
+2025-07-18 07:39:18,614 DEBUG org.saidone.test.BaseTest - Node d914008f-97ce-4739-9400-8f97ce97398a created with name: macaw_3.pdf
+2025-07-18 07:39:18,615 INFO  org.saidone.service.VaultService - Archiving node: d914008f-97ce-4739-9400-8f97ce97398a
+2025-07-18 07:39:18,619 DEBUG org.saidone.test.BaseTest - Node 870295ff-3542-4ac2-8295-ff35422ac24e created with name: cricket_2.pdf
+2025-07-18 07:39:18,620 INFO  org.saidone.service.VaultService - Archiving node: 870295ff-3542-4ac2-8295-ff35422ac24e
+2025-07-18 07:39:18,652 DEBUG org.saidone.test.BaseTest - Node f7f310bf-bc39-4942-b310-bfbc39d94279 created with name: giraffe_1.pdf
+2025-07-18 07:39:18,652 INFO  org.saidone.service.VaultService - Archiving node: f7f310bf-bc39-4942-b310-bfbc39d94279
+2025-07-18 07:39:18,669 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: cd8ad1d6-3d63-4821-8ad1-d63d63682151
+2025-07-18 07:39:18,690 DEBUG org.saidone.service.VaultService - Digest check passed for node: ae768ca9-f915-4b4a-b68c-a9f915eb4ad4
+2025-07-18 07:39:18,760 DEBUG org.saidone.service.VaultService - Digest check passed for node: 020ba656-147d-42de-8ba6-56147d32de9b
+2025-07-18 07:39:18,776 DEBUG org.saidone.test.BaseTest - Node 04dc4c1e-a505-4d7f-9c4c-1ea5050d7fdb created with name: serval_1.pdf
+2025-07-18 07:39:18,777 INFO  org.saidone.service.VaultService - Archiving node: 04dc4c1e-a505-4d7f-9c4c-1ea5050d7fdb
+2025-07-18 07:39:18,826 DEBUG org.saidone.service.VaultService - Digest check passed for node: 051781c2-54fe-49ea-9781-c254feb9ea57
+2025-07-18 07:39:18,875 DEBUG org.saidone.service.VaultService - Digest check passed for node: c68344ff-d822-4734-8344-ffd822073413
+2025-07-18 07:39:18,942 DEBUG org.saidone.service.VaultService - Digest check passed for node: fb587454-b0e7-46f7-9874-54b0e7a6f7d5
+2025-07-18 07:39:19,022 DEBUG org.saidone.service.VaultService - Digest check passed for node: 600b8f0f-e3db-4134-8b8f-0fe3dbc13441
+2025-07-18 07:39:19,132 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e81df7cd-2045-4327-9df7-cd2045632795: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:19,132 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e81df7cd-2045-4327-9df7-cd2045632795: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:19,132 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e81df7cd-2045-4327-9df7-cd2045632795: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:19,132 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e81df7cd-2045-4327-9df7-cd2045632795: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:19,132 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e81df7cd-2045-4327-9df7-cd2045632795: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:19,133 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e81df7cd-2045-4327-9df7-cd2045632795: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:19,133 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e81df7cd-2045-4327-9df7-cd2045632795: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:19,133 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e81df7cd-2045-4327-9df7-cd2045632795: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:19,133 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e81df7cd-2045-4327-9df7-cd2045632795: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:19,133 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e81df7cd-2045-4327-9df7-cd2045632795: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:19,144 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: e776d0f2-5e27-4cdb-b6d0-f25e27bcdbbd
+2025-07-18 07:39:19,226 DEBUG org.saidone.service.VaultService - Digest check passed for node: cd8ad1d6-3d63-4821-8ad1-d63d63682151
+2025-07-18 07:39:19,236 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6598676c-4075-4030-9867-6c40758030b0: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:19,236 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6598676c-4075-4030-9867-6c40758030b0: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:19,236 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6598676c-4075-4030-9867-6c40758030b0: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:19,236 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6598676c-4075-4030-9867-6c40758030b0: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:19,237 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6598676c-4075-4030-9867-6c40758030b0: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:19,237 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6598676c-4075-4030-9867-6c40758030b0: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:19,237 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6598676c-4075-4030-9867-6c40758030b0: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:19,237 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6598676c-4075-4030-9867-6c40758030b0: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:19,237 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6598676c-4075-4030-9867-6c40758030b0: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:19,237 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6598676c-4075-4030-9867-6c40758030b0: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:19,284 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d914008f-97ce-4739-9400-8f97ce97398a: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:19,284 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d914008f-97ce-4739-9400-8f97ce97398a: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:19,284 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d914008f-97ce-4739-9400-8f97ce97398a: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:19,284 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d914008f-97ce-4739-9400-8f97ce97398a: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:19,284 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d914008f-97ce-4739-9400-8f97ce97398a: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:19,284 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d914008f-97ce-4739-9400-8f97ce97398a: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:19,284 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d914008f-97ce-4739-9400-8f97ce97398a: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:19,284 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d914008f-97ce-4739-9400-8f97ce97398a: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:19,284 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d914008f-97ce-4739-9400-8f97ce97398a: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:19,285 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d914008f-97ce-4739-9400-8f97ce97398a: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:19,288 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f7f310bf-bc39-4942-b310-bfbc39d94279: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:19,288 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f7f310bf-bc39-4942-b310-bfbc39d94279: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:19,288 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f7f310bf-bc39-4942-b310-bfbc39d94279: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:19,288 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f7f310bf-bc39-4942-b310-bfbc39d94279: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:19,288 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f7f310bf-bc39-4942-b310-bfbc39d94279: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:19,289 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f7f310bf-bc39-4942-b310-bfbc39d94279: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:19,289 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f7f310bf-bc39-4942-b310-bfbc39d94279: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:19,289 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f7f310bf-bc39-4942-b310-bfbc39d94279: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:19,289 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f7f310bf-bc39-4942-b310-bfbc39d94279: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:19,289 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f7f310bf-bc39-4942-b310-bfbc39d94279: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:19,341 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: e81df7cd-2045-4327-9df7-cd2045632795
+2025-07-18 07:39:19,349 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 870295ff-3542-4ac2-8295-ff35422ac24e: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:19,350 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 870295ff-3542-4ac2-8295-ff35422ac24e: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:19,350 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 870295ff-3542-4ac2-8295-ff35422ac24e: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:19,350 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 870295ff-3542-4ac2-8295-ff35422ac24e: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:19,350 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 870295ff-3542-4ac2-8295-ff35422ac24e: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:19,350 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 870295ff-3542-4ac2-8295-ff35422ac24e: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:19,350 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 870295ff-3542-4ac2-8295-ff35422ac24e: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:19,350 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 870295ff-3542-4ac2-8295-ff35422ac24e: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:19,350 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 870295ff-3542-4ac2-8295-ff35422ac24e: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:19,350 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 870295ff-3542-4ac2-8295-ff35422ac24e: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:19,369 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 04dc4c1e-a505-4d7f-9c4c-1ea5050d7fdb: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:19,369 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 04dc4c1e-a505-4d7f-9c4c-1ea5050d7fdb: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:19,369 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 04dc4c1e-a505-4d7f-9c4c-1ea5050d7fdb: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:19,370 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 04dc4c1e-a505-4d7f-9c4c-1ea5050d7fdb: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:19,370 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 04dc4c1e-a505-4d7f-9c4c-1ea5050d7fdb: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:19,370 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 04dc4c1e-a505-4d7f-9c4c-1ea5050d7fdb: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:19,370 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 04dc4c1e-a505-4d7f-9c4c-1ea5050d7fdb: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:19,370 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 04dc4c1e-a505-4d7f-9c4c-1ea5050d7fdb: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:19,370 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 04dc4c1e-a505-4d7f-9c4c-1ea5050d7fdb: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:19,371 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 04dc4c1e-a505-4d7f-9c4c-1ea5050d7fdb: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:19,396 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: f7f310bf-bc39-4942-b310-bfbc39d94279
+2025-07-18 07:39:19,403 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 6598676c-4075-4030-9867-6c40758030b0
+2025-07-18 07:39:19,412 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: d914008f-97ce-4739-9400-8f97ce97398a
+2025-07-18 07:39:19,459 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 870295ff-3542-4ac2-8295-ff35422ac24e
+2025-07-18 07:39:19,477 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 04dc4c1e-a505-4d7f-9c4c-1ea5050d7fdb
+2025-07-18 07:39:19,500 DEBUG org.saidone.service.VaultService - Digest check passed for node: e776d0f2-5e27-4cdb-b6d0-f25e27bcdbbd
+2025-07-18 07:39:19,578 DEBUG org.saidone.service.VaultService - Digest check passed for node: e81df7cd-2045-4327-9df7-cd2045632795
+2025-07-18 07:39:19,590 DEBUG org.saidone.service.VaultService - Digest check passed for node: 6598676c-4075-4030-9867-6c40758030b0
+2025-07-18 07:39:19,594 DEBUG org.saidone.service.VaultService - Digest check passed for node: f7f310bf-bc39-4942-b310-bfbc39d94279
+2025-07-18 07:39:19,617 DEBUG org.saidone.service.VaultService - Digest check passed for node: d914008f-97ce-4739-9400-8f97ce97398a
+2025-07-18 07:39:19,657 DEBUG org.saidone.service.VaultService - Digest check passed for node: 870295ff-3542-4ac2-8295-ff35422ac24e
+2025-07-18 07:39:19,692 DEBUG org.saidone.service.VaultService - Digest check passed for node: 04dc4c1e-a505-4d7f-9c4c-1ea5050d7fdb
+2025-07-18 07:39:19,882 INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.saidone.test.AlfrescoServiceTests]: AlfrescoServiceTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-07-18 07:39:19,884 INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.saidone.AlfrescoNodeVaultApplication for test class org.saidone.test.AlfrescoServiceTests
+2025-07-18 07:39:20,116 INFO  o.saidone.test.AlfrescoServiceTests - Starting AlfrescoServiceTests using Java 21.0.7 with PID 27657 (started by saidone in /home/saidone/workspace-alfresco/alfresco-node-vault)
+2025-07-18 07:39:20,117 DEBUG o.saidone.test.AlfrescoServiceTests - Running with Spring Boot v3.5.3, Spring v6.2.8
+2025-07-18 07:39:20,117 INFO  o.saidone.test.AlfrescoServiceTests - The following 1 profile is active: "test"
+2025-07-18 07:39:20,118 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/AlfrescoNodeVault/test] not resolvable: Not found
+2025-07-18 07:39:20,119 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/application/test] not resolvable: Not found
+2025-07-18 07:39:20,119 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/application] not resolvable: Not found
+2025-07-18 07:39:20,580 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+2025-07-18 07:39:20,586 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 4 ms. Found 0 MongoDB repository interfaces.
+2025-07-18 07:39:20,612 INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2025-07-18 07:39:20,613 INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2025-07-18 07:39:20,620 INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=1095e749-2dd1-3d6a-bc92-d978491b198e
+2025-07-18 07:39:20,730 INFO  org.mongodb.driver.client - MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync", "version": "5.5.1"}, "os": {"type": "Linux", "name": "Linux", "architecture": "amd64", "version": "6.8.0-64-generic"}, "platform": "Java/Ubuntu/21.0.7+6-Ubuntu-0ubuntu124.04"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=majority, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=MongoCredential{mechanism=null, userName='root', source='admin', password=<hidden>, mechanismProperties=<hidden>}, transportSettings=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.client.model.mql.ExpressionCodecProvider@57d5c04, com.mongodb.Jep395RecordCodecProvider@23b046a8, com.mongodb.KotlinCodecProvider@73dd61ca]}, ProvidersCodecRegistry{codecProviders=[org.bson.codecs.pojo.PojoCodecProvider@64a57b90]}]}, loggerSettings=LoggerSettings{maxDocumentLength=1000}, clusterSettings={hosts=[localhost:27017], srvServiceName=mongodb, mode=SINGLE, requiredClusterType=UNKNOWN, requiredReplicaSetName='null', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='15 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverMonitoringMode=AUTO, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=false, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=UNSPECIFIED, serverApi=ServerApi{version=V1, deprecationErrors=null, strict=null}, autoEncryptionSettings=null, dnsClient=null, inetAddressResolver=null, contextProvider=null, timeoutMS=null}
+2025-07-18 07:39:20,732 INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=localhost:27017, type=STANDALONE, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=1534328, minRoundTripTimeNanos=0}
+2025-07-18 07:39:20,750 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditService
+2025-07-18 07:39:20,750 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditWebFilter
+2025-07-18 07:39:20,751 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditCollectionCreator
+2025-07-18 07:39:20,760 INFO  o.s.component.AuditCollectionCreator - Collection 'vault_audit' already exists.
+2025-07-18 07:39:20,785 DEBUG org.saidone.config.EthereumConfig - Ethereum account loaded: 0x9c5b620ca0d9493f870388016fd86c16d2503302
+2025-07-18 07:39:20,962 INFO  org.saidone.component.BaseComponent - >>>>> Starting SecretService
+2025-07-18 07:39:20,967 INFO  org.saidone.component.BaseComponent - >>>>> Starting BcCryptoServiceImpl
+2025-07-18 07:39:20,968 INFO  org.saidone.component.BaseComponent - >>>>> Starting EncryptedMongoNodeRepositoryImpl
+2025-07-18 07:39:20,976 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [IsOnVaultPredicate]
+2025-07-18 07:39:20,976 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [After]
+2025-07-18 07:39:20,976 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Before]
+2025-07-18 07:39:20,977 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Between]
+2025-07-18 07:39:20,977 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Cookie]
+2025-07-18 07:39:20,977 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Header]
+2025-07-18 07:39:20,977 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Host]
+2025-07-18 07:39:20,977 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Method]
+2025-07-18 07:39:20,977 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Path]
+2025-07-18 07:39:20,977 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Query]
+2025-07-18 07:39:20,977 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [ReadBody]
+2025-07-18 07:39:20,977 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [RemoteAddr]
+2025-07-18 07:39:20,977 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2025-07-18 07:39:20,977 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Weight]
+2025-07-18 07:39:20,977 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2025-07-18 07:39:21,046 INFO  org.saidone.component.BaseComponent - >>>>> Starting AlfrescoService
+2025-07-18 07:39:21,048 INFO  org.saidone.component.BaseComponent - >>>>> Starting MongoNodeService
+2025-07-18 07:39:21,055 INFO  org.saidone.component.BaseComponent - >>>>> Starting EncryptedS3RepositoryImpl
+2025-07-18 07:39:21,057 INFO  org.saidone.component.BaseComponent - >>>>> Starting S3ContentService
+2025-07-18 07:39:21,058 INFO  org.saidone.component.BaseComponent - >>>>> Starting EthereumService
+2025-07-18 07:39:21,346 INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 5 endpoints beneath base path '/actuator'
+2025-07-18 07:39:21,511 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-07-18 07:39:21,511 INFO  o.s.i.c.PublishSubscribeChannel - Channel 'AlfrescoNodeVault.errorChannel' has 1 subscriber(s).
+2025-07-18 07:39:21,511 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2025-07-18 07:39:21,511 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {recipient-list-router} as a subscriber to the 'acsEventsListeningFlow.channel#1' channel
+2025-07-18 07:39:21,511 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#1' has 1 subscriber(s).
+2025-07-18 07:39:21,511 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:21,511 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsHandlersFlow.channel#1' has 1 subscriber(s).
+2025-07-18 07:39:21,511 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-07-18 07:39:21,511 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {transformer} as a subscriber to the 'acsEventsListeningFlow.channel#0' channel
+2025-07-18 07:39:21,511 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#0' has 1 subscriber(s).
+2025-07-18 07:39:21,512 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:21,512 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'alfresco.events.si.channel' channel
+2025-07-18 07:39:21,512 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.si.channel' has 1 subscriber(s).
+2025-07-18 07:39:21,512 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-07-18 07:39:21,512 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'acsEventsSpringIntegrationFlow.channel#1' channel
+2025-07-18 07:39:21,512 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsSpringIntegrationFlow.channel#1' has 1 subscriber(s).
+2025-07-18 07:39:21,512 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-07-18 07:39:21,512 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'alfresco.events.handlers.channel' channel
+2025-07-18 07:39:21,512 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.handlers.channel' has 1 subscriber(s).
+2025-07-18 07:39:21,512 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-07-18 07:39:21,512 INFO  o.s.i.j.ChannelPublishingJmsMessageListener$GatewayDelegate - started org.springframework.integration.jms.ChannelPublishingJmsMessageListener$GatewayDelegate@41264eec
+2025-07-18 07:39:21,514 INFO  o.s.i.jms.JmsMessageDrivenEndpoint - started bean 'acsEventsListeningFlow.jms:message-driven-channel-adapter#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:21,522 INFO  o.saidone.test.AlfrescoServiceTests - Started AlfrescoServiceTests in 1.635 seconds (process running for 32.865)
+2025-07-18 07:39:22,108 INFO  org.saidone.test.BaseTest - Running --> getNodeTest()
+2025-07-18 07:39:22,108 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:22,303 DEBUG org.saidone.test.BaseTest - Node c5374118-de7a-411b-b741-18de7ac11b9b created with name: woodchuck_1.pdf
+2025-07-18 07:39:22,385 INFO  org.saidone.test.BaseTest - Running --> getNodeContentTest()
+2025-07-18 07:39:22,386 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:22,550 DEBUG org.saidone.test.BaseTest - Node 2fcb5f23-4151-4010-8b5f-2341511010e7 created with name: wombat_1.pdf
+2025-07-18 07:39:22,628 INFO  org.saidone.test.BaseTest - Running --> deleteNodeTest()
+2025-07-18 07:39:22,629 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:22,796 DEBUG org.saidone.test.BaseTest - Node 253a6732-6644-4760-ba67-326644676034 created with name: ferret_1.pdf
+2025-07-18 07:39:22,953 INFO  org.saidone.test.BaseTest - Running --> aspectsTest()
+2025-07-18 07:39:22,953 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:23,113 DEBUG org.saidone.test.BaseTest - Node bcde67c2-1009-489b-9e67-c21009c89b84 created with name: bee_1.pdf
+2025-07-18 07:39:23,183 DEBUG org.saidone.service.AlfrescoService - Adding aspects: [cm:effectivity]
+2025-07-18 07:39:23,403 DEBUG org.saidone.service.AlfrescoService - Removing aspects: [cm:effectivity]
+2025-07-18 07:39:23,560 INFO  org.saidone.test.BaseTest - Running --> searchAndProcessTest()
+2025-07-18 07:39:23,561 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:23,722 DEBUG org.saidone.test.BaseTest - Node 02896481-20ec-4349-8964-8120ec4349eb created with name: rat_1.pdf
+2025-07-18 07:39:23,723 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-07-18 07:39:24,343 INFO  org.saidone.service.AlfrescoService - Documents processed: 1
+2025-07-18 07:39:24,348 INFO  org.saidone.test.BaseTest - Running --> createPathIfNotExistsTest()
+2025-07-18 07:39:24,349 DEBUG org.saidone.service.AlfrescoService - Trying to create folder: foo
+2025-07-18 07:39:24,431 DEBUG org.saidone.service.AlfrescoService - Created folder: foo
+2025-07-18 07:39:24,431 DEBUG org.saidone.service.AlfrescoService - Trying to create folder: bar
+2025-07-18 07:39:24,507 DEBUG org.saidone.service.AlfrescoService - Created folder: bar
+2025-07-18 07:39:24,507 DEBUG org.saidone.service.AlfrescoService - Trying to create folder: baz
+2025-07-18 07:39:24,583 DEBUG org.saidone.service.AlfrescoService - Created folder: baz
+2025-07-18 07:39:24,726 DEBUG org.saidone.service.AlfrescoService - Trying to create folder: foo
+2025-07-18 07:39:24,878 INFO  org.saidone.service.AlfrescoService - Duplicate child name not allowed: foo, getting children
+2025-07-18 07:39:24,979 INFO  org.saidone.service.AlfrescoService - Found matching child: foo
+2025-07-18 07:39:24,979 DEBUG org.saidone.service.AlfrescoService - Trying to create folder: bar
+2025-07-18 07:39:25,108 INFO  org.saidone.service.AlfrescoService - Duplicate child name not allowed: bar, getting children
+2025-07-18 07:39:25,191 INFO  org.saidone.service.AlfrescoService - Found matching child: bar
+2025-07-18 07:39:25,191 DEBUG org.saidone.service.AlfrescoService - Trying to create folder: baz
+2025-07-18 07:39:25,325 INFO  org.saidone.service.AlfrescoService - Duplicate child name not allowed: baz, getting children
+2025-07-18 07:39:25,407 INFO  org.saidone.service.AlfrescoService - Found matching child: baz
+2025-07-18 07:39:25,549 INFO  org.saidone.test.BaseTest - Running --> nodeWrapperTest()
+2025-07-18 07:39:25,549 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:25,704 DEBUG org.saidone.test.BaseTest - Node de8bf807-e372-4815-8bf8-07e372381548 created with name: goldfish_1.pdf
+2025-07-18 07:39:25,706 ERROR org.saidone.model.NodeWrapper - Error while deserializing node: Unrecognized token 'd6d39d00': was expecting (JSON String, Number, Array, Object or token 'null', 'true' or 'false')
+ at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1, column: 9]
+2025-07-18 07:39:25,706 ERROR org.saidone.model.NodeWrapper - Error while deserializing node: No content to map due to end-of-input
+ at [Source: REDACTED (`StreamReadFeature.INCLUDE_SOURCE_IN_LOCATION` disabled); line: 1]
+2025-07-18 07:39:25,706 ERROR org.saidone.model.NodeWrapper - Error while deserializing node: argument "content" is null
+2025-07-18 07:39:25,713 INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.saidone.test.VaultApiControllerTests]: VaultApiControllerTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-07-18 07:39:25,714 INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.saidone.AlfrescoNodeVaultApplication for test class org.saidone.test.VaultApiControllerTests
+2025-07-18 07:39:25,832 INFO  o.s.test.VaultApiControllerTests - Starting VaultApiControllerTests using Java 21.0.7 with PID 27657 (started by saidone in /home/saidone/workspace-alfresco/alfresco-node-vault)
+2025-07-18 07:39:25,832 DEBUG o.s.test.VaultApiControllerTests - Running with Spring Boot v3.5.3, Spring v6.2.8
+2025-07-18 07:39:25,832 INFO  o.s.test.VaultApiControllerTests - The following 1 profile is active: "test"
+2025-07-18 07:39:25,833 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/AlfrescoNodeVault/test] not resolvable: Not found
+2025-07-18 07:39:25,833 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/application/test] not resolvable: Not found
+2025-07-18 07:39:25,833 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/application] not resolvable: Not found
+2025-07-18 07:39:26,022 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+2025-07-18 07:39:26,026 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 3 ms. Found 0 MongoDB repository interfaces.
+2025-07-18 07:39:26,047 INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2025-07-18 07:39:26,048 INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2025-07-18 07:39:26,053 INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=6797143e-4912-3dd9-a13e-fed0abe628c3
+2025-07-18 07:39:26,115 INFO  org.mongodb.driver.client - MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync", "version": "5.5.1"}, "os": {"type": "Linux", "name": "Linux", "architecture": "amd64", "version": "6.8.0-64-generic"}, "platform": "Java/Ubuntu/21.0.7+6-Ubuntu-0ubuntu124.04"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=majority, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=MongoCredential{mechanism=null, userName='root', source='admin', password=<hidden>, mechanismProperties=<hidden>}, transportSettings=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.client.model.mql.ExpressionCodecProvider@57d5c04, com.mongodb.Jep395RecordCodecProvider@23b046a8, com.mongodb.KotlinCodecProvider@73dd61ca]}, ProvidersCodecRegistry{codecProviders=[org.bson.codecs.pojo.PojoCodecProvider@3f050f7]}]}, loggerSettings=LoggerSettings{maxDocumentLength=1000}, clusterSettings={hosts=[localhost:27017], srvServiceName=mongodb, mode=SINGLE, requiredClusterType=UNKNOWN, requiredReplicaSetName='null', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='15 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverMonitoringMode=AUTO, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=false, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=UNSPECIFIED, serverApi=ServerApi{version=V1, deprecationErrors=null, strict=null}, autoEncryptionSettings=null, dnsClient=null, inetAddressResolver=null, contextProvider=null, timeoutMS=null}
+2025-07-18 07:39:26,116 INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=localhost:27017, type=STANDALONE, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=1227187, minRoundTripTimeNanos=0}
+2025-07-18 07:39:26,128 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditService
+2025-07-18 07:39:26,129 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditWebFilter
+2025-07-18 07:39:26,129 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditCollectionCreator
+2025-07-18 07:39:26,150 INFO  o.s.component.AuditCollectionCreator - Collection 'vault_audit' already exists.
+2025-07-18 07:39:26,164 DEBUG org.saidone.config.EthereumConfig - Ethereum account loaded: 0x9c5b620ca0d9493f870388016fd86c16d2503302
+2025-07-18 07:39:26,265 INFO  org.saidone.component.BaseComponent - >>>>> Starting SecretService
+2025-07-18 07:39:26,268 INFO  org.saidone.component.BaseComponent - >>>>> Starting BcCryptoServiceImpl
+2025-07-18 07:39:26,268 INFO  org.saidone.component.BaseComponent - >>>>> Starting EncryptedMongoNodeRepositoryImpl
+2025-07-18 07:39:26,273 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [IsOnVaultPredicate]
+2025-07-18 07:39:26,273 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [After]
+2025-07-18 07:39:26,273 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Before]
+2025-07-18 07:39:26,273 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Between]
+2025-07-18 07:39:26,273 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Cookie]
+2025-07-18 07:39:26,273 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Header]
+2025-07-18 07:39:26,273 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Host]
+2025-07-18 07:39:26,273 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Method]
+2025-07-18 07:39:26,273 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Path]
+2025-07-18 07:39:26,273 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Query]
+2025-07-18 07:39:26,273 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [ReadBody]
+2025-07-18 07:39:26,273 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [RemoteAddr]
+2025-07-18 07:39:26,273 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2025-07-18 07:39:26,273 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Weight]
+2025-07-18 07:39:26,273 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2025-07-18 07:39:26,318 INFO  org.saidone.component.BaseComponent - >>>>> Starting AlfrescoService
+2025-07-18 07:39:26,319 INFO  org.saidone.component.BaseComponent - >>>>> Starting MongoNodeService
+2025-07-18 07:39:26,324 INFO  org.saidone.component.BaseComponent - >>>>> Starting EncryptedS3RepositoryImpl
+2025-07-18 07:39:26,325 INFO  org.saidone.component.BaseComponent - >>>>> Starting S3ContentService
+2025-07-18 07:39:26,326 INFO  org.saidone.component.BaseComponent - >>>>> Starting VaultService
+2025-07-18 07:39:26,327 INFO  org.saidone.component.BaseComponent - >>>>> Starting EthereumService
+2025-07-18 07:39:26,592 INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 5 endpoints beneath base path '/actuator'
+2025-07-18 07:39:26,726 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-07-18 07:39:26,726 INFO  o.s.i.c.PublishSubscribeChannel - Channel 'AlfrescoNodeVault.errorChannel' has 1 subscriber(s).
+2025-07-18 07:39:26,726 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2025-07-18 07:39:26,726 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {recipient-list-router} as a subscriber to the 'acsEventsListeningFlow.channel#1' channel
+2025-07-18 07:39:26,726 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#1' has 1 subscriber(s).
+2025-07-18 07:39:26,726 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:26,726 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsHandlersFlow.channel#1' has 1 subscriber(s).
+2025-07-18 07:39:26,726 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-07-18 07:39:26,726 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {transformer} as a subscriber to the 'acsEventsListeningFlow.channel#0' channel
+2025-07-18 07:39:26,726 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#0' has 1 subscriber(s).
+2025-07-18 07:39:26,726 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:26,726 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'alfresco.events.si.channel' channel
+2025-07-18 07:39:26,726 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.si.channel' has 1 subscriber(s).
+2025-07-18 07:39:26,726 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-07-18 07:39:26,726 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'acsEventsSpringIntegrationFlow.channel#1' channel
+2025-07-18 07:39:26,726 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsSpringIntegrationFlow.channel#1' has 1 subscriber(s).
+2025-07-18 07:39:26,726 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-07-18 07:39:26,726 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'alfresco.events.handlers.channel' channel
+2025-07-18 07:39:26,726 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.handlers.channel' has 1 subscriber(s).
+2025-07-18 07:39:26,726 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-07-18 07:39:26,726 INFO  o.s.i.j.ChannelPublishingJmsMessageListener$GatewayDelegate - started org.springframework.integration.jms.ChannelPublishingJmsMessageListener$GatewayDelegate@1853c0b2
+2025-07-18 07:39:26,729 INFO  o.s.i.jms.JmsMessageDrivenEndpoint - started bean 'acsEventsListeningFlow.jms:message-driven-channel-adapter#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:26,738 INFO  o.s.b.w.e.netty.NettyWebServer - Netty started on port 41931 (http)
+2025-07-18 07:39:26,816 INFO  o.s.test.VaultApiControllerTests - Started VaultApiControllerTests in 1.1 seconds (process running for 38.159)
+2025-07-18 07:39:27,296 INFO  org.saidone.test.BaseTest - Running --> getNodeTest()
+2025-07-18 07:39:27,297 INFO  o.s.test.VaultApiControllerTests - Running --> getNodeTest()
+2025-07-18 07:39:27,297 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:27,477 DEBUG org.saidone.test.BaseTest - Node 6e4690db-9ba3-436a-8690-db9ba3a36a05 created with name: mink_1.pdf
+2025-07-18 07:39:27,848 ERROR o.s.controller.VaultApiController - Node 6e4690db-9ba3-436a-8690-db9ba3a36a05 not found on the vault
+2025-07-18 07:39:27,877 INFO  org.saidone.service.VaultService - Archiving node: 6e4690db-9ba3-436a-8690-db9ba3a36a05
+2025-07-18 07:39:28,064 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6e4690db-9ba3-436a-8690-db9ba3a36a05: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:28,064 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6e4690db-9ba3-436a-8690-db9ba3a36a05: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:28,064 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6e4690db-9ba3-436a-8690-db9ba3a36a05: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:28,064 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6e4690db-9ba3-436a-8690-db9ba3a36a05: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:28,064 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6e4690db-9ba3-436a-8690-db9ba3a36a05: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:28,064 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6e4690db-9ba3-436a-8690-db9ba3a36a05: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:28,064 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6e4690db-9ba3-436a-8690-db9ba3a36a05: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:28,064 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6e4690db-9ba3-436a-8690-db9ba3a36a05: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:28,064 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6e4690db-9ba3-436a-8690-db9ba3a36a05: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:28,064 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 6e4690db-9ba3-436a-8690-db9ba3a36a05: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:28,103 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 6e4690db-9ba3-436a-8690-db9ba3a36a05
+2025-07-18 07:39:28,209 DEBUG org.saidone.service.VaultService - Digest check passed for node: 6e4690db-9ba3-436a-8690-db9ba3a36a05
+2025-07-18 07:39:28,549 INFO  org.saidone.test.BaseTest - Running --> getNodeContentTest()
+2025-07-18 07:39:28,549 INFO  o.s.test.VaultApiControllerTests - Running --> getNodeContentTest()
+2025-07-18 07:39:28,549 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:28,705 DEBUG org.saidone.test.BaseTest - Node e8c5416a-78ec-4129-8541-6a78ecf129f2 created with name: elk_2.pdf
+2025-07-18 07:39:28,906 DEBUG o.s.controller.VaultApiController - Streaming node content for node: e8c5416a-78ec-4129-8541-6a78ecf129f2
+2025-07-18 07:39:28,919 ERROR o.s.controller.VaultApiController - Node e8c5416a-78ec-4129-8541-6a78ecf129f2 not found on the vault
+2025-07-18 07:39:28,922 INFO  org.saidone.service.VaultService - Archiving node: e8c5416a-78ec-4129-8541-6a78ecf129f2
+2025-07-18 07:39:29,084 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e8c5416a-78ec-4129-8541-6a78ecf129f2: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:29,084 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e8c5416a-78ec-4129-8541-6a78ecf129f2: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:29,084 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e8c5416a-78ec-4129-8541-6a78ecf129f2: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:29,084 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e8c5416a-78ec-4129-8541-6a78ecf129f2: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:29,084 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e8c5416a-78ec-4129-8541-6a78ecf129f2: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:29,084 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e8c5416a-78ec-4129-8541-6a78ecf129f2: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:29,084 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e8c5416a-78ec-4129-8541-6a78ecf129f2: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:29,085 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e8c5416a-78ec-4129-8541-6a78ecf129f2: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:29,085 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e8c5416a-78ec-4129-8541-6a78ecf129f2: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:29,085 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node e8c5416a-78ec-4129-8541-6a78ecf129f2: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:29,118 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: e8c5416a-78ec-4129-8541-6a78ecf129f2
+2025-07-18 07:39:29,223 DEBUG org.saidone.service.VaultService - Digest check passed for node: e8c5416a-78ec-4129-8541-6a78ecf129f2
+2025-07-18 07:39:29,509 DEBUG o.s.controller.VaultApiController - Streaming node content for node: e8c5416a-78ec-4129-8541-6a78ecf129f2
+2025-07-18 07:39:29,573 INFO  org.saidone.test.BaseTest - Running --> restoreNodeTest()
+2025-07-18 07:39:29,573 INFO  o.s.test.VaultApiControllerTests - Running --> restoreNodeTest()
+2025-07-18 07:39:29,573 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:29,726 DEBUG org.saidone.test.BaseTest - Node 4df634a7-af70-4f2b-b634-a7af701f2bac created with name: goose_2.pdf
+2025-07-18 07:39:29,929 ERROR o.s.controller.VaultApiController - Node 4df634a7-af70-4f2b-b634-a7af701f2bac not found on the vault
+2025-07-18 07:39:29,932 INFO  org.saidone.service.VaultService - Archiving node: 4df634a7-af70-4f2b-b634-a7af701f2bac
+2025-07-18 07:39:30,116 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4df634a7-af70-4f2b-b634-a7af701f2bac: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:30,116 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4df634a7-af70-4f2b-b634-a7af701f2bac: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:30,116 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4df634a7-af70-4f2b-b634-a7af701f2bac: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:30,116 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4df634a7-af70-4f2b-b634-a7af701f2bac: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:30,116 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4df634a7-af70-4f2b-b634-a7af701f2bac: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:30,116 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4df634a7-af70-4f2b-b634-a7af701f2bac: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:30,116 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4df634a7-af70-4f2b-b634-a7af701f2bac: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:30,116 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4df634a7-af70-4f2b-b634-a7af701f2bac: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:30,116 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4df634a7-af70-4f2b-b634-a7af701f2bac: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:30,116 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 4df634a7-af70-4f2b-b634-a7af701f2bac: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:30,152 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 4df634a7-af70-4f2b-b634-a7af701f2bac
+2025-07-18 07:39:30,267 DEBUG org.saidone.service.VaultService - Digest check passed for node: 4df634a7-af70-4f2b-b634-a7af701f2bac
+2025-07-18 07:39:30,758 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 5cbfe7ac-aac9-468b-bfe7-acaac9868b7b: 1984 bytes written (10% out of 18858 bytes)
+2025-07-18 07:39:30,759 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 5cbfe7ac-aac9-468b-bfe7-acaac9868b7b: 4032 bytes written (21% out of 18858 bytes)
+2025-07-18 07:39:30,759 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 5cbfe7ac-aac9-468b-bfe7-acaac9868b7b: 6080 bytes written (32% out of 18858 bytes)
+2025-07-18 07:39:30,759 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 5cbfe7ac-aac9-468b-bfe7-acaac9868b7b: 7936 bytes written (42% out of 18858 bytes)
+2025-07-18 07:39:30,759 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 5cbfe7ac-aac9-468b-bfe7-acaac9868b7b: 9984 bytes written (52% out of 18858 bytes)
+2025-07-18 07:39:30,759 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 5cbfe7ac-aac9-468b-bfe7-acaac9868b7b: 12032 bytes written (63% out of 18858 bytes)
+2025-07-18 07:39:30,759 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 5cbfe7ac-aac9-468b-bfe7-acaac9868b7b: 14080 bytes written (74% out of 18858 bytes)
+2025-07-18 07:39:30,759 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 5cbfe7ac-aac9-468b-bfe7-acaac9868b7b: 16128 bytes written (85% out of 18858 bytes)
+2025-07-18 07:39:30,759 TRACE o.s.m.ProgressTrackingOutputStream - Upload progress for node 5cbfe7ac-aac9-468b-bfe7-acaac9868b7b: 18176 bytes written (96% out of 18858 bytes)
+2025-07-18 07:39:30,833 DEBUG org.saidone.service.AlfrescoService - Upload completed successfully for node: 5cbfe7ac-aac9-468b-bfe7-acaac9868b7b
+2025-07-18 07:39:30,939 INFO  org.saidone.test.BaseTest - Running --> archiveNodeTest()
+2025-07-18 07:39:30,939 INFO  o.s.test.VaultApiControllerTests - Running --> archiveNodeTest()
+2025-07-18 07:39:30,939 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-07-18 07:39:31,093 DEBUG org.saidone.test.BaseTest - Node d9a969ce-50e7-4cf5-a969-ce50e7ecf544 created with name: pug_1.pdf
+2025-07-18 07:39:31,300 INFO  org.saidone.service.VaultService - Archiving node: d9a969ce-50e7-4cf5-a969-ce50e7ecf544
+2025-07-18 07:39:31,464 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d9a969ce-50e7-4cf5-a969-ce50e7ecf544: 2048 bytes read (10% out of 18810 bytes)
+2025-07-18 07:39:31,464 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d9a969ce-50e7-4cf5-a969-ce50e7ecf544: 4096 bytes read (21% out of 18810 bytes)
+2025-07-18 07:39:31,464 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d9a969ce-50e7-4cf5-a969-ce50e7ecf544: 6144 bytes read (32% out of 18810 bytes)
+2025-07-18 07:39:31,464 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d9a969ce-50e7-4cf5-a969-ce50e7ecf544: 8192 bytes read (43% out of 18810 bytes)
+2025-07-18 07:39:31,464 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d9a969ce-50e7-4cf5-a969-ce50e7ecf544: 10240 bytes read (54% out of 18810 bytes)
+2025-07-18 07:39:31,464 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d9a969ce-50e7-4cf5-a969-ce50e7ecf544: 12288 bytes read (65% out of 18810 bytes)
+2025-07-18 07:39:31,464 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d9a969ce-50e7-4cf5-a969-ce50e7ecf544: 14336 bytes read (76% out of 18810 bytes)
+2025-07-18 07:39:31,464 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d9a969ce-50e7-4cf5-a969-ce50e7ecf544: 16384 bytes read (87% out of 18810 bytes)
+2025-07-18 07:39:31,464 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d9a969ce-50e7-4cf5-a969-ce50e7ecf544: 18432 bytes read (97% out of 18810 bytes)
+2025-07-18 07:39:31,464 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node d9a969ce-50e7-4cf5-a969-ce50e7ecf544: 18810 bytes read (100% out of 18810 bytes)
+2025-07-18 07:39:31,499 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: d9a969ce-50e7-4cf5-a969-ce50e7ecf544
+2025-07-18 07:39:31,599 DEBUG org.saidone.service.VaultService - Digest check passed for node: d9a969ce-50e7-4cf5-a969-ce50e7ecf544
+2025-07-18 07:39:31,881 INFO  org.saidone.service.VaultService - Archiving node: d9a969ce-50e7-4cf5-a969-ce50e7ecf544
+2025-07-18 07:39:31,947 ERROR o.s.controller.VaultApiController - Node d9a969ce-50e7-4cf5-a969-ce50e7ecf544 not found on Alfresco
+2025-07-18 07:39:32,024 INFO  o.s.t.c.s.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [org.saidone.test.AuditApiControllerTests]: AuditApiControllerTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2025-07-18 07:39:32,025 INFO  o.s.b.t.c.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration org.saidone.AlfrescoNodeVaultApplication for test class org.saidone.test.AuditApiControllerTests
+2025-07-18 07:39:32,030 INFO  org.saidone.test.BaseTest - Running --> getAuditEntries()
+2025-07-18 07:39:32,030 INFO  org.saidone.test.BaseTest - Running --> getAuditEntries()
+2025-07-18 07:39:32,031 INFO  o.s.test.AuditApiControllerTests - Running --> getAuditEntries()
+2025-07-18 07:39:32,697 INFO  o.s.b.w.e.netty.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-07-18 07:39:32,697 INFO  o.s.i.j.ChannelPublishingJmsMessageListener$GatewayDelegate - stopped org.springframework.integration.jms.ChannelPublishingJmsMessageListener$GatewayDelegate@27274299
+2025-07-18 07:39:32,697 INFO  o.s.i.j.ChannelPublishingJmsMessageListener$GatewayDelegate - stopped org.springframework.integration.jms.ChannelPublishingJmsMessageListener$GatewayDelegate@41264eec
+2025-07-18 07:39:32,698 INFO  o.s.i.jms.JmsMessageDrivenEndpoint - stopped bean 'acsEventsListeningFlow.jms:message-driven-channel-adapter#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:32,698 INFO  o.s.i.jms.JmsMessageDrivenEndpoint - stopped bean 'acsEventsListeningFlow.jms:message-driven-channel-adapter#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:32,701 INFO  o.s.b.w.e.netty.GracefulShutdown - Graceful shutdown complete
+2025-07-18 07:39:32,702 INFO  o.s.i.j.ChannelPublishingJmsMessageListener$GatewayDelegate - stopped org.springframework.integration.jms.ChannelPublishingJmsMessageListener$GatewayDelegate@1853c0b2
+2025-07-18 07:39:32,702 INFO  o.s.i.jms.JmsMessageDrivenEndpoint - stopped bean 'acsEventsListeningFlow.jms:message-driven-channel-adapter#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:32,719 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {transformer} as a subscriber to the 'acsEventsListeningFlow.channel#0' channel
+2025-07-18 07:39:32,719 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {transformer} as a subscriber to the 'acsEventsListeningFlow.channel#0' channel
+2025-07-18 07:39:32,719 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#0' has 0 subscriber(s).
+2025-07-18 07:39:32,719 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#0' has 0 subscriber(s).
+2025-07-18 07:39:32,719 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:32,719 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:32,719 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {recipient-list-router} as a subscriber to the 'acsEventsListeningFlow.channel#1' channel
+2025-07-18 07:39:32,719 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {recipient-list-router} as a subscriber to the 'acsEventsListeningFlow.channel#1' channel
+2025-07-18 07:39:32,719 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#1' has 0 subscriber(s).
+2025-07-18 07:39:32,720 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#1' has 0 subscriber(s).
+2025-07-18 07:39:32,720 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:32,720 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:32,720 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'alfresco.events.si.channel' channel
+2025-07-18 07:39:32,720 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'alfresco.events.si.channel' channel
+2025-07-18 07:39:32,720 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.si.channel' has 0 subscriber(s).
+2025-07-18 07:39:32,720 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.si.channel' has 0 subscriber(s).
+2025-07-18 07:39:32,720 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-07-18 07:39:32,720 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-07-18 07:39:32,720 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'acsEventsSpringIntegrationFlow.channel#1' channel
+2025-07-18 07:39:32,720 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsSpringIntegrationFlow.channel#1' has 0 subscriber(s).
+2025-07-18 07:39:32,720 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'acsEventsSpringIntegrationFlow.channel#1' channel
+2025-07-18 07:39:32,720 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-07-18 07:39:32,720 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsSpringIntegrationFlow.channel#1' has 0 subscriber(s).
+2025-07-18 07:39:32,720 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'alfresco.events.handlers.channel' channel
+2025-07-18 07:39:32,720 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-07-18 07:39:32,720 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.handlers.channel' has 0 subscriber(s).
+2025-07-18 07:39:32,720 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'alfresco.events.handlers.channel' channel
+2025-07-18 07:39:32,720 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-07-18 07:39:32,720 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.handlers.channel' has 0 subscriber(s).
+2025-07-18 07:39:32,720 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsHandlersFlow.channel#1' has 0 subscriber(s).
+2025-07-18 07:39:32,720 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-07-18 07:39:32,720 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-07-18 07:39:32,720 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsHandlersFlow.channel#1' has 0 subscriber(s).
+2025-07-18 07:39:32,721 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-07-18 07:39:32,721 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-07-18 07:39:32,721 INFO  o.s.i.c.PublishSubscribeChannel - Channel 'AlfrescoNodeVault.errorChannel' has 0 subscriber(s).
+2025-07-18 07:39:32,721 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2025-07-18 07:39:32,721 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-07-18 07:39:32,721 INFO  o.s.i.c.PublishSubscribeChannel - Channel 'AlfrescoNodeVault.errorChannel' has 0 subscriber(s).
+2025-07-18 07:39:32,721 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2025-07-18 07:39:32,747 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EthereumService
+2025-07-18 07:39:32,747 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EthereumService
+2025-07-18 07:39:32,747 INFO  org.saidone.component.BaseComponent - <<<<< Stopping VaultService
+2025-07-18 07:39:32,748 INFO  org.saidone.component.BaseComponent - <<<<< Stopping S3ContentService
+2025-07-18 07:39:32,749 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EncryptedS3RepositoryImpl
+2025-07-18 07:39:32,749 INFO  org.saidone.component.BaseComponent - <<<<< Stopping S3ContentService
+2025-07-18 07:39:32,749 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EncryptedS3RepositoryImpl
+2025-07-18 07:39:32,749 INFO  org.saidone.component.BaseComponent - <<<<< Stopping MongoNodeService
+2025-07-18 07:39:32,749 INFO  org.saidone.component.BaseComponent - <<<<< Stopping MongoNodeService
+2025-07-18 07:39:32,749 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AlfrescoService
+2025-07-18 07:39:32,749 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AlfrescoService
+2025-07-18 07:39:32,750 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EncryptedMongoNodeRepositoryImpl
+2025-07-18 07:39:32,750 INFO  org.saidone.component.BaseComponent - <<<<< Stopping BcCryptoServiceImpl
+2025-07-18 07:39:32,750 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EncryptedMongoNodeRepositoryImpl
+2025-07-18 07:39:32,750 INFO  org.saidone.component.BaseComponent - <<<<< Stopping SecretService
+2025-07-18 07:39:32,750 INFO  org.saidone.component.BaseComponent - <<<<< Stopping BcCryptoServiceImpl
+2025-07-18 07:39:32,750 INFO  org.saidone.component.BaseComponent - <<<<< Stopping SecretService
+2025-07-18 07:39:32,757 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditCollectionCreator
+2025-07-18 07:39:32,757 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditCollectionCreator
+2025-07-18 07:39:32,757 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditWebFilter
+2025-07-18 07:39:32,757 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditWebFilter
+2025-07-18 07:39:32,757 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditService
+2025-07-18 07:39:32,757 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditService
+2025-07-18 07:39:34,736 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {transformer} as a subscriber to the 'acsEventsListeningFlow.channel#0' channel
+2025-07-18 07:39:34,736 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#0' has 0 subscriber(s).
+2025-07-18 07:39:34,736 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:34,736 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {recipient-list-router} as a subscriber to the 'acsEventsListeningFlow.channel#1' channel
+2025-07-18 07:39:34,736 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#1' has 0 subscriber(s).
+2025-07-18 07:39:34,736 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-07-18 07:39:34,736 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'alfresco.events.si.channel' channel
+2025-07-18 07:39:34,736 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.si.channel' has 0 subscriber(s).
+2025-07-18 07:39:34,737 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-07-18 07:39:34,737 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'acsEventsSpringIntegrationFlow.channel#1' channel
+2025-07-18 07:39:34,737 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsSpringIntegrationFlow.channel#1' has 0 subscriber(s).
+2025-07-18 07:39:34,737 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-07-18 07:39:34,737 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'alfresco.events.handlers.channel' channel
+2025-07-18 07:39:34,737 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.handlers.channel' has 0 subscriber(s).
+2025-07-18 07:39:34,737 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-07-18 07:39:34,737 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsHandlersFlow.channel#1' has 0 subscriber(s).
+2025-07-18 07:39:34,737 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-07-18 07:39:34,737 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-07-18 07:39:34,737 INFO  o.s.i.c.PublishSubscribeChannel - Channel 'AlfrescoNodeVault.errorChannel' has 0 subscriber(s).
+2025-07-18 07:39:34,737 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2025-07-18 07:39:34,745 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EthereumService
+2025-07-18 07:39:34,745 INFO  org.saidone.component.BaseComponent - <<<<< Stopping VaultService
+2025-07-18 07:39:34,746 INFO  org.saidone.component.BaseComponent - <<<<< Stopping S3ContentService
+2025-07-18 07:39:34,746 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EncryptedS3RepositoryImpl
+2025-07-18 07:39:34,746 INFO  org.saidone.component.BaseComponent - <<<<< Stopping MongoNodeService
+2025-07-18 07:39:34,747 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AlfrescoService
+2025-07-18 07:39:34,747 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EncryptedMongoNodeRepositoryImpl
+2025-07-18 07:39:34,747 INFO  org.saidone.component.BaseComponent - <<<<< Stopping BcCryptoServiceImpl
+2025-07-18 07:39:34,747 INFO  org.saidone.component.BaseComponent - <<<<< Stopping SecretService
+2025-07-18 07:39:34,752 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditCollectionCreator
+2025-07-18 07:39:34,752 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditWebFilter
+2025-07-18 07:39:34,752 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditService
