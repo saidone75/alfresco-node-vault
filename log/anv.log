@@ -1,0 +1,500 @@
+2025-08-01 07:56:51,754 INFO  org.saidone.test.VaultServiceTests - Starting VaultServiceTests using Java 21.0.8 with PID 2713314 (started by saidone in /home/saidone/workspace-alfresco/alfresco-node-vault)
+2025-08-01 07:56:51,757 DEBUG org.saidone.test.VaultServiceTests - Running with Spring Boot v3.5.3, Spring v6.2.8
+2025-08-01 07:56:51,758 INFO  org.saidone.test.VaultServiceTests - The following 1 profile is active: "test"
+2025-08-01 07:56:51,786 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/AlfrescoNodeVault/test] not resolvable: Not found
+2025-08-01 07:56:51,787 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/application/test] not resolvable: Not found
+2025-08-01 07:56:51,787 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/application] not resolvable: Not found
+2025-08-01 07:56:53,839 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+2025-08-01 07:56:53,866 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 17 ms. Found 0 MongoDB repository interfaces.
+2025-08-01 07:56:54,054 INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2025-08-01 07:56:54,064 INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2025-08-01 07:56:54,337 INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=2547290a-818f-35a3-9560-dff00760cb67
+2025-08-01 07:56:55,744 INFO  org.mongodb.driver.client - MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync", "version": "5.5.1"}, "os": {"type": "Linux", "name": "Linux", "architecture": "amd64", "version": "6.8.0-64-generic"}, "platform": "Java/Ubuntu/21.0.8+9-Ubuntu-0ubuntu124.04.1"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=majority, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=MongoCredential{mechanism=null, userName='root', source='admin', password=<hidden>, mechanismProperties=<hidden>}, transportSettings=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.client.model.mql.ExpressionCodecProvider@701153c1, com.mongodb.Jep395RecordCodecProvider@301434fb, com.mongodb.KotlinCodecProvider@1641dfb3]}, ProvidersCodecRegistry{codecProviders=[org.bson.codecs.pojo.PojoCodecProvider@49620576]}]}, loggerSettings=LoggerSettings{maxDocumentLength=1000}, clusterSettings={hosts=[localhost:27017], srvServiceName=mongodb, mode=SINGLE, requiredClusterType=UNKNOWN, requiredReplicaSetName='null', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='15 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverMonitoringMode=AUTO, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=false, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=UNSPECIFIED, serverApi=ServerApi{version=V1, deprecationErrors=null, strict=null}, autoEncryptionSettings=null, dnsClient=null, inetAddressResolver=null, contextProvider=null, timeoutMS=null}
+2025-08-01 07:56:55,765 INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=localhost:27017, type=STANDALONE, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=33291683, minRoundTripTimeNanos=0}
+2025-08-01 07:56:56,078 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditCollectionCreator
+2025-08-01 07:56:56,333 INFO  o.s.component.AuditCollectionCreator - Time series collection 'audit' successfully created.
+2025-08-01 07:56:56,333 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditCollectionCreator
+2025-08-01 07:56:56,758 DEBUG org.saidone.config.EthereumConfig - Ethereum account loaded: 0x9c5b620ca0d9493f870388016fd86c16d2503302
+2025-08-01 07:56:56,779 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditServiceImpl
+2025-08-01 07:56:57,677 INFO  org.saidone.component.BaseComponent - >>>>> Starting SecretService
+2025-08-01 07:56:57,734 INFO  org.saidone.component.BaseComponent - >>>>> Starting BcCryptoServiceImpl
+2025-08-01 07:56:57,737 INFO  org.saidone.component.BaseComponent - >>>>> Starting EncryptedMongoNodeRepositoryImpl
+2025-08-01 07:56:57,819 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [IsOnVaultPredicate]
+2025-08-01 07:56:57,819 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [After]
+2025-08-01 07:56:57,819 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Before]
+2025-08-01 07:56:57,819 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Between]
+2025-08-01 07:56:57,820 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Cookie]
+2025-08-01 07:56:57,820 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Header]
+2025-08-01 07:56:57,820 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Host]
+2025-08-01 07:56:57,820 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Method]
+2025-08-01 07:56:57,820 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Path]
+2025-08-01 07:56:57,820 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Query]
+2025-08-01 07:56:57,820 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [ReadBody]
+2025-08-01 07:56:57,820 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [RemoteAddr]
+2025-08-01 07:56:57,820 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2025-08-01 07:56:57,820 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Weight]
+2025-08-01 07:56:57,821 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2025-08-01 07:56:58,204 INFO  org.saidone.component.BaseComponent - >>>>> Starting AlfrescoService
+2025-08-01 07:56:58,214 INFO  org.saidone.component.BaseComponent - >>>>> Starting MongoNodeService
+2025-08-01 07:56:58,969 INFO  org.saidone.component.BaseComponent - >>>>> Starting EncryptedS3RepositoryImpl
+2025-08-01 07:56:58,974 INFO  org.saidone.component.BaseComponent - >>>>> Starting S3ContentService
+2025-08-01 07:56:58,976 INFO  org.saidone.component.BaseComponent - >>>>> Starting VaultService
+2025-08-01 07:56:58,980 INFO  org.saidone.component.BaseComponent - >>>>> Starting EthereumService
+2025-08-01 07:56:59,147 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditWebFilter
+2025-08-01 07:57:00,004 INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 5 endpoints beneath base path '/actuator'
+2025-08-01 07:57:01,176 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-08-01 07:57:01,177 INFO  o.s.i.c.PublishSubscribeChannel - Channel 'AlfrescoNodeVault.errorChannel' has 1 subscriber(s).
+2025-08-01 07:57:01,178 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2025-08-01 07:57:01,178 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {recipient-list-router} as a subscriber to the 'acsEventsListeningFlow.channel#1' channel
+2025-08-01 07:57:01,178 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#1' has 1 subscriber(s).
+2025-08-01 07:57:01,179 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 07:57:01,179 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsHandlersFlow.channel#1' has 1 subscriber(s).
+2025-08-01 07:57:01,179 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-08-01 07:57:01,179 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {transformer} as a subscriber to the 'acsEventsListeningFlow.channel#0' channel
+2025-08-01 07:57:01,179 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#0' has 1 subscriber(s).
+2025-08-01 07:57:01,179 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 07:57:01,179 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'alfresco.events.si.channel' channel
+2025-08-01 07:57:01,180 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.si.channel' has 1 subscriber(s).
+2025-08-01 07:57:01,180 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-08-01 07:57:01,180 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'acsEventsSpringIntegrationFlow.channel#1' channel
+2025-08-01 07:57:01,180 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsSpringIntegrationFlow.channel#1' has 1 subscriber(s).
+2025-08-01 07:57:01,180 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-08-01 07:57:01,180 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'alfresco.events.handlers.channel' channel
+2025-08-01 07:57:01,180 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.handlers.channel' has 1 subscriber(s).
+2025-08-01 07:57:01,180 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-08-01 07:57:01,181 INFO  o.s.i.j.ChannelPublishingJmsMessageListener$GatewayDelegate - started org.springframework.integration.jms.ChannelPublishingJmsMessageListener$GatewayDelegate@25ad3681
+2025-08-01 07:57:01,350 INFO  o.s.i.jms.JmsMessageDrivenEndpoint - started bean 'acsEventsListeningFlow.jms:message-driven-channel-adapter#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 07:57:01,403 INFO  org.saidone.test.VaultServiceTests - Started VaultServiceTests in 12.037 seconds (process running for 14.158)
+2025-08-01 07:57:03,515 DEBUG org.saidone.service.AlfrescoService - Guest Home: a4dc7878-8c41-42aa-9c78-788c4112aae8
+2025-08-01 07:57:03,746 INFO  org.saidone.test.BaseTest - Running --> archiveNodeTest()
+2025-08-01 07:57:03,749 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-08-01 07:57:04,109 DEBUG org.saidone.test.BaseTest - Node 08f519db-68f0-4c70-b519-db68f01c7098 created with name: kangaroo_1.pdf
+2025-08-01 07:57:04,115 INFO  org.saidone.service.VaultService - Archiving node: 08f519db-68f0-4c70-b519-db68f01c7098
+2025-08-01 07:57:04,684 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 08f519db-68f0-4c70-b519-db68f01c7098: 2048 bytes read (10% out of 18810 bytes)
+2025-08-01 07:57:04,685 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 08f519db-68f0-4c70-b519-db68f01c7098: 4096 bytes read (21% out of 18810 bytes)
+2025-08-01 07:57:04,686 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 08f519db-68f0-4c70-b519-db68f01c7098: 6144 bytes read (32% out of 18810 bytes)
+2025-08-01 07:57:04,687 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 08f519db-68f0-4c70-b519-db68f01c7098: 8192 bytes read (43% out of 18810 bytes)
+2025-08-01 07:57:04,688 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 08f519db-68f0-4c70-b519-db68f01c7098: 10240 bytes read (54% out of 18810 bytes)
+2025-08-01 07:57:04,689 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 08f519db-68f0-4c70-b519-db68f01c7098: 12288 bytes read (65% out of 18810 bytes)
+2025-08-01 07:57:04,690 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 08f519db-68f0-4c70-b519-db68f01c7098: 14336 bytes read (76% out of 18810 bytes)
+2025-08-01 07:57:04,691 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 08f519db-68f0-4c70-b519-db68f01c7098: 16384 bytes read (87% out of 18810 bytes)
+2025-08-01 07:57:04,691 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 08f519db-68f0-4c70-b519-db68f01c7098: 18432 bytes read (97% out of 18810 bytes)
+2025-08-01 07:57:04,692 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node 08f519db-68f0-4c70-b519-db68f01c7098: 18810 bytes read (100% out of 18810 bytes)
+2025-08-01 07:57:04,990 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: 08f519db-68f0-4c70-b519-db68f01c7098
+2025-08-01 07:57:05,202 DEBUG org.saidone.service.VaultService - Digest check passed for node: 08f519db-68f0-4c70-b519-db68f01c7098
+2025-08-01 07:57:06,377 INFO  o.s.i.j.ChannelPublishingJmsMessageListener$GatewayDelegate - stopped org.springframework.integration.jms.ChannelPublishingJmsMessageListener$GatewayDelegate@25ad3681
+2025-08-01 07:57:06,378 INFO  o.s.i.jms.JmsMessageDrivenEndpoint - stopped bean 'acsEventsListeningFlow.jms:message-driven-channel-adapter#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 07:57:06,388 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {transformer} as a subscriber to the 'acsEventsListeningFlow.channel#0' channel
+2025-08-01 07:57:06,388 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#0' has 0 subscriber(s).
+2025-08-01 07:57:06,388 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 07:57:06,388 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {recipient-list-router} as a subscriber to the 'acsEventsListeningFlow.channel#1' channel
+2025-08-01 07:57:06,388 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#1' has 0 subscriber(s).
+2025-08-01 07:57:06,388 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 07:57:06,388 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'alfresco.events.si.channel' channel
+2025-08-01 07:57:06,388 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.si.channel' has 0 subscriber(s).
+2025-08-01 07:57:06,388 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-08-01 07:57:06,388 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'acsEventsSpringIntegrationFlow.channel#1' channel
+2025-08-01 07:57:06,389 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsSpringIntegrationFlow.channel#1' has 0 subscriber(s).
+2025-08-01 07:57:06,389 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-08-01 07:57:06,389 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'alfresco.events.handlers.channel' channel
+2025-08-01 07:57:06,389 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.handlers.channel' has 0 subscriber(s).
+2025-08-01 07:57:06,389 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-08-01 07:57:06,389 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsHandlersFlow.channel#1' has 0 subscriber(s).
+2025-08-01 07:57:06,389 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-08-01 07:57:06,389 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-08-01 07:57:06,389 INFO  o.s.i.c.PublishSubscribeChannel - Channel 'AlfrescoNodeVault.errorChannel' has 0 subscriber(s).
+2025-08-01 07:57:06,389 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2025-08-01 07:57:06,396 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditWebFilter
+2025-08-01 07:57:06,397 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EthereumService
+2025-08-01 07:57:06,397 INFO  org.saidone.component.BaseComponent - <<<<< Stopping VaultService
+2025-08-01 07:57:06,398 INFO  org.saidone.component.BaseComponent - <<<<< Stopping S3ContentService
+2025-08-01 07:57:06,398 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EncryptedS3RepositoryImpl
+2025-08-01 07:57:06,398 INFO  org.saidone.component.BaseComponent - <<<<< Stopping MongoNodeService
+2025-08-01 07:57:06,398 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AlfrescoService
+2025-08-01 07:57:06,398 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EncryptedMongoNodeRepositoryImpl
+2025-08-01 07:57:06,398 INFO  org.saidone.component.BaseComponent - <<<<< Stopping BcCryptoServiceImpl
+2025-08-01 07:57:06,399 INFO  org.saidone.component.BaseComponent - <<<<< Stopping SecretService
+2025-08-01 07:57:06,402 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditServiceImpl
+2025-08-01 07:57:06,402 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditCollectionCreator
+2025-08-01 07:59:36,823 INFO  org.saidone.test.VaultServiceTests - Starting VaultServiceTests using Java 21.0.8 with PID 2718546 (started by saidone in /home/saidone/workspace-alfresco/alfresco-node-vault)
+2025-08-01 07:59:36,824 DEBUG org.saidone.test.VaultServiceTests - Running with Spring Boot v3.5.3, Spring v6.2.8
+2025-08-01 07:59:36,824 INFO  org.saidone.test.VaultServiceTests - The following 1 profile is active: "test"
+2025-08-01 07:59:36,846 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/AlfrescoNodeVault/test] not resolvable: Not found
+2025-08-01 07:59:36,846 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/application/test] not resolvable: Not found
+2025-08-01 07:59:36,846 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/application] not resolvable: Not found
+2025-08-01 07:59:37,839 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+2025-08-01 07:59:37,852 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 8 ms. Found 0 MongoDB repository interfaces.
+2025-08-01 07:59:37,926 INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2025-08-01 07:59:37,930 INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2025-08-01 07:59:38,037 INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=2547290a-818f-35a3-9560-dff00760cb67
+2025-08-01 07:59:38,851 INFO  org.mongodb.driver.client - MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync", "version": "5.5.1"}, "os": {"type": "Linux", "name": "Linux", "architecture": "amd64", "version": "6.8.0-64-generic"}, "platform": "Java/Ubuntu/21.0.8+9-Ubuntu-0ubuntu124.04.1"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=majority, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=MongoCredential{mechanism=null, userName='root', source='admin', password=<hidden>, mechanismProperties=<hidden>}, transportSettings=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.client.model.mql.ExpressionCodecProvider@4c219c84, com.mongodb.Jep395RecordCodecProvider@2b01be54, com.mongodb.KotlinCodecProvider@14997cb9]}, ProvidersCodecRegistry{codecProviders=[org.bson.codecs.pojo.PojoCodecProvider@701153c1]}]}, loggerSettings=LoggerSettings{maxDocumentLength=1000}, clusterSettings={hosts=[localhost:27017], srvServiceName=mongodb, mode=SINGLE, requiredClusterType=UNKNOWN, requiredReplicaSetName='null', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='15 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverMonitoringMode=AUTO, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=false, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=UNSPECIFIED, serverApi=ServerApi{version=V1, deprecationErrors=null, strict=null}, autoEncryptionSettings=null, dnsClient=null, inetAddressResolver=null, contextProvider=null, timeoutMS=null}
+2025-08-01 07:59:38,865 INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=localhost:27017, type=STANDALONE, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=18570974, minRoundTripTimeNanos=0}
+2025-08-01 07:59:38,994 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditCollectionCreator
+2025-08-01 07:59:39,085 INFO  o.s.component.AuditCollectionCreator - Collection 'audit' already exists.
+2025-08-01 07:59:39,086 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditCollectionCreator
+2025-08-01 07:59:39,272 DEBUG org.saidone.config.EthereumConfig - Ethereum account loaded: 0x9c5b620ca0d9493f870388016fd86c16d2503302
+2025-08-01 07:59:39,283 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditServiceImpl
+2025-08-01 07:59:39,757 INFO  org.saidone.component.BaseComponent - >>>>> Starting SecretService
+2025-08-01 07:59:39,783 INFO  org.saidone.component.BaseComponent - >>>>> Starting BcCryptoServiceImpl
+2025-08-01 07:59:39,785 INFO  org.saidone.component.BaseComponent - >>>>> Starting EncryptedMongoNodeRepositoryImpl
+2025-08-01 07:59:39,823 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [IsOnVaultPredicate]
+2025-08-01 07:59:39,823 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [After]
+2025-08-01 07:59:39,824 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Before]
+2025-08-01 07:59:39,824 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Between]
+2025-08-01 07:59:39,824 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Cookie]
+2025-08-01 07:59:39,824 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Header]
+2025-08-01 07:59:39,824 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Host]
+2025-08-01 07:59:39,824 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Method]
+2025-08-01 07:59:39,824 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Path]
+2025-08-01 07:59:39,824 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Query]
+2025-08-01 07:59:39,824 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [ReadBody]
+2025-08-01 07:59:39,824 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [RemoteAddr]
+2025-08-01 07:59:39,824 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2025-08-01 07:59:39,824 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Weight]
+2025-08-01 07:59:39,824 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2025-08-01 07:59:39,993 INFO  org.saidone.component.BaseComponent - >>>>> Starting AlfrescoService
+2025-08-01 07:59:39,999 INFO  org.saidone.component.BaseComponent - >>>>> Starting MongoNodeService
+2025-08-01 07:59:40,423 INFO  org.saidone.component.BaseComponent - >>>>> Starting EncryptedS3RepositoryImpl
+2025-08-01 07:59:40,426 INFO  org.saidone.component.BaseComponent - >>>>> Starting S3ContentService
+2025-08-01 07:59:40,427 INFO  org.saidone.component.BaseComponent - >>>>> Starting VaultService
+2025-08-01 07:59:40,429 INFO  org.saidone.component.BaseComponent - >>>>> Starting EthereumService
+2025-08-01 07:59:40,507 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditWebFilter
+2025-08-01 07:59:41,051 INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 5 endpoints beneath base path '/actuator'
+2025-08-01 07:59:41,547 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-08-01 07:59:41,547 INFO  o.s.i.c.PublishSubscribeChannel - Channel 'AlfrescoNodeVault.errorChannel' has 1 subscriber(s).
+2025-08-01 07:59:41,548 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2025-08-01 07:59:41,548 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {recipient-list-router} as a subscriber to the 'acsEventsListeningFlow.channel#1' channel
+2025-08-01 07:59:41,548 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#1' has 1 subscriber(s).
+2025-08-01 07:59:41,548 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 07:59:41,548 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsHandlersFlow.channel#1' has 1 subscriber(s).
+2025-08-01 07:59:41,548 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-08-01 07:59:41,548 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {transformer} as a subscriber to the 'acsEventsListeningFlow.channel#0' channel
+2025-08-01 07:59:41,548 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#0' has 1 subscriber(s).
+2025-08-01 07:59:41,549 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 07:59:41,549 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'alfresco.events.si.channel' channel
+2025-08-01 07:59:41,549 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.si.channel' has 1 subscriber(s).
+2025-08-01 07:59:41,549 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-08-01 07:59:41,549 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'acsEventsSpringIntegrationFlow.channel#1' channel
+2025-08-01 07:59:41,549 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsSpringIntegrationFlow.channel#1' has 1 subscriber(s).
+2025-08-01 07:59:41,549 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-08-01 07:59:41,549 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'alfresco.events.handlers.channel' channel
+2025-08-01 07:59:41,549 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.handlers.channel' has 1 subscriber(s).
+2025-08-01 07:59:41,549 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-08-01 07:59:41,549 INFO  o.s.i.j.ChannelPublishingJmsMessageListener$GatewayDelegate - started org.springframework.integration.jms.ChannelPublishingJmsMessageListener$GatewayDelegate@5df01ff5
+2025-08-01 07:59:41,702 INFO  o.s.i.jms.JmsMessageDrivenEndpoint - started bean 'acsEventsListeningFlow.jms:message-driven-channel-adapter#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 07:59:41,746 INFO  org.saidone.test.VaultServiceTests - Started VaultServiceTests in 6.095 seconds (process running for 6.994)
+2025-08-01 07:59:43,541 DEBUG org.saidone.service.AlfrescoService - Guest Home: a4dc7878-8c41-42aa-9c78-788c4112aae8
+2025-08-01 07:59:43,750 INFO  org.saidone.test.BaseTest - Running --> archiveNodeTest()
+2025-08-01 07:59:43,754 INFO  org.saidone.utils.ResourceFileUtils - Looking for resource in classpath => sample.pdf
+2025-08-01 07:59:44,087 DEBUG org.saidone.test.BaseTest - Node f41fa0af-290c-4cac-9fa0-af290c1cac25 created with name: panda_1.pdf
+2025-08-01 07:59:44,091 INFO  org.saidone.service.VaultService - Archiving node: f41fa0af-290c-4cac-9fa0-af290c1cac25
+2025-08-01 07:59:44,690 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f41fa0af-290c-4cac-9fa0-af290c1cac25: 2048 bytes read (10% out of 18810 bytes)
+2025-08-01 07:59:44,691 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f41fa0af-290c-4cac-9fa0-af290c1cac25: 4096 bytes read (21% out of 18810 bytes)
+2025-08-01 07:59:44,692 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f41fa0af-290c-4cac-9fa0-af290c1cac25: 6144 bytes read (32% out of 18810 bytes)
+2025-08-01 07:59:44,693 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f41fa0af-290c-4cac-9fa0-af290c1cac25: 8192 bytes read (43% out of 18810 bytes)
+2025-08-01 07:59:44,694 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f41fa0af-290c-4cac-9fa0-af290c1cac25: 10240 bytes read (54% out of 18810 bytes)
+2025-08-01 07:59:44,694 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f41fa0af-290c-4cac-9fa0-af290c1cac25: 12288 bytes read (65% out of 18810 bytes)
+2025-08-01 07:59:44,695 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f41fa0af-290c-4cac-9fa0-af290c1cac25: 14336 bytes read (76% out of 18810 bytes)
+2025-08-01 07:59:44,696 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f41fa0af-290c-4cac-9fa0-af290c1cac25: 16384 bytes read (87% out of 18810 bytes)
+2025-08-01 07:59:44,696 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f41fa0af-290c-4cac-9fa0-af290c1cac25: 18432 bytes read (97% out of 18810 bytes)
+2025-08-01 07:59:44,697 TRACE o.s.misc.ProgressTrackingInputStream - Download progress for node f41fa0af-290c-4cac-9fa0-af290c1cac25: 18810 bytes read (100% out of 18810 bytes)
+2025-08-01 07:59:45,047 DEBUG org.saidone.service.VaultService - Comparing MD5 hashes for node: f41fa0af-290c-4cac-9fa0-af290c1cac25
+2025-08-01 07:59:45,292 DEBUG org.saidone.service.VaultService - Digest check passed for node: f41fa0af-290c-4cac-9fa0-af290c1cac25
+2025-08-01 07:59:46,464 INFO  o.s.i.j.ChannelPublishingJmsMessageListener$GatewayDelegate - stopped org.springframework.integration.jms.ChannelPublishingJmsMessageListener$GatewayDelegate@5df01ff5
+2025-08-01 07:59:46,464 INFO  o.s.i.jms.JmsMessageDrivenEndpoint - stopped bean 'acsEventsListeningFlow.jms:message-driven-channel-adapter#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 07:59:46,470 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {transformer} as a subscriber to the 'acsEventsListeningFlow.channel#0' channel
+2025-08-01 07:59:46,470 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#0' has 0 subscriber(s).
+2025-08-01 07:59:46,470 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 07:59:46,470 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {recipient-list-router} as a subscriber to the 'acsEventsListeningFlow.channel#1' channel
+2025-08-01 07:59:46,470 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#1' has 0 subscriber(s).
+2025-08-01 07:59:46,471 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 07:59:46,471 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'alfresco.events.si.channel' channel
+2025-08-01 07:59:46,471 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.si.channel' has 0 subscriber(s).
+2025-08-01 07:59:46,471 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-08-01 07:59:46,471 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'acsEventsSpringIntegrationFlow.channel#1' channel
+2025-08-01 07:59:46,471 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsSpringIntegrationFlow.channel#1' has 0 subscriber(s).
+2025-08-01 07:59:46,471 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-08-01 07:59:46,471 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'alfresco.events.handlers.channel' channel
+2025-08-01 07:59:46,471 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.handlers.channel' has 0 subscriber(s).
+2025-08-01 07:59:46,471 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-08-01 07:59:46,471 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsHandlersFlow.channel#1' has 0 subscriber(s).
+2025-08-01 07:59:46,471 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-08-01 07:59:46,471 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-08-01 07:59:46,471 INFO  o.s.i.c.PublishSubscribeChannel - Channel 'AlfrescoNodeVault.errorChannel' has 0 subscriber(s).
+2025-08-01 07:59:46,471 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2025-08-01 07:59:46,482 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditWebFilter
+2025-08-01 07:59:46,482 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EthereumService
+2025-08-01 07:59:46,482 INFO  org.saidone.component.BaseComponent - <<<<< Stopping VaultService
+2025-08-01 07:59:46,483 INFO  org.saidone.component.BaseComponent - <<<<< Stopping S3ContentService
+2025-08-01 07:59:46,483 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EncryptedS3RepositoryImpl
+2025-08-01 07:59:46,484 INFO  org.saidone.component.BaseComponent - <<<<< Stopping MongoNodeService
+2025-08-01 07:59:46,484 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AlfrescoService
+2025-08-01 07:59:46,484 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EncryptedMongoNodeRepositoryImpl
+2025-08-01 07:59:46,484 INFO  org.saidone.component.BaseComponent - <<<<< Stopping BcCryptoServiceImpl
+2025-08-01 07:59:46,484 INFO  org.saidone.component.BaseComponent - <<<<< Stopping SecretService
+2025-08-01 07:59:46,487 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditServiceImpl
+2025-08-01 07:59:46,487 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditCollectionCreator
+2025-08-01 08:00:16,280 INFO  o.s.AlfrescoNodeVaultApplication - Starting AlfrescoNodeVaultApplication using Java 21.0.8 with PID 2719983 (/home/saidone/workspace-alfresco/alfresco-node-vault/target/classes started by saidone in /home/saidone/workspace-alfresco/alfresco-node-vault)
+2025-08-01 08:00:16,281 INFO  o.s.AlfrescoNodeVaultApplication - The following 1 profile is active: "dev"
+2025-08-01 08:00:16,300 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/AlfrescoNodeVault/dev] not resolvable: Not found
+2025-08-01 08:00:16,300 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/application/dev] not resolvable: Not found
+2025-08-01 08:00:16,300 INFO  o.s.v.c.e.LeaseAwareVaultPropertySource - Vault location [secret/application] not resolvable: Not found
+2025-08-01 08:00:17,024 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data MongoDB repositories in DEFAULT mode.
+2025-08-01 08:00:17,035 INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 7 ms. Found 0 MongoDB repository interfaces.
+2025-08-01 08:00:17,096 INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'errorChannel' has been explicitly defined. Therefore, a default PublishSubscribeChannel will be created.
+2025-08-01 08:00:17,099 INFO  o.s.i.c.DefaultConfiguringBeanFactoryPostProcessor - No bean named 'integrationHeaderChannelRegistry' has been explicitly defined. Therefore, a default DefaultHeaderChannelRegistry will be created.
+2025-08-01 08:00:17,178 INFO  o.s.cloud.context.scope.GenericScope - BeanFactory id=f26d4ea4-3405-3767-9975-aff74ec2f6aa
+2025-08-01 08:00:17,385 INFO  org.mongodb.driver.client - MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync", "version": "5.5.1"}, "os": {"type": "Linux", "name": "Linux", "architecture": "amd64", "version": "6.8.0-64-generic"}, "platform": "Java/Ubuntu/21.0.8+9-Ubuntu-0ubuntu124.04.1"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=majority, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=MongoCredential{mechanism=null, userName='root', source='admin', password=<hidden>, mechanismProperties=<hidden>}, transportSettings=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.client.model.mql.ExpressionCodecProvider@103033fe, com.mongodb.Jep395RecordCodecProvider@25511895, com.mongodb.KotlinCodecProvider@38f569d]}, ProvidersCodecRegistry{codecProviders=[org.bson.codecs.pojo.PojoCodecProvider@6464f017]}]}, loggerSettings=LoggerSettings{maxDocumentLength=1000}, clusterSettings={hosts=[localhost:27017], srvServiceName=mongodb, mode=SINGLE, requiredClusterType=UNKNOWN, requiredReplicaSetName='null', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='15 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, proxySettings=ProxySettings{host=null, port=null, username=null, password=null}}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverMonitoringMode=AUTO, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=false, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=UNSPECIFIED, serverApi=ServerApi{version=V1, deprecationErrors=null, strict=null}, autoEncryptionSettings=null, dnsClient=null, inetAddressResolver=null, contextProvider=null, timeoutMS=null}
+2025-08-01 08:00:17,392 INFO  org.mongodb.driver.cluster - Monitor thread successfully connected to server with description ServerDescription{address=localhost:27017, type=STANDALONE, cryptd=false, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=25, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=11943577, minRoundTripTimeNanos=0}
+2025-08-01 08:00:17,491 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditCollectionCreator
+2025-08-01 08:00:17,561 INFO  o.s.component.AuditCollectionCreator - Collection 'audit' already exists.
+2025-08-01 08:00:17,561 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditCollectionCreator
+2025-08-01 08:00:17,741 DEBUG org.saidone.config.EthereumConfig - Ethereum account loaded: 0x9c5b620ca0d9493f870388016fd86c16d2503302
+2025-08-01 08:00:17,751 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditServiceImpl
+2025-08-01 08:00:18,127 INFO  org.saidone.component.BaseComponent - >>>>> Starting SecretService
+2025-08-01 08:00:18,157 INFO  org.saidone.component.BaseComponent - >>>>> Starting BcCryptoServiceImpl
+2025-08-01 08:00:18,159 INFO  org.saidone.component.BaseComponent - >>>>> Starting EncryptedMongoNodeRepositoryImpl
+2025-08-01 08:00:18,188 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [IsOnVaultPredicate]
+2025-08-01 08:00:18,188 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [After]
+2025-08-01 08:00:18,188 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Before]
+2025-08-01 08:00:18,188 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Between]
+2025-08-01 08:00:18,188 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Cookie]
+2025-08-01 08:00:18,188 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Header]
+2025-08-01 08:00:18,188 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Host]
+2025-08-01 08:00:18,188 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Method]
+2025-08-01 08:00:18,188 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Path]
+2025-08-01 08:00:18,188 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Query]
+2025-08-01 08:00:18,189 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [ReadBody]
+2025-08-01 08:00:18,189 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [RemoteAddr]
+2025-08-01 08:00:18,189 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [XForwardedRemoteAddr]
+2025-08-01 08:00:18,189 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [Weight]
+2025-08-01 08:00:18,189 INFO  o.s.c.g.r.RouteDefinitionRouteLocator - Loaded RoutePredicateFactory [CloudFoundryRouteService]
+2025-08-01 08:00:18,324 INFO  org.saidone.component.BaseComponent - >>>>> Starting AlfrescoService
+2025-08-01 08:00:18,329 INFO  org.saidone.component.BaseComponent - >>>>> Starting MongoNodeService
+2025-08-01 08:00:18,676 INFO  org.saidone.component.BaseComponent - >>>>> Starting EncryptedS3RepositoryImpl
+2025-08-01 08:00:18,678 INFO  org.saidone.component.BaseComponent - >>>>> Starting S3ContentService
+2025-08-01 08:00:18,679 INFO  org.saidone.component.BaseComponent - >>>>> Starting VaultService
+2025-08-01 08:00:18,686 INFO  org.saidone.component.BaseComponent - >>>>> Starting EthereumService
+2025-08-01 08:00:18,763 INFO  org.saidone.component.BaseComponent - >>>>> Starting NodeArchivingJob
+2025-08-01 08:00:18,767 INFO  org.saidone.component.BaseComponent - >>>>> Starting AuditWebFilter
+2025-08-01 08:00:19,323 INFO  o.s.b.a.e.web.EndpointLinksResolver - Exposing 6 endpoints beneath base path '/actuator'
+2025-08-01 08:00:20,211 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-08-01 08:00:20,212 INFO  o.s.i.c.PublishSubscribeChannel - Channel 'AlfrescoNodeVault.errorChannel' has 1 subscriber(s).
+2025-08-01 08:00:20,212 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean '_org.springframework.integration.errorLogger'
+2025-08-01 08:00:20,213 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {recipient-list-router} as a subscriber to the 'acsEventsListeningFlow.channel#1' channel
+2025-08-01 08:00:20,213 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#1' has 1 subscriber(s).
+2025-08-01 08:00:20,213 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 08:00:20,213 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsHandlersFlow.channel#1' has 1 subscriber(s).
+2025-08-01 08:00:20,213 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-08-01 08:00:20,213 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {transformer} as a subscriber to the 'acsEventsListeningFlow.channel#0' channel
+2025-08-01 08:00:20,213 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#0' has 1 subscriber(s).
+2025-08-01 08:00:20,213 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 08:00:20,213 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'alfresco.events.si.channel' channel
+2025-08-01 08:00:20,213 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.si.channel' has 1 subscriber(s).
+2025-08-01 08:00:20,213 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-08-01 08:00:20,214 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'acsEventsSpringIntegrationFlow.channel#1' channel
+2025-08-01 08:00:20,214 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsSpringIntegrationFlow.channel#1' has 1 subscriber(s).
+2025-08-01 08:00:20,214 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-08-01 08:00:20,214 INFO  o.s.i.endpoint.EventDrivenConsumer - Adding {bridge} as a subscriber to the 'alfresco.events.handlers.channel' channel
+2025-08-01 08:00:20,214 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.handlers.channel' has 1 subscriber(s).
+2025-08-01 08:00:20,214 INFO  o.s.i.endpoint.EventDrivenConsumer - started bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-08-01 08:00:20,214 INFO  o.s.i.j.ChannelPublishingJmsMessageListener$GatewayDelegate - started org.springframework.integration.jms.ChannelPublishingJmsMessageListener$GatewayDelegate@17d1b2a0
+2025-08-01 08:00:20,400 INFO  o.s.i.jms.JmsMessageDrivenEndpoint - started bean 'acsEventsListeningFlow.jms:message-driven-channel-adapter#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 08:00:20,412 INFO  o.s.b.w.e.netty.NettyWebServer - Netty started on port 8086 (http)
+2025-08-01 08:00:20,532 INFO  o.s.AlfrescoNodeVaultApplication - Started AlfrescoNodeVaultApplication in 5.253 seconds (process running for 5.548)
+2025-08-01 08:00:21,874 INFO  o.s.api.AbstractOpenApiResource - Init duration for springdoc-openapi is: 369 ms
+2025-08-01 08:00:30,001 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:00:30,303 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:00:40,001 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:00:40,099 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:00:50,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:00:50,091 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:01:00,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:01:00,088 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:01:10,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:01:10,104 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:01:20,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:01:20,084 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:01:30,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:01:30,092 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:01:40,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:01:40,085 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:01:50,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:01:50,080 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:02:00,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:02:00,397 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:02:10,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:02:10,083 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:02:20,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:02:20,083 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:02:30,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:02:30,086 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:02:40,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:02:40,081 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:02:50,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:02:50,083 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:03:00,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:03:00,085 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:03:10,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:03:10,080 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:03:20,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:03:20,103 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:03:30,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:03:30,081 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:03:40,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:03:40,082 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:03:50,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:03:50,083 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:04:00,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:04:00,088 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:04:10,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:04:10,087 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:04:20,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:04:20,083 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:04:30,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:04:30,105 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:04:40,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:04:40,089 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:04:50,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:04:50,080 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:05:00,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:05:00,095 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:05:10,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:05:10,091 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:05:20,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:05:20,091 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:05:30,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:05:30,091 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:05:40,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:05:40,095 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:05:50,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:05:50,108 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:06:00,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:06:00,083 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:06:10,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:06:10,089 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:06:20,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:06:20,092 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:06:30,001 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:06:30,091 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:06:40,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:06:40,083 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:06:50,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:06:50,081 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:07:00,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:07:00,082 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:07:10,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:07:10,101 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:07:20,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:07:20,085 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:07:30,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:07:30,090 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:07:40,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:07:40,090 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:07:50,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:07:50,088 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:08:00,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:08:00,093 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:08:10,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:08:10,091 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:08:20,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:08:20,090 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:08:30,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:08:30,095 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:08:40,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:08:40,092 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:08:50,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:08:50,077 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:09:00,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:09:00,092 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:09:10,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:09:10,080 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:09:20,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:09:20,079 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:09:30,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:09:30,080 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:09:40,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:09:40,085 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:09:50,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:09:50,079 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:10:00,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:10:00,091 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:10:10,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:10:10,088 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:10:20,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:10:20,077 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:10:30,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:10:30,089 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:10:40,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:10:40,083 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:10:50,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:10:50,084 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:11:00,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:11:00,102 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:11:10,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:11:10,083 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:11:20,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:11:20,084 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:11:30,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:11:30,079 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:11:40,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:11:40,079 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:11:50,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:11:50,090 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:12:00,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:12:00,085 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:12:10,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:12:10,091 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:12:20,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:12:20,089 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:12:30,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:12:30,081 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:12:40,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:12:40,085 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:12:50,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:12:50,079 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:13:00,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:13:00,082 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:13:10,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:13:10,100 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:13:20,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:13:20,089 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:13:30,000 DEBUG org.saidone.service.AlfrescoService - Skip count: 0
+2025-08-01 08:13:30,078 INFO  org.saidone.service.AlfrescoService - Documents processed: 0
+2025-08-01 08:13:36,656 INFO  o.s.b.w.e.netty.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2025-08-01 08:13:36,659 INFO  o.s.b.w.e.netty.GracefulShutdown - Graceful shutdown complete
+2025-08-01 08:13:36,660 INFO  o.s.i.j.ChannelPublishingJmsMessageListener$GatewayDelegate - stopped org.springframework.integration.jms.ChannelPublishingJmsMessageListener$GatewayDelegate@17d1b2a0
+2025-08-01 08:13:36,661 INFO  o.s.i.jms.JmsMessageDrivenEndpoint - stopped bean 'acsEventsListeningFlow.jms:message-driven-channel-adapter#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 08:13:38,681 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {transformer} as a subscriber to the 'acsEventsListeningFlow.channel#0' channel
+2025-08-01 08:13:38,681 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#0' has 0 subscriber(s).
+2025-08-01 08:13:38,681 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 08:13:38,681 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {recipient-list-router} as a subscriber to the 'acsEventsListeningFlow.channel#1' channel
+2025-08-01 08:13:38,681 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsListeningFlow.channel#1' has 0 subscriber(s).
+2025-08-01 08:13:38,681 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsListeningFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsListeningFlow(org.apache.activemq.ActiveMQConnectionFactory,org.springframework.integration.channel.DirectChannel,jakarta.jms.Topic,org.springframework.integration.core.GenericTransformer)'
+2025-08-01 08:13:38,681 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'alfresco.events.si.channel' channel
+2025-08-01 08:13:38,681 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.si.channel' has 0 subscriber(s).
+2025-08-01 08:13:38,681 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-08-01 08:13:38,681 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'acsEventsSpringIntegrationFlow.channel#1' channel
+2025-08-01 08:13:38,681 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsSpringIntegrationFlow.channel#1' has 0 subscriber(s).
+2025-08-01 08:13:38,681 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsSpringIntegrationFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsSpringIntegrationFlow(org.springframework.integration.channel.PublishSubscribeChannel)'
+2025-08-01 08:13:38,681 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {bridge} as a subscriber to the 'alfresco.events.handlers.channel' channel
+2025-08-01 08:13:38,681 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.alfresco.events.handlers.channel' has 0 subscriber(s).
+2025-08-01 08:13:38,681 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#0'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-08-01 08:13:38,681 INFO  o.s.i.channel.DirectChannel - Channel 'AlfrescoNodeVault.acsEventsHandlersFlow.channel#1' has 0 subscriber(s).
+2025-08-01 08:13:38,681 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean 'acsEventsHandlersFlow.org.springframework.integration.config.ConsumerEndpointFactoryBean#1'; from source: 'org.alfresco.event.sdk.autoconfigure.AlfrescoEventsAutoConfiguration.acsEventsHandlersFlow(org.alfresco.event.sdk.handling.EventHandlingExecutor)'
+2025-08-01 08:13:38,681 INFO  o.s.i.endpoint.EventDrivenConsumer - Removing {logging-channel-adapter:_org.springframework.integration.errorLogger} as a subscriber to the 'errorChannel' channel
+2025-08-01 08:13:38,681 INFO  o.s.i.c.PublishSubscribeChannel - Channel 'AlfrescoNodeVault.errorChannel' has 0 subscriber(s).
+2025-08-01 08:13:38,681 INFO  o.s.i.endpoint.EventDrivenConsumer - stopped bean '_org.springframework.integration.errorLogger'
+2025-08-01 08:13:38,688 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditWebFilter
+2025-08-01 08:13:38,689 INFO  org.saidone.component.BaseComponent - <<<<< Stopping NodeArchivingJob
+2025-08-01 08:13:38,689 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EthereumService
+2025-08-01 08:13:38,689 INFO  org.saidone.component.BaseComponent - <<<<< Stopping VaultService
+2025-08-01 08:13:38,690 INFO  org.saidone.component.BaseComponent - <<<<< Stopping S3ContentService
+2025-08-01 08:13:38,690 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EncryptedS3RepositoryImpl
+2025-08-01 08:13:38,690 INFO  org.saidone.component.BaseComponent - <<<<< Stopping MongoNodeService
+2025-08-01 08:13:38,690 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AlfrescoService
+2025-08-01 08:13:38,692 INFO  org.saidone.component.BaseComponent - <<<<< Stopping EncryptedMongoNodeRepositoryImpl
+2025-08-01 08:13:38,692 INFO  org.saidone.component.BaseComponent - <<<<< Stopping BcCryptoServiceImpl
+2025-08-01 08:13:38,693 INFO  org.saidone.component.BaseComponent - <<<<< Stopping SecretService
+2025-08-01 08:13:38,695 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditServiceImpl
+2025-08-01 08:13:38,695 INFO  org.saidone.component.BaseComponent - <<<<< Stopping AuditCollectionCreator
