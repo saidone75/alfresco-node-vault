@@ -52,8 +52,13 @@ public interface NodeService {
      */
     Iterable<NodeWrapper> findByNtx(String ntx);
 
-    // find by encryption key version
-    Iterable<NodeWrapper> findByKv(String txId);
+    /**
+     * Retrieves all node wrappers associated with the specified encryption key version.
+     *
+     * @param kv the encryption key version to filter by
+     * @return iterable collection of {@link NodeWrapper}
+     */
+    Iterable<NodeWrapper> findByKv(String kv);
 
     /**
      * Retrieves all stored node wrappers.
