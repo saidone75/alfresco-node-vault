@@ -66,6 +66,9 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
 
     private final MongoOperations mongoOperations;
 
+    /**
+     * {@inheritDoc}
+     */
     @PostConstruct
     @Override
     public void init() {
@@ -78,6 +81,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     @NonNull
     public <S extends NodeWrapper> S insert(@NonNull S entity) {
@@ -85,6 +89,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return entity;
     }
 
+    /** {@inheritDoc} */
     @Override
     @NonNull
     public <S extends NodeWrapper> List<S> insert(@NonNull Iterable<S> entities) {
@@ -95,6 +100,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return result;
     }
 
+    /** {@inheritDoc} */
     @Override
     @NonNull
     public <S extends NodeWrapper> S save(@NonNull S entity) {
@@ -102,6 +108,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return entity;
     }
 
+    /** {@inheritDoc} */
     @Override
     @NonNull
     public <S extends NodeWrapper> List<S> saveAll(@NonNull Iterable<S> entities) {
@@ -112,6 +119,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return result;
     }
 
+    /** {@inheritDoc} */
     @Override
     @NonNull
     public <S extends NodeWrapper> Optional<S> findOne(@NonNull Example<S> example) {
@@ -120,6 +128,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
                 example.getProbeType()));
     }
 
+    /** {@inheritDoc} */
     @Override
     @NonNull
     public <S extends NodeWrapper> List<S> findAll(@NonNull Example<S> example) {
@@ -128,6 +137,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
                 example.getProbeType());
     }
 
+    /** {@inheritDoc} */
     @Override
     @NonNull
     public <S extends NodeWrapper> List<S> findAll(@NonNull Example<S> example, @NonNull Sort sort) {
@@ -136,6 +146,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
                 example.getProbeType());
     }
 
+    /** {@inheritDoc} */
     @Override
     @NonNull
     public <S extends NodeWrapper> Page<S> findAll(@NonNull Example<S> example, @NonNull Pageable pageable) {
@@ -146,6 +157,11 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return new PageImpl<>(content, pageable, count);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @throws UnsupportedOperationException always thrown as this method is not implemented
+     */
     @Override
     public <S extends NodeWrapper, R> @NonNull R findBy(@NonNull Example<S> example, @NonNull Function<FluentQuery.FetchableFluentQuery<S>, R> queryFunction) {
         val methodSignature = StackWalker.getInstance()
@@ -155,17 +171,20 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         throw new UnsupportedOperationException(String.format("Method %s is not implemented in this version of the repository", methodSignature));
     }
 
+    /** {@inheritDoc} */
     @Override
     @NonNull
     public Optional<NodeWrapper> findById(@NonNull String id) {
         return Optional.ofNullable(mongoOperations.findById(id, NodeWrapper.class));
     }
 
+    /** {@inheritDoc} */
     @Override
     public boolean existsById(@NonNull String id) {
         return mongoOperations.exists(Query.query(Criteria.where("_id").is(id)), NodeWrapper.class);
     }
 
+    /** {@inheritDoc} */
     @Override
     @NonNull
     public List<NodeWrapper> findAll() {
@@ -195,6 +214,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return mongoOperations.find(query, NodeWrapper.class);
     }
 
+    /** {@inheritDoc} */
     @Override
     @NonNull
     public List<NodeWrapper> findAllById(@NonNull Iterable<String> ids) {
@@ -202,28 +222,33 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return mongoOperations.find(query, NodeWrapper.class);
     }
 
+    /** {@inheritDoc} */
     @Override
     public long count() {
         return mongoOperations.count(new Query(), NodeWrapper.class);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void deleteById(@NonNull String id) {
         val query = new Query(Criteria.where("_id").is(id));
         mongoOperations.remove(query, NodeWrapper.class);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void delete(@NonNull NodeWrapper entity) {
         mongoOperations.remove(entity);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void deleteAllById(@NonNull Iterable<? extends String> ids) {
         val query = new Query(Criteria.where("_id").in(ids));
         mongoOperations.remove(query, NodeWrapper.class);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void deleteAll(@NonNull Iterable<? extends NodeWrapper> entities) {
         for (val entity : entities) {
@@ -231,17 +256,20 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         }
     }
 
+    /** {@inheritDoc} */
     @Override
     public void deleteAll() {
         mongoOperations.remove(new Query(), NodeWrapper.class);
     }
 
+    /** {@inheritDoc} */
     @Override
     @NonNull
     public List<NodeWrapper> findAll(@NonNull Sort sort) {
         return mongoOperations.find(new Query().with(sort), NodeWrapper.class);
     }
 
+    /** {@inheritDoc} */
     @Override
     @NonNull
     public Page<NodeWrapper> findAll(@NonNull Pageable pageable) {
@@ -253,11 +281,13 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return new PageImpl<>(content, pageable, count);
     }
 
+    /** {@inheritDoc} */
     @Override
     public <S extends NodeWrapper> long count(@NonNull Example<S> example) {
         return mongoOperations.count(Query.query(Criteria.byExample(example)), example.getProbeType());
     }
 
+    /** {@inheritDoc} */
     @Override
     public <S extends NodeWrapper> boolean exists(@NonNull Example<S> example) {
         return mongoOperations.exists(Query.query(Criteria.byExample(example)), example.getProbeType());

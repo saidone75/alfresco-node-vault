@@ -40,11 +40,7 @@ public class MongoNodeService extends BaseComponent implements NodeService {
     /** Repository used for persisting and retrieving node metadata. */
     private final MongoNodeRepositoryImpl mongoNodeRepository;
 
-    /**
-     * Saves the given node wrapper to the repository.
-     *
-     * @param nodeWrapper node metadata to persist
-     */
+    /** {@inheritDoc} */
     @Override
     @SneakyThrows
     public void save(NodeWrapper nodeWrapper) {
