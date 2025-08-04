@@ -18,15 +18,29 @@
 
 package org.saidone.service.crypto;
 
+import lombok.RequiredArgsConstructor;
+import lombok.val;
+import org.saidone.service.NodeService;
+import org.springframework.stereotype.Service;
+
+@RequiredArgsConstructor
+@Service
 public class KeyServiceImpl implements KeyService {
 
+    private final NodeService nodeService;
+
     @Override
-    public void updateKey(int sourceVersion) {
+    public void updateKey(String nodeId) {
 
     }
 
     @Override
-    public void updateKey(int sourceVersion, int targetVersion) {
+    public void updateKeys(int sourceVersion) {
+        val nodes = nodeService.findByKv(sourceVersion);
+    }
+
+    @Override
+    public void updateKeys(int sourceVersion, int targetVersion) {
 
     }
 

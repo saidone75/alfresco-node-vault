@@ -20,8 +20,10 @@ package org.saidone.service.crypto;
 
 public interface KeyService {
 
-    void updateKey(int sourceVersion);
+    void updateKey(String nodeId);
 
-    void updateKey(int sourceVersion, int targetVersion);
+    void updateKeys(int sourceVersion);
+
+    void updateKeys(int sourceVersion, int targetVersion);
 
 }

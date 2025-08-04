@@ -80,7 +80,7 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      * {@inheritDoc}
      */
     @Override
-    public Iterable<NodeWrapper> findByKv(String kv) {
+    public Iterable<NodeWrapper> findByKv(int kv) {
         return mongoNodeRepository.findByKv(kv);
     }
 

@@ -189,7 +189,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
      * @param kv the encryption key version to filter by
      * @return list of nodes encrypted with the specified key version
      */
-    public List<NodeWrapper> findByKv(String kv) {
+    public List<NodeWrapper> findByKv(int kv) {
         val query = new Query(Criteria.where("kv").is(kv));
         return mongoOperations.find(query, NodeWrapper.class);
     }
