@@ -47,10 +47,13 @@ public interface NodeService {
      * A {@code null} transaction ID is used to select nodes that have not yet
      * been notarized.
      *
-     * @param txId the notarization transaction ID to filter by
+     * @param ntx the notarization transaction ID to filter by
      * @return iterable collection of {@link NodeWrapper}
      */
-    Iterable<NodeWrapper> findByTxId(String txId);
+    Iterable<NodeWrapper> findByNtx(String ntx);
+
+    // find by encryption key version
+    Iterable<NodeWrapper> findByKv(String txId);
 
     /**
      * Retrieves all stored node wrappers.

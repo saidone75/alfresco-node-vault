@@ -71,7 +71,7 @@ public class NodeNotarizationJob extends BaseComponent {
      * This method is synchronized to avoid concurrent executions.
      */
     private synchronized void doNotarize() {
-        for (val node : nodeService.findByTxId(null)) {
+        for (val node : nodeService.findByNtx(null)) {
             try {
                 ethereumService.notarizeNode(node.getId());
             } catch (Exception e) {

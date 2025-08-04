@@ -71,8 +71,16 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      * {@inheritDoc}
      */
     @Override
-    public Iterable<NodeWrapper> findByTxId(String txId) {
-        return mongoNodeRepository.findByTxId(txId);
+    public Iterable<NodeWrapper> findByNtx(String ntx) {
+        return mongoNodeRepository.findByNtx(ntx);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterable<NodeWrapper> findByKv(String kv) {
+        return mongoNodeRepository.findByNtx(kv);
     }
 
     /**
