@@ -18,6 +18,7 @@
 
 package org.saidone.service;
 
+import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.model.NodeWrapper;
 
 /**
@@ -39,6 +40,7 @@ public interface NodeService {
      *
      * @param nodeId the Alfresco node identifier
      * @return the stored {@link NodeWrapper}
+     * @throws NodeNotFoundOnVaultException if the node does not exist in the vault
      */
     NodeWrapper findById(String nodeId);
 

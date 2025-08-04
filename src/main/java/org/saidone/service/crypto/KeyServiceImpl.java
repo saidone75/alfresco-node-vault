@@ -23,22 +23,29 @@ import lombok.val;
 import org.saidone.service.NodeService;
 import org.springframework.stereotype.Service;
 
+/**
+ * Default {@link KeyService} implementation that delegates node retrieval to a {@link NodeService}.
+ * The actual re-encryption logic is currently left unimplemented and will be provided in future iterations.
+ */
 @RequiredArgsConstructor
 @Service
 public class KeyServiceImpl implements KeyService {
 
     private final NodeService nodeService;
 
+    /** {@inheritDoc} */
     @Override
     public void updateKey(String nodeId) {
 
     }
 
+    /** {@inheritDoc} */
     @Override
     public void updateKeys(int sourceVersion) {
         val nodes = nodeService.findByKv(sourceVersion);
     }
 
+    /** {@inheritDoc} */
     @Override
     public void updateKeys(int sourceVersion, int targetVersion) {
 
