@@ -32,6 +32,8 @@ public interface MetadataKeys {
     String CONTENT_TYPE = "ct";
     /** Flag marking content as encrypted. */
     String ENCRYPTED = "enc";
+    // blockchain transaction id
+    String NOTARIZATION_TRANSACTION_ID = "ntx";
     /**
      * Version identifier of the secret key that was used to encrypt
      * the stored content.
