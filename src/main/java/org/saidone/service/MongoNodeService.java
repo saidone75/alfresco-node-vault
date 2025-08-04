@@ -37,6 +37,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class MongoNodeService extends BaseComponent implements NodeService {
 
+    /** Repository used for persisting and retrieving node metadata. */
     private final MongoNodeRepositoryImpl mongoNodeRepository;
 
     /**
@@ -80,7 +81,7 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      */
     @Override
     public Iterable<NodeWrapper> findByKv(String kv) {
-        return mongoNodeRepository.findByNtx(kv);
+        return mongoNodeRepository.findByKv(kv);
     }
 
     /**

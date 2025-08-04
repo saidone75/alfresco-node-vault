@@ -47,7 +47,10 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class NodeNotarizationJob extends BaseComponent {
 
+    /** Service providing access to vault-stored nodes. */
     private final NodeService nodeService;
+
+    /** Blockchain service responsible for notarising node checksums. */
     private final EthereumService ethereumService;
 
     /**
@@ -60,6 +63,7 @@ public class NodeNotarizationJob extends BaseComponent {
 
     /**
      * Scheduled entry point triggered according to the configured cron expression.
+     * Delegates execution to {@link #doNotarize()}.
      */
     @Scheduled(cron = "${application.notarization-job.cron-expression}")
     void notarize() {
