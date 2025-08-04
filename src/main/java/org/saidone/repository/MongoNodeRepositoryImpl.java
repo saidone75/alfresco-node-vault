@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.component.BaseComponent;
+import org.saidone.model.MetadataKeys;
 import org.saidone.model.NodeWrapper;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.*;
@@ -179,7 +180,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
      * @return list of matching nodes
      */
     public List<NodeWrapper> findByNtx(String ntx) {
-        val query = new Query(Criteria.where("ntx").is(ntx));
+        val query = new Query(Criteria.where(MetadataKeys.NOTARIZATION_TRANSACTION_ID).is(ntx));
         return mongoOperations.find(query, NodeWrapper.class);
     }
 
@@ -190,7 +191,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
      * @return list of nodes encrypted with the specified key version
      */
     public List<NodeWrapper> findByKv(int kv) {
-        val query = new Query(Criteria.where("kv").is(kv));
+        val query = new Query(Criteria.where(MetadataKeys.KEY_VERSION).is(kv));
         return mongoOperations.find(query, NodeWrapper.class);
     }
 
