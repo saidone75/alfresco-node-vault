@@ -24,6 +24,7 @@ import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.EncryptionConfig;
 import org.saidone.service.crypto.Secret;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 import org.springframework.vault.core.VaultTemplate;
 import org.springframework.vault.core.VaultVersionedKeyValueOperations;
@@ -44,6 +45,7 @@ import java.util.concurrent.ExecutionException;
 @RequiredArgsConstructor
 @Service
 @Slf4j
+@ConditionalOnExpression("${application.service.vault.encryption.enabled}.equals(true)")
 public class SecretService extends BaseComponent {
 
     private final VaultTemplate vaultTemplate;

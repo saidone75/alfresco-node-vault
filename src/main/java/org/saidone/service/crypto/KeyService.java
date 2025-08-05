@@ -38,12 +38,4 @@ public interface KeyService {
      */
     void updateKeys(int sourceVersion);
 
-    /**
-     * Re-encrypts all nodes from the given source key version to the desired target key version.
-     *
-     * @param sourceVersion the encryption key version from which nodes will be re-encrypted
-     * @param targetVersion the target encryption key version to apply
-     */
-    void updateKeys(int sourceVersion, int targetVersion);
-
 }

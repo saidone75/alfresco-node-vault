@@ -21,6 +21,8 @@ package org.saidone.service.crypto;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.saidone.service.NodeService;
+import org.saidone.service.content.ContentService;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
 /**
@@ -29,26 +31,29 @@ import org.springframework.stereotype.Service;
  */
 @RequiredArgsConstructor
 @Service
+@ConditionalOnExpression("${application.service.vault.encryption.enabled}.equals(true)")
 public class KeyServiceImpl implements KeyService {
 
     private final NodeService nodeService;
+    private final ContentService contentService;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateKey(String nodeId) {
-
+        val nodeWrapper = nodeService.findById(nodeId);
+       contentService.archiveNodeContent(nodeWrapper.getNode(), contentService.getNodeContent(nodeId).getContentStream());
+       nodeService.save(nodeWrapper);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void updateKeys(int sourceVersion) {
         val nodes = nodeService.findByKv(sourceVersion);
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public void updateKeys(int sourceVersion, int targetVersion) {
-
+        nodes.forEach(node -> updateKey(node.getId()));
     }
 
 }
