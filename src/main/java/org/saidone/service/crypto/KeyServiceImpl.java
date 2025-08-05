@@ -26,8 +26,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
 /**
- * Default {@link KeyService} implementation that delegates node retrieval to a {@link NodeService}.
- * The actual re-encryption logic is currently left unimplemented and will be provided in future iterations.
+ * Default {@link KeyService} implementation that re-encrypts node content by
+ * delegating node retrieval to {@link NodeService} and content handling to
+ * {@link ContentService}.
  */
 @RequiredArgsConstructor
 @Service
@@ -38,17 +39,29 @@ public class KeyServiceImpl implements KeyService {
     private final ContentService contentService;
 
     /**
-     * {@inheritDoc}
+     * Re-encrypts the node identified by the given ID using the latest key
+     * version.
+     *
+     * <p>The node metadata is loaded from the {@link NodeService}, its content
+     * is archived using the {@link ContentService}, and the updated node is
+     * persisted.</p>
+     *
+     * @param nodeId the Alfresco node identifier
      */
     @Override
     public void updateKey(String nodeId) {
         val nodeWrapper = nodeService.findById(nodeId);
-       contentService.archiveNodeContent(nodeWrapper.getNode(), contentService.getNodeContent(nodeId).getContentStream());
-       nodeService.save(nodeWrapper);
+        contentService.archiveNodeContent(nodeWrapper.getNode(),
+                contentService.getNodeContent(nodeId).getContentStream());
+        nodeService.save(nodeWrapper);
     }
 
     /**
-     * {@inheritDoc}
+     * Re-encrypts all nodes currently protected with the specified key version
+     * by delegating each node to {@link #updateKey(String)}.
+     *
+     * @param sourceVersion the key version currently used by nodes that should
+     *                      be updated
      */
     @Override
     public void updateKeys(int sourceVersion) {
