@@ -24,6 +24,7 @@ import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.EncryptionConfig;
 import org.saidone.service.crypto.Secret;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 import org.springframework.vault.core.VaultTemplate;
 import org.springframework.vault.core.VaultVersionedKeyValueOperations;
@@ -44,6 +45,7 @@ import java.util.concurrent.ExecutionException;
 @RequiredArgsConstructor
 @Service
 @Slf4j
+@ConditionalOnExpression("${application.service.vault.encryption.enabled}.equals(true)")
 public class SecretService extends BaseComponent {
 
     private final VaultTemplate vaultTemplate;
@@ -74,8 +76,8 @@ public class SecretService extends BaseComponent {
      * Retrieves the latest version of the secret from Vault.
      *
      * <p>This is a convenience method that delegates to
-     * {@link #getSecret(Integer)} with a {@code null} version</p>
-     * to fetch the most recent secret value.</p>
+     * {@link #getSecret(Integer)} with a {@code null} version to fetch the most
+     * recent secret value.</p>
      *
      * @return the secret containing the raw bytes and version information
      * @throws RuntimeException if the secret cannot be retrieved
@@ -91,9 +93,11 @@ public class SecretService extends BaseComponent {
     /**
      * Retrieves the secret from Vault for the specified version.
      *
-     * @param version the version of the secret to retrieve; if null, retrieves the latest version
-     * @return a Pair containing the secret bytes and the version number
-     * @throws RuntimeException if unable to retrieve the secret or if an error occurs during retrieval
+     * @param version the version of the secret to retrieve; if {@code null},
+     *                retrieves the latest version
+     * @return a {@link Secret} containing the secret bytes and the version number
+     * @throws RuntimeException if unable to retrieve the secret or if an error
+     *                          occurs during retrieval
      */
     public Secret getSecret(Integer version) {
         try {
@@ -108,7 +112,7 @@ public class SecretService extends BaseComponent {
      *
      * @param version version of the secret to retrieve; {@code null} for the
      *                latest version
-     * @return a future yielding the secret data and version
+     * @return a {@link CompletableFuture} yielding the secret data and version
      */
     private CompletableFuture<Secret> getSecretAsync(Integer version) {
         return CompletableFuture.supplyAsync(() -> {

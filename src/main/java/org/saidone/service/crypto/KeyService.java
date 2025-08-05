@@ -19,31 +19,27 @@
 package org.saidone.service.crypto;
 
 /**
- * Service responsible for managing encryption keys used to protect nodes in the vault.
- * Implementations typically handle key rotation and re-encryption of persisted data.
+ * Service responsible for managing encryption keys used to protect nodes in the
+ * vault. Implementations typically handle key rotation and re-encryption of
+ * persisted data.
  */
 public interface KeyService {
 
     /**
-     * Re-encrypts the node identified by the given ID using the latest available key version.
+     * Re-encrypts the node identified by the given ID using the latest available
+     * key version and persists the updated node.
      *
      * @param nodeId the Alfresco node identifier
      */
     void updateKey(String nodeId);
 
     /**
-     * Re-encrypts all nodes currently protected with the specified key version to the latest version.
+     * Re-encrypts all nodes currently protected with the specified key version
+     * to the latest version.
      *
-     * @param sourceVersion the encryption key version currently used by the nodes to update
+     * @param sourceVersion the encryption key version currently used by the nodes
+     *                      that should be updated
      */
     void updateKeys(int sourceVersion);
-
-    /**
-     * Re-encrypts all nodes from the given source key version to the desired target key version.
-     *
-     * @param sourceVersion the encryption key version from which nodes will be re-encrypted
-     * @param targetVersion the target encryption key version to apply
-     */
-    void updateKeys(int sourceVersion, int targetVersion);
 
 }
