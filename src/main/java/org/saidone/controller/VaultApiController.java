@@ -39,6 +39,7 @@ import org.saidone.service.AuthenticationService;
 import org.saidone.service.NodeService;
 import org.saidone.service.VaultService;
 import org.saidone.service.content.ContentService;
+import org.saidone.service.crypto.KeyService;
 import org.saidone.service.notarization.NotarizationService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
@@ -83,6 +84,8 @@ public class VaultApiController {
      * Handles notarization requests for archived nodes.
      */
     private final NotarizationService notarizationService;
+
+    private final KeyService keyService;
 
     /**
      * Handles any unexpected exception thrown during request processing.
@@ -404,6 +407,39 @@ public class VaultApiController {
 
         notarizationService.checkNotarization(nodeId);
         return ResponseEntity.ok(String.format("Node %s is notarized and hashes match.", nodeId));
+    }
+
+    /**
+     * Update encryption key for node
+     */
+    @SecurityRequirement(name = "basicAuth")
+    @GetMapping("/nodes/{nodeId}/update-key")
+    @Operation(
+            summary = "Update encryption key",
+            description = "Update the encryption key of the specified node.",
+            parameters = {
+                    @Parameter(name = "nodeId", description = "Identifier of the node to update", required = true, in = ParameterIn.PATH)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Encryption key updated",
+                            content = @Content(mediaType = "text/plain")),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized",
+                            content = @Content),
+                    @ApiResponse(responseCode = "404", description = "Node not found",
+                            content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content)
+            })
+    public ResponseEntity<?> updateKey(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
+            @PathVariable String nodeId) {
+
+        if (!authenticationService.isAuthorized(auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        keyService.updateKey(nodeId);
+        return ResponseEntity.ok(String.format("Encryption key updated for node %s.", nodeId));
     }
 
 }

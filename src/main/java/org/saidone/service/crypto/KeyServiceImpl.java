@@ -19,8 +19,10 @@
 package org.saidone.service.crypto;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.service.NodeService;
+import org.saidone.service.SecretService;
 import org.saidone.service.content.ContentService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
@@ -32,9 +34,11 @@ import org.springframework.stereotype.Service;
  */
 @RequiredArgsConstructor
 @Service
+@Slf4j
 @ConditionalOnExpression("${application.service.vault.encryption.enabled}.equals(true)")
 public class KeyServiceImpl implements KeyService {
 
+    private final SecretService secretService;
     private final NodeService nodeService;
     private final ContentService contentService;
 
@@ -51,9 +55,17 @@ public class KeyServiceImpl implements KeyService {
     @Override
     public void updateKey(String nodeId) {
         val nodeWrapper = nodeService.findById(nodeId);
-        contentService.archiveNodeContent(nodeWrapper.getNode(),
-                contentService.getNodeContent(nodeId).getContentStream());
-        nodeService.save(nodeWrapper);
+        val actualKeyVersion = nodeWrapper.getKeyVersion();
+        val lastKeyVersion = secretService.getSecret().getVersion();
+        if (actualKeyVersion < lastKeyVersion) {
+            log.debug("Updating encryption key from v.{} to v.{} for node {}", actualKeyVersion, lastKeyVersion, nodeId);
+            nodeWrapper.setKeyVersion(lastKeyVersion);
+            contentService.archiveNodeContent(nodeWrapper.getNode(),
+                    contentService.getNodeContent(nodeId).getContentStream());
+            nodeService.save(nodeWrapper);
+        } else {
+            log.debug("Encryption key for node {} is already up-to-date (v.{})", nodeId, actualKeyVersion);
+        }
     }
 
     /**
