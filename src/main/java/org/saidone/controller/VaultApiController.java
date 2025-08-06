@@ -85,6 +85,9 @@ public class VaultApiController {
      */
     private final NotarizationService notarizationService;
 
+    /**
+     * Manages encryption key rotation for node content.
+     */
     private final KeyService keyService;
 
     /**
@@ -410,7 +413,11 @@ public class VaultApiController {
     }
 
     /**
-     * Update encryption key for node
+     * Rotates the encryption key protecting a node's content.
+     *
+     * @param auth   optional Basic authentication header
+     * @param nodeId identifier of the node whose key should be updated
+     * @return a confirmation message
      */
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/nodes/{nodeId}/update-key")

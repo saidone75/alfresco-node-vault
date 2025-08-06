@@ -38,8 +38,17 @@ import org.springframework.stereotype.Service;
 @ConditionalOnExpression("${application.service.vault.encryption.enabled}.equals(true)")
 public class KeyServiceImpl implements KeyService {
 
+    /**
+     * Provides access to the encryption secrets used for re-encryption.
+     */
     private final SecretService secretService;
+    /**
+     * Retrieves and persists node metadata.
+     */
     private final NodeService nodeService;
+    /**
+     * Handles reading and writing of encrypted node content.
+     */
     private final ContentService contentService;
 
     /**
