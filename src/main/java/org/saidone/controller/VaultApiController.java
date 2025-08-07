@@ -113,7 +113,7 @@ public class VaultApiController {
      */
     @ExceptionHandler(VaultException.class)
     @Operation(hidden = true)
-    public ResponseEntity<String> handleVaultException(Exception e) {
+    public ResponseEntity<String> handleVaultException(VaultException e) {
         log.error(e.getMessage());
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -335,17 +335,18 @@ public class VaultApiController {
     }
 
     /**
-     * Require notarization of a node.
+     * Require notarization of a node. The notarization process runs asynchronously
+     * and the call returns immediately.
      *
      * @param auth   optional Basic authentication header
      * @param nodeId identifier of the node to notarize
-     * @return a confirmation message
+     * @return a confirmation message, or {@code 409 Conflict} if the node was already notarized
      */
     @SecurityRequirement(name = "basicAuth")
     @PostMapping("/nodes/{nodeId}/notarize")
     @Operation(
             summary = "Notarize a node",
-            description = "Require notarization of the specified node.",
+            description = "Require notarization of the specified node. Returns conflict if already notarized.",
             parameters = {
                     @Parameter(name = "nodeId", description = "Identifier of the node to notarize", required = true, in = ParameterIn.PATH)
             },
@@ -355,6 +356,8 @@ public class VaultApiController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized",
                             content = @Content),
                     @ApiResponse(responseCode = "404", description = "Node not found",
+                            content = @Content),
+                    @ApiResponse(responseCode = "409", description = "Node already notarized",
                             content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
@@ -371,6 +374,7 @@ public class VaultApiController {
         if (Strings.isNotBlank(nodeWrapper.getNotarizationTxId())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(String.format("Node %s is already notarized.", nodeId));
         }
+        // Run notarization asynchronously to avoid blocking the caller
         CompletableFuture.runAsync(() -> notarizationService.notarizeNode(nodeId));
         return ResponseEntity.ok().body(String.format("Notarization for node %s required.", nodeId));
     }
@@ -451,9 +455,10 @@ public class VaultApiController {
     }
 
     /**
-     *  Re-encrypts all nodes currently protected with the specified key version.
+     * Re-encrypts all nodes currently protected with the specified key version.
+     * The operation runs asynchronously and returns immediately.
      *
-     * @param auth   optional Basic authentication header
+     * @param auth       optional Basic authentication header
      * @param keyVersion version of the outdated encryption key
      * @return a confirmation message
      */
@@ -461,7 +466,7 @@ public class VaultApiController {
     @GetMapping("/nodes/update-keys")
     @Operation(
             summary = "Re-encrypts nodes",
-            description = " Re-encrypts all nodes currently protected with the specified key version.",
+            description = "Re-encrypts all nodes with the specified key version. The update runs asynchronously.",
             parameters = {
                     @Parameter(name = "keyVersion", description = "Version of the encryption key to update", required = true, in = ParameterIn.QUERY)
             },
@@ -481,6 +486,7 @@ public class VaultApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        // Re-key nodes asynchronously to avoid long blocking requests
         CompletableFuture.runAsync(() -> keyService.updateKeys(keyVersion));
         return ResponseEntity.ok("Update required.");
     }
