@@ -366,6 +366,7 @@ public class VaultApiController {
         if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
         val nodeWrapper = nodeService.findById(nodeId);
         if (Strings.isNotBlank(nodeWrapper.getNotarizationTxId())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(String.format("Node %s is already notarized.", nodeId));
@@ -413,7 +414,7 @@ public class VaultApiController {
     }
 
     /**
-     * Rotates the encryption key protecting a node's content.
+     * Updates the encryption key for a node.
      *
      * @param auth   optional Basic authentication header
      * @param nodeId identifier of the node whose key should be updated
@@ -447,6 +448,41 @@ public class VaultApiController {
 
         keyService.updateKey(nodeId);
         return ResponseEntity.ok(String.format("Encryption key updated for node %s.", nodeId));
+    }
+
+    /**
+     *  Re-encrypts all nodes currently protected with the specified key version.
+     *
+     * @param auth   optional Basic authentication header
+     * @param keyVersion version of the outdated encryption key
+     * @return a confirmation message
+     */
+    @SecurityRequirement(name = "basicAuth")
+    @GetMapping("/nodes/update-keys")
+    @Operation(
+            summary = "Re-encrypts nodes",
+            description = " Re-encrypts all nodes currently protected with the specified key version.",
+            parameters = {
+                    @Parameter(name = "keyVersion", description = "Version of the encryption key to update", required = true, in = ParameterIn.QUERY)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Update required",
+                            content = @Content(mediaType = "text/plain")),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized",
+                            content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Internal server error",
+                            content = @Content)
+            })
+    public ResponseEntity<?> updateKey(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
+            @Parameter int keyVersion) {
+
+        if (!authenticationService.isAuthorized(auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        CompletableFuture.runAsync(() -> keyService.updateKeys(keyVersion));
+        return ResponseEntity.ok("Update required.");
     }
 
 }
