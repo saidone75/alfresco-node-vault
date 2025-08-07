@@ -45,6 +45,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -347,7 +348,7 @@ public class VaultApiController {
      * @return a confirmation message
      */
     @SecurityRequirement(name = "basicAuth")
-    @GetMapping("/nodes/{nodeId}/update-key")
+    @PostMapping("/nodes/{nodeId}/update-key")
     @Operation(
             summary = "Update encryption key",
             description = "Update the encryption key of the specified node.",
@@ -385,7 +386,7 @@ public class VaultApiController {
      * @return a confirmation message
      */
     @SecurityRequirement(name = "basicAuth")
-    @GetMapping("/nodes/update-keys")
+    @PostMapping("/nodes/update-keys")
     @Operation(
             summary = "Re-encrypts nodes",
             description = "Re-encrypts all nodes with the specified key version. The update runs asynchronously.",
