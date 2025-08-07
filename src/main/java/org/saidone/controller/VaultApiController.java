@@ -31,9 +31,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.logging.log4j.util.Strings;
-import org.saidone.exception.NodeNotFoundException;
-import org.saidone.exception.NotarizationException;
-import org.saidone.exception.VaultException;
 import org.saidone.model.Entry;
 import org.saidone.service.AuthenticationService;
 import org.saidone.service.NodeService;
@@ -89,81 +86,6 @@ public class VaultApiController {
      * Manages encryption key rotation for node content.
      */
     private final KeyService keyService;
-
-    /**
-     * Handles any unexpected exception thrown during request processing.
-     *
-     * @param e the exception that was raised
-     * @return a generic {@code 500 Internal Server Error} response
-     */
-    @ExceptionHandler(Exception.class)
-    @Operation(hidden = true)
-    public ResponseEntity<String> handleException(Exception e) {
-        log.error(e.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Internal server error");
-    }
-
-    /**
-     * Handles vault specific errors that may occur while processing a request.
-     *
-     * @param e the thrown {@link VaultException}
-     * @return a generic error response with HTTP status {@code 500}
-     */
-    @ExceptionHandler(VaultException.class)
-    @Operation(hidden = true)
-    public ResponseEntity<String> handleVaultException(VaultException e) {
-        log.error(e.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Internal server error");
-    }
-
-    /**
-     * Handles cases where the requested node cannot be found in the vault.
-     *
-     * @param e the thrown exception
-     * @return a response with HTTP status {@code 404 Not Found}
-     */
-    @ExceptionHandler(NodeNotFoundException.class)
-    @Operation(hidden = true)
-    public ResponseEntity<String> handleNodeNotFoundException(NodeNotFoundException e) {
-        log.error(e.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.NOT_FOUND)
-                .body("Node not found");
-    }
-
-    /**
-     * Handles out-of-memory situations that may occur when streaming large files.
-     *
-     * @param e the {@link OutOfMemoryError} encountered
-     * @return a response indicating that the server ran out of memory
-     */
-    @ExceptionHandler(OutOfMemoryError.class)
-    @Operation(hidden = true)
-    public ResponseEntity<String> handleOutOfMemoryError(OutOfMemoryError e) {
-        log.error(e.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Server memory limit exceeded. Please try with a smaller file or contact administrator.");
-    }
-
-    /**
-     * Handles errors related to the notarization process.
-     *
-     * @param e the thrown {@link NotarizationException}
-     * @return an internal server error response containing the exception message
-     */
-    @ExceptionHandler(NotarizationException.class)
-    @Operation(hidden = true)
-    public ResponseEntity<String> handleNotarizationException(NotarizationException e) {
-        log.error(e.getMessage());
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(e.getMessage());
-    }
 
     /**
      * Returns the metadata of a node stored in the vault.
