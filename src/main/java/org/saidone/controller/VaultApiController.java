@@ -38,6 +38,7 @@ import org.saidone.service.VaultService;
 import org.saidone.service.content.ContentService;
 import org.saidone.service.crypto.KeyService;
 import org.saidone.service.notarization.NotarizationService;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -87,6 +88,11 @@ public class VaultApiController {
      * Manages encryption key rotation for node content.
      */
     private final KeyService keyService;
+
+    /**
+     * Executor used for asynchronous operations.
+     */
+    private final TaskExecutor taskExecutor;
 
     /**
      * Returns the metadata of a node stored in the vault.
@@ -298,7 +304,15 @@ public class VaultApiController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(String.format("Node %s is already notarized.", nodeId));
         }
         // Run notarization asynchronously to avoid blocking the caller
-        CompletableFuture.runAsync(() -> notarizationService.notarizeNode(nodeId));
+        CompletableFuture.runAsync(() -> {
+            try {
+                log.info("Starting notarization for node {}", nodeId);
+                notarizationService.notarizeNode(nodeId);
+                log.info("Completed notarization for node {}", nodeId);
+            } catch (Exception e) {
+                log.error("Error while notarizing node {}", nodeId, e);
+            }
+        }, taskExecutor);
         return ResponseEntity.ok().body(String.format("Notarization for node %s required.", nodeId));
     }
 
@@ -410,7 +424,15 @@ public class VaultApiController {
         }
 
         // Re-key nodes asynchronously to avoid long blocking requests
-        CompletableFuture.runAsync(() -> keyService.updateKeys(keyVersion));
+        CompletableFuture.runAsync(() -> {
+            try {
+                log.info("Starting key update for version {}", keyVersion);
+                keyService.updateKeys(keyVersion);
+                log.info("Completed key update for version {}", keyVersion);
+            } catch (Exception e) {
+                log.error("Error while updating keys for version {}", keyVersion, e);
+            }
+        }, taskExecutor);
         return ResponseEntity.ok("Update required.");
     }
 
