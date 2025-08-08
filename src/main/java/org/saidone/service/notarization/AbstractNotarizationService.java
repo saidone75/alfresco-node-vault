@@ -81,7 +81,6 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
      */
     @SneakyThrows
     public void notarizeNode(String nodeId) {
-        log.debug("Notarizing document {}", nodeId);
         val hash = contentService.computeHash(nodeId, checksumAlgorithm);
         val txHash = putHash(nodeId, hash);
         val nodeWrapper = nodeService.findById(nodeId);
@@ -101,7 +100,7 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
      */
     @SneakyThrows
     public void checkNotarization(String nodeId) {
-        log.debug("Checking notarization for document {}", nodeId);
+        log.debug("Checking notarization for node {}", nodeId);
         val notarizationTransactionId = nodeService.findById(nodeId).getNotarizationTxId();
         if (Strings.isBlank(notarizationTransactionId)) {
             throw new NotarizationException(String.format("Node %s is not notarized", nodeId));
