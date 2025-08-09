@@ -27,6 +27,8 @@ import org.saidone.model.NodeWrapper;
 import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+
 /**
  * Default {@link NodeService} implementation that persists node metadata using
  * a {@link MongoNodeRepositoryImpl}. It throws
@@ -62,6 +64,14 @@ public class MongoNodeService extends BaseComponent implements NodeService {
         } else {
             throw new NodeNotFoundOnVaultException(nodeId);
         }
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Iterable<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
+        return mongoNodeRepository.findByArchiveDateRange(from, to);
     }
 
     /**

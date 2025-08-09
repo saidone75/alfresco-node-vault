@@ -35,6 +35,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -81,7 +82,9 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public <S extends NodeWrapper> S insert(@NonNull S entity) {
@@ -89,7 +92,9 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return entity;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public <S extends NodeWrapper> List<S> insert(@NonNull Iterable<S> entities) {
@@ -100,7 +105,9 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return result;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public <S extends NodeWrapper> S save(@NonNull S entity) {
@@ -108,7 +115,9 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return entity;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public <S extends NodeWrapper> List<S> saveAll(@NonNull Iterable<S> entities) {
@@ -119,7 +128,9 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return result;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public <S extends NodeWrapper> Optional<S> findOne(@NonNull Example<S> example) {
@@ -128,7 +139,9 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
                 example.getProbeType()));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public <S extends NodeWrapper> List<S> findAll(@NonNull Example<S> example) {
@@ -137,7 +150,9 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
                 example.getProbeType());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public <S extends NodeWrapper> List<S> findAll(@NonNull Example<S> example, @NonNull Sort sort) {
@@ -146,7 +161,9 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
                 example.getProbeType());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public <S extends NodeWrapper> Page<S> findAll(@NonNull Example<S> example, @NonNull Pageable pageable) {
@@ -171,24 +188,52 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         throw new UnsupportedOperationException(String.format("Method %s is not implemented in this version of the repository", methodSignature));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public Optional<NodeWrapper> findById(@NonNull String id) {
         return Optional.ofNullable(mongoOperations.findById(id, NodeWrapper.class));
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean existsById(@NonNull String id) {
         return mongoOperations.exists(Query.query(Criteria.where("_id").is(id)), NodeWrapper.class);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public List<NodeWrapper> findAll() {
         return mongoOperations.findAll(NodeWrapper.class);
+    }
+
+    /**
+     * Retrieves node wrappers whose archive date falls within the specified range.
+     *
+     * @param from lower bound of the archive date range, inclusive. {@code null} for no lower bound.
+     * @param to   upper bound of the archive date range, inclusive. {@code null} for no upper bound.
+     * @return list of matching nodes
+     */
+    public List<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
+        Criteria criteria;
+        if (from != null && to != null) {
+            criteria = Criteria.where("adt").gte(from).lte(to);
+        } else if (from != null) {
+            criteria = Criteria.where("adt").gte(from);
+        } else if (to != null) {
+            criteria = Criteria.where("adt").lte(to);
+        } else {
+            return findAll();
+        }
+        val query = new Query(criteria);
+        return mongoOperations.find(query, NodeWrapper.class);
     }
 
     /**
@@ -214,7 +259,9 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return mongoOperations.find(query, NodeWrapper.class);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public List<NodeWrapper> findAllById(@NonNull Iterable<String> ids) {
@@ -222,33 +269,43 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return mongoOperations.find(query, NodeWrapper.class);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public long count() {
         return mongoOperations.count(new Query(), NodeWrapper.class);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteById(@NonNull String id) {
         val query = new Query(Criteria.where("_id").is(id));
         mongoOperations.remove(query, NodeWrapper.class);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void delete(@NonNull NodeWrapper entity) {
         mongoOperations.remove(entity);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteAllById(@NonNull Iterable<? extends String> ids) {
         val query = new Query(Criteria.where("_id").in(ids));
         mongoOperations.remove(query, NodeWrapper.class);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteAll(@NonNull Iterable<? extends NodeWrapper> entities) {
         for (val entity : entities) {
@@ -256,20 +313,26 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         }
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void deleteAll() {
         mongoOperations.remove(new Query(), NodeWrapper.class);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public List<NodeWrapper> findAll(@NonNull Sort sort) {
         return mongoOperations.find(new Query().with(sort), NodeWrapper.class);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     @NonNull
     public Page<NodeWrapper> findAll(@NonNull Pageable pageable) {
@@ -281,13 +344,17 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return new PageImpl<>(content, pageable, count);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <S extends NodeWrapper> long count(@NonNull Example<S> example) {
         return mongoOperations.count(Query.query(Criteria.byExample(example)), example.getProbeType());
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public <S extends NodeWrapper> boolean exists(@NonNull Example<S> example) {
         return mongoOperations.exists(Query.query(Criteria.byExample(example)), example.getProbeType());
