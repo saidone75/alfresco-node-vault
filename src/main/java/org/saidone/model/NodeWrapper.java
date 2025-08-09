@@ -49,34 +49,40 @@ import java.time.Instant;
 @Slf4j
 public class NodeWrapper {
 
-    @Transient
-    @JsonIgnore
     /**
      * Shared {@link ObjectMapper} used for serializing and deserializing
      * the wrapped {@link Node}. It is configured via {@link #createObjectMapper()}.
      */
+    @Transient
+    @JsonIgnore
     private static final ObjectMapper objectMapper = createObjectMapper();
 
-    @Id
     /** Identifier of the wrapped Alfresco node. */
+    @Id
     private String id;
-    @Field("adt")
+
     /** Timestamp when the node was archived. */
+    @Field("adt")
     private Instant archiveDate;
-    @Field("res")
+
     /** Flag indicating whether the node has been restored. */
+    @Field("res")
     private boolean restored;
-    @Field("enc")
+
     /** Flag signalling that {@link #nodeJson} is encrypted. */
+    @Field("enc")
     private boolean encrypted;
-    @Field("kv")
+
     /** Version of the key used to encrypt {@link #nodeJson}. */
+    @Field("kv")
     private int keyVersion;
-    @Field("nj")
+
     /** JSON representation of the node. May be encrypted. */
+    @Field("nj")
     private String nodeJson;
-    @Field("ntx")
+
     /** Transaction id returned from notarization, if any. */
+    @Field("ntx")
     private String notarizationTxId;
 
     /**

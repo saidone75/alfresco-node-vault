@@ -48,6 +48,7 @@ public class ResourceFileUtils {
      *
      * @param resourcePath the path to the resource, either absolute path in the filesystem or a classpath resource
      * @return the {@link File} object representing the resource
+     * @throws IOException if an I/O error occurs while accessing the resource
      */
     public File getFileFromResource(String resourcePath) throws IOException {
         return getFileFromResource(resourcePath, null);
