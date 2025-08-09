@@ -38,15 +38,14 @@ import org.saidone.service.VaultService;
 import org.saidone.service.content.ContentService;
 import org.saidone.service.crypto.KeyService;
 import org.saidone.service.notarization.NotarizationService;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 /**
