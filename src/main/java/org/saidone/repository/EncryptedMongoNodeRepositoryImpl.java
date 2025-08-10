@@ -34,11 +34,13 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Repository implementation that encrypts node data before saving to MongoDB
- * and decrypts it when retrieving. The bean is activated only when both
+ * Repository implementation that encrypts {@link NodeWrapper} data before
+ * persisting it to MongoDB and decrypts it on retrieval.
+ *
+ * <p>The bean is activated only when both
  * {@code application.service.vault.encryption.enabled} and
  * {@code application.service.vault.encryption.metadata} are set to
- * {@code true} in the application properties.
+ * {@code true} in the application properties.</p>
  */
 @Repository
 @ConditionalOnProperty(name = {"application.service.vault.encryption.enabled", "application.service.vault.encryption.metadata"},
@@ -83,37 +85,26 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
     /**
      * Finds a node by its ID and decrypts its JSON content if it is encrypted.
      *
-     * @param s the ID of the node to find
+     * @param id the ID of the node to find
      * @return an Optional containing the found node, or empty if not found
      */
     @Override
-    public @NonNull Optional<NodeWrapper> findById(@NonNull String s) {
-        val result = super.findById(s);
+    public @NonNull Optional<NodeWrapper> findById(@NonNull String id) {
+        val result = super.findById(id);
         result.ifPresent(this::decryptNode);
         return result;
     }
 
-    /**
-     * Retrieves node wrappers whose archive date falls within the specified range.
-     *
-     * @param from lower bound of the archive date range, inclusive. {@code null} for no lower bound.
-     * @param to   upper bound of the archive date range, inclusive. {@code null} for no upper bound.
-     * @return list of matching nodes
-     */
+    /** {@inheritDoc} */
+    @Override
     public List<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
         val result = super.findByArchiveDateRange(from, to);
         result.forEach(this::decryptNode);
         return result;
     }
 
-    /**
-     * Retrieves node wrappers archived within the specified date range using pagination.
-     *
-     * @param from     lower bound of the archive date range, inclusive. {@code null} for no lower bound.
-     * @param to       upper bound of the archive date range, inclusive. {@code null} for no upper bound.
-     * @param pageable pagination information
-     * @return page of matching nodes
-     */
+    /** {@inheritDoc} */
+    @Override
     public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
         val result = super.findByArchiveDateRange(from, to, pageable);
         result.getContent().forEach(this::decryptNode);

@@ -43,21 +43,26 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 /**
- * Repository implementation for managing NodeWrapper entities in MongoDB.
- * <p>
- * Implements the MongoRepository interface using MongoOperations to perform database operations.
- * <p>
- * Activation of this repository is controlled by the property 'application.service.vault.encryption.enabled':
- * it is enabled when the value is "false" or the property is missing.
- * <p>
- * Offers various CRUD operations such as insertion, save, batch operations, find by example, find by sort
- * or pageable criteria, counting, and removal of entities. Supports custom queries using Example, Sort, and Pageable.
- * <p>
- * The findBy(Example, Function) method is not implemented and will always throw an UnsupportedOperationException.
- * <p>
- * This class extends BaseComponent and is intended for scenarios where node encryption is disabled at the application level.
- * <p>
- * Depends on MongoOperations for thread-safe persistence handling of NodeWrapper documents.
+ * Repository implementation for managing {@link NodeWrapper} entities in MongoDB.
+ *
+ * <p>Implements the {@link MongoRepository} interface using {@link MongoOperations}
+ * to perform database operations.</p>
+ *
+ * <p>Activation of this repository is controlled by the
+ * {@code application.service.vault.encryption.enabled} property: the bean is
+ * instantiated when the value is {@code false} or the property is missing.</p>
+ *
+ * <p>Provides CRUD operations including insertion, saving, batch operations, and
+ * queries by {@link Example}, {@link Sort} or {@link Pageable}. It also supports
+ * counting and removal of entities.</p>
+ *
+ * <p>The {@code findBy(Example, Function)} method is not implemented and always
+ * throws an {@link UnsupportedOperationException}.</p>
+ *
+ * <p>This class extends {@link BaseComponent} and is intended for scenarios
+ * where node encryption is disabled at the application level. It relies on
+ * {@link MongoOperations} for thread-safe persistence of {@link NodeWrapper}
+ * documents.</p>
  */
 @Repository
 @RequiredArgsConstructor
