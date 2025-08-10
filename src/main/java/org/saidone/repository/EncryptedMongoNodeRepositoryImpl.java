@@ -24,9 +24,15 @@ import org.saidone.model.NodeWrapper;
 import org.saidone.service.SecretService;
 import org.saidone.service.crypto.CryptoService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -86,6 +92,33 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
     public @NonNull Optional<NodeWrapper> findById(@NonNull String s) {
         val result = super.findById(s);
         result.ifPresent(this::decryptNode);
+        return result;
+    }
+
+    /**
+     * Retrieves node wrappers whose archive date falls within the specified range.
+     *
+     * @param from lower bound of the archive date range, inclusive. {@code null} for no lower bound.
+     * @param to   upper bound of the archive date range, inclusive. {@code null} for no upper bound.
+     * @return list of matching nodes
+     */
+    public List<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
+        val result = super.findByArchiveDateRange(from, to);
+        result.forEach(this::decryptNode);
+        return result;
+    }
+
+    /**
+     * Retrieves node wrappers archived within the specified date range using pagination.
+     *
+     * @param from     lower bound of the archive date range, inclusive. {@code null} for no lower bound.
+     * @param to       upper bound of the archive date range, inclusive. {@code null} for no upper bound.
+     * @param pageable pagination information
+     * @return page of matching nodes
+     */
+    public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
+        val result = super.findByArchiveDateRange(from, to, pageable);
+        result.getContent().forEach(this::decryptNode);
         return result;
     }
 
