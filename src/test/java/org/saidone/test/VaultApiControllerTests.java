@@ -121,6 +121,31 @@ class VaultApiControllerTests extends BaseTest {
     }
 
     @Test
+    @Order(20)
+    @SneakyThrows
+    void searchNodesByArchiveDateTest() {
+        val nodeId1 = createNode().getId();
+        Thread.sleep(1000);
+        val nodeId2 = createNode().getId();
+        vaultService.archiveNode(nodeId1);
+        Thread.sleep(1000);
+        vaultService.archiveNode(nodeId2);
+
+        performRequestAndProcess(HttpMethod.GET, "/api/vault/search?page={page}&size={size}", new Object[]{0, 1},
+                null, 200, String.class, body -> {
+                    assertTrue(body.contains(nodeId1));
+                    assertFalse(body.contains(nodeId2));
+                    assertTrue(body.contains("\"totalElements\":2"));
+                });
+
+        performRequestAndProcess(HttpMethod.GET, "/api/vault/search?page={page}&size={size}", new Object[]{1, 1},
+                null, 200, String.class, body -> {
+                    assertTrue(body.contains(nodeId2));
+                    assertFalse(body.contains(nodeId1));
+                });
+    }
+
+    @Test
     @Order(30)
     @SneakyThrows
     void restoreNodeTest() {

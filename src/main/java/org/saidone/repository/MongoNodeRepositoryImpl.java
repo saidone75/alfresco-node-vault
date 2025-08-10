@@ -237,6 +237,31 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
     }
 
     /**
+     * Retrieves node wrappers archived within the specified date range using pagination.
+     *
+     * @param from     lower bound of the archive date range, inclusive. {@code null} for no lower bound.
+     * @param to       upper bound of the archive date range, inclusive. {@code null} for no upper bound.
+     * @param pageable pagination information
+     * @return page of matching nodes
+     */
+    public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
+        Criteria criteria;
+        if (from != null && to != null) {
+            criteria = Criteria.where("adt").gte(from).lte(to);
+        } else if (from != null) {
+            criteria = Criteria.where("adt").gte(from);
+        } else if (to != null) {
+            criteria = Criteria.where("adt").lte(to);
+        } else {
+            return findAll(pageable);
+        }
+        long count = mongoOperations.count(new Query(criteria), NodeWrapper.class);
+        val query = new Query(criteria).with(pageable);
+        val content = mongoOperations.find(query, NodeWrapper.class);
+        return new PageImpl<>(content, pageable, count);
+    }
+
+    /**
      * Retrieves node wrappers by notarization transaction ID. A {@code null} value
      * matches nodes without a transaction ID.
      *

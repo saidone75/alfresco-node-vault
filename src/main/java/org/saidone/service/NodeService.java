@@ -20,6 +20,8 @@ package org.saidone.service;
 
 import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.model.NodeWrapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
 
@@ -56,6 +58,18 @@ public interface NodeService {
      * @return iterable collection of {@link NodeWrapper}
      */
     Iterable<NodeWrapper> findByArchiveDateRange(Instant from, Instant to);
+
+    /**
+     * Retrieves node wrappers archived within the specified date range using pagination.
+     * Both bounds are inclusive. Passing {@code null} for one of the parameters will
+     * make the range open-ended on that side.
+     *
+     * @param from     the lower bound of the archive date range, inclusive
+     * @param to       the upper bound of the archive date range, inclusive
+     * @param pageable pagination information
+     * @return page of {@link NodeWrapper}
+     */
+    Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Pageable pageable);
 
     /**
      * Retrieves all node wrappers having the given notarization transaction ID.
