@@ -25,6 +25,8 @@ import org.saidone.component.BaseComponent;
 import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.model.NodeWrapper;
 import org.saidone.repository.MongoNodeRepositoryImpl;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -72,6 +74,14 @@ public class MongoNodeService extends BaseComponent implements NodeService {
     @Override
     public Iterable<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
         return mongoNodeRepository.findByArchiveDateRange(from, to);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
+        return mongoNodeRepository.findByArchiveDateRange(from, to, pageable);
     }
 
     /**
