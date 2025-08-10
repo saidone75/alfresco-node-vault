@@ -40,6 +40,10 @@ import org.saidone.service.crypto.KeyService;
 import org.saidone.service.notarization.NotarizationService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -47,6 +51,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.concurrent.CompletableFuture;
+import java.time.Instant;
 
 /**
  * REST controller that exposes operations for interacting with the vault.
@@ -92,6 +97,52 @@ public class VaultApiController {
      * Executor used for asynchronous operations.
      */
     private final TaskExecutor taskExecutor;
+
+    /**
+     * Searches nodes archived within the specified date range with pagination support.
+     *
+     * @param auth optional Basic authentication header
+     * @param from start of the archive date range (inclusive)
+     * @param to   end of the archive date range (inclusive)
+     * @param page page number
+     * @param size page size
+     * @return paginated list of node entries
+     */
+    @SecurityRequirement(name = "basicAuth")
+    @GetMapping("/search")
+    @Operation(
+            summary = "Search archived nodes",
+            description = "Search nodes by archive date range.",
+            parameters = {
+                    @Parameter(name = "from", description = "Start archive date (ISO-8601)", in = ParameterIn.QUERY),
+                    @Parameter(name = "to", description = "End archive date (ISO-8601)", in = ParameterIn.QUERY),
+                    @Parameter(name = "page", description = "Page number", in = ParameterIn.QUERY),
+                    @Parameter(name = "size", description = "Page size", in = ParameterIn.QUERY)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Nodes retrieved",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = Entry.class))),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+            })
+    @SneakyThrows
+    public ResponseEntity<Page<Entry>> searchNodes(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
+            @RequestParam(required = false) Instant from,
+            @RequestParam(required = false) Instant to,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "20") int size) {
+
+        if (!authenticationService.isAuthorized(auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "archiveDate"));
+        val result = nodeService.findByArchiveDateRange(from, to, pageable)
+                .map(nodeWrapper -> new Entry(nodeWrapper.getNode()));
+        return ResponseEntity.ok(result);
+    }
 
     /**
      * Returns the metadata of a node stored in the vault.
