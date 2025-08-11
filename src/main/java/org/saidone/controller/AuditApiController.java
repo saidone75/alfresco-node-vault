@@ -64,9 +64,9 @@ public class AuditApiController {
      * @param auth optional Basic authentication header
      * @param type filter by entry type
      * @param from start timestamp (inclusive)
-     * @param to        end timestamp (inclusive)
-     * @param size  maximum number of items to return
-     * @param page number of items to skip (for pagination)
+     * @param to   end timestamp (inclusive)
+     * @param page page number
+     * @param size page size
      * @return the list of matching audit entries
      */
     @SecurityRequirement(name = "basicAuth")
