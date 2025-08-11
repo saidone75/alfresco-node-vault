@@ -67,7 +67,7 @@ public class AuditServiceImpl extends BaseComponent implements AuditService {
      * @return list of matching audit entries ordered by timestamp descending
      */
     @Override
-    public List<AuditEntry> findEntries(String type, Instant from, Instant to, int maxItems, int skipCount) {
+    public List<AuditEntry> findEntries(String type, Instant from, Instant to, Pageable pageable) {
         val criteriaList = new ArrayList<Criteria>();
         if (type != null) {
             criteriaList.add(Criteria.where("type").is(type));
@@ -82,7 +82,6 @@ public class AuditServiceImpl extends BaseComponent implements AuditService {
         if (!criteriaList.isEmpty()) {
             query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
         }
-        var pageable = Pageable.ofSize(maxItems).withPage(skipCount);
         query.with(pageable);
         query.with(Sort.by(Sort.Direction.DESC, "timestamp"));
         return mongoTemplate.find(query, AuditEntry.class);
