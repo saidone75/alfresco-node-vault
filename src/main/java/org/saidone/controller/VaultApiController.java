@@ -42,7 +42,6 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -50,8 +49,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.concurrent.CompletableFuture;
 import java.time.Instant;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * REST controller that exposes operations for interacting with the vault.
@@ -138,7 +137,7 @@ public class VaultApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "archiveDate"));
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "archiveDate"));
         val result = nodeService.findByArchiveDateRange(from, to, pageable)
                 .map(nodeWrapper -> new Entry(nodeWrapper.getNode()));
         return ResponseEntity.ok(result);

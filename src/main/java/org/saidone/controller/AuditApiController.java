@@ -32,6 +32,8 @@ import lombok.val;
 import org.saidone.service.AuthenticationService;
 import org.saidone.service.audit.AuditEntry;
 import org.saidone.service.audit.AuditServiceImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -63,8 +65,8 @@ public class AuditApiController {
      * @param type filter by entry type
      * @param from start timestamp (inclusive)
      * @param to        end timestamp (inclusive)
-     * @param maxItems  maximum number of items to return
-     * @param skipCount number of items to skip (for pagination)
+     * @param size  maximum number of items to return
+     * @param page number of items to skip (for pagination)
      * @return the list of matching audit entries
      */
     @SecurityRequirement(name = "basicAuth")
@@ -90,14 +92,15 @@ public class AuditApiController {
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Instant from,
             @RequestParam(required = false) Instant to,
-            @RequestParam(required = false, defaultValue = "20") int maxItems,
-            @RequestParam(required = false, defaultValue = "0") int skipCount) {
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "20") int size) {
 
         if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        val list = auditService.findEntries(type, from, to, maxItems, skipCount);
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "archiveDate"));
+        val list = auditService.findEntries(type, from, to, pageable);
         return ResponseEntity.ok(list);
     }
 
