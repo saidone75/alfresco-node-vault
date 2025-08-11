@@ -47,11 +47,10 @@ public interface AuditService {
     /**
      * Retrieve stored audit entries.
      *
-     * @param type      optional entry type to filter by
-     * @param from      lower bound of the timestamp range (inclusive)
-     * @param to        upper bound of the timestamp range (inclusive)
-     * @param maxItems  maximum number of items to return
-     * @param skipCount number of items to skip (for pagination)
+     * @param type     optional entry type to filter by
+     * @param from     lower bound of the timestamp range (inclusive)
+     * @param to       upper bound of the timestamp range (inclusive)
+     * @param pageable pagination information such as page number and size
      * @return list of matching audit entries ordered by timestamp descending
      */
     List<AuditEntry> findEntries(String type, Instant from, Instant to, Pageable pageable);
