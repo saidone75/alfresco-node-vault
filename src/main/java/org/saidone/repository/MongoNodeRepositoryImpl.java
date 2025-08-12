@@ -224,7 +224,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
      *
      * @param from lower bound of the archive date range, inclusive. {@code null} for no lower bound.
      * @param to   upper bound of the archive date range, inclusive. {@code null} for no upper bound.
-     * @return list of matching nodes
+     * @return page of matching nodes
      */
     public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
         return findByArchiveDateRange(from, to, null);
@@ -232,6 +232,12 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
 
     /**
      * Retrieves node wrappers archived within the specified date range using pagination.
+     *
+     * <p>When both {@code from} and {@code to} are {@code null}, this method
+     * delegates to {@link #findAll(Pageable)}.</p>
+     *
+     * <p>If the supplied {@link Pageable} does not define a sort order, results
+     * are ordered by archive date in ascending order.</p>
      *
      * @param from     lower bound of the archive date range, inclusive. {@code null} for no lower bound.
      * @param to       upper bound of the archive date range, inclusive. {@code null} for no upper bound.

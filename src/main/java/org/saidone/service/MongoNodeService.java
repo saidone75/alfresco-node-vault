@@ -27,7 +27,6 @@ import org.saidone.model.NodeWrapper;
 import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -45,7 +44,12 @@ public class MongoNodeService extends BaseComponent implements NodeService {
     /** Repository used for persisting and retrieving node metadata. */
     private final MongoNodeRepositoryImpl mongoNodeRepository;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     *
+     * <p>This implementation simply delegates to
+     * {@link MongoNodeRepositoryImpl#save(NodeWrapper)}.</p>
+     */
     @Override
     @SneakyThrows
     public void save(NodeWrapper nodeWrapper) {
@@ -95,6 +99,9 @@ public class MongoNodeService extends BaseComponent implements NodeService {
 
     /**
      * {@inheritDoc}
+     *
+     * <p>The returned iterable is backed by the underlying repository and
+     * reflects the current state of the vault.</p>
      */
     @Override
     public Iterable<NodeWrapper> findAll() {
