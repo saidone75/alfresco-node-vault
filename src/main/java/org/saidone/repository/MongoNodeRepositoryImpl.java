@@ -227,6 +227,19 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
      * @return list of matching nodes
      */
     public List<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
+        return findByArchiveDateRange(from, to, Sort.by(Sort.Direction.ASC, "adt"));
+    }
+
+    /**
+     * Retrieves node wrappers whose archive date falls within the specified range
+     * applying the provided {@link Sort} order.
+     *
+     * @param from lower bound of the archive date range, inclusive. {@code null} for no lower bound.
+     * @param to   upper bound of the archive date range, inclusive. {@code null} for no upper bound.
+     * @param sort sort directive, defaults to ascending {@code adt} if {@code null}
+     * @return list of matching nodes
+     */
+    public List<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Sort sort) {
         Criteria criteria;
         if (from != null && to != null) {
             criteria = Criteria.where("adt").gte(from).lte(to);
@@ -235,9 +248,9 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         } else if (to != null) {
             criteria = Criteria.where("adt").lte(to);
         } else {
-            return findAll();
+            return findAll(sort != null ? sort : Sort.by(Sort.Direction.ASC, "adt"));
         }
-        val query = new Query(criteria);
+        val query = new Query(criteria).with(sort != null ? sort : Sort.by(Sort.Direction.ASC, "adt"));
         return mongoOperations.find(query, NodeWrapper.class);
     }
 
@@ -260,10 +273,14 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         } else {
             return findAll(pageable);
         }
+        Pageable sortedPageable = pageable;
+        if (pageable.getSort().isUnsorted()) {
+            sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "adt"));
+        }
         long count = mongoOperations.count(new Query(criteria), NodeWrapper.class);
-        val query = new Query(criteria).with(pageable);
+        val query = new Query(criteria).with(sortedPageable);
         val content = mongoOperations.find(query, NodeWrapper.class);
-        return new PageImpl<>(content, pageable, count);
+        return new PageImpl<>(content, sortedPageable, count);
     }
 
     /**
