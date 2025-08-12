@@ -38,6 +38,9 @@ import java.util.Optional;
  * Repository implementation that encrypts {@link NodeWrapper} data before
  * persisting it to MongoDB and decrypts it on retrieval.
  *
+ * <p>Encryption keys are supplied by {@link SecretService} and the actual
+ * cryptographic operations are delegated to {@link CryptoService}.</p>
+ *
  * <p>The bean is activated only when both
  * {@code application.service.vault.encryption.enabled} and
  * {@code application.service.vault.encryption.metadata} are set to
@@ -96,23 +99,11 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
         return result;
     }
 
-    /** {@inheritDoc} */
-    @Override
-    public List<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
-        val result = super.findByArchiveDateRange(from, to);
-        result.forEach(this::decryptNode);
-        return result;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Sort sort) {
-        val result = super.findByArchiveDateRange(from, to, sort);
-        result.forEach(this::decryptNode);
-        return result;
-    }
-
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The resulting nodes are decrypted before being returned.</p>
+     */
     @Override
     public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
         val result = super.findByArchiveDateRange(from, to, pageable);

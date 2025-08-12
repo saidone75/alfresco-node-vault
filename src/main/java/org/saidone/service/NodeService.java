@@ -29,6 +29,10 @@ import java.time.Instant;
  * Service abstraction for persisting and retrieving node metadata within the
  * vault. Implementations typically store {@link NodeWrapper} instances in a
  * backing store such as MongoDB.
+ *
+ * <p>The API is intentionally minimal and focused on CRUD-style operations.
+ * Higher level orchestration of archive and restore flows is handled by
+ * {@link org.saidone.service.VaultService}.</p>
  */
 public interface NodeService {
 
@@ -47,17 +51,6 @@ public interface NodeService {
      * @throws NodeNotFoundOnVaultException if the node does not exist in the vault
      */
     NodeWrapper findById(String nodeId);
-
-    /**
-     * Retrieves node wrappers archived within the specified date range.
-     * Both bounds are inclusive. Passing {@code null} for one of the
-     * parameters will make the range open-ended on that side.
-     *
-     * @param from the lower bound of the archive date range, inclusive
-     * @param to   the upper bound of the archive date range, inclusive
-     * @return iterable collection of {@link NodeWrapper}
-     */
-    Iterable<NodeWrapper> findByArchiveDateRange(Instant from, Instant to);
 
     /**
      * Retrieves node wrappers archived within the specified date range using pagination.

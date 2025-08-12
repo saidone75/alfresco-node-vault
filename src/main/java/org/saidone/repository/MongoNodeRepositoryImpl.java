@@ -224,38 +224,20 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
      *
      * @param from lower bound of the archive date range, inclusive. {@code null} for no lower bound.
      * @param to   upper bound of the archive date range, inclusive. {@code null} for no upper bound.
-     * @return list of matching nodes
+     * @return page of matching nodes
      */
-    public List<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
-        return findByArchiveDateRange(from, to, Sort.by(Sort.Direction.ASC, "adt"));
-    }
-
-    /**
-     * Retrieves node wrappers whose archive date falls within the specified range
-     * applying the provided {@link Sort} order.
-     *
-     * @param from lower bound of the archive date range, inclusive. {@code null} for no lower bound.
-     * @param to   upper bound of the archive date range, inclusive. {@code null} for no upper bound.
-     * @param sort sort directive, defaults to ascending {@code adt} if {@code null}
-     * @return list of matching nodes
-     */
-    public List<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Sort sort) {
-        Criteria criteria;
-        if (from != null && to != null) {
-            criteria = Criteria.where("adt").gte(from).lte(to);
-        } else if (from != null) {
-            criteria = Criteria.where("adt").gte(from);
-        } else if (to != null) {
-            criteria = Criteria.where("adt").lte(to);
-        } else {
-            return findAll(sort != null ? sort : Sort.by(Sort.Direction.ASC, "adt"));
-        }
-        val query = new Query(criteria).with(sort != null ? sort : Sort.by(Sort.Direction.ASC, "adt"));
-        return mongoOperations.find(query, NodeWrapper.class);
+    public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
+        return findByArchiveDateRange(from, to, null);
     }
 
     /**
      * Retrieves node wrappers archived within the specified date range using pagination.
+     *
+     * <p>When both {@code from} and {@code to} are {@code null}, this method
+     * delegates to {@link #findAll(Pageable)}.</p>
+     *
+     * <p>If the supplied {@link Pageable} does not define a sort order, results
+     * are ordered by archive date in ascending order.</p>
      *
      * @param from     lower bound of the archive date range, inclusive. {@code null} for no lower bound.
      * @param to       upper bound of the archive date range, inclusive. {@code null} for no upper bound.
@@ -273,14 +255,17 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         } else {
             return findAll(pageable);
         }
-        Pageable sortedPageable = pageable;
+
         if (pageable.getSort().isUnsorted()) {
-            sortedPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "adt"));
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "adt"));
+        } else {
+            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "adt"));
         }
+
         long count = mongoOperations.count(new Query(criteria), NodeWrapper.class);
-        val query = new Query(criteria).with(sortedPageable);
+        val query = new Query(criteria).with(pageable);
         val content = mongoOperations.find(query, NodeWrapper.class);
-        return new PageImpl<>(content, sortedPageable, count);
+        return new PageImpl<>(content, pageable, count);
     }
 
     /**

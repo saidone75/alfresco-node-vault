@@ -44,7 +44,12 @@ public class MongoNodeService extends BaseComponent implements NodeService {
     /** Repository used for persisting and retrieving node metadata. */
     private final MongoNodeRepositoryImpl mongoNodeRepository;
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     *
+     * <p>This implementation simply delegates to
+     * {@link MongoNodeRepositoryImpl#save(NodeWrapper)}.</p>
+     */
     @Override
     @SneakyThrows
     public void save(NodeWrapper nodeWrapper) {
@@ -66,14 +71,6 @@ public class MongoNodeService extends BaseComponent implements NodeService {
         } else {
             throw new NodeNotFoundOnVaultException(nodeId);
         }
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
-        return mongoNodeRepository.findByArchiveDateRange(from, to);
     }
 
     /**
@@ -102,6 +99,9 @@ public class MongoNodeService extends BaseComponent implements NodeService {
 
     /**
      * {@inheritDoc}
+     *
+     * <p>The returned iterable is backed by the underlying repository and
+     * reflects the current state of the vault.</p>
      */
     @Override
     public Iterable<NodeWrapper> findAll() {
