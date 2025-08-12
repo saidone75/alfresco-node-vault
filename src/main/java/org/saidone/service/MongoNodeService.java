@@ -73,22 +73,6 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      * {@inheritDoc}
      */
     @Override
-    public Iterable<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
-        return mongoNodeRepository.findByArchiveDateRange(from, to);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Iterable<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Sort sort) {
-        return mongoNodeRepository.findByArchiveDateRange(from, to, sort);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
         return mongoNodeRepository.findByArchiveDateRange(from, to, pageable);
     }

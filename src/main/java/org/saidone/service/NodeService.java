@@ -50,30 +50,6 @@ public interface NodeService {
     NodeWrapper findById(String nodeId);
 
     /**
-     * Retrieves node wrappers archived within the specified date range.
-     * Both bounds are inclusive. Passing {@code null} for one of the
-     * parameters will make the range open-ended on that side.
-     *
-     * @param from the lower bound of the archive date range, inclusive
-     * @param to   the upper bound of the archive date range, inclusive
-     * @return iterable collection of {@link NodeWrapper}
-     */
-    Iterable<NodeWrapper> findByArchiveDateRange(Instant from, Instant to);
-
-    /**
-     * Retrieves node wrappers archived within the specified date range applying the
-     * provided {@link Sort} order. Both bounds are inclusive. Passing
-     * {@code null} for one of the parameters will make the range open-ended on
-     * that side.
-     *
-     * @param from the lower bound of the archive date range, inclusive
-     * @param to   the upper bound of the archive date range, inclusive
-     * @param sort sort directive to apply
-     * @return iterable collection of {@link NodeWrapper}
-     */
-    Iterable<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Sort sort);
-
-    /**
      * Retrieves node wrappers archived within the specified date range using pagination.
      * Both bounds are inclusive. Passing {@code null} for one of the parameters will
      * make the range open-ended on that side.

@@ -98,22 +98,6 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
 
     /** {@inheritDoc} */
     @Override
-    public List<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
-        val result = super.findByArchiveDateRange(from, to);
-        result.forEach(this::decryptNode);
-        return result;
-    }
-
-    /** {@inheritDoc} */
-    @Override
-    public List<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Sort sort) {
-        val result = super.findByArchiveDateRange(from, to, sort);
-        result.forEach(this::decryptNode);
-        return result;
-    }
-
-    /** {@inheritDoc} */
-    @Override
     public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
         val result = super.findByArchiveDateRange(from, to, pageable);
         result.getContent().forEach(this::decryptNode);

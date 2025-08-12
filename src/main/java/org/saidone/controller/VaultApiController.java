@@ -117,7 +117,6 @@ public class VaultApiController {
                     @Parameter(name = "to", description = "End archive date (ISO-8601)", in = ParameterIn.QUERY),
                     @Parameter(name = "page", description = "Page number", in = ParameterIn.QUERY),
                     @Parameter(name = "size", description = "Page size", in = ParameterIn.QUERY),
-                    @Parameter(name = "sort", description = "Field to sort by", in = ParameterIn.QUERY),
                     @Parameter(name = "dir", description = "Sort direction (ASC or DESC)", in = ParameterIn.QUERY)
             },
             responses = {
@@ -134,14 +133,13 @@ public class VaultApiController {
             @RequestParam(required = false) Instant to,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "20") int size,
-            @RequestParam(required = false, defaultValue = "archiveDate") String sort,
             @RequestParam(required = false, defaultValue = "ASC") Sort.Direction dir) {
 
         if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        val pageable = PageRequest.of(page, size, Sort.by(dir, sort));
+        val pageable = PageRequest.of(page, size, dir);
         val result = nodeService.findByArchiveDateRange(from, to, pageable)
                 .map(nodeWrapper -> new Entry(nodeWrapper.getNode()));
         return ResponseEntity.ok(result);
