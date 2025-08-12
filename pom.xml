@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.3</version>
+        <version>3.5.4</version>
         <relativePath/>
     </parent>
     <groupId>org.saidone</groupId>
@@ -64,12 +64,12 @@
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>alfresco-acs-java-rest-api-spring-boot-starter</artifactId>
-            <version>7.1.0</version>
+            <version>7.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.alfresco</groupId>
             <artifactId>alfresco-java-event-api-spring-boot-starter</artifactId>
-            <version>7.1.0</version>
+            <version>7.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>
@@ -112,7 +112,7 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>sdk-core</artifactId>
-            <version>2.31.78</version>
+            <version>2.32.19</version>
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
@@ -122,7 +122,7 @@
         <dependency>
             <groupId>org.web3j</groupId>
             <artifactId>core</artifactId>
-            <version>4.14.0</version>
+            <version>5.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

@@ -26,6 +26,7 @@ import org.saidone.service.crypto.CryptoService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.stereotype.Repository;
 
@@ -99,6 +100,14 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
     @Override
     public List<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
         val result = super.findByArchiveDateRange(from, to);
+        result.forEach(this::decryptNode);
+        return result;
+    }
+
+    /** {@inheritDoc} */
+    @Override
+    public List<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Sort sort) {
+        val result = super.findByArchiveDateRange(from, to, sort);
         result.forEach(this::decryptNode);
         return result;
     }
