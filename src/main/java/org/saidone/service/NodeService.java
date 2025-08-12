@@ -22,7 +22,6 @@ import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.model.NodeWrapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 
 import java.time.Instant;
 
@@ -30,6 +29,10 @@ import java.time.Instant;
  * Service abstraction for persisting and retrieving node metadata within the
  * vault. Implementations typically store {@link NodeWrapper} instances in a
  * backing store such as MongoDB.
+ *
+ * <p>The API is intentionally minimal and focused on CRUD-style operations.
+ * Higher level orchestration of archive and restore flows is handled by
+ * {@link org.saidone.service.VaultService}.</p>
  */
 public interface NodeService {
 

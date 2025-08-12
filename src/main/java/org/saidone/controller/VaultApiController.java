@@ -105,6 +105,7 @@ public class VaultApiController {
      * @param to   end of the archive date range (inclusive)
      * @param page page number
      * @param size page size
+     * @param dir  sort direction for archive date
      * @return paginated list of node entries
      */
     @SecurityRequirement(name = "basicAuth")
@@ -468,7 +469,7 @@ public class VaultApiController {
             })
     public ResponseEntity<?> updateKey(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
-            @Parameter int keyVersion) {
+            @RequestParam(name = "keyVersion") @Parameter(name = "keyVersion", description = "Version of the encryption key to update", required = true) int keyVersion) {
 
         if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
