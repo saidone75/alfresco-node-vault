@@ -50,6 +50,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -99,6 +100,12 @@ public class VaultApiController {
 
     /**
      * Searches nodes archived within the specified date range with pagination support.
+     * <p>
+     * If no range is supplied the search defaults to the last 24 hours ending at
+     * {@link Instant#now()}. This mirrors the behaviour of the underlying service
+     * which looks for nodes archived during the previous day when no parameters
+     * are provided.
+     * </p>
      *
      * @param auth optional Basic authentication header
      * @param from start of the archive date range (inclusive)
@@ -140,7 +147,15 @@ public class VaultApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        val pageable = PageRequest.of(page, size, dir);
+        if (to == null) {
+            to = Instant.now();
+        }
+
+        if (from == null) {
+            from = to.minus(1, ChronoUnit.DAYS);
+        }
+
+        val pageable = PageRequest.of(page, size, Sort.by(dir, "adt"));
         val result = nodeService.findByArchiveDateRange(from, to, pageable)
                 .map(nodeWrapper -> new Entry(nodeWrapper.getNode()));
         return ResponseEntity.ok(result);

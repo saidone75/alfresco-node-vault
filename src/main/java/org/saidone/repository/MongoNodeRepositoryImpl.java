@@ -69,11 +69,20 @@ import java.util.stream.Stream;
 @ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "false", matchIfMissing = true)
 @Slf4j
 public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepository<NodeWrapper, String> {
-
+    /**
+     * Template for executing MongoDB operations. It provides low level access to
+     * the database and is used throughout this repository for persistence and
+     * queries.
+     */
     private final MongoOperations mongoOperations;
 
     /**
      * {@inheritDoc}
+     * <p>
+     * The method verifies that the MongoDB connection is available at start-up.
+     * If the connection cannot be established the application is shut down to
+     * avoid running in an inconsistent state.
+     * </p>
      */
     @PostConstruct
     @Override
@@ -220,17 +229,6 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
     }
 
     /**
-     * Retrieves node wrappers whose archive date falls within the specified range.
-     *
-     * @param from lower bound of the archive date range, inclusive. {@code null} for no lower bound.
-     * @param to   upper bound of the archive date range, inclusive. {@code null} for no upper bound.
-     * @return page of matching nodes
-     */
-    public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
-        return findByArchiveDateRange(from, to, null);
-    }
-
-    /**
      * Retrieves node wrappers archived within the specified date range using pagination.
      *
      * <p>When both {@code from} and {@code to} are {@code null}, this method
@@ -245,23 +243,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
      * @return page of matching nodes
      */
     public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
-        Criteria criteria;
-        if (from != null && to != null) {
-            criteria = Criteria.where("adt").gte(from).lte(to);
-        } else if (from != null) {
-            criteria = Criteria.where("adt").gte(from);
-        } else if (to != null) {
-            criteria = Criteria.where("adt").lte(to);
-        } else {
-            return findAll(pageable);
-        }
-
-        if (pageable.getSort().isUnsorted()) {
-            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "adt"));
-        } else {
-            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "adt"));
-        }
-
+        val criteria = Criteria.where("adt").gte(from).lte(to);
         long count = mongoOperations.count(new Query(criteria), NodeWrapper.class);
         val query = new Query(criteria).with(pageable);
         val content = mongoOperations.find(query, NodeWrapper.class);
