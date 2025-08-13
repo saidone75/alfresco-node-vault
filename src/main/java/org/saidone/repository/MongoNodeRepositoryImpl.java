@@ -36,7 +36,9 @@ import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -220,17 +222,6 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
     }
 
     /**
-     * Retrieves node wrappers whose archive date falls within the specified range.
-     *
-     * @param from lower bound of the archive date range, inclusive. {@code null} for no lower bound.
-     * @param to   upper bound of the archive date range, inclusive. {@code null} for no upper bound.
-     * @return page of matching nodes
-     */
-    public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to) {
-        return findByArchiveDateRange(from, to, null);
-    }
-
-    /**
      * Retrieves node wrappers archived within the specified date range using pagination.
      *
      * <p>When both {@code from} and {@code to} are {@code null}, this method
@@ -253,7 +244,9 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         } else if (to != null) {
             criteria = Criteria.where("adt").lte(to);
         } else {
-            return findAll(pageable);
+            val now = Instant.now();
+            // default to last 24 hours
+            return findByArchiveDateRange(now.minus(1, ChronoUnit.DAYS), now, pageable);
         }
 
         if (pageable.getSort().isUnsorted()) {
