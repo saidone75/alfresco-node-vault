@@ -36,7 +36,6 @@ import org.springframework.data.repository.query.FluentQuery;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -235,25 +234,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
      * @return page of matching nodes
      */
     public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
-        Criteria criteria;
-        if (from != null && to != null) {
-            criteria = Criteria.where("adt").gte(from).lte(to);
-        } else if (from != null) {
-            criteria = Criteria.where("adt").gte(from);
-        } else if (to != null) {
-            criteria = Criteria.where("adt").lte(to);
-        } else {
-            val now = Instant.now();
-            // default to last 24 hours
-            return findByArchiveDateRange(now.minus(1, ChronoUnit.DAYS), now, pageable);
-        }
-
-        if (pageable.getSort().isUnsorted()) {
-            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.ASC, "adt"));
-        } else {
-            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by(Sort.Direction.DESC, "adt"));
-        }
-
+        val criteria = Criteria.where("adt").gte(from).lte(to);
         long count = mongoOperations.count(new Query(criteria), NodeWrapper.class);
         val query = new Query(criteria).with(pageable);
         val content = mongoOperations.find(query, NodeWrapper.class);

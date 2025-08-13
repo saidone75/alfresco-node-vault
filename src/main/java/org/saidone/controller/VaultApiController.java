@@ -50,6 +50,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -140,7 +141,15 @@ public class VaultApiController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        val pageable = PageRequest.of(page, size, dir);
+        if (to == null) {
+            to = Instant.now();
+        }
+
+        if (from == null) {
+            from = to.minus(1, ChronoUnit.DAYS);
+        }
+
+        val pageable = PageRequest.of(page, size, Sort.by(dir, "adt"));
         val result = nodeService.findByArchiveDateRange(from, to, pageable)
                 .map(nodeWrapper -> new Entry(nodeWrapper.getNode()));
         return ResponseEntity.ok(result);
