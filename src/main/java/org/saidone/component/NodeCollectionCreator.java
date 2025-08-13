@@ -57,12 +57,13 @@ public class NodeCollectionCreator extends BaseComponent {
             } else {
                 log.info("Collection '{}' already exists.", COLLECTION_NAME);
             }
-            val index = new Index().on("adt", Sort.Direction.ASC).named("adt_index");
-            mongoTemplate.indexOps(COLLECTION_NAME).ensureIndex(index);
+            val index = new Index().on("adt", Sort.Direction.ASC).named("adt_1");
+            mongoTemplate.indexOps(COLLECTION_NAME).createIndex(index);
         } catch (Exception e) {
             log.error("Unable to start {}", this.getClass().getSimpleName());
             super.shutDown(0);
         }
         super.stop();
     }
+
 }
