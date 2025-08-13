@@ -69,11 +69,20 @@ import java.util.stream.Stream;
 @ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "false", matchIfMissing = true)
 @Slf4j
 public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepository<NodeWrapper, String> {
-
+    /**
+     * Template for executing MongoDB operations. It provides low level access to
+     * the database and is used throughout this repository for persistence and
+     * queries.
+     */
     private final MongoOperations mongoOperations;
 
     /**
      * {@inheritDoc}
+     * <p>
+     * The method verifies that the MongoDB connection is available at start-up.
+     * If the connection cannot be established the application is shut down to
+     * avoid running in an inconsistent state.
+     * </p>
      */
     @PostConstruct
     @Override
