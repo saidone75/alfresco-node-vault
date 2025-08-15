@@ -43,7 +43,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleOutOfMemoryError(OutOfMemoryError e) {
         log.error(e.getMessage());
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR,
-                "Server memory limit exceeded. Please try with a smaller file or contact administrator.");
+                "Server memory limit exceeded. Please contact an administrator.");
     }
 
     @ExceptionHandler(NotarizationException.class)
@@ -56,4 +56,5 @@ public class GlobalExceptionHandler {
     private ResponseEntity<String> buildResponse(HttpStatus status, String message) {
         return ResponseEntity.status(status).body(message);
     }
+
 }
