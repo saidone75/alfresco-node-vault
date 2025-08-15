@@ -2,8 +2,6 @@ package org.saidone.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
-import org.saidone.exception.ApiExceptionError;
 import org.saidone.exception.NodeNotFoundException;
 import org.saidone.exception.NotarizationException;
 import org.saidone.exception.VaultException;
@@ -21,48 +19,42 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @Operation(hidden = true)
-    public ResponseEntity<ApiExceptionError> handleException(Exception e) {
+    public ResponseEntity<String> handleException(Exception e) {
         log.error(e.getMessage());
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getClass().getSimpleName(), "Internal server error");
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
     }
 
     @ExceptionHandler(VaultException.class)
     @Operation(hidden = true)
-    public ResponseEntity<ApiExceptionError> handleVaultException(VaultException e) {
+    public ResponseEntity<String> handleVaultException(VaultException e) {
         log.error(e.getMessage());
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getClass().getSimpleName(), "Internal server error");
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
     }
 
     @ExceptionHandler(NodeNotFoundException.class)
     @Operation(hidden = true)
-    public ResponseEntity<ApiExceptionError> handleNodeNotFoundException(NodeNotFoundException e) {
+    public ResponseEntity<String> handleNodeNotFoundException(NodeNotFoundException e) {
         log.error(e.getMessage());
-        return buildResponse(HttpStatus.NOT_FOUND, e.getClass().getSimpleName(), "Node not found");
+        return buildResponse(HttpStatus.NOT_FOUND, "Node not found");
     }
 
     @ExceptionHandler(OutOfMemoryError.class)
     @Operation(hidden = true)
-    public ResponseEntity<ApiExceptionError> handleOutOfMemoryError(OutOfMemoryError e) {
+    public ResponseEntity<String> handleOutOfMemoryError(OutOfMemoryError e) {
         log.error(e.getMessage());
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getClass().getSimpleName(),
-                "Server memory limit exceeded. Please try with a smaller file or contact administrator.");
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR,
+                "Server memory limit exceeded. Please contact an administrator.");
     }
 
     @ExceptionHandler(NotarizationException.class)
     @Operation(hidden = true)
-    public ResponseEntity<ApiExceptionError> handleNotarizationException(NotarizationException e) {
+    public ResponseEntity<String> handleNotarizationException(NotarizationException e) {
         log.error(e.getMessage());
-        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getClass().getSimpleName(), e.getMessage());
+        return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
     }
 
-    private ResponseEntity<ApiExceptionError> buildResponse(HttpStatus status, String errorKey, String message) {
-        ApiExceptionError error = new ApiExceptionError();
-        error.setErrorKey(errorKey);
-        error.setStatusCode(String.valueOf(status.value()));
-        error.setBriefSummary(message);
-        error.setStackTrace(Strings.EMPTY);
-        error.setDescriptionURL(Strings.EMPTY);
-        error.setLogId(Strings.EMPTY);
-        return ResponseEntity.status(status).body(error);
+    private ResponseEntity<String> buildResponse(HttpStatus status, String message) {
+        return ResponseEntity.status(status).body(message);
     }
+
 }
