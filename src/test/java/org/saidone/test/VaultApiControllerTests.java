@@ -126,20 +126,11 @@ class VaultApiControllerTests extends BaseTest {
     void searchNodesByArchiveDateTest() {
         val nodeId = createNode().getId();
         vaultService.archiveNode(nodeId);
-
-        performRequestAndProcess(HttpMethod.GET, "/api/vault/search?page={page}&size={size}", new Object[]{0, 10},
-                null, 200, String.class, body -> {
-                    assertTrue(body.contains(nodeId));
-                });
-
-        /*
-        performRequestAndProcess(HttpMethod.GET, "/api/vault/search?page={page}&size={size}", new Object[]{1, 1},
-                null, 200, String.class, body -> {
-                    assertTrue(body.contains(nodeId2));
-                    assertFalse(body.contains(nodeId1));
-                });
-
-         */
+        performRequestAndProcess(HttpMethod.GET, "/api/vault/search?page={page}&size={size}&dir={dir}", new Object[]{0, 10, "DESC"},
+                null, 200, String.class, body -> assertTrue(body.contains(nodeId)));
+        vaultService.archiveNode(createNode().getId());
+        performRequestAndProcess(HttpMethod.GET, "/api/vault/search?page={page}&size={size}&dir={dir}", new Object[]{0, 1, "DESC"},
+                null, 200, String.class, body -> assertFalse(body.contains(nodeId)));
     }
 
     @Test
