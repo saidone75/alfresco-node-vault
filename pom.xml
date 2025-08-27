@@ -107,12 +107,12 @@
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>s3</artifactId>
-            <version>2.31.78</version>
+            <version>2.32.29</version>
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
             <artifactId>sdk-core</artifactId>
-            <version>2.32.19</version>
+            <version>2.32.24</version>
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
@@ -185,7 +185,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.11.2</version>
+                <version>3.11.3</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
                     <doctitle>Alfresco Node Vault</doctitle>
