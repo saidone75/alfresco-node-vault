@@ -74,7 +74,7 @@
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-gateway-server-webflux</artifactId>
-            <version>4.3.0</version>
+            <version>4.3.1</version>
         </dependency>
         <!-- gather metrics and show in a specific endpoints -->
         <dependency>
