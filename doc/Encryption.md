@@ -181,9 +181,9 @@ Where:
 
 This structure ensures that everything needed for decryption (except the master
 secret) travels with the ciphertext. For reference, see the implementations in
-[JcaCryptoServiceImpl.java](../src/main/java/org/saidone/service/JcaCryptoServiceImpl.java)
+[JcaCryptoServiceImpl.java](../src/main/java/org/saidone/service/crypto/JcaCryptoServiceImpl.java)
 and
-[BcCryptoServiceImpl.java](../src/main/java/org/saidone/service/BcCryptoServiceImpl.java).
+[BcCryptoServiceImpl.java](../src/main/java/org/saidone/service/crypto/BcCryptoServiceImpl.java).
 
 ## Development Recommendations
 

@@ -82,12 +82,16 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
      * Encrypts a data stream using AES-GCM authenticated encryption.
      * <p>
      * The encryption process follows these steps:
-     * 1. Generates random salt and IV
-     * 2. Derives encryption key from salt using configured KDF
-     * 3. Initializes AES-GCM cipher
-     * 4. Prepends key version+salt+IV to encrypted stream
+     * </p>
+     * <ol>
+     *     <li>Generate random salt and IV</li>
+     *     <li>Derive the encryption key from the salt using the configured KDF</li>
+     *     <li>Initialize the AES-GCM cipher</li>
+     *     <li>Prepend {@code key version + salt + IV} to the encrypted stream</li>
+     * </ol>
      * <p>
-     * The output stream format is: [key version][salt][IV][encrypted data]
+     * The output stream format is: {@code [key version][salt][IV][encrypted data]}
+     * </p>
      *
      * @param inputStream The plaintext input data to be encrypted
      * @param secret      secret material used to derive the encryption key
@@ -130,16 +134,22 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
      * Decrypts an AES-GCM encrypted stream.
      * <p>
      * The decryption process follows these steps:
-     * 1. Reads key version, salt and IV from stream header
-     * 2. Derives decryption key from salt
-     * 3. Initializes cipher for decryption
-     * 4. Returns decrypting stream for remaining data
+     * </p>
+     * <ol>
+     *     <li>Read key version, salt and IV from the stream header</li>
+     *     <li>Derive the decryption key from the salt</li>
+     *     <li>Initialize the cipher for decryption</li>
+     *     <li>Return a decrypting stream for the remaining data</li>
+     * </ol>
      * <p>
-     * Expected input format: [key version][salt][IV][encrypted data]
+     * Expected input format: {@code [key version][salt][IV][encrypted data]}
      * where:
-     * - key version length = 4 bytes
-     * - salt length = saltLength bytes
-     * - IV length = ivLength bytes
+     * </p>
+     * <ul>
+     *     <li>key version length = 4 bytes</li>
+     *     <li>salt length = {@code saltLength} bytes</li>
+     *     <li>IV length = {@code ivLength} bytes</li>
+     * </ul>
      *
      * @param inputStream InputStream containing encrypted data with prepended salt and IV
      * @return An InputStream yielding the decrypted data

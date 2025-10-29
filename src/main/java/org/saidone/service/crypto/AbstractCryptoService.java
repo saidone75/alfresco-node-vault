@@ -69,7 +69,7 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
      * @param secret    the secret fetched from Vault
      * @param algorithm the name of the cryptographic algorithm for which the secret key is derived
      * @param salt      the salt value used in the key derivation process
-     * @return a {@code Pair} containing the derived {@link javax.crypto.spec.SecretKeySpec} and an {@link Integer} representing the key version
+     * @return a {@code Pair} containing the derived {@link javax.crypto.spec.SecretKeySpec} and the corresponding key version
      */
     protected Pair<SecretKeySpec, Integer> deriveSecretKey(Secret secret, String algorithm, byte[] salt) {
         return switch (kdf.getImpl()) {
