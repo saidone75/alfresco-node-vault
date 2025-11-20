@@ -4,6 +4,15 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.0.4] - 2025-11-20
+
+### Changed
+- Updated Spring Boot parent to 3.5.7 and aligned with Spring Cloud 2025.0.0 and Gateway 4.3.2 for the latest platform fixes.
+- Refreshed AWS SDK dependencies (S3, transfer manager, and SDK core) to 2.38.2.
+- Bumped supporting libraries including Commons IO 2.21.0 and SpringDoc WebFlux UI 2.8.14.
+- Updated build and test tooling (Datafaker 2.5.3, JaCoCo Maven Plugin 0.8.14).
+- CI now uploads build artifacts using `actions/upload-artifact@v5`.
+
 ## [0.0.3] - 2025-07-21
 
 ### Added
