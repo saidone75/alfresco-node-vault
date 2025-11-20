@@ -8,31 +8,33 @@ spring:
     active: dev
   cloud:
     gateway:
-      routes:
-        - id: vault_node_route
-          uri: http://localhost:8086
-          predicates:
-            - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}
-            - Method=GET
-            - name: IsOnVaultPredicate
-          filters:
-            - SetPath=/api/vault/nodes/{nodeId}
-        - id: vault_node_content_route
-          uri: http://localhost:8086
-          predicates:
-            - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}/content
-            - Method=GET
-            - name: IsOnVaultPredicate
-          filters:
-            - SetPath=/api/vault/nodes/{nodeId}/content
-        - id: vault_direct_api_route
-          uri: http://localhost:8086
-          predicates:
-            - Path=/api/vault/**
-        - id: alfresco_default_route
-          uri: ${ALFRESCO_BASE_PATH:http://localhost:8080}
-          predicates:
-            - Path=/alfresco/**,/api-explorer/**
+      server:
+        webflux:
+          routes:
+            - id: vault_node_route
+              uri: http://localhost:8086
+              predicates:
+                - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}
+                - Method=GET
+                - name: IsOnVaultPredicate
+              filters:
+                - SetPath=/api/vault/nodes/{nodeId}
+            - id: vault_node_content_route
+              uri: http://localhost:8086
+              predicates:
+                - Path=/alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}/content
+                - Method=GET
+                - name: IsOnVaultPredicate
+              filters:
+                - SetPath=/api/vault/nodes/{nodeId}/content
+            - id: vault_direct_api_route
+              uri: http://localhost:8086
+              predicates:
+                - Path=/api/vault/**
+            - id: alfresco_default_route
+              uri: ${ALFRESCO_BASE_PATH:http://localhost:8080}
+              predicates:
+                - Path=/alfresco/**,/api-explorer/**
     vault:
       uri: ${VAULT_URL:http://localhost:8200}
       token: root
