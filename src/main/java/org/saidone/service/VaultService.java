@@ -55,6 +55,9 @@ public class VaultService extends BaseComponent {
     @Value("${application.service.vault.double-check}")
     private boolean doubleCheck;
 
+    @Value("${application.service.vault.delete-on-alfresco}")
+    private boolean deleteOnAlfresco;
+
     private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
 
     /**
@@ -81,7 +84,7 @@ public class VaultService extends BaseComponent {
             contentService.archiveNodeContent(node, nodeContentInputStream);
             nodeService.save(new NodeWrapper(node));
             if (doubleCheck) doubleCheck(nodeId);
-            alfrescoService.deleteNode(nodeId);
+            if (deleteOnAlfresco) alfrescoService.deleteNode(nodeId);
         } catch (FeignException.NotFound e) {
             throw new NodeNotFoundOnAlfrescoException(nodeId);
         } catch (Exception e) {
