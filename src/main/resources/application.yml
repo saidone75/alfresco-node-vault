@@ -110,6 +110,7 @@ application:
     vault:
       hash-algorithm: ${VAULT_HASH_ALGORITHM:SHA-256}
       double-check: ${VAULT_DOUBLE_CHECK:true}
+      delete-on-alfresco: ${VAULT_DELETE_ON_ALFRESCO:true}
       encryption:
         enabled: ${VAULT_ENCRYPTION_ENABLED:true}
         metadata: ${VAULT_ENCRYPT_METADATA:true}
