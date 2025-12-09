@@ -28,7 +28,7 @@
     </scm>
     <properties>
         <java.version>21</java.version>
-        <spring-cloud.version>2025.0.0</spring-cloud.version>
+        <spring-cloud.version>2025.1.0</spring-cloud.version>
         <tests>none()</tests>
         <sonar.organization>saidone75</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
