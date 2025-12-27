@@ -20,62 +20,135 @@ package org.saidone.utils;
 
 import lombok.experimental.UtilityClass;
 
-import java.util.*;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
- * Utility class providing methods for safely casting collections to specific generic types.
+ * Utility class providing methods for casting collections to specific generic
+ * types.
  * <p>
- * This class offers methods to cast a list of unknown type to a list of strings,
- * and to cast an object representing a map to a map with string keys and object values.
- * All methods return empty collections if the provided input is null.
+ * The helpers in this class convert loose {@code Object} instances into typed
+ * {@link List} and {@link Map} representations. Inputs are expected to already
+ * contain compatible elements; otherwise a {@link ClassCastException} will be
+ * raised by the casting operations. When {@code null} is provided, the methods
+ * return empty collections instead of {@code null}.
  */
 @UtilityClass
 public class CastUtils {
 
     /**
-     * Safely casts a list of objects to a list containing only non-null strings.
-     * <br>
-     * This method filters out null values and elements that are not instances of {@code String}.
-     * If the input list is {@code null}, an empty list is returned.
+     * Casts an object to a {@link List} of {@link String} values.
+     * <p>
+     * The input must already be a {@link List}; otherwise an
+     * {@link IllegalArgumentException} is thrown. Each element is cast to
+     * {@link String}, so incompatible entries trigger a
+     * {@link ClassCastException}. When {@code null} is supplied, an empty list is
+     * returned.
      *
-     * @param list the input list containing elements of any type
-     * @return a list containing only non-null strings from the original list,
-     * or an empty list if input is {@code null}
+     * @param object the input value expected to be a {@link List}
+     * @return a list containing string values, or an empty list when the input
+     * is {@code null}
+     * @throws IllegalArgumentException if {@code object} is not a {@link List}
+     * @throws ClassCastException       if any element cannot be cast to
+     *                                  {@link String}
      */
-    public List<String> castToListOfStrings(List<?> list) {
-        if (list == null) return Collections.emptyList();
-        return list.stream()
-                .filter(Objects::nonNull)
-                .filter(String.class::isInstance)
-                .map(String.class::cast)
-                .toList();
+    public List<String> castToListOfStrings(Object object) {
+        return castToListOfObjects(object, String.class);
     }
 
     /**
-     * Casts an input object to a map with {@code String} keys and {@code Object} values.
-     * <br>
-     * If the provided object is {@code null}, an empty map is returned.
-     * If the provided object is not an instance of {@code Map<?, ?>}, an {@code IllegalArgumentException} is thrown.
-     * The method performs a runtime cast of each key to {@code String}; if any key cannot be cast, a {@code ClassCastException} will be thrown.
+     * Casts an object to a {@link List} containing elements of the requested type.
+     * <p>
+     * The input must already be a {@link List}; otherwise an
+     * {@link IllegalArgumentException} is thrown. Each element is cast using
+     * {@link Class#cast(Object)}, so incompatible entries trigger a
+     * {@link ClassCastException}. When {@code null} is supplied, an empty list is
+     * returned.
      *
-     * @param object the object to cast, expected to be a map with string keys
-     * @return a map with string keys and object values, or an empty map if the input is null
-     * @throws IllegalArgumentException if the input object is not a map
-     * @throws ClassCastException       if a map key cannot be cast to {@code String}
+     * @param object      the input value expected to be a {@link List}
+     * @param elementType the desired element type
+     * @return a list containing elements cast to {@code elementType}, or an empty
+     * list when the input is {@code null}
+     * @throws IllegalArgumentException if {@code object} is not a {@link List}
+     * @throws ClassCastException       if any element cannot be cast to
+     *                                  {@code elementType}
      */
-    public Map<String, Object> castToMapOfStringObject(Object object) {
+    public <T> List<T> castToListOfObjects(Object object, Class<T> elementType) {
+        if (object == null) {
+            return new ArrayList<>();
+        }
+
+        if (!(object instanceof List<?> inputList)) {
+            throw new IllegalArgumentException(
+                    String.format("Input object is not a List: %s", object.getClass().getName())
+            );
+        }
+
+        return inputList.stream()
+                .map(elementType::cast)
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Casts an object to a {@link Map} with {@link String} keys and
+     * {@link Serializable} values.
+     * <p>
+     * The input must already be a {@link Map}; otherwise an
+     * {@link IllegalArgumentException} is thrown. Keys are cast to
+     * {@link String} and values to {@link Serializable}, so incompatible entries
+     * cause {@link ClassCastException}s. When {@code null} is provided, an empty
+     * map is returned.
+     *
+     * @param object the input value expected to be a {@link Map}
+     * @return a map containing string keys and serializable values, or an empty
+     * map when the input is {@code null}
+     * @throws IllegalArgumentException if {@code object} is not a {@link Map}
+     * @throws ClassCastException       if any key or value cannot be cast to the
+     *                                  requested types
+     */
+    public Map<String, Serializable> castToMapOfStringSerializable(Object object) {
+        return castToMapOfObjectObject(object, String.class, Serializable.class);
+    }
+
+    /**
+     * Casts an object to a {@link Map} with {@link String} keys and values of the
+     * requested {@link Serializable} type.
+     * <p>
+     * The input must be a {@link Map}; otherwise an
+     * {@link IllegalArgumentException} is thrown. Keys are cast to
+     * {@link String} and values to {@code valueType}, so incompatible entries
+     * cause {@link ClassCastException}s. When {@code null} is provided, an empty
+     * map is returned.
+     *
+     * @param object    the input value expected to be a {@link Map}
+     * @param keyType   the expected key type
+     * @param valueType the expected value type
+     * @return a map containing entries cast to the requested types, or an empty
+     * map when the input is {@code null}
+     * @throws IllegalArgumentException if {@code object} is not a {@link Map}
+     * @throws ClassCastException       if any key or value cannot be cast to the
+     *                                  requested types
+     */
+    public <KT, KV> Map<KT, KV> castToMapOfObjectObject(Object object, Class<KT> keyType, Class<KV> valueType) {
         if (object == null) {
             return new HashMap<>();
         }
+
         if (!(object instanceof Map<?, ?> inputMap)) {
-            throw new IllegalArgumentException(String.format("Input object is not a Map: %s", object.getClass().getName()));
+            throw new IllegalArgumentException(
+                    String.format("Input object is not a Map: %s", object.getClass().getName())
+            );
         }
+
         return inputMap.entrySet()
                 .stream()
                 .collect(Collectors.toMap(
-                        e -> (String) e.getKey(),
-                        Map.Entry::getValue
+                        e -> keyType.cast(e.getKey()),
+                        e -> valueType.cast(e.getValue())
                 ));
     }
 
