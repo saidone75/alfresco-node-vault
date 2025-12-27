@@ -250,7 +250,7 @@ public class AlfrescoService extends BaseComponent {
         val aspectNames = node.getAspectNames();
         aspectNames.remove(AnvContentModel.ASP_ARCHIVE);
         nodeBodyCreate.setAspectNames(aspectNames);
-        val properties = CastUtils.castToMapOfStringObject(node.getProperties());
+        val properties = CastUtils.castToMapOfObjectObject(node.getProperties(), String.class, Object.class);
         properties.put(AnvContentModel.PROP_WAS, node.getId());
         nodeBodyCreate.setProperties(properties);
         if (restorePermissions) {
