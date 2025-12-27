@@ -116,12 +116,9 @@ public class SecretService extends BaseComponent {
      */
     private CompletableFuture<Secret> getSecretAsync(Integer version) {
         return CompletableFuture.supplyAsync(() -> {
-            Versioned<Map<String, Object>> response;
-            if (version == null) {
-                response = vaultVersionedKeyValueOperations.get(properties.getVaultSecretPath());
-            } else {
-                response = vaultVersionedKeyValueOperations.get(properties.getVaultSecretPath(), Versioned.Version.from(version));
-            }
+            val response = version == null ?
+                    vaultVersionedKeyValueOperations.get(properties.getVaultSecretPath()) :
+                    vaultVersionedKeyValueOperations.get(properties.getVaultSecretPath(), Versioned.Version.from(version));
             if (response != null && response.getData() != null && response.getMetadata() != null) {
                 return Secret.builder()
                         .version(response.getMetadata().getVersion().getVersion())
