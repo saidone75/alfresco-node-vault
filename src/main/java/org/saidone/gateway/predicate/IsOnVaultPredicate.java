@@ -57,7 +57,7 @@ public class IsOnVaultPredicate extends AbstractRoutePredicateFactory<IsOnVaultP
 
     private final MongoNodeRepositoryImpl mongoNodeRepository;
 
-    private static final Pattern nodeContentPattern = Pattern.compile("^.*/nodes/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}).*$");
+    private static final Pattern NODE_CONTENT_PATTERN = Pattern.compile("^.*/nodes/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}).*$");
 
     public static class Config {
     }
@@ -71,7 +71,7 @@ public class IsOnVaultPredicate extends AbstractRoutePredicateFactory<IsOnVaultP
     public Predicate<ServerWebExchange> apply(Config config) {
         return exchange -> {
             val path = exchange.getRequest().getURI().getPath();
-            val matcher = nodeContentPattern.matcher(path);
+            val matcher = NODE_CONTENT_PATTERN.matcher(path);
             if (matcher.matches()) {
                 val nodeId = matcher.group(1);
                 log.debug("Detected node ID: {}", nodeId);
