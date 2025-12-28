@@ -72,7 +72,7 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
     private static final String CIPHER_TRANSFORMATION = "ChaCha20-Poly1305";
     private static final String KEY_ALGORITHM = "ChaCha20";
 
-    private static final SecureRandom secureRandom = new SecureRandom();
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     /**
      * Injects encryption configuration properties.
@@ -107,10 +107,10 @@ public class BcCryptoServiceImpl extends AbstractCryptoService implements Crypto
         try {
             // Generate random salt and nonce
             byte[] salt = new byte[saltLength];
-            secureRandom.nextBytes(salt);
+            SECURE_RANDOM.nextBytes(salt);
 
             byte[] nonce = new byte[nonceLength];
-            secureRandom.nextBytes(nonce);
+            SECURE_RANDOM.nextBytes(nonce);
 
             // Derive key using configured KDF
             val secretKey = deriveSecretKey(secret, KEY_ALGORITHM, salt);

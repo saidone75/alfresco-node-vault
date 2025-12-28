@@ -64,7 +64,7 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
     private static final String KEY_ALGORITHM = "AES";
     private static final String CIPHER_TRANSFORMATION = "AES/GCM/NoPadding";
 
-    private static final SecureRandom secureRandom = new SecureRandom();
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
 
     /**
      * Injects encryption configuration properties.
@@ -99,11 +99,11 @@ public class JcaCryptoServiceImpl extends AbstractCryptoService implements Crypt
         try {
             // Generate random salt for PBKDF2
             byte[] salt = new byte[saltLength];
-            secureRandom.nextBytes(salt);
+            SECURE_RANDOM.nextBytes(salt);
 
             // Generate random IV for GCM mode
             byte[] iv = new byte[ivLength];
-            secureRandom.nextBytes(iv);
+            SECURE_RANDOM.nextBytes(iv);
 
             val cipher = Cipher.getInstance(CIPHER_TRANSFORMATION);
             val spec = new GCMParameterSpec(TAG_LENGTH, iv);
