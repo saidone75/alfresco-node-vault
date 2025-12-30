@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.logging.log4j.util.Strings;
@@ -134,7 +133,6 @@ public class VaultApiController {
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
             })
-    @SneakyThrows
     public ResponseEntity<Page<Entry>> searchNodes(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @RequestParam(required = false) Instant from,
@@ -187,7 +185,6 @@ public class VaultApiController {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
-    @SneakyThrows
     public ResponseEntity<?> getNode(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
@@ -279,7 +276,6 @@ public class VaultApiController {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
-    @SneakyThrows
     public ResponseEntity<?> restoreNode(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId,

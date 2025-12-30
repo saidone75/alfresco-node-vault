@@ -133,9 +133,9 @@ public class VaultService extends BaseComponent {
      * @param nodeId the ID of the node
      * @return the Alfresco Node object
      * @throws NodeNotFoundOnVaultException if the node is not found in the vault
-     * @throws JsonProcessingException      if there is an error processing the node metadata JSON
+     * @throws VaultException               if the stored metadata cannot be parsed
      */
-    public Node getNode(String nodeId) throws JsonProcessingException {
+    public Node getNode(String nodeId) throws VaultException {
         return getNodeWrapper(nodeId).getNode();
     }
 
@@ -150,9 +150,9 @@ public class VaultService extends BaseComponent {
      * @param restorePermissions whether to restore permissions along with the node
      * @return the new node ID assigned by Alfresco after restoration
      * @throws NodeNotFoundOnVaultException if the node is not found in the vault
-     * @throws JsonProcessingException      if there is an error processing the node metadata JSON
+     * @throws VaultException               if stored metadata cannot be parsed
      */
-    public String restoreNode(String nodeId, boolean restorePermissions) throws JsonProcessingException {
+    public String restoreNode(String nodeId, boolean restorePermissions) throws VaultException {
         val nodeWrapper = getNodeWrapper(nodeId);
         val newNodeId = alfrescoService.restoreNode(nodeWrapper.getNode(), restorePermissions);
         alfrescoService.restoreNodeContent(newNodeId, contentService.getNodeContent(nodeId));
