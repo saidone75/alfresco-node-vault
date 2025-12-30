@@ -18,7 +18,6 @@
 
 package org.saidone.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
