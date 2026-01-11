@@ -7,7 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
-- Documented the `delete-on-alfresco` flag (`${VAULT_DELETE_ON_ALFRESCO:true}`) in configuration.
+- New `delete-on-alfresco` flag (`${VAULT_DELETE_ON_ALFRESCO:true}`) in configuration.
 
 ### Changed
 - Updated Spring Boot parent to 3.5.9 and aligned with Spring Cloud 2025.0.1 for the latest platform fixes.
