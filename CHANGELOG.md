@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
-## [Unreleased]
+## [0.9.0] - 2026-12-01
 
 ### Added
 - New `delete-on-alfresco` flag (`${VAULT_DELETE_ON_ALFRESCO:true}`) in configuration.
@@ -20,7 +20,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - Introduced node notarization: records content checksums on the blockchain to ensure tamper-proof integrity.
-- `NodeContentInfo` and `NodeContentStream` models with encryption metadata.
+- `NodeContentInfo` and `NodeContentStream` models with metadata encryption.
 
 ### Changed
 - Refactored content services to use `NodeContentInfo`.
