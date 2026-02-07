@@ -1,6 +1,6 @@
 /*
  * Alfresco Node Vault - archive today, accelerate tomorrow
- * Copyright (C) 2025 Saidone
+ * Copyright (C) 2025-2026 Saidone
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
