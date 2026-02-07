@@ -182,6 +182,6 @@ Javadoc is available at the following address: https://saidone75.github.io/alfre
 
 ## License
 
-Copyright (c) 2025 Saidone
+Copyright (c) 2025-2026 Saidone
 
 Distributed under the GNU General Public License v3.0
