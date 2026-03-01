@@ -1,5 +1,8 @@
 name: OWASP Dependency Check
-on: [ push ]
+on:
+  push:
+    branches:
+      - dev
 
 jobs:
   dependency-check:
