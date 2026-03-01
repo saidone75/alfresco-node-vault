@@ -189,7 +189,7 @@
                     <encoding>UTF-8</encoding>
                     <doctitle>Alfresco Node Vault</doctitle>
                     <header>Alfresco Node Vault</header>
-                    <bottom>© 2025 Saidone</bottom>
+                    <bottom>© 2025-2026 Saidone</bottom>
                     <failOnError>false</failOnError>
                 </configuration>
             </plugin>

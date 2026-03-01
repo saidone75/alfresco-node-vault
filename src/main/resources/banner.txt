@@ -9,7 +9,7 @@ ${AnsiColor.YELLOW}
 d88P     888 888    Y888     Y8P
 
 Alfresco Node Vault - v.${application.version}
-Copyright (c) 2025 Saidone
+Copyright (c) 2025-2026 Saidone
 Powered by Spring Boot ${spring-boot.version}
 Active profiles: ${spring.profiles.active}
 ${AnsiColor.DEFAULT}
