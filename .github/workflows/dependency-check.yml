@@ -32,13 +32,6 @@ jobs:
           args: >
             --failOnCVSS 7
             --enableRetired
-      - name: Debug reports folder
-        if: always()
-        run: |
-          echo "Workspace:"
-          pwd
-          echo "Reports folder content:"
-          ls -la reports || echo "reports folder not found"
       - name: Upload Test results
         if: always()
         uses: actions/upload-artifact@v6
