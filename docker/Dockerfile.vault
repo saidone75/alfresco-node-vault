@@ -33,7 +33,7 @@ RUN apk add curl jq
 RUN addgroup --gid ${GID} -S spring && adduser --uid ${UID} -S spring -G spring
 
 USER spring:spring
-ARG JAR_FILE=/application/target/anv.jar
+ARG JAR_FILE=/application/target/anv*.jar
 COPY --from=builder ${JAR_FILE} anv.jar
 
 ENV SPRING_PROFILES_ACTIVE docker

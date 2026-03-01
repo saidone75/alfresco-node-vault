@@ -9,7 +9,7 @@
         <relativePath/>
     </parent>
     <groupId>org.saidone</groupId>
-    <artifactId>alfresco-node-vault</artifactId>
+    <artifactId>anv</artifactId>
     <version>0.0.4-SNAPSHOT</version>
     <name>alfresco-node-vault</name>
     <description>Alfresco Node Vault</description>
@@ -165,7 +165,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <finalName>anv</finalName>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
