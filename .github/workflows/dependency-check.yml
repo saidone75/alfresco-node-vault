@@ -34,3 +34,9 @@ jobs:
         with:
           name: dependency-check-report
           path: ${{ github.workspace }}/reports
+      - name: Upload SARIF to GitHub Security
+        if: always()
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: reports/dependency-check-report.sarif
+          category: dependency-check
