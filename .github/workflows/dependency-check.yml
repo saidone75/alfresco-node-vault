@@ -17,7 +17,7 @@ jobs:
       - name: Build project with Maven
         run: mvn clean install -DskipTests
       - name: Dependency Check
-        uses: GovTechSG/dependency-check-action@v2.0.0
+        uses: dependency-check/Dependency-Check_Action@main
         with:
           project: 'test'
           path: '.'
