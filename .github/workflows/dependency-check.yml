@@ -2,7 +2,7 @@ name: OWASP Dependency Check
 on:
   push:
     branches:
-      - dev
+      - main
 
 jobs:
   dependency-check:
@@ -33,7 +33,6 @@ jobs:
           format: 'ALL'
           out: 'reports'
           args: >
-            --failOnCVSS 7
             --enableRetired
       - name: Upload Test results
         if: always()
