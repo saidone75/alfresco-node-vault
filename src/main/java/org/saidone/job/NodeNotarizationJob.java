@@ -23,7 +23,6 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.service.NodeService;
-import org.saidone.service.notarization.EthereumService;
 import org.saidone.service.notarization.NotarizationService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -31,12 +30,12 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
- * Schedules the periodic notarization of all nodes missing a transaction id.
+ * Scheduled job that notarizes vault nodes that still miss a blockchain transaction id.
  * <p>
- * At each execution the job computes a checksum of the node content using the
- * configured algorithm and stores the result on the blockchain via the
- * {@link EthereumService}. The returned transaction id is then saved back on
- * the node. Execution is synchronized and enabled only when the property
+ * At each execution the job retrieves nodes where {@code ntx} is {@code null}
+ * and delegates the notarization flow to {@link NotarizationService}. Successful
+ * notarization stores the returned transaction id on the related node. Execution
+ * is synchronized to avoid overlapping runs and enabled only when the property
  * {@code application.notarization-job.enabled} is set to {@code true}.
  * </p>
  */
@@ -47,14 +46,15 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class NodeNotarizationJob extends BaseComponent {
 
-    /** Service providing access to vault-stored nodes. */
+    /** Service used to query nodes that require notarization. */
     private final NodeService nodeService;
 
-    /** Blockchain service responsible for notarising node checksums. */
+    /** Service responsible for notarization and transaction id persistence. */
     private final NotarizationService notarizationService;
 
     /**
-     * Scheduled entry point triggered according to the configured cron expression.
+     * Scheduled entry point triggered according to
+     * {@code application.notarization-job.cron-expression}.
      * Delegates execution to {@link #doNotarize()}.
      */
     @Scheduled(cron = "${application.notarization-job.cron-expression}")
@@ -63,8 +63,10 @@ public class NodeNotarizationJob extends BaseComponent {
     }
 
     /**
-     * Performs the notarization of all nodes currently lacking a transaction id.
-     * This method is synchronized to avoid concurrent executions.
+     * Iterates over all nodes with a missing transaction id and requests
+     * notarization for each of them. Exceptions for individual nodes are
+     * logged and do not stop processing of the remaining nodes.
+     * This method is synchronized to prevent concurrent executions.
      */
     private synchronized void doNotarize() {
         for (val node : nodeService.findByNtx(null)) {
