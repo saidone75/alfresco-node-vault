@@ -24,7 +24,7 @@ import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.service.NodeService;
 import org.saidone.service.notarization.EthereumService;
-import org.springframework.beans.factory.annotation.Value;
+import org.saidone.service.notarization.NotarizationService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -51,15 +51,7 @@ public class NodeNotarizationJob extends BaseComponent {
     private final NodeService nodeService;
 
     /** Blockchain service responsible for notarising node checksums. */
-    private final EthereumService ethereumService;
-
-    /**
-     * Hash algorithm used to generate the checksum that will be notarised.
-     * The value is injected from the
-     * {@code application.service.vault.hash-algorithm} property.
-     */
-    @Value("${application.service.vault.hash-algorithm}")
-    private String algorithm;
+    private final NotarizationService notarizationService;
 
     /**
      * Scheduled entry point triggered according to the configured cron expression.
@@ -77,7 +69,7 @@ public class NodeNotarizationJob extends BaseComponent {
     private synchronized void doNotarize() {
         for (val node : nodeService.findByNtx(null)) {
             try {
-                ethereumService.notarizeNode(node.getId());
+                notarizationService.notarizeNode(node.getId());
             } catch (Exception e) {
                 log.warn(e.getMessage(), e);
             }
