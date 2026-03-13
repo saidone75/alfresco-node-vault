@@ -33,7 +33,7 @@ RUN apk add curl jq
 RUN addgroup --gid ${GID} -S spring && adduser --uid ${UID} -S spring -G spring
 
 USER spring:spring
-ARG JAR_FILE=/application/target/anv*.jar
+ARG JAR_FILE=/application/target/anv.jar
 COPY --from=builder ${JAR_FILE} anv.jar
 
 ENV SPRING_PROFILES_ACTIVE docker
@@ -42,4 +42,4 @@ ENV SHARED_FILES_PATH /tmp/anv
 ENV CONNECTION_TIMEOUT 10000
 ENV READ_TIMEOUT 10000
 
-ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MinRAMPercentage=35", "-XX:MaxRAMPercentage=70", "-jar","/anv.jar"]
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MinRAMPercentage=35", "-XX:MaxRAMPercentage=70", "-jar", "/anv.jar"]
