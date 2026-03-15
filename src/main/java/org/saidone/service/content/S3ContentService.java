@@ -19,6 +19,7 @@
 package org.saidone.service.content;
 
 import jakarta.annotation.PreDestroy;
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -42,6 +43,7 @@ import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.HashMap;
 
 /**
@@ -88,22 +90,17 @@ public class S3ContentService extends BaseComponent implements ContentService {
         metadata.put(MetadataKeys.UUID, node.getId());
         metadata.put(MetadataKeys.FILENAME, node.getName());
         metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
-        try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
-            s3Repository.putObject(s3Config.getBucket(), node, metadata, digestInputStream);
+        @Cleanup("delete") val tempFile = Files.createTempFile("s3-upload-", ".bin").toFile();
+        try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm);
+             val fos = Files.newOutputStream(tempFile.toPath());
+             val fis = Files.newInputStream(tempFile.toPath())) {
+            digestInputStream.transferTo(fos);
+            fos.flush();
             val hash = digestInputStream.getHash();
             log.trace("{}: {}", checksumAlgorithm, hash);
             metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
             metadata.put(MetadataKeys.CHECKSUM_VALUE, hash);
-            val copyRequest = CopyObjectRequest.builder()
-                    .sourceBucket(s3Config.getBucket())
-                    .sourceKey(node.getId())
-                    .destinationBucket(s3Config.getBucket())
-                    .destinationKey(node.getId())
-                    .metadata(metadata)
-                    .metadataDirective(MetadataDirective.REPLACE)
-                    .contentType(node.getContent().getMimeType())
-                    .build();
-            s3Client.copyObject(copyRequest);
+            s3Repository.putObject(s3Config.getBucket(), node, metadata, fis);
         }
     }
 
