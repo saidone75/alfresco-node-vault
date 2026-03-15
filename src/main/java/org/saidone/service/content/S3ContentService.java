@@ -19,6 +19,7 @@
 package org.saidone.service.content;
 
 import jakarta.annotation.PreDestroy;
+import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -42,14 +43,17 @@ import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
 import java.util.HashMap;
 
 /**
  * {@link ContentService} implementation that stores node binaries in Amazon S3.
  * <p>
- * During archival the content stream is uploaded while a checksum is computed on the
- * fly. The resulting hash and other metadata are stored as object metadata. Retrieval
- * operations return a {@link NodeContentStream} descriptor using the AWS SDK.
+ * During archival the content stream is written to a temporary file so the checksum can
+ * be computed before uploading. The resulting hash and other metadata are persisted as
+ * S3 user metadata. Retrieval operations return {@link NodeContentStream} and
+ * {@link NodeContentInfo} descriptors built from {@code HeadObject} and {@code GetObject}
+ * responses.
  * </p>
  * <p>
  * This service is enabled when {@code application.service.vault.storage.impl} is set to
@@ -75,8 +79,12 @@ public class S3ContentService extends BaseComponent implements ContentService {
     private final S3Config s3Config;
 
     /**
-     * Saves the content stream of the given node to S3. The method computes the
-     * checksum on the fly and stores it as object metadata.
+     * Saves the content stream of the given node to S3.
+     * <p>
+     * The method computes the checksum while copying the payload to a temporary file,
+     * then uploads that file with Alfresco metadata (UUID, file name, MIME type,
+     * checksum algorithm and checksum value).
+     * </p>
      *
      * @param node        node whose content is being archived
      * @param inputStream input stream providing the node content
@@ -88,22 +96,17 @@ public class S3ContentService extends BaseComponent implements ContentService {
         metadata.put(MetadataKeys.UUID, node.getId());
         metadata.put(MetadataKeys.FILENAME, node.getName());
         metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
-        try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
-            s3Repository.putObject(s3Config.getBucket(), node, metadata, digestInputStream);
+        @Cleanup("delete") val tempFile = Files.createTempFile("s3-upload-", ".bin").toFile();
+        try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm);
+             val fos = Files.newOutputStream(tempFile.toPath());
+             val fis = Files.newInputStream(tempFile.toPath())) {
+            digestInputStream.transferTo(fos);
+            fos.flush();
             val hash = digestInputStream.getHash();
             log.trace("{}: {}", checksumAlgorithm, hash);
             metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
             metadata.put(MetadataKeys.CHECKSUM_VALUE, hash);
-            val copyRequest = CopyObjectRequest.builder()
-                    .sourceBucket(s3Config.getBucket())
-                    .sourceKey(node.getId())
-                    .destinationBucket(s3Config.getBucket())
-                    .destinationKey(node.getId())
-                    .metadata(metadata)
-                    .metadataDirective(MetadataDirective.REPLACE)
-                    .contentType(node.getContent().getMimeType())
-                    .build();
-            s3Client.copyObject(copyRequest);
+            s3Repository.putObject(s3Config.getBucket(), node, metadata, fis);
         }
     }
 
@@ -157,6 +160,8 @@ public class S3ContentService extends BaseComponent implements ContentService {
 
     /**
      * Removes the stored object associated with the given node id.
+     *
+     * @param nodeId identifier of the node
      */
     @Override
     public void deleteNodeContent(String nodeId) {
@@ -170,7 +175,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
      * @param nodeId    identifier of the node
      * @param algorithm name of the hash algorithm
      * @return hexadecimal encoded hash string
-     * @throws NodeNotFoundOnVaultException if the node cannot be found
+     * @throws VaultException if the object cannot be read from the vault
      */
     @Override
     @SneakyThrows
