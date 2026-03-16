@@ -65,9 +65,6 @@ import java.util.HashMap;
 @ConditionalOnExpression("'${application.service.vault.storage.impl:}' == 's3'")
 public class S3ContentService extends BaseComponent implements ContentService {
 
-    @Value("${application.service.vault.encryption.enabled}")
-    private boolean encryptionEnabled;
-
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
 
