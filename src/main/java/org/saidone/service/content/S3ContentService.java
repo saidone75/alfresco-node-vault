@@ -49,9 +49,11 @@ import java.util.HashMap;
 /**
  * {@link ContentService} implementation that stores node binaries in Amazon S3.
  * <p>
- * During archival the content stream is uploaded while a checksum is computed on the
- * fly. The resulting hash and other metadata are stored as object metadata. Retrieval
- * operations return a {@link NodeContentStream} descriptor using the AWS SDK.
+ * During archival the content stream is written to a temporary file so the checksum can
+ * be computed before uploading. The resulting hash and other metadata are persisted as
+ * S3 user metadata. Retrieval operations return {@link NodeContentStream} and
+ * {@link NodeContentInfo} descriptors built from {@code HeadObject} and {@code GetObject}
+ * responses.
  * </p>
  * <p>
  * This service is enabled when {@code application.service.vault.storage.impl} is set to
@@ -74,8 +76,12 @@ public class S3ContentService extends BaseComponent implements ContentService {
     private final S3Config s3Config;
 
     /**
-     * Saves the content stream of the given node to S3. The method computes the
-     * checksum on the fly and stores it as object metadata.
+     * Saves the content stream of the given node to S3.
+     * <p>
+     * The method computes the checksum while copying the payload to a temporary file,
+     * then uploads that file with Alfresco metadata (UUID, file name, MIME type,
+     * checksum algorithm and checksum value).
+     * </p>
      *
      * @param node        node whose content is being archived
      * @param inputStream input stream providing the node content
@@ -151,6 +157,8 @@ public class S3ContentService extends BaseComponent implements ContentService {
 
     /**
      * Removes the stored object associated with the given node id.
+     *
+     * @param nodeId identifier of the node
      */
     @Override
     public void deleteNodeContent(String nodeId) {
@@ -164,7 +172,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
      * @param nodeId    identifier of the node
      * @param algorithm name of the hash algorithm
      * @return hexadecimal encoded hash string
-     * @throws NodeNotFoundOnVaultException if the node cannot be found
+     * @throws VaultException if the object cannot be read from the vault
      */
     @Override
     @SneakyThrows
