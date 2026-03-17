@@ -34,7 +34,9 @@ import software.amazon.awssdk.services.s3.S3Client;
 import java.net.URI;
 
 /**
- * Configuration for the Amazon S3 client used as storage backend.
+ * Configuration properties and bean factory for the Amazon S3 client used by the vault storage backend.
+ *
+ * <p>Properties are bound from the {@code application.service.vault.storage.s3.*} namespace.</p>
  */
 @EqualsAndHashCode(callSuper = true)
 @Configuration
@@ -42,17 +44,27 @@ import java.net.URI;
 @Data
 public class S3Config extends BaseComponent {
 
+    /** Access key used when static credentials are configured. */
     private String key;
+
+    /** Secret key used when static credentials are configured. */
     private String secret;
+
+    /** Target bucket name for vault object storage. */
     private String bucket;
+
+    /** AWS region identifier (for example {@code eu-west-1}). */
     private String region;
+
+    /** Optional custom S3-compatible endpoint URI. */
     private String endpoint;
 
     /**
      * Builds the Amazon S3 client used as storage backend.
      *
-     * <p>If a custom endpoint is provided, it is configured and basic
-     * credentials are set when the endpoint targets localhost.</p>
+     * <p>If a custom endpoint is provided, it is applied through
+     * {@link software.amazon.awssdk.services.s3.S3ClientBuilder#endpointOverride(URI)} and static
+     * credentials built from {@link #key} and {@link #secret} are configured.</p>
      *
      * @return configured {@link S3Client}
      */
