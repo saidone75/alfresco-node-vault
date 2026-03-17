@@ -19,7 +19,10 @@
 package org.saidone.config;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.val;
+import org.apache.logging.log4j.util.Strings;
+import org.saidone.component.BaseComponent;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,10 +36,11 @@ import java.net.URI;
 /**
  * Configuration for the Amazon S3 client used as storage backend.
  */
+@EqualsAndHashCode(callSuper = true)
 @Configuration
 @ConfigurationProperties(prefix = "application.service.vault.storage.s3")
 @Data
-public class S3Config {
+public class S3Config extends BaseComponent {
 
     private String key;
     private String secret;
@@ -55,12 +59,10 @@ public class S3Config {
     @Bean
     public S3Client s3Client() {
         val builder = S3Client.builder().region(Region.of(region)).forcePathStyle(true);
-        if (endpoint != null && !endpoint.isBlank()) {
+        if (Strings.isNotBlank(endpoint)) {
             builder.endpointOverride(URI.create(endpoint));
-            if (endpoint.contains("localhost")) {
-                builder.credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(key, secret)));
-            }
+            builder.credentialsProvider(StaticCredentialsProvider.create(
+                    AwsBasicCredentials.create(key, secret)));
         }
         return builder.build();
     }
