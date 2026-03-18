@@ -78,7 +78,7 @@ jobs:
 
       - run: |
           echo "Run, Build Application using script"
-          mvn clean package -Pjava17 -DskipTests -Dlicense.skip=true
+          mvn clean package -Pjava21 -DskipTests -Dlicense.skip=true
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
