@@ -56,9 +56,8 @@ public class AnvDigestInputStream extends FilterInputStream {
      * mainly useful when the same type is required but hashing is disabled.
      *
      * @param inputStream the underlying stream
-     * @throws NoSuchAlgorithmException if the algorithm is not available
      */
-    public AnvDigestInputStream(InputStream inputStream) throws NoSuchAlgorithmException {
+    public AnvDigestInputStream(InputStream inputStream) {
         super(inputStream);
         digest = null;
     }
