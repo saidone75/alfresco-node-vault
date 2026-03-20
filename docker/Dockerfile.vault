@@ -1,30 +1,28 @@
 # syntax=docker/dockerfile:1.2
 
 ARG MAVEN_VERSION=3-sapmachine-21
+ARG JAVA_VENDOR=azul/zulu-openjdk-alpine
 ARG JAVA_VERSION=21-jre-headless-latest
 
+# --- Stage 1: Builder ---
 FROM maven:${MAVEN_VERSION} as builder
-
-ENV MAVEN_CLI_OPTS="-s .m2/settings.xml -Dmaven.repo.local=.m2/repository --batch-mode"
-ENV MAVEN_OPTS="-client -XX:+TieredCompilation -XX:TieredStopAtLevel=1"
 
 WORKDIR /application
 
-# Optimizing for dependencies cache
+RUN --mount=type=bind,source=pom.xml,target=pom.xml \
+    --mount=type=bind,source=.m2/settings.xml,target=.m2/settings.xml \
+    --mount=type=cache,target=/root/.m2 \
+    mvn -s .m2/settings.xml -Dmaven.repo.local=/root/.m2/repository \
+    dependency:go-offline -B
 
-COPY .m2/settings.xml ./.m2/settings.xml
+COPY . .
 
-COPY pom.xml ./pom.xml
+RUN --mount=type=cache,target=/root/.m2 \
+    mvn -s .m2/settings.xml -Dmaven.repo.local=/root/.m2/repository \
+    clean package -DskipTests -Dlicense.skip=true
 
-RUN mvn $MAVEN_CLI_OPTS -e -B de.qaware.maven:go-offline-maven-plugin:resolve-dependencies
-
-# Building
-
-COPY ./ ./
-
-RUN mvn $MAVEN_CLI_OPTS install -DskipTests -Dlicense.skip=true
-
-FROM azul/zulu-openjdk-alpine:${JAVA_VERSION}
+# --- Stage 2: Runtime ---
+FROM ${JAVA_VENDOR}:${JAVA_VERSION}
 ARG UID=1010
 ARG GID=1010
 
