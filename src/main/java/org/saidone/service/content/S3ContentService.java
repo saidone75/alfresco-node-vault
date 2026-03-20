@@ -89,20 +89,19 @@ public class S3ContentService extends BaseComponent implements ContentService {
     @Override
     @SneakyThrows
     public void archiveNodeContent(Node node, InputStream inputStream) {
-        val metadata = new HashMap<String, String>();
-        metadata.put(MetadataKeys.UUID, node.getId());
-        metadata.put(MetadataKeys.FILENAME, node.getName());
-        metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
         @Cleanup("delete") val tempFile = Files.createTempFile("s3-upload-", ".bin").toFile();
-        try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm);
+        try (val dis = new AnvDigestInputStream(inputStream, checksumAlgorithm);
              val fos = Files.newOutputStream(tempFile.toPath());
              val fis = Files.newInputStream(tempFile.toPath())) {
-            digestInputStream.transferTo(fos);
+            dis.transferTo(fos);
             fos.flush();
-            val hash = digestInputStream.getHash();
-            log.trace("{}: {}", checksumAlgorithm, hash);
+            log.trace("{}: {}", checksumAlgorithm, dis.getHash());
+            val metadata = new HashMap<String, String>();
+            metadata.put(MetadataKeys.UUID, node.getId());
+            metadata.put(MetadataKeys.FILENAME, node.getName());
+            metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
             metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
-            metadata.put(MetadataKeys.CHECKSUM_VALUE, hash);
+            metadata.put(MetadataKeys.CHECKSUM_VALUE, dis.getHash());
             s3Repository.putObject(s3Config.getBucket(), node, metadata, fis);
         }
     }
@@ -119,12 +118,12 @@ public class S3ContentService extends BaseComponent implements ContentService {
         try {
             val head = s3Client.headObject(HeadObjectRequest.builder()
                     .bucket(s3Config.getBucket()).key(nodeId).build());
-            val nodeContent = new NodeContentStream();
-            nodeContent.setFileName(head.metadata().getOrDefault(MetadataKeys.FILENAME, nodeId));
-            nodeContent.setContentType(head.contentType());
-            nodeContent.setLength(head.contentLength());
-            nodeContent.setContentStream(s3Repository.getObject(s3Config.getBucket(), nodeId));
-            return nodeContent;
+            val nodeContentStream = new NodeContentStream();
+            nodeContentStream.setFileName(head.metadata().getOrDefault(MetadataKeys.FILENAME, nodeId));
+            nodeContentStream.setContentType(head.contentType());
+            nodeContentStream.setLength(head.contentLength());
+            nodeContentStream.setContentStream(s3Repository.getObject(s3Config.getBucket(), nodeId));
+            return nodeContentStream;
         } catch (S3Exception e) {
             throw new NodeNotFoundOnVaultException(nodeId);
         }
