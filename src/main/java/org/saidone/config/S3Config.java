@@ -19,10 +19,8 @@
 package org.saidone.config;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.val;
 import org.apache.logging.log4j.util.Strings;
-import org.saidone.component.BaseComponent;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -38,11 +36,10 @@ import java.net.URI;
  *
  * <p>Properties are bound from the {@code application.service.vault.storage.s3.*} namespace.</p>
  */
-@EqualsAndHashCode(callSuper = true)
 @Configuration
 @ConfigurationProperties(prefix = "application.service.vault.storage.s3")
 @Data
-public class S3Config extends BaseComponent {
+public class S3Config {
 
     /** Access key used when static credentials are configured. */
     private String key;

@@ -21,6 +21,7 @@ package org.saidone.service;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.apache.logging.log4j.util.Strings;
+import org.saidone.component.BaseComponent;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -36,7 +37,7 @@ import java.util.Base64;
  */
 @RequiredArgsConstructor
 @Service
-public class AuthenticationService {
+public class AuthenticationService extends BaseComponent {
 
     private final AlfrescoService alfrescoService;
 

@@ -21,6 +21,7 @@ package org.saidone.service.crypto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.saidone.component.BaseComponent;
 import org.saidone.service.NodeService;
 import org.saidone.service.SecretService;
 import org.saidone.service.content.ContentService;
@@ -36,7 +37,7 @@ import org.springframework.stereotype.Service;
 @Service
 @Slf4j
 @ConditionalOnExpression("${application.service.vault.encryption.enabled}.equals(true)")
-public class KeyServiceImpl implements KeyService {
+public class KeyServiceImpl extends BaseComponent implements KeyService {
 
     /**
      * Provides access to the encryption secrets used for re-encryption.

@@ -23,6 +23,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.Node;
+import org.saidone.component.BaseComponent;
 import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
@@ -50,7 +51,7 @@ import java.util.HashMap;
 @Slf4j
 @ConfigurationProperties(prefix = "application.service.vault.storage")
 @ConditionalOnExpression("'${application.service.vault.storage.impl:}' == 'gridfs'")
-public class GridFsContentService implements ContentService {
+public class GridFsContentService extends BaseComponent implements ContentService {
 
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;

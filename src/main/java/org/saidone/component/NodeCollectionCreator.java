@@ -63,7 +63,7 @@ public class NodeCollectionCreator extends BaseComponent {
             log.error("Unable to start {}", this.getClass().getSimpleName());
             super.shutDown(1);
         }
-        super.stop();
+        this.stop();
     }
 
 }
