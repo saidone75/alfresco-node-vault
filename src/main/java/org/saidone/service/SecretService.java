@@ -36,11 +36,15 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 /**
- * Service class for interacting with Vault to retrieve secrets.
- * <p>
- * This service uses Spring Vault's versioned key-value operations to fetch secrets
- * from a configured Vault path and key. It supports retrieving secrets by specific version
- * or the latest version if none is specified.
+ * Service responsible for reading encryption secrets from HashiCorp Vault.
+ *
+ * <p>The service uses Spring Vault {@code kv-v2} operations to read one configured key
+ * from one configured secret path. Consumers can request either the latest secret version
+ * or a specific version.</p>
+ *
+ * <p>When an error occurs while waiting for the asynchronous Vault call, methods in this class
+ * log the exception, restore the interrupted status for {@link InterruptedException}, and return
+ * {@code null} to indicate the secret could not be retrieved.</p>
  */
 @RequiredArgsConstructor
 @Service
@@ -54,12 +58,11 @@ public class SecretService extends BaseComponent {
     private static VaultVersionedKeyValueOperations vaultVersionedKeyValueOperations;
 
     /**
-     * Initializes the service after dependency injection.
-     * <p>
-     * Sets up the {@link VaultVersionedKeyValueOperations} instance used to
-     * retrieve secrets and verifies that Vault is initialized. If Vault is not
-     * initialized, the application is gracefully shut down.
-     * </p>
+     * Initializes Vault operations after dependency injection.
+     *
+     * <p>This method prepares the {@link VaultVersionedKeyValueOperations} instance bound to
+     * the configured KV mount and checks the Vault system health endpoint. If Vault is reported
+     * as not initialized, startup is aborted through {@link #shutDown(int)}.</p>
      */
     @Override
     public void init() {
@@ -73,14 +76,12 @@ public class SecretService extends BaseComponent {
     }
 
     /**
-     * Retrieves the latest version of the secret from Vault.
+     * Retrieves the latest configured secret value from Vault.
      *
-     * <p>This is a convenience method that delegates to
-     * {@link #getSecret(Integer)} with a {@code null} version to fetch the most
-     * recent secret value.</p>
+     * <p>This is a convenience method equivalent to calling {@link #getSecret(Integer)}
+     * with {@code null}.</p>
      *
-     * @return the secret containing the raw bytes and version information
-     * @throws RuntimeException if the secret cannot be retrieved
+     * @return the latest {@link Secret}, or {@code null} when retrieval fails
      */
     public Secret getSecret() {
         try {
@@ -94,13 +95,11 @@ public class SecretService extends BaseComponent {
     }
 
     /**
-     * Retrieves the secret from Vault for the specified version.
+     * Retrieves a secret from Vault for a specific version or for the latest version.
      *
-     * @param version the version of the secret to retrieve; if {@code null},
-     *                retrieves the latest version
-     * @return a {@link Secret} containing the secret bytes and the version number
-     * @throws RuntimeException if unable to retrieve the secret or if an error
-     *                          occurs during retrieval
+     * @param version the version number to retrieve; {@code null} loads the latest version
+     * @return a {@link Secret} containing secret bytes and metadata version, or {@code null}
+     *         if retrieval fails
      */
     public Secret getSecret(Integer version) {
         try {
@@ -114,11 +113,12 @@ public class SecretService extends BaseComponent {
     }
 
     /**
-     * Asynchronously fetches a secret from Vault.
+     * Asynchronously fetches and maps a secret from Vault.
      *
-     * @param version version of the secret to retrieve; {@code null} for the
-     *                latest version
-     * @return a {@link CompletableFuture} yielding the secret data and version
+     * @param version secret version to retrieve; {@code null} for the latest version
+     * @return a future that resolves to a {@link Secret} built from Vault response data
+     * @throws RuntimeException when Vault returns no payload/metadata for the requested version
+     *                          or when the configured secret key is absent in the payload
      */
     private CompletableFuture<Secret> getSecretAsync(Integer version) {
         return CompletableFuture.supplyAsync(() -> {
