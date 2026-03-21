@@ -86,8 +86,11 @@ public class SecretService extends BaseComponent {
         try {
             return getSecretAsync(null).get();
         } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage());
+            log.trace(e.getMessage(), e);
+            Thread.currentThread().interrupt();
         }
+        return null;
     }
 
     /**
@@ -103,8 +106,11 @@ public class SecretService extends BaseComponent {
         try {
             return getSecretAsync(version).get();
         } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
+            log.error(e.getMessage());
+            log.trace(e.getMessage(), e);
+            Thread.currentThread().interrupt();
         }
+        return null;
     }
 
     /**
