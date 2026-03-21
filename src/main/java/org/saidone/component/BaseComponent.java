@@ -22,7 +22,6 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import org.saidone.misc.Constants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -42,6 +41,11 @@ public abstract class BaseComponent implements ApplicationContextAware {
     @Autowired
     private ApplicationContext applicationContext;
 
+    /** Prefix displayed when a component is starting. */
+    private static final String START_PREFIX = ">>>>>";
+    /** Prefix displayed when a component is stopping. */
+    private static final String STOP_PREFIX = "<<<<<";
+
     /**
      * Stores the injected {@link ApplicationContext} for later use.
      */
@@ -56,7 +60,7 @@ public abstract class BaseComponent implements ApplicationContextAware {
      */
     @PostConstruct
     public void init() {
-        log.info("{} Starting {}", Constants.START_PREFIX, this.getClass().getSimpleName());
+        log.info("{} Starting {}", START_PREFIX, this.getClass().getSimpleName());
     }
 
     /**
@@ -65,7 +69,7 @@ public abstract class BaseComponent implements ApplicationContextAware {
      */
     @PreDestroy
     public void stop() {
-        log.info("{} Stopping {}", Constants.STOP_PREFIX, this.getClass().getSimpleName());
+        log.info("{} Stopping {}", STOP_PREFIX, this.getClass().getSimpleName());
     }
 
     /**
