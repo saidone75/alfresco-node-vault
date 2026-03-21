@@ -73,12 +73,10 @@ public class MongoDBConfig extends AbstractMongoClientConfiguration {
                 .build());
     }
 
-    @Override
     public boolean autoIndexCreation() {
         return true;
     }
 
-    @Override
     @NonNull
     protected String getDatabaseName() {
         return database;
