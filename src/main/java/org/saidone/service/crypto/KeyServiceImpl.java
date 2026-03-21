@@ -33,8 +33,8 @@ import org.springframework.stereotype.Service;
  * delegating node retrieval to {@link NodeService} and content handling to
  * {@link ContentService}.
  */
-@RequiredArgsConstructor
 @Service
+@RequiredArgsConstructor
 @Slf4j
 @ConditionalOnExpression("${application.service.vault.encryption.enabled}.equals(true)")
 public class KeyServiceImpl extends BaseComponent implements KeyService {

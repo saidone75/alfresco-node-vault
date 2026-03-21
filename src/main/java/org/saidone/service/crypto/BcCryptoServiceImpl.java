@@ -19,6 +19,7 @@
 package org.saidone.service.crypto;
 
 import jakarta.validation.constraints.Min;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.val;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -48,6 +49,7 @@ import java.security.Security;
  * encryption key is derived using the configured KDF implementation.
  */
 @Service
+@RequiredArgsConstructor
 @Setter
 @ConfigurationProperties(prefix = "application.service.vault.encryption.bc")
 @ConditionalOnExpression(
@@ -55,8 +57,7 @@ import java.security.Security;
 )
 public class BcCryptoServiceImpl extends AbstractCryptoService implements CryptoService {
 
-    @Autowired
-    private SecretService secretService;
+    private final SecretService secretService;
 
     static {
         if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
