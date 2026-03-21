@@ -74,21 +74,20 @@ public class GridFsContentService extends BaseComponent implements ContentServic
     @SneakyThrows
     public void archiveNodeContent(Node node, InputStream inputStream) {
         try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
+            val metadata = new HashMap<String, String>();
+            metadata.put(MetadataKeys.UUID, node.getId());
             gridFsRepository.saveFile(
                     digestInputStream,
                     node.getName(),
                     node.getContent().getMimeType(),
-                    new HashMap<>() {{
-                        put(MetadataKeys.UUID, node.getId());
-                    }});
+                    metadata);
             val hash = digestInputStream.getHash();
             log.trace("{}: {}", checksumAlgorithm, hash);
+            metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
+            metadata.put(MetadataKeys.CHECKSUM_VALUE, hash);
             gridFsRepository.updateFileMetadata(
                     node.getId(),
-                    new HashMap<>() {{
-                        put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
-                        put(MetadataKeys.CHECKSUM_VALUE, hash);
-                    }});
+                    metadata);
         }
     }
 
