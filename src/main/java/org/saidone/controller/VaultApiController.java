@@ -186,7 +186,7 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
-    public ResponseEntity<?> getNode(
+    public ResponseEntity<Entry> getNode(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
 
@@ -277,7 +277,7 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
-    public ResponseEntity<?> restoreNode(
+    public ResponseEntity<String> restoreNode(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId,
             @RequestParam(required = false, defaultValue = "false") boolean restorePermissions) {
@@ -315,7 +315,7 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
-    public ResponseEntity<?> archiveNode(
+    public ResponseEntity<String> archiveNode(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
 
@@ -355,7 +355,7 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
-    public ResponseEntity<?> notarizeNode(
+    public ResponseEntity<String> notarizeNode(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
 
@@ -406,7 +406,7 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
-    public ResponseEntity<?> checkNotarization(
+    public ResponseEntity<String> checkNotarization(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
 
@@ -443,7 +443,7 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
-    public ResponseEntity<?> updateKey(
+    public ResponseEntity<String> updateKey(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
 
@@ -479,7 +479,7 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
-    public ResponseEntity<?> updateKey(
+    public ResponseEntity<String> updateKey(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @RequestParam(name = "keyVersion") @Parameter(name = "keyVersion", description = "Version of the encryption key to update", required = true) int keyVersion) {
 
