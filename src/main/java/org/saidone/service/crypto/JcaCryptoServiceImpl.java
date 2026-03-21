@@ -19,6 +19,7 @@
 package org.saidone.service.crypto;
 
 import jakarta.validation.constraints.Min;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.val;
 import org.saidone.config.EncryptionConfig;
@@ -46,6 +47,7 @@ import java.security.SecureRandom;
  * is derived using the configured KDF implementation.
  */
 @Service
+@RequiredArgsConstructor
 @Setter
 @ConfigurationProperties(prefix = "application.service.vault.encryption.jca")
 @ConditionalOnExpression(
@@ -53,8 +55,7 @@ import java.security.SecureRandom;
 )
 public class JcaCryptoServiceImpl extends AbstractCryptoService implements CryptoService {
 
-    @Autowired
-    private SecretService secretService;
+    private final SecretService secretService;
 
     @Min(16)
     private int saltLength;
