@@ -189,6 +189,7 @@ services:
       ACTIVE_MQ_URL: tcp://activemq:61616
       MONGODB_URL: mongodb://mongo:27017
       VAULT_URL: http://anv-hashicorp-vault:8200
+      S3_ENDPOINT: http://anv-localstack:4566
     ports:
       - "8086:8086"
 volumes:

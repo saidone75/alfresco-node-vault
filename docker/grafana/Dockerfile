@@ -1,4 +1,4 @@
-ARG GRAFANA_IMAGE
+ARG GRAFANA_IMAGE=grafana/grafana:main
 FROM ${GRAFANA_IMAGE}
 
 WORKDIR /etc/grafana
