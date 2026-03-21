@@ -5,7 +5,10 @@
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Javadoc](https://img.shields.io/badge/Javadoc-API-blue.svg)](https://saidone75.github.io/alfresco-node-vault/javadoc/)
 ![Java CI](https://github.com/saidone75/alfresco-node-vault/actions/workflows/build.yml/badge.svg)
-![CodeQL](https://github.com/saidone75/alfresco-node-vault/actions/workflows/codeql.yml/badge.svg)
+
+[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=saidone75_alfresco-node-vault&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=saidone75_alfresco-node-vault)
+[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=saidone75_alfresco-node-vault&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=saidone75_alfresco-node-vault)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=saidone75_alfresco-node-vault&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=saidone75_alfresco-node-vault)
 
 ## The Long-term Document Management Challenge
 
