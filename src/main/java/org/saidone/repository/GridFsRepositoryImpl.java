@@ -106,7 +106,7 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
             indexOps.createIndex(index);
         } catch (Exception e) {
             log.error("Unable to start {}", this.getClass().getSimpleName());
-            super.shutDown(0);
+            super.shutDown(1);
         }
     }
 

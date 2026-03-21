@@ -61,9 +61,9 @@ public class NodeCollectionCreator extends BaseComponent {
             mongoTemplate.indexOps(COLLECTION_NAME).createIndex(index);
         } catch (Exception e) {
             log.error("Unable to start {}", this.getClass().getSimpleName());
-            super.shutDown(0);
+            super.shutDown(1);
         }
-        super.stop();
+        this.stop();
     }
 
 }

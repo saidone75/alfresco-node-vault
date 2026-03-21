@@ -30,6 +30,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.logging.log4j.util.Strings;
+import org.saidone.component.BaseComponent;
 import org.saidone.model.Entry;
 import org.saidone.service.AuthenticationService;
 import org.saidone.service.NodeService;
@@ -64,7 +65,7 @@ import java.util.concurrent.CompletableFuture;
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Vault API", description = "Vault operations")
-public class VaultApiController {
+public class VaultApiController extends BaseComponent {
 
     /**
      * Service used to verify Basic authentication credentials.

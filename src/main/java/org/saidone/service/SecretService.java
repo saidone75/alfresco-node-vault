@@ -71,7 +71,7 @@ public class SecretService extends BaseComponent {
         val health = vaultTemplate.opsForSys().health();
         if (!health.isInitialized()) {
             log.error("Unable to start {}", this.getClass().getSimpleName());
-            super.shutDown(0);
+            super.shutDown(1);
         }
     }
 

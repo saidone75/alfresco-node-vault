@@ -78,7 +78,7 @@ public class AuditCollectionCreator extends BaseComponent {
         } else {
             log.info("Collection '{}' already exists.", AuditService.AUDIT_COLLECTION_NAME);
         }
-        super.stop();
+        this.stop();
     }
 
 }

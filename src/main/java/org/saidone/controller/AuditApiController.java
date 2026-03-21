@@ -29,6 +29,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.val;
+import org.saidone.component.BaseComponent;
 import org.saidone.service.AuthenticationService;
 import org.saidone.service.audit.AuditEntry;
 import org.saidone.service.audit.AuditServiceImpl;
@@ -53,7 +54,7 @@ import java.util.List;
 @RequestMapping("/api/audit")
 @RequiredArgsConstructor
 @Tag(name = "Audit API", description = "Audit log operations")
-public class AuditApiController {
+public class AuditApiController extends BaseComponent {
 
     private final AuditServiceImpl auditService;
     private final AuthenticationService authenticationService;
