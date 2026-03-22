@@ -102,6 +102,8 @@ public class AlfrescoService extends BaseComponent {
         OBJECT_MAPPER.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
     }
 
+    private static final String ROOT = "-root-";
+
     /**
      * Initializes the AlfrescoService component after dependency injection.
      * <p>
@@ -127,7 +129,7 @@ public class AlfrescoService extends BaseComponent {
     public Node getGuestHome() {
         if (guestHome != null) return guestHome;
         try {
-            guestHome = Objects.requireNonNull(nodesApi.getNode("-root-", null, "/Guest Home", null).getBody()).getEntry();
+            guestHome = Objects.requireNonNull(nodesApi.getNode(ROOT, null, "/Guest Home", null).getBody()).getEntry();
         } catch (Exception e) {
             log.warn(e.getMessage());
         }
@@ -271,10 +273,10 @@ public class AlfrescoService extends BaseComponent {
             val originalPathElements = node.getPath().getElements().stream().map(PathElement::getName).toList().subList(1, node.getPath().getElements().size());
             if (!pathExists(String.join("/", originalPathElements))) {
                 log.debug("Path {} does not exist anymore, creating path structure...", String.join("/", originalPathElements));
-                node.setParentId(createPathIfNotExists("-root-", originalPathElements));
+                node.setParentId(createPathIfNotExists(ROOT, originalPathElements));
             } else {
                 log.debug("Path {} exists, getting parent node...", String.join("/", originalPathElements));
-                node.setParentId(Objects.requireNonNull(nodesApi.getNode("-root-", null, String.join("/", originalPathElements), null).getBody()).getEntry().getId());
+                node.setParentId(Objects.requireNonNull(nodesApi.getNode(ROOT, null, String.join("/", originalPathElements), null).getBody()).getEntry().getId());
             }
         }
 
@@ -488,7 +490,7 @@ public class AlfrescoService extends BaseComponent {
      */
     public boolean pathExists(String path) {
         try {
-            nodesApi.getNode("-root-", null, path, null);
+            nodesApi.getNode(ROOT, null, path, null);
             return true;
         } catch (FeignException.NotFound e) {
             return false;
