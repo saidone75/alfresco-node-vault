@@ -62,32 +62,38 @@ public class AnvDigestInputStream extends FilterInputStream {
         digest = null;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int read() throws IOException {
         int byteRead = in.read();
-        if (byteRead != -1) {
-            if (digest != null) digest.update((byte) byteRead);
+        if (byteRead != -1 && digest != null) {
+            digest.update((byte) byteRead);
         }
         return byteRead;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int read(byte[] b) throws IOException {
         int bytesRead = in.read(b);
-        if (bytesRead != -1) {
-            if (digest != null) digest.update(b, 0, bytesRead);
+        if (bytesRead != -1 && digest != null) {
+            digest.update(b, 0, bytesRead);
         }
         return bytesRead;
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int read(byte[] b, int off, int len) throws IOException {
         int bytesRead = in.read(b, off, len);
-        if (bytesRead != -1) {
-            if (digest != null) digest.update(b, off, bytesRead);
+        if (bytesRead != -1 && digest != null) {
+            digest.update(b, off, bytesRead);
         }
         return bytesRead;
     }
