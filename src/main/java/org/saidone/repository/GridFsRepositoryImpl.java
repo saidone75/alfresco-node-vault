@@ -90,6 +90,8 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
     private final GridFsOperations gridFsOperations;
     private final MongoTemplate mongoTemplate;
 
+    private final static String UUID_FIELD = "metadata.uuid";
+
     /**
      * Initializes the component by creating an index on the
      * {@code metadata.uuid} field of the {@code fs.files} collection. This
@@ -102,7 +104,7 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
         super.init();
         try {
             val indexOps = mongoTemplate.indexOps("fs.files");
-            val index = new Index().on("metadata.uuid", Sort.Direction.ASC).named("metadata_uuid_index");
+            val index = new Index().on(UUID_FIELD, Sort.Direction.ASC).named("metadata_uuid_index");
             indexOps.createIndex(index);
         } catch (Exception e) {
             log.error("Unable to start {}", this.getClass().getSimpleName());
@@ -136,7 +138,7 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
      */
     @Override
     public void updateFileMetadata(String uuid, Map<String, String> metadata) {
-        val query = new Query(Criteria.where("metadata.uuid").is(uuid));
+        val query = new Query(Criteria.where(UUID_FIELD).is(uuid));
         val update = new Update();
         metadata.forEach((key, value) -> update.set(String.format("metadata.%s", key), value));
         mongoTemplate.updateFirst(query, update, "fs.files");
@@ -150,7 +152,7 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
      */
     @Override
     public GridFSFile findFileById(String uuid) {
-        val query = new Query(Criteria.where("metadata.uuid").is(uuid));
+        val query = new Query(Criteria.where(UUID_FIELD).is(uuid));
         return gridFsTemplate.findOne(query);
     }
 
@@ -161,7 +163,7 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
      */
     @Override
     public void deleteFileById(String uuid) {
-        val query = new Query(Criteria.where("metadata.uuid").is(uuid));
+        val query = new Query(Criteria.where(UUID_FIELD).is(uuid));
         gridFsTemplate.delete(query);
     }
 
