@@ -55,7 +55,7 @@ public class NodeWrapper {
      */
     @Transient
     @JsonIgnore
-    private static final ObjectMapper objectMapper = createObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = createObjectMapper();
 
     /** Identifier of the wrapped Alfresco node. */
     @Id
@@ -99,7 +99,7 @@ public class NodeWrapper {
         }
         this.id = node.getId();
         this.archiveDate = java.time.Instant.now();
-        this.nodeJson = objectMapper.writeValueAsString(node);
+        this.nodeJson = OBJECT_MAPPER.writeValueAsString(node);
     }
 
     /**
@@ -112,7 +112,7 @@ public class NodeWrapper {
     @SneakyThrows
     public Node getNode() {
         try {
-            return objectMapper.readValue(nodeJson, Node.class);
+            return OBJECT_MAPPER.readValue(nodeJson, Node.class);
         } catch (Exception e) {
             log.error("Error while deserializing node: {}", e.getMessage());
             log.trace(e.getMessage(), e);
