@@ -55,6 +55,7 @@ public class MongoDBConfig extends AbstractMongoClientConfiguration {
      * @return the configured {@link MongoClient}
      */
     @Bean
+    @Override
     @NonNull
     public MongoClient mongoClient() {
         val pojoCodecRegistry = fromProviders(PojoCodecProvider.builder().automatic(true).build());
@@ -73,6 +74,7 @@ public class MongoDBConfig extends AbstractMongoClientConfiguration {
                 .build());
     }
 
+    @Override
     public boolean autoIndexCreation() {
         return true;
     }
