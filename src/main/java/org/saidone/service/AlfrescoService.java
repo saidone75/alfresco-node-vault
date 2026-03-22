@@ -90,12 +90,17 @@ public class AlfrescoService extends BaseComponent {
     private String userName;
     @Value("${content.service.security.basicAuth.password}")
     private String password;
-
     @Value("${application.service.alfresco.chunk-size}")
     private int chunkSize;
 
-    private static String basicAuth;
-    private static Node guestHome;
+    private String basicAuth;
+    private Node guestHome;
+
+    private static final ObjectMapper OBJECT_MAPPER;
+    static {
+        OBJECT_MAPPER = new ObjectMapper();
+        OBJECT_MAPPER.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
+    }
 
     /**
      * Initializes the AlfrescoService component after dependency injection.
@@ -498,11 +503,8 @@ public class AlfrescoService extends BaseComponent {
      */
     @SneakyThrows
     public static String getErrorKey(FeignException e) {
-        val objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
-        val charset = StandardCharsets.UTF_8;
-        val body = charset.decode(e.responseBody().orElse(ByteBuffer.allocate(0))).toString();
-        val apiExceptionError = objectMapper.readValue(body, ApiExceptionError.class);
+        val body = StandardCharsets.UTF_8.decode(e.responseBody().orElse(ByteBuffer.allocate(0))).toString();
+        val apiExceptionError = OBJECT_MAPPER.readValue(body, ApiExceptionError.class);
         return apiExceptionError.getErrorKey();
     }
 
