@@ -55,7 +55,7 @@ public class SecretService extends BaseComponent {
     private final VaultTemplate vaultTemplate;
     private final EncryptionConfig properties;
 
-    private static VaultVersionedKeyValueOperations vaultVersionedKeyValueOperations;
+    private VaultVersionedKeyValueOperations vaultVersionedKeyValueOperations;
 
     /**
      * Initializes Vault operations after dependency injection.
