@@ -27,7 +27,7 @@ import lombok.Data;
 @Data
 public abstract class NodeContent {
 
-    public String fileName;
-    public String contentType;
+    protected String fileName;
+    protected String contentType;
 
 }
