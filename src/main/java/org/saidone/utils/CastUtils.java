@@ -90,7 +90,7 @@ public class CastUtils {
 
         return inputList.stream()
                 .map(elementType::cast)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
