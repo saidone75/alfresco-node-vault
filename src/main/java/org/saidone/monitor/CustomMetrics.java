@@ -38,7 +38,6 @@ public class CustomMetrics {
     /**
      * Creates a new instance and registers the custom gauge metric.
      *
-     * @param meterRegistry the registry to register metrics with
      * @param mongoTemplate template used to query MongoDB collections
      */
     public CustomMetrics(MeterRegistry meterRegistry, MongoTemplate mongoTemplate) {
