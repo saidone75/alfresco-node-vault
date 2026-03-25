@@ -65,6 +65,7 @@ class VaultApiControllerTests extends BaseTest {
     private AlfrescoService alfrescoService;
 
     @BeforeEach
+    @Override
     public void before(TestInfo testInfo) {
         super.before(testInfo);
         if (basicAuth == null)
