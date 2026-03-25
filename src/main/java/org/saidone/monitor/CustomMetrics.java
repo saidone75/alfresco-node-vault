@@ -33,17 +33,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class CustomMetrics {
 
-    private final MeterRegistry meterRegistry;
     private final MongoTemplate mongoTemplate;
 
     /**
      * Creates a new instance and registers the custom gauge metric.
      *
-     * @param meterRegistry the registry to register metrics with
      * @param mongoTemplate template used to query MongoDB collections
      */
     public CustomMetrics(MeterRegistry meterRegistry, MongoTemplate mongoTemplate) {
-        this.meterRegistry = meterRegistry;
         this.mongoTemplate = mongoTemplate;
         Gauge.builder("nodes_on_vault", this, CustomMetrics::getAlfNodeCount)
                 .description("Nodes on vault")

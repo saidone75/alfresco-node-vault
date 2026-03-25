@@ -100,6 +100,7 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
      * If the index creation fails the component is shut down.
      */
     @PostConstruct
+    @Override
     public void init() {
         super.init();
         try {
