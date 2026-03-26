@@ -36,11 +36,11 @@ public class Secret {
     /**
      * Version of the secret as stored in Vault metadata.
      */
-    public int version;
+    private int version;
 
     /**
      * Raw secret bytes retrieved from Vault.
      */
-    public byte[] data;
+    private byte[] data;
 
 }
