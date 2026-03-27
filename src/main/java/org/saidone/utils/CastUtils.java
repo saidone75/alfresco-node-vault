@@ -133,7 +133,7 @@ public class CastUtils {
      * @throws ClassCastException       if any key or value cannot be cast to the
      *                                  requested types
      */
-    public <KT, KV> Map<KT, KV> castToMapOfObjectObject(Object object, Class<KT> keyType, Class<KV> valueType) {
+    public <T, V> Map<T, V> castToMapOfObjectObject(Object object, Class<T> keyType, Class<V> valueType) {
         if (object == null) {
             return new HashMap<>();
         }
