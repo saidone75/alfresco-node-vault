@@ -62,7 +62,7 @@ class AlfrescoServiceTests extends BaseTest {
     @Test
     @Order(10)
     @SneakyThrows
-    public void getNodeTest() {
+    void getNodeTest() {
         val nodeId = createNode().getId();
         assertDoesNotThrow(() -> alfrescoService.getNode(nodeId));
     }
@@ -70,7 +70,7 @@ class AlfrescoServiceTests extends BaseTest {
     @Test
     @Order(20)
     @SneakyThrows
-    public void getNodeContentTest() {
+    void getNodeContentTest() {
         val file = ResourceFileUtils.getFileFromResource("sample.pdf");
         val nodeId = createNode(file).getId();
         @Cleanup val inputStream = assertDoesNotThrow(() -> alfrescoService.getNodeContent(nodeId));
@@ -80,7 +80,7 @@ class AlfrescoServiceTests extends BaseTest {
     @Test
     @Order(30)
     @SneakyThrows
-    public void deleteNodeTest() {
+    void deleteNodeTest() {
         val nodeId = createNode().getId();
         assertDoesNotThrow(() -> alfrescoService.deleteNode(nodeId));
         assertThrows(FeignException.NotFound.class, () -> alfrescoService.getNode(nodeId));
@@ -89,7 +89,7 @@ class AlfrescoServiceTests extends BaseTest {
     @Test
     @Order(40)
     @SneakyThrows
-    public void aspectsTest() {
+    void aspectsTest() {
         val nodeId = createNode().getId();
         assertDoesNotThrow(() -> alfrescoService.addAspects(nodeId, List.of(AlfrescoContentModel.ASP_EFFECTIVITY)));
         assertTrue(alfrescoService.getNode(nodeId).getAspectNames().contains(AlfrescoContentModel.ASP_EFFECTIVITY));
@@ -100,7 +100,7 @@ class AlfrescoServiceTests extends BaseTest {
     @Test
     @Order(50)
     @SneakyThrows
-    public void searchAndProcessTest() {
+    void searchAndProcessTest() {
         val node = createNode();
         val result = new AtomicReference<String>();
         val consumer = (Consumer<String>) result::set;
@@ -111,7 +111,7 @@ class AlfrescoServiceTests extends BaseTest {
     @Test
     @Order(60)
     @SneakyThrows
-    public void createPathIfNotExistsTest() {
+    void createPathIfNotExistsTest() {
         val pathElements = List.of("foo", "bar", "baz");
         var nodeId = alfrescoService.createPathIfNotExists(BaseTest.parentId, pathElements);
         var node = alfrescoService.getNode(nodeId);
@@ -126,7 +126,7 @@ class AlfrescoServiceTests extends BaseTest {
     @Test
     @Order(70)
     @SneakyThrows
-    public void nodeWrapperTest() {
+    void nodeWrapperTest() {
         assertThrows(IllegalArgumentException.class, () -> new NodeWrapper(null));
         val node = createNode();
         val nodeWrapper = assertDoesNotThrow(() -> new NodeWrapper(node));
