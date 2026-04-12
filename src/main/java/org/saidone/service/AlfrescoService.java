@@ -39,6 +39,7 @@ import org.alfresco.search.model.SearchRequest;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.AlfrescoServiceConfig;
 import org.saidone.exception.ApiExceptionError;
+import org.saidone.exception.NodeNotFoundException;
 import org.saidone.exception.VaultException;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.misc.ProgressTrackingOutputStream;
@@ -454,7 +455,7 @@ public class AlfrescoService extends BaseComponent {
                 } else {
                     var message = String.format("Got %s but a child named %s does not exist", getErrorKey(ex), pathPart);
                     log.error("{}", message);
-                    throw new Exception(message);
+                    throw new NodeNotFoundException(message);
                 }
             }
         }
