@@ -45,6 +45,8 @@ spring:
     import: vault://
   activemq:
     brokerUrl: ${ACTIVE_MQ_URL:tcp://localhost:61616}
+    user: ${ACTIVE_MQ_USER:admin}
+    password: ${ACTIVE_MQ_PASSWORD:admin}
   jms:
     cache:
       enabled: false
