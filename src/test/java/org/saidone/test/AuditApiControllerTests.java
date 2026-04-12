@@ -59,7 +59,7 @@ class AuditApiControllerTests extends BaseTest {
     private static String basicAuth;
 
     @BeforeEach
-    public void beforeEach(org.junit.jupiter.api.TestInfo testInfo) {
+    void beforeEach(org.junit.jupiter.api.TestInfo testInfo) {
         super.before(testInfo);
         if (basicAuth == null) {
             basicAuth = String.format("Basic %s", Base64.getEncoder().encodeToString((userName + ":" + password).getBytes(StandardCharsets.UTF_8)));
