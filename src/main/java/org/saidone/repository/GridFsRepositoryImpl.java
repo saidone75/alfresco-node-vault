@@ -90,7 +90,7 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
     private final GridFsOperations gridFsOperations;
     private final MongoTemplate mongoTemplate;
 
-    private final static String UUID_FIELD = "metadata.uuid";
+    private static final String UUID_FIELD = "metadata.uuid";
 
     /**
      * Initializes the component by creating an index on the
