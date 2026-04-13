@@ -21,6 +21,7 @@ package org.saidone.gateway.predicate;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.logging.log4j.util.Strings;
+import org.jspecify.annotations.NonNull;
 import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory;
 import org.springframework.stereotype.Component;
@@ -68,7 +69,7 @@ public class IsOnVaultPredicate extends AbstractRoutePredicateFactory<IsOnVaultP
     }
 
     @Override
-    public Predicate<ServerWebExchange> apply(Config config) {
+    public @NonNull Predicate<ServerWebExchange> apply(@NonNull Config config) {
         return exchange -> {
             val path = exchange.getRequest().getURI().getPath();
             val matcher = NODE_CONTENT_PATTERN.matcher(path);
