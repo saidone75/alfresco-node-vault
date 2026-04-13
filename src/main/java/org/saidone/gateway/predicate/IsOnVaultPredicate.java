@@ -46,7 +46,7 @@ import java.util.regex.Pattern;
  * Extends {@link AbstractRoutePredicateFactory} to be used as a custom route predicate in gateway
  * routing configurations.
  * <p>
- * The inner {@code Config} interface is required for Spring Cloud Gateway custom predicate factories.
+ * The inner static {@code Config} class is required for Spring Cloud Gateway custom predicate factories.
  * <p>
  * Dependencies:
  * - {@link MongoNodeRepositoryImpl}: Used for checking node existence by ID.
@@ -59,7 +59,7 @@ public class IsOnVaultPredicate extends AbstractRoutePredicateFactory<IsOnVaultP
 
     private static final Pattern NODE_CONTENT_PATTERN = Pattern.compile("^.*/nodes/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}).*$");
 
-    public interface Config {
+    public static class Config {
     }
 
     public IsOnVaultPredicate(MongoNodeRepositoryImpl mongoNodeRepository) {
