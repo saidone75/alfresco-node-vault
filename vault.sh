@@ -2,6 +2,9 @@
 
 DOCKER_COMPOSE="docker-compose \
 -f docker/docker-compose.yml \
+-f docker/mongo/docker-compose.yml \
+-f docker/hashicorp-vault/docker-compose.yml \
+-f docker/motoserver/docker-compose.yml \
 -f docker/ganache/docker-compose.yml \
 -f docker/grafana/docker-compose.yml \
 --env-file docker/.env"
