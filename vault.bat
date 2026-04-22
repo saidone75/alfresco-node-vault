@@ -4,7 +4,6 @@ SETLOCAL
 SET VOLUME_PREFIX=anv
 SET DOCKER_COMPOSE=docker-compose ^
                     -f docker\docker-compose.yml ^
-                    -f docker\localstack\docker-compose.yml ^
                     -f docker\ganache\docker-compose.yml ^
                     -f docker\grafana\docker-compose.yml ^
                     --env-file docker\.env

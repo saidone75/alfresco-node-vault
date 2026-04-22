@@ -92,7 +92,7 @@ services:
   solr6:
     image: ${ASS_IMAGE}:${ASS_VERSION}
     container_name: anv-solr
-    mem_limit: 1g
+    mem_limit: 1536m
     environment:
       # Solr needs to know how to register itself with Alfresco
       SOLR_ALFRESCO_HOST: "alfresco"
@@ -148,6 +148,11 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: example
       ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
       ME_CONFIG_BASICAUTH: "false"
+  motoserver:
+    image: ${MOTOSERVER_IMAGE}
+    container_name: anv-motoserver
+    networks:
+      - default
   anv-hashicorp-vault:
     image: ${HASHICORP_VAULT_IMAGE}:${HASHICORP_VAULT_IMAGE_VERSION}
     container_name: anv-hashicorp-vault
@@ -191,7 +196,7 @@ services:
       ACTIVE_MQ_URL: tcp://activemq:61616
       MONGODB_URL: mongodb://mongo:27017
       VAULT_URL: http://anv-hashicorp-vault:8200
-      S3_ENDPOINT: http://anv-localstack:4566
+      S3_ENDPOINT: http://anv-motoserver:5000
     ports:
       - "8086:8086"
 volumes:
