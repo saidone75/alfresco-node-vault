@@ -92,7 +92,7 @@ services:
   solr6:
     image: ${ASS_IMAGE}:${ASS_VERSION}
     container_name: anv-solr
-    mem_limit: 1g
+    mem_limit: 2g
     environment:
       # Solr needs to know how to register itself with Alfresco
       SOLR_ALFRESCO_HOST: "alfresco"
@@ -124,58 +124,6 @@ services:
       - 61613:61613 # STOMP
     networks:
       - default
-  mongo:
-    image: ${MONGO_IMAGE}
-    container_name: anv-mongo
-    ports:
-      - 27017:27017
-    networks:
-      - default
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: example
-    volumes:
-      - anv-mongo-volume:/data/db
-  mongo-express:
-    image: ${MONGO_EXPRESS_IMAGE}
-    container_name: anv-mongo-express
-    ports:
-      - 8081:8081
-    networks:
-      - default
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: root
-      ME_CONFIG_MONGODB_ADMINPASSWORD: example
-      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
-      ME_CONFIG_BASICAUTH: "false"
-  anv-hashicorp-vault:
-    image: ${HASHICORP_VAULT_IMAGE}:${HASHICORP_VAULT_IMAGE_VERSION}
-    container_name: anv-hashicorp-vault
-    ports:
-      - "8200:8200"
-    networks:
-      - default
-    environment:
-      VAULT_DEV_ROOT_TOKEN_ID: "root"
-      VAULT_DEV_LISTEN_ADDRESS: "0.0.0.0:8200"
-      VAULT_LOCAL_CONFIG: |
-        {
-          "ui": true
-        }
-    cap_add:
-      - IPC_LOCK
-  anv-hashicorp-vault-provisioner:
-    image: ${HASHICORP_VAULT_IMAGE}:${HASHICORP_VAULT_IMAGE_VERSION}
-    container_name: anv-hashicorp-vault-provisioner
-    depends_on:
-      - anv-hashicorp-vault
-    entrypoint: >
-      sh -c "
-        export VAULT_ADDR='http://anv-hashicorp-vault:8200' && \
-        export VAULT_TOKEN='root' && \
-        sleep 5 && \
-        vault kv put secret/AlfrescoNodeVault anv.secret=vault-secret
-      "
   anv-vault:
     image: anv:latest
     container_name: anv-vault
@@ -191,7 +139,7 @@ services:
       ACTIVE_MQ_URL: tcp://activemq:61616
       MONGODB_URL: mongodb://mongo:27017
       VAULT_URL: http://anv-hashicorp-vault:8200
-      S3_ENDPOINT: http://anv-localstack:4566
+      S3_ENDPOINT: http://anv-motoserver:5000
     ports:
       - "8086:8086"
 volumes:
@@ -200,6 +148,4 @@ volumes:
   anv-postgres-volume:
     external: true
   anv-ass-volume:
-    external: true
-  anv-mongo-volume:
     external: true

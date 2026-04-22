@@ -1,0 +1,28 @@
+services:
+  mongo:
+    image: ${MONGO_IMAGE}
+    container_name: anv-mongo
+    ports:
+      - 27017:27017
+    networks:
+      - default
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - anv-mongo-volume:/data/db
+  mongo-express:
+    image: ${MONGO_EXPRESS_IMAGE}
+    container_name: anv-mongo-express
+    ports:
+      - 8081:8081
+    networks:
+      - default
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: root
+      ME_CONFIG_MONGODB_ADMINPASSWORD: example
+      ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+      ME_CONFIG_BASICAUTH: "false"
+volumes:
+  anv-mongo-volume:
+    external: true

@@ -1,0 +1,25 @@
+services:
+  motoserver:
+    image: ${MOTOSERVER_IMAGE}
+    container_name: anv-motoserver
+    ports:
+      - "5000:5000"
+    networks:
+      - default
+  motoserver-provisioner:
+    image: amazon/aws-cli
+    container_name: anv-motoserver-provisioner
+    depends_on:
+      - motoserver
+    environment:
+      - AWS_ACCESS_KEY_ID=testing
+      - AWS_SECRET_ACCESS_KEY=testing
+      - AWS_DEFAULT_REGION=eu-central-1
+    entrypoint: /bin/sh -c
+    command: >
+      "
+      echo 'Waiting for motoserver to start...'
+      sleep 3;
+      aws --endpoint-url=http://motoserver:5000 s3 mb s3://anv;
+      echo 'Provisioning completed!'
+      "
