@@ -27,30 +27,24 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.saidone.service.NodeService;
 import org.saidone.service.VaultService;
-import org.saidone.service.content.ContentService;
 import org.saidone.service.notarization.NotarizationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @SpringBootTest
 @ActiveProfiles("test")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @Slf4j
-public class NotarizationServiceTests extends BaseTest {
-
-    @Value("${application.service.vault.hash-algorithm}")
-    private String checksumAlgorithm;
+class NotarizationServiceTests extends BaseTest {
 
     @Autowired
     VaultService vaultService;
     @Autowired
     NodeService nodeService;
-    @Autowired
-    ContentService contentService;
     @Autowired
     NotarizationService notarizationService;
 
