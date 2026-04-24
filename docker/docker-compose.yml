@@ -131,15 +131,13 @@ services:
     build:
       dockerfile: ./docker/Dockerfile.vault
       context: ../
-    depends_on:
-      anv-hashicorp-vault-provisioner:
-        condition: service_completed_successfully
     environment:
       ALFRESCO_BASE_PATH: http://alfresco:8080
       ACTIVE_MQ_URL: tcp://activemq:61616
       MONGODB_URL: mongodb://mongo:27017
       VAULT_URL: http://anv-hashicorp-vault:8200
       S3_ENDPOINT: http://anv-motoserver:5000
+      ETH_RPC_URL: http://anv-ganache:8545
     ports:
       - "8086:8086"
 volumes:

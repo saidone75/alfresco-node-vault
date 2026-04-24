@@ -65,6 +65,14 @@ public interface NodeService {
     Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Pageable pageable);
 
     /**
+     * Retrieves notarized node wrappers using pagination.
+     *
+     * @param pageable pagination information
+     * @return page of notarized {@link NodeWrapper}
+     */
+    Page<NodeWrapper> findNotarized(Pageable pageable);
+
+    /**
      * Retrieves all node wrappers having the given notarization transaction ID.
      * A {@code null} transaction ID is used to select nodes that have not yet
      * been notarized.

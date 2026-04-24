@@ -110,6 +110,18 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
     }
 
     /**
+     * {@inheritDoc}
+     *
+     * <p>The resulting nodes are decrypted before being returned.</p>
+     */
+    @Override
+    public Page<NodeWrapper> findNotarized(Pageable pageable) {
+        val result = super.findNotarized(pageable);
+        result.getContent().forEach(this::decryptNode);
+        return result;
+    }
+
+    /**
      * Encrypts the JSON content of the given node and marks it as encrypted.
      *
      * @param node the node to encrypt

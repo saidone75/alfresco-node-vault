@@ -95,6 +95,10 @@ application:
   notarization-job:
     cron-expression: ${NOTARIZATION_JOB_CRON_EXPRESSION:0 0/5 * * * ?}
     enabled: ${NOTARIZATION_JOB_ENABLED:false}
+  integrity-sweep:
+    cron-expression: ${INTEGRITY_SWEEP_CRON_EXPRESSION:0 0 2 * * ?}
+    enabled: ${INTEGRITY_SWEEP_ENABLED:false}
+    batch-size: ${INTEGRITY_SWEEP_BATCH_SIZE:200}
   service:
     alfresco:
       include:
