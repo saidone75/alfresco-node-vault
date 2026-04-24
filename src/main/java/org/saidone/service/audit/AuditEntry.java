@@ -19,7 +19,6 @@
 package org.saidone.service.audit;
 
 import lombok.Data;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.TimeSeries;
@@ -47,12 +46,6 @@ import java.util.Map;
         expireAfter = "60d"
 )
 public class AuditEntry {
-
-    /**
-     * Unique identifier of the audit entry.
-     */
-    @Id
-    private String id;
 
     /**
      * Type of the audited event. Typical values are

@@ -74,7 +74,7 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
         val requestEntry = createRequestAuditEntry(exchange.getRequest());
         auditService.saveEntry(requestEntry);
         return chain.filter(exchange).doFinally(signal -> {
-            val responseEntry = createResponseAuditEntry(requestEntry.getId(), exchange.getResponse());
+            val responseEntry = createResponseAuditEntry((String) requestEntry.getMetadata().get(AuditEntryKeys.METADATA_ID), exchange.getResponse());
             auditService.saveEntry(responseEntry);
         });
     }
