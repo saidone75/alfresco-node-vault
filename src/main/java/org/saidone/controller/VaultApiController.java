@@ -517,6 +517,20 @@ public class VaultApiController extends BaseComponent {
      */
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/integrity-sweeps")
+    @Operation(
+            summary = "List integrity sweep runs",
+            description = "Returns integrity sweep runs ordered by start time (most recent first).",
+            parameters = {
+                    @Parameter(name = "page", description = "Page number", in = ParameterIn.QUERY),
+                    @Parameter(name = "size", description = "Page size", in = ParameterIn.QUERY)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Integrity sweep runs retrieved",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = IntegritySweepRun.class))),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+            })
     public ResponseEntity<Page<IntegritySweepRun>> getIntegritySweepRuns(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @RequestParam(required = false, defaultValue = "0") int page,
@@ -538,6 +552,15 @@ public class VaultApiController extends BaseComponent {
      */
     @SecurityRequirement(name = "basicAuth")
     @PostMapping("/integrity-sweeps/run")
+    @Operation(
+            summary = "Run integrity sweep",
+            description = "Starts an integrity sweep asynchronously and returns immediately.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Integrity sweep required",
+                            content = @Content(mediaType = "text/plain")),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+            })
     public ResponseEntity<String> runIntegritySweep(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth) {
 
