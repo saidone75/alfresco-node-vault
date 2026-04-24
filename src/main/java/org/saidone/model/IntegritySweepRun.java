@@ -20,6 +20,7 @@ package org.saidone.model;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -36,6 +37,7 @@ public class IntegritySweepRun {
     private String id;
 
     @Field("sat")
+    @Indexed
     private Instant startedAt;
 
     @Field("eat")

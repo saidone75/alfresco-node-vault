@@ -64,7 +64,7 @@ public class NodeWrapper {
 
     /** Timestamp when the node was archived. */
     @Field("adt")
-    @Indexed(name = "adt_1")
+    @Indexed
     private Instant archiveDate;
 
     /** Flag indicating whether the node has been restored. */
