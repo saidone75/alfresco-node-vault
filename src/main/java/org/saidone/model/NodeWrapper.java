@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.model.Node;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -63,6 +64,7 @@ public class NodeWrapper {
 
     /** Timestamp when the node was archived. */
     @Field("adt")
+    @Indexed(name = "adt_1")
     private Instant archiveDate;
 
     /** Flag indicating whether the node has been restored. */
