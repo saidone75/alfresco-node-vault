@@ -250,6 +250,21 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         return new PageImpl<>(content, pageable, count);
     }
 
+
+    /**
+     * Retrieves notarized node wrappers where the transaction id is not null.
+     *
+     * @param pageable pagination information
+     * @return page of notarized nodes
+     */
+    public Page<NodeWrapper> findNotarized(Pageable pageable) {
+        val criteria = Criteria.where(MetadataKeys.NOTARIZATION_TRANSACTION_ID).ne(null);
+        val query = new Query(criteria).with(pageable);
+        long count = mongoOperations.count(new Query(criteria), NodeWrapper.class);
+        val content = mongoOperations.find(query, NodeWrapper.class);
+        return new PageImpl<>(content, pageable, count);
+    }
+
     /**
      * Retrieves node wrappers by notarization transaction ID. A {@code null} value
      * matches nodes without a transaction ID.

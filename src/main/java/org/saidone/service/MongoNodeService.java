@@ -83,6 +83,17 @@ public class MongoNodeService extends BaseComponent implements NodeService {
 
     /**
      * {@inheritDoc}
+     *
+     * <p>This implementation delegates to
+     * {@link MongoNodeRepositoryImpl#findNotarized(Pageable)}.</p>
+     */
+    @Override
+    public Page<NodeWrapper> findNotarized(Pageable pageable) {
+        return mongoNodeRepository.findNotarized(pageable);
+    }
+
+    /**
+     * {@inheritDoc}
      */
     @Override
     public Iterable<NodeWrapper> findByNtx(String ntx) {

@@ -1,7 +1,5 @@
 @echo off
 
-set JAVA_HOME=C:\Program Files\Java\jbr_jcef-21.0.6-windows-x64-b872.80
-
 set JAVA_OPTS=-Xms64m -Xmx64m -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=0.0.0.0:9000
 
 :: activate HotswapAgent when using Trava OpenJDK
