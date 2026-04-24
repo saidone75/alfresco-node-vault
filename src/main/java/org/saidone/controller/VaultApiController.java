@@ -32,10 +32,12 @@ import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
 import org.saidone.model.Entry;
+import org.saidone.model.IntegritySweepRun;
 import org.saidone.service.AuthenticationService;
 import org.saidone.service.NodeService;
 import org.saidone.service.VaultService;
 import org.saidone.service.content.ContentService;
+import org.saidone.service.integrity.IntegritySweepService;
 import org.saidone.service.crypto.KeyService;
 import org.saidone.service.notarization.NotarizationService;
 import org.springframework.core.io.InputStreamResource;
@@ -92,6 +94,11 @@ public class VaultApiController extends BaseComponent {
      * Manages encryption key rotation for node content.
      */
     private final KeyService keyService;
+
+    /**
+     * Service responsible for integrity sweep executions.
+     */
+    private final IntegritySweepService integritySweepService;
 
     /**
      * Executor used for asynchronous operations.
@@ -498,6 +505,48 @@ public class VaultApiController extends BaseComponent {
             }
         }, taskExecutor);
         return ResponseEntity.ok("Update required.");
+    }
+
+    /**
+     * Lists integrity sweep runs with pagination.
+     *
+     * @param auth optional Basic authentication header
+     * @param page page number
+     * @param size page size
+     * @return page of integrity sweep runs
+     */
+    @SecurityRequirement(name = "basicAuth")
+    @GetMapping("/integrity-sweeps")
+    public ResponseEntity<Page<IntegritySweepRun>> getIntegritySweepRuns(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "20") int size) {
+
+        if (!authenticationService.isAuthorized(auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "sat"));
+        return ResponseEntity.ok(integritySweepService.findRuns(pageable));
+    }
+
+    /**
+     * Triggers an integrity sweep asynchronously.
+     *
+     * @param auth optional Basic authentication header
+     * @return textual confirmation message
+     */
+    @SecurityRequirement(name = "basicAuth")
+    @PostMapping("/integrity-sweeps/run")
+    public ResponseEntity<String> runIntegritySweep(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth) {
+
+        if (!authenticationService.isAuthorized(auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        CompletableFuture.runAsync(() -> integritySweepService.runSweep("MANUAL"), taskExecutor);
+        return ResponseEntity.ok("Integrity sweep required.");
     }
 
 }
