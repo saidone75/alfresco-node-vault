@@ -67,6 +67,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - MongoDB storage for metadata and audit trail 
 - GridFS or S3 storage for binaries
 - Optional blockchain node notarization to ensure tamper-proof integrity
+- Scheduled and on-demand [integrity sweep](doc/IntegritySweep.md) to continuously verify notarized nodes
 - Secure and decoupled design that suits zero trust environments
 - Focus on [strong encryption](doc/Encryption.md) option for both content and metadata
 - Passwords securely stored in a secret engine

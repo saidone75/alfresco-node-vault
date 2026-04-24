@@ -19,9 +19,9 @@
 package org.saidone.service.audit;
 
 import lombok.Data;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import org.springframework.data.mongodb.core.mapping.TimeSeries;
 
 import static org.saidone.service.audit.AuditEntryKeys.*;
 
@@ -39,13 +39,13 @@ import java.util.Map;
  */
 @Data
 @Document(collection = AuditService.AUDIT_COLLECTION_NAME)
+@TimeSeries(
+        collection = AuditService.AUDIT_COLLECTION_NAME,
+        timeField = TIMESTAMP,
+        metaField = METADATA,
+        expireAfter = "60d"
+)
 public class AuditEntry {
-
-    /**
-     * Unique identifier of the audit entry.
-     */
-    @Id
-    private String id;
 
     /**
      * Type of the audited event. Typical values are

@@ -49,8 +49,6 @@ import java.time.Instant;
 @Slf4j
 public class IntegritySweepService extends BaseComponent {
 
-    public static final String INTEGRITY_SWEEP_COLLECTION_NAME = "integrity_sweep_run";
-
     private final NodeService nodeService;
     private final NotarizationService notarizationService;
     private final MongoTemplate mongoTemplate;
