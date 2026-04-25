@@ -23,6 +23,7 @@ import lombok.SneakyThrows;
 import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.exception.NodeNotFoundOnVaultException;
+import org.saidone.mapper.NodeMapper;
 import org.saidone.model.NodeWrapper;
 import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.data.domain.Page;
@@ -43,17 +44,20 @@ public class MongoNodeService extends BaseComponent implements NodeService {
 
     /** Repository used for persisting and retrieving node metadata. */
     private final MongoNodeRepositoryImpl mongoNodeRepository;
+    /** Mapper used to translate between DTO and persistence entity. */
+    private final NodeMapper nodeMapper;
 
     /**
      * {@inheritDoc}
      *
      * <p>This implementation simply delegates to
-     * {@link MongoNodeRepositoryImpl#save(NodeWrapper)}.</p>
+     * {@link MongoNodeRepositoryImpl#save(Object)} after mapping the DTO to
+     * the persistence entity.</p>
      */
     @Override
     @SneakyThrows
     public void save(NodeWrapper nodeWrapper) {
-        mongoNodeRepository.save(nodeWrapper);
+        mongoNodeRepository.save(nodeMapper.toEntity(nodeWrapper));
     }
 
     /**
@@ -65,7 +69,7 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      */
     @Override
     public NodeWrapper findById(String nodeId) {
-        val nodeOptional = mongoNodeRepository.findById(nodeId);
+        val nodeOptional = mongoNodeRepository.findById(nodeId).map(nodeMapper::toDto);
         if (nodeOptional.isPresent()) {
             return nodeOptional.get();
         } else {
@@ -78,7 +82,7 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      */
     @Override
     public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
-        return mongoNodeRepository.findByArchiveDateRange(from, to, pageable);
+        return mongoNodeRepository.findByArchiveDateRange(from, to, pageable).map(nodeMapper::toDto);
     }
 
     /**
@@ -89,7 +93,7 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      */
     @Override
     public Page<NodeWrapper> findNotarized(Pageable pageable) {
-        return mongoNodeRepository.findNotarized(pageable);
+        return mongoNodeRepository.findNotarized(pageable).map(nodeMapper::toDto);
     }
 
     /**
@@ -97,7 +101,7 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      */
     @Override
     public Iterable<NodeWrapper> findByNtx(String ntx) {
-        return mongoNodeRepository.findByNtx(ntx);
+        return nodeMapper.toDtoList(mongoNodeRepository.findByNtx(ntx));
     }
 
     /**
@@ -105,7 +109,7 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      */
     @Override
     public Iterable<NodeWrapper> findByKv(int kv) {
-        return mongoNodeRepository.findByKv(kv);
+        return nodeMapper.toDtoList(mongoNodeRepository.findByKv(kv));
     }
 
     /**
@@ -116,7 +120,7 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      */
     @Override
     public Iterable<NodeWrapper> findAll() {
-        return mongoNodeRepository.findAll();
+        return nodeMapper.toDtoList(mongoNodeRepository.findAll());
     }
 
     /**

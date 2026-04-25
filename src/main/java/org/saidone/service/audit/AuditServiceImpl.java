@@ -21,6 +21,8 @@ package org.saidone.service.audit;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.saidone.component.BaseComponent;
+import org.saidone.mapper.AuditEntryMapper;
+import org.saidone.service.audit.entity.AuditEntryEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -31,6 +33,9 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.saidone.service.audit.AuditEntryKeys.TIMESTAMP;
+import static org.saidone.service.audit.AuditEntryKeys.TYPE;
 
 /**
  * Service for persisting and retrieving {@link AuditEntry} instances.
@@ -46,6 +51,8 @@ public class AuditServiceImpl extends BaseComponent implements AuditService {
      * Template used to perform MongoDB operations.
      */
     private final MongoTemplate mongoTemplate;
+    /** Mapper used to convert between audit DTO and persistence entity. */
+    private final AuditEntryMapper auditEntryMapper;
 
     /**
      * Persist the provided audit entry in MongoDB.
@@ -53,7 +60,7 @@ public class AuditServiceImpl extends BaseComponent implements AuditService {
      * @param auditEntry the entry to store
      */
     public void saveEntry(AuditEntry auditEntry) {
-        mongoTemplate.insert(auditEntry);
+        mongoTemplate.insert(auditEntryMapper.toEntity(auditEntry));
     }
 
     /**
@@ -69,10 +76,10 @@ public class AuditServiceImpl extends BaseComponent implements AuditService {
     public List<AuditEntry> findEntries(String type, Instant from, Instant to, Pageable pageable) {
         val criteriaList = new ArrayList<Criteria>();
         if (type != null) {
-            criteriaList.add(Criteria.where("type").is(type));
+            criteriaList.add(Criteria.where(TYPE).is(type));
         }
         if (from != null || to != null) {
-            val timeCriteria = Criteria.where("timestamp");
+            val timeCriteria = Criteria.where(TIMESTAMP);
             if (from != null) timeCriteria.gte(from);
             if (to != null) timeCriteria.lte(to);
             criteriaList.add(timeCriteria);
@@ -82,8 +89,8 @@ public class AuditServiceImpl extends BaseComponent implements AuditService {
             query.addCriteria(new Criteria().andOperator(criteriaList.toArray(new Criteria[0])));
         }
         query.with(pageable);
-        query.with(Sort.by(Sort.Direction.DESC, "timestamp"));
-        return mongoTemplate.find(query, AuditEntry.class);
+        query.with(Sort.by(Sort.Direction.DESC, TIMESTAMP));
+        return auditEntryMapper.toDtoList(mongoTemplate.find(query, AuditEntryEntity.class));
     }
 
 }

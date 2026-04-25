@@ -28,24 +28,20 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.model.Node;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Instant;
 
 /**
- * MongoDB wrapper entity storing an Alfresco {@link Node} together with
- * additional vault specific metadata. The JSON representation of the
- * {@code Node} is persisted in the {@code nodeJson} field while metadata such
- * as archival date or notarization id are stored in dedicated properties.
+ * Data transfer object carrying an Alfresco {@link Node} serialized as JSON
+ * together with vault metadata.
+ *
+ * <p>Persistence concerns are mapped separately by
+ * {@code org.saidone.model.entity.NodeEntity}.</p>
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "alf_node")
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Slf4j
 public class NodeWrapper {
@@ -59,32 +55,24 @@ public class NodeWrapper {
     private static final ObjectMapper OBJECT_MAPPER = createObjectMapper();
 
     /** Identifier of the wrapped Alfresco node. */
-    @Id
     private String id;
 
     /** Timestamp when the node was archived. */
-    @Field("adt")
-    @Indexed
     private Instant archiveDate;
 
     /** Flag indicating whether the node has been restored. */
-    @Field("res")
     private boolean restored;
 
     /** Flag signalling that {@link #nodeJson} is encrypted. */
-    @Field("enc")
     private boolean encrypted;
 
     /** Version of the key used to encrypt {@link #nodeJson}. */
-    @Field("kv")
     private int keyVersion;
 
     /** JSON representation of the node. May be encrypted. */
-    @Field("nj")
     private String nodeJson;
 
     /** Transaction id returned from notarization, if any. */
-    @Field("ntx")
     private String notarizationTxId;
 
     /**

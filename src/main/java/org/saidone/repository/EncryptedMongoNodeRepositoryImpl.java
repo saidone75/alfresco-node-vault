@@ -20,7 +20,7 @@ package org.saidone.repository;
 
 import lombok.NonNull;
 import lombok.val;
-import org.saidone.model.NodeWrapper;
+import org.saidone.model.entity.NodeEntity;
 import org.saidone.service.SecretService;
 import org.saidone.service.crypto.CryptoService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -33,7 +33,7 @@ import java.time.Instant;
 import java.util.Optional;
 
 /**
- * Repository implementation that encrypts {@link NodeWrapper} data before
+ * Repository implementation that encrypts {@link NodeEntity} data before
  * persisting it to MongoDB and decrypts it on retrieval.
  *
  * <p>Encryption keys are supplied by {@link SecretService} and the actual
@@ -79,7 +79,7 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
      * @return the saved node entity
      */
     @Override
-    public <S extends NodeWrapper> @NonNull S save(@NonNull S entity) {
+    public <S extends NodeEntity> @NonNull S save(@NonNull S entity) {
         encryptNode(entity);
         return super.save(entity);
     }
@@ -91,7 +91,7 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
      * @return an Optional containing the found node, or empty if not found
      */
     @Override
-    public @NonNull Optional<NodeWrapper> findById(@NonNull String id) {
+    public @NonNull Optional<NodeEntity> findById(@NonNull String id) {
         val result = super.findById(id);
         result.ifPresent(this::decryptNode);
         return result;
@@ -103,7 +103,7 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
      * <p>The resulting nodes are decrypted before being returned.</p>
      */
     @Override
-    public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
+    public Page<NodeEntity> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
         val result = super.findByArchiveDateRange(from, to, pageable);
         result.getContent().forEach(this::decryptNode);
         return result;
@@ -115,7 +115,7 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
      * <p>The resulting nodes are decrypted before being returned.</p>
      */
     @Override
-    public Page<NodeWrapper> findNotarized(Pageable pageable) {
+    public Page<NodeEntity> findNotarized(Pageable pageable) {
         val result = super.findNotarized(pageable);
         result.getContent().forEach(this::decryptNode);
         return result;
@@ -127,7 +127,7 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
      * @param node the node to encrypt
      * @param <S>  the type of the node
      */
-    private <S extends NodeWrapper> void encryptNode(S node) {
+    private <S extends NodeEntity> void encryptNode(S node) {
         if (node != null && node.getNodeJson() != null) {
             val secret = secretService.getSecret();
             node.setNodeJson(cryptoService.encryptText(node.getNodeJson(), secret));
@@ -142,7 +142,7 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
      * @param node the node to decrypt
      * @param <S>  the type of the node
      */
-    private <S extends NodeWrapper> void decryptNode(S node) {
+    private <S extends NodeEntity> void decryptNode(S node) {
         if (node != null && node.getNodeJson() != null && node.isEncrypted()) {
             node.setNodeJson(cryptoService.decryptText(node.getNodeJson()));
         }
