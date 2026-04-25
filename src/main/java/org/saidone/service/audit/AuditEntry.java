@@ -19,18 +19,13 @@
 package org.saidone.service.audit;
 
 import lombok.Data;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.Field;
-import org.springframework.data.mongodb.core.mapping.TimeSeries;
-
-import static org.saidone.service.audit.AuditEntryKeys.*;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Map;
 
 /**
- * Entity representing a single audit entry stored in MongoDB.
+ * DTO representing a single audit entry returned by API/services.
  *
  * <p>An entry records the timestamp of an audited event along with a small
  * metadata map describing the request or response. The entry {@linkplain #type
@@ -38,26 +33,17 @@ import java.util.Map;
  * {@link AuditEntryKeys} so that the persisted documents remain compact.</p>
  */
 @Data
-@Document(collection = AuditService.AUDIT_COLLECTION_NAME)
-@TimeSeries(
-        collection = AuditService.AUDIT_COLLECTION_NAME,
-        timeField = TIMESTAMP,
-        metaField = METADATA,
-        expireAfter = "60d"
-)
 public class AuditEntry {
 
     /**
      * Type of the audited event. Typical values are
      * {@link AuditEntryKeys#REQUEST} or {@link AuditEntryKeys#RESPONSE}.
      */
-    @Field(TYPE)
     private String type;
 
     /**
      * Moment in time when the event occurred.
      */
-    @Field(TIMESTAMP)
     private Instant timestamp;
 
     /**
@@ -68,7 +54,6 @@ public class AuditEntry {
      * information stored depends on whether the entry represents a request or
      * a response.
      */
-    @Field(METADATA)
     private Map<String, Serializable> metadata;
 
     /**
