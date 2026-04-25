@@ -7,13 +7,16 @@ org.saidone.exception
 org.saidone.filter
 org.saidone.gateway.predicate
 org.saidone.job
+org.saidone.mapper
 org.saidone.misc
 org.saidone.model
 org.saidone.model.alfresco
+org.saidone.model.entity
 org.saidone.monitor
 org.saidone.repository
 org.saidone.service
 org.saidone.service.audit
+org.saidone.service.audit.entity
 org.saidone.service.content
 org.saidone.service.crypto
 org.saidone.service.integrity

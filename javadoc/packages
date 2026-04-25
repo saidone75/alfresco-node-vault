@@ -1,6 +1,8 @@
+org.saidone.mapper
 org.saidone.controller
 org.saidone.utils
 org.saidone.service.audit
+org.saidone.service.audit.entity
 org.saidone.service
 org.saidone.service.content
 org.saidone.service.notarization
@@ -19,3 +21,4 @@ org.saidone.exception
 org.saidone.filter
 org.saidone.model
 org.saidone.model.alfresco
+org.saidone.model.entity
