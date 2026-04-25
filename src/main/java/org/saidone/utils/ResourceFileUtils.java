@@ -66,10 +66,9 @@ public class ResourceFileUtils {
      * @param destinationPath optional path for the extracted resource file (used if resource is found in classpath);
      *                        if null, a temporary file is created
      * @return a {@link File} object representing the file or a copy of the extracted classpath resource
-     * @throws FileNotFoundException if the resource cannot be found in both the filesystem and classpath
      * @throws IOException           if an I/O error occurs during file access or resource extraction
      */
-    public File getFileFromResource(String resourcePath, String destinationPath) throws FileNotFoundException, IOException {
+    public File getFileFromResource(String resourcePath, String destinationPath) throws IOException {
         val filePath = Path.of(resourcePath);
         val file = filePath.toFile();
         if (file.exists() && file.isFile()) {
