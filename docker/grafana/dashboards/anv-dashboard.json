@@ -72,7 +72,7 @@
       },
       "gridPos": {
         "h": 3,
-        "w": 6,
+        "w": 8,
         "x": 0,
         "y": 1
       },
@@ -163,9 +163,9 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 5,
-        "x": 6,
+        "h": 3,
+        "w": 8,
+        "x": 8,
         "y": 1
       },
       "id": 58,
@@ -258,9 +258,9 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
-        "w": 5,
-        "x": 11,
+        "h": 3,
+        "w": 8,
+        "x": 16,
         "y": 1
       },
       "id": 60,
@@ -329,10 +329,10 @@
         "overrides": []
       },
       "gridPos": {
-        "h": 6,
+        "h": 7,
         "w": 8,
-        "x": 16,
-        "y": 1
+        "x": 0,
+        "y": 4
       },
       "id": 66,
       "options": {
@@ -375,23 +375,30 @@
       "type": "stat"
     },
     {
+      "collapsed": false,
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 11
+      },
+      "id": 104,
+      "panels": [],
+      "title": "Integrity sweep",
+      "type": "row"
+    },
+    {
       "datasource": {
         "type": "prometheus",
         "uid": "anv-prometheus"
       },
       "fieldConfig": {
         "defaults": {
-          "mappings": [
-            {
-              "options": {
-                "match": "null",
-                "result": {
-                  "text": "N/A"
-                }
-              },
-              "type": "special"
-            }
-          ],
+          "color": {
+            "mode": "palette-classic"
+          },
+          "fieldMinMax": false,
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -404,33 +411,32 @@
               }
             ]
           },
-          "unit": "dateTimeFromNow"
+          "unit": "locale"
         },
         "overrides": []
       },
       "gridPos": {
         "h": 3,
-        "w": 6,
+        "w": 8,
         "x": 0,
-        "y": 4
+        "y": 12
       },
-      "id": 56,
-      "maxDataPoints": 100,
+      "id": 101,
       "options": {
         "colorMode": "value",
-        "graphMode": "none",
+        "graphMode": "area",
         "justifyMode": "auto",
-        "orientation": "horizontal",
+        "orientation": "auto",
         "percentChangeColorMode": "standard",
         "reduceOptions": {
           "calcs": [
-            "first"
+            "lastNotNull"
           ],
           "fields": "",
           "values": false
         },
         "showPercentChange": false,
-        "textMode": "auto",
+        "textMode": "value",
         "wideLayout": true
       },
       "pluginVersion": "11.6.1",
@@ -440,17 +446,167 @@
             "type": "prometheus",
             "uid": "anv-prometheus"
           },
-          "expr": "avg(process_start_time_seconds{application=\"$application\", instance=~\"$instance\"})*1000",
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(integrity_sweep_runs_total{application=\"$application\", instance=~\"$instance\"})",
           "format": "time_series",
+          "instant": false,
           "interval": "",
-          "intervalFactor": 2,
-          "legendFormat": "",
-          "metric": "",
-          "refId": "A",
-          "step": 14400
+          "intervalFactor": 1,
+          "legendFormat": "Integrity Sweep Runs",
+          "range": true,
+          "refId": "A"
         }
       ],
-      "title": "Start time",
+      "title": "Integrity Sweep Runs",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "anv-prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 8,
+        "x": 8,
+        "y": 12
+      },
+      "id": 102,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "anv-prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(integrity_sweep_failures_total{application=\"$application\", instance=~\"$instance\"})",
+          "format": "time_series",
+          "instant": false,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "Integrity Sweep Mismatches",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Integrity Sweep Mismatches",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "anv-prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "fieldMinMax": false,
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green"
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "locale"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 3,
+        "w": 8,
+        "x": 16,
+        "y": 12
+      },
+      "id": 103,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.6.1",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "anv-prometheus"
+          },
+          "editorMode": "code",
+          "exemplar": false,
+          "expr": "sum(integrity_sweep_errors_total{application=\"$application\", instance=~\"$instance\"})",
+          "format": "time_series",
+          "instant": false,
+          "interval": "",
+          "intervalFactor": 1,
+          "legendFormat": "Integrity Sweep Errors",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Integrity Sweep Errors",
       "type": "stat"
     },
     {
@@ -515,9 +671,9 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 12,
-        "x": 0,
-        "y": 7
+        "w": 8,
+        "x": 8,
+        "y": 4
       },
       "id": 95,
       "options": {
@@ -629,9 +785,9 @@
       },
       "gridPos": {
         "h": 7,
-        "w": 12,
-        "x": 12,
-        "y": 7
+        "w": 8,
+        "x": 16,
+        "y": 4
       },
       "id": 96,
       "options": {
@@ -687,7 +843,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 14
+        "y": 15
       },
       "id": 48,
       "panels": [],
@@ -709,7 +865,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 15
+        "y": 16
       },
       "id": 85,
       "options": {
@@ -761,7 +917,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 24
       },
       "id": 72,
       "panels": [],
@@ -831,7 +987,7 @@
         "h": 10,
         "w": 12,
         "x": 0,
-        "y": 24
+        "y": 25
       },
       "id": 74,
       "options": {
@@ -928,7 +1084,7 @@
         "h": 10,
         "w": 12,
         "x": 12,
-        "y": 24
+        "y": 25
       },
       "id": 76,
       "options": {
@@ -968,7 +1124,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 34
+        "y": 35
       },
       "id": 8,
       "panels": [],
@@ -1038,7 +1194,7 @@
         "h": 7,
         "w": 12,
         "x": 0,
-        "y": 35
+        "y": 36
       },
       "id": 6,
       "options": {
@@ -1137,7 +1293,7 @@
         "h": 7,
         "w": 12,
         "x": 12,
-        "y": 35
+        "y": 36
       },
       "id": 10,
       "options": {
@@ -1236,7 +1392,7 @@
         "h": 7,
         "w": 8,
         "x": 0,
-        "y": 42
+        "y": 43
       },
       "id": 14,
       "options": {
@@ -1335,7 +1491,7 @@
         "h": 7,
         "w": 8,
         "x": 8,
-        "y": 42
+        "y": 43
       },
       "id": 16,
       "options": {
@@ -1434,7 +1590,7 @@
         "h": 7,
         "w": 8,
         "x": 16,
-        "y": 42
+        "y": 43
       },
       "id": 20,
       "options": {
