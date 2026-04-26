@@ -31,7 +31,7 @@ import lombok.SneakyThrows;
 import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.service.AuthenticationService;
-import org.saidone.service.audit.AuditEntry;
+import org.saidone.model.dto.AuditEntryDto;
 import org.saidone.service.audit.AuditServiceImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -83,12 +83,12 @@ public class AuditApiController extends BaseComponent {
                     @Parameter(name = "size", description = "Page size", in = ParameterIn.QUERY)
             },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Entries retrieved", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuditEntry.class))),
+                    @ApiResponse(responseCode = "200", description = "Entries retrieved", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuditEntryDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
             })
     @SneakyThrows
-    public ResponseEntity<List<AuditEntry>> getEntries(
+    public ResponseEntity<List<AuditEntryDto>> getEntries(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @RequestParam(required = false) String type,
             @RequestParam(required = false) Instant from,

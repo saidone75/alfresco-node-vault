@@ -21,7 +21,7 @@ package org.saidone.monitor;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.Gauge;
 import io.micrometer.core.instrument.MeterRegistry;
-import org.saidone.model.IntegritySweepRun;
+import org.saidone.model.dto.IntegritySweepRunDto;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.atomic.AtomicLong;
@@ -61,7 +61,7 @@ public class IntegritySweepMetrics {
                 .register(meterRegistry);
     }
 
-    public void recordRun(IntegritySweepRun run) {
+    public void recordRun(IntegritySweepRunDto run) {
         sweepRunsTotal.increment();
         sweepFailuresTotal.increment(run.getFailed());
         sweepErrorsTotal.increment(run.getErrors());

@@ -16,23 +16,25 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.model;
+package org.saidone.model.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.InputStream;
+
 /**
- * Metadata describing the archived content of a node. Extends
- * {@link NodeContent} with additional information such as checksum and
- * encryption status.
+ * Descriptor representing a node's binary data as an {@link InputStream} along
+ * with its length. Extends {@link NodeContentDto} to also expose the file name and
+ * content type.
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class NodeContentInfo extends NodeContent {
+public class NodeContentStreamDto extends NodeContentDto {
 
-    private String contentId;
-    private String contentHashAlgorithm;
-    private String contentHash;
-    private boolean encrypted;
+    /** Size of the content in bytes. */
+    private long length;
+    /** Stream providing access to the binary content. */
+    private InputStream contentStream;
 
 }

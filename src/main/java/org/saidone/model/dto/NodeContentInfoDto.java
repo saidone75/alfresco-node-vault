@@ -16,22 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.model;
+package org.saidone.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.alfresco.core.model.Node;
+import lombok.EqualsAndHashCode;
 
 /**
- * Simple wrapper used when communicating with the Alfresco public API where
- * responses are typically wrapped inside an {@code entry} JSON object.
+ * Metadata describing the archived content of a node. Extends
+ * {@link NodeContentDto} with additional information such as checksum and
+ * encryption status.
  */
-@AllArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Data
-public class Entry {
+public class NodeContentInfoDto extends NodeContentDto {
 
-    @JsonProperty("entry")
-    private Node node;
+    private String contentId;
+    private String contentHashAlgorithm;
+    private String contentHash;
+    private boolean encrypted;
 
 }

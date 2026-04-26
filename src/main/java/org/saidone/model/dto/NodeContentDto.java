@@ -16,21 +16,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.mapper;
+package org.saidone.model.dto;
 
-import org.mapstruct.Mapper;
-import org.saidone.service.audit.AuditEntry;
-import org.saidone.service.audit.entity.AuditEntryEntity;
+import lombok.Data;
 
-import java.util.List;
+/**
+ * Base class containing minimal information about node binary content. It is
+ * extended by descriptors carrying additional metadata or a content stream.
+ */
+@Data
+public abstract class NodeContentDto {
 
-@Mapper(componentModel = "spring")
-public interface AuditEntryMapper {
-
-    AuditEntryEntity toEntity(AuditEntry dto);
-
-    AuditEntry toDto(AuditEntryEntity entity);
-
-    List<AuditEntry> toDtoList(List<AuditEntryEntity> entities);
+    protected String fileName;
+    protected String contentType;
 
 }

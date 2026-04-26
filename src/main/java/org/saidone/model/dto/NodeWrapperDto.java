@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.model;
+package org.saidone.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -44,7 +44,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
 @Slf4j
-public class NodeWrapper {
+public class NodeWrapperDto {
 
     /**
      * Shared {@link ObjectMapper} used for serializing and deserializing
@@ -83,7 +83,7 @@ public class NodeWrapper {
      * @throws IllegalArgumentException if {@code node} is {@code null}
      * @throws JsonProcessingException  if the node cannot be serialized to JSON
      */
-    public NodeWrapper(Node node) throws IllegalArgumentException, JsonProcessingException {
+    public NodeWrapperDto(Node node) throws IllegalArgumentException, JsonProcessingException {
         if (node == null) {
             throw new IllegalArgumentException("Node cannot be null");
         }

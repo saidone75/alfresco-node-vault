@@ -16,9 +16,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.service.audit;
+package org.saidone.model.dto;
 
 import lombok.Data;
+import org.saidone.service.audit.AuditEntryKeys;
+import org.saidone.service.audit.AuditService;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -33,7 +35,7 @@ import java.util.Map;
  * {@link AuditEntryKeys} so that the persisted documents remain compact.</p>
  */
 @Data
-public class AuditEntry {
+public class AuditEntryDto {
 
     /**
      * Type of the audited event. Typical values are
@@ -57,11 +59,11 @@ public class AuditEntry {
     private Map<String, Serializable> metadata;
 
     /**
-     * Creates a new {@code AuditEntry} with its {@linkplain #timestamp
+     * Creates a new {@code AuditEntryDto} with its {@linkplain #timestamp
      * timestamp} set to the current instant. Other properties can be populated
      * later before the entry is persisted via {@link AuditService}.
      */
-    public AuditEntry() {
+    public AuditEntryDto() {
         this.timestamp = Instant.now();
     }
 

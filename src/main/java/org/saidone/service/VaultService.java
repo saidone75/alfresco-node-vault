@@ -29,7 +29,7 @@ import org.saidone.exception.NodeNotFoundOnAlfrescoException;
 import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.exception.VaultException;
 import org.saidone.misc.ProgressTrackingInputStream;
-import org.saidone.model.NodeWrapper;
+import org.saidone.model.dto.NodeWrapperDto;
 import org.saidone.service.content.ContentService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -81,7 +81,7 @@ public class VaultService extends BaseComponent {
                     nodeId,
                     node.getContent().getSizeInBytes());
             contentService.archiveNodeContent(node, nodeContentInputStream);
-            nodeService.save(new NodeWrapper(node));
+            nodeService.save(new NodeWrapperDto(node));
             if (doubleCheck) doubleCheck(nodeId);
             if (deleteOnAlfresco) alfrescoService.deleteNode(nodeId);
         } catch (FeignException.NotFound e) {
@@ -119,10 +119,10 @@ public class VaultService extends BaseComponent {
      * Retrieves the wrapped node metadata from the vault by node ID.
      *
      * @param nodeId the ID of the node
-     * @return the {@link NodeWrapper} containing node metadata
+     * @return the {@link NodeWrapperDto} containing node metadata
      * @throws NodeNotFoundOnVaultException if the node is not found in the vault
      */
-    private NodeWrapper getNodeWrapper(String nodeId) {
+    private NodeWrapperDto getNodeWrapper(String nodeId) {
         return nodeService.findById(nodeId);
     }
 

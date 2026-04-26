@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.saidone.service.audit.AuditEntry;
+import org.saidone.model.dto.AuditEntryDto;
 import org.saidone.service.audit.AuditServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -70,7 +70,7 @@ class AuditApiControllerTests extends BaseTest {
     @Test
     @SneakyThrows
     void getAuditEntries() {
-        val auditEntry = new AuditEntry();
+        val auditEntry = new AuditEntryDto();
         auditEntry.setType("test");
         auditService.saveEntry(auditEntry);
         auditService.saveEntry(auditEntry);
@@ -81,7 +81,7 @@ class AuditApiControllerTests extends BaseTest {
                 .header(HttpHeaders.AUTHORIZATION, basicAuth)
                 .exchange()
                 .expectStatus().isOk()
-                .expectBodyList(AuditEntry.class)
+                .expectBodyList(AuditEntryDto.class)
                 .value(list -> assertTrue(list.size() >= 2));
     }
 

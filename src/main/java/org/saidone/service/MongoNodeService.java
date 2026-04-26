@@ -23,8 +23,8 @@ import lombok.SneakyThrows;
 import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.exception.NodeNotFoundOnVaultException;
-import org.saidone.mapper.NodeMapper;
-import org.saidone.model.NodeWrapper;
+import org.saidone.model.mapper.NodeMapper;
+import org.saidone.model.dto.NodeWrapperDto;
 import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -56,7 +56,7 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      */
     @Override
     @SneakyThrows
-    public void save(NodeWrapper nodeWrapper) {
+    public void save(NodeWrapperDto nodeWrapper) {
         mongoNodeRepository.save(nodeMapper.toEntity(nodeWrapper));
     }
 
@@ -64,11 +64,11 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      * Retrieves the stored node wrapper by its identifier.
      *
      * @param nodeId the Alfresco node identifier
-     * @return the stored {@link NodeWrapper}
+     * @return the stored {@link NodeWrapperDto}
      * @throws NodeNotFoundOnVaultException if the node does not exist
      */
     @Override
-    public NodeWrapper findById(String nodeId) {
+    public NodeWrapperDto findById(String nodeId) {
         val nodeOptional = mongoNodeRepository.findById(nodeId).map(nodeMapper::toDto);
         if (nodeOptional.isPresent()) {
             return nodeOptional.get();
@@ -81,7 +81,7 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      * {@inheritDoc}
      */
     @Override
-    public Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
+    public Page<NodeWrapperDto> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
         return mongoNodeRepository.findByArchiveDateRange(from, to, pageable).map(nodeMapper::toDto);
     }
 
@@ -92,7 +92,7 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      * {@link MongoNodeRepositoryImpl#findNotarized(Pageable)}.</p>
      */
     @Override
-    public Page<NodeWrapper> findNotarized(Pageable pageable) {
+    public Page<NodeWrapperDto> findNotarized(Pageable pageable) {
         return mongoNodeRepository.findNotarized(pageable).map(nodeMapper::toDto);
     }
 
@@ -100,7 +100,7 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      * {@inheritDoc}
      */
     @Override
-    public Iterable<NodeWrapper> findByNtx(String ntx) {
+    public Iterable<NodeWrapperDto> findByNtx(String ntx) {
         return nodeMapper.toDtoList(mongoNodeRepository.findByNtx(ntx));
     }
 
@@ -108,7 +108,7 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      * {@inheritDoc}
      */
     @Override
-    public Iterable<NodeWrapper> findByKv(int kv) {
+    public Iterable<NodeWrapperDto> findByKv(int kv) {
         return nodeMapper.toDtoList(mongoNodeRepository.findByKv(kv));
     }
 
@@ -119,7 +119,7 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      * reflects the current state of the vault.</p>
      */
     @Override
-    public Iterable<NodeWrapper> findAll() {
+    public Iterable<NodeWrapperDto> findAll() {
         return nodeMapper.toDtoList(mongoNodeRepository.findAll());
     }
 

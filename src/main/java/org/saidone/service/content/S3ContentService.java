@@ -31,8 +31,8 @@ import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.exception.VaultException;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
-import org.saidone.model.NodeContentInfo;
-import org.saidone.model.NodeContentStream;
+import org.saidone.model.dto.NodeContentInfoDto;
+import org.saidone.model.dto.NodeContentStreamDto;
 import org.saidone.repository.S3Repository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -51,8 +51,8 @@ import java.util.HashMap;
  * <p>
  * During archival the content stream is written to a temporary file so the checksum can
  * be computed before uploading. The resulting hash and other metadata are persisted as
- * S3 user metadata. Retrieval operations return {@link NodeContentStream} and
- * {@link NodeContentInfo} descriptors built from {@code HeadObject} and {@code GetObject}
+ * S3 user metadata. Retrieval operations return {@link NodeContentStreamDto} and
+ * {@link NodeContentInfoDto} descriptors built from {@code HeadObject} and {@code GetObject}
  * responses.
  * </p>
  * <p>
@@ -114,11 +114,11 @@ public class S3ContentService extends BaseComponent implements ContentService {
      * @throws NodeNotFoundOnVaultException if the object is not found
      */
     @Override
-    public NodeContentStream getNodeContent(String nodeId) {
+    public NodeContentStreamDto getNodeContent(String nodeId) {
         try {
             val head = s3Client.headObject(HeadObjectRequest.builder()
                     .bucket(s3Config.getBucket()).key(nodeId).build());
-            val nodeContentStream = new NodeContentStream();
+            val nodeContentStream = new NodeContentStreamDto();
             nodeContentStream.setFileName(head.metadata().getOrDefault(MetadataKeys.FILENAME, nodeId));
             nodeContentStream.setContentType(head.contentType());
             nodeContentStream.setLength(head.contentLength());
@@ -134,15 +134,15 @@ public class S3ContentService extends BaseComponent implements ContentService {
      * streaming the actual binary.
      *
      * @param nodeId identifier of the node
-     * @return a populated {@link NodeContentInfo}
+     * @return a populated {@link NodeContentInfoDto}
      * @throws NodeNotFoundOnVaultException if the object does not exist in S3
      */
     @Override
-    public NodeContentInfo getNodeContentInfo(String nodeId) {
+    public NodeContentInfoDto getNodeContentInfo(String nodeId) {
         try {
             val head = s3Client.headObject(HeadObjectRequest.builder()
                     .bucket(s3Config.getBucket()).key(nodeId).build());
-            val nodeContentInfo = new NodeContentInfo();
+            val nodeContentInfo = new NodeContentInfoDto();
             nodeContentInfo.setFileName(head.metadata().getOrDefault(MetadataKeys.FILENAME, nodeId));
             nodeContentInfo.setContentType(head.contentType());
             nodeContentInfo.setContentId(nodeId);

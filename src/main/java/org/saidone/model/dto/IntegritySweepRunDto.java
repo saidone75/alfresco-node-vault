@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.model;
+package org.saidone.model.dto;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -31,7 +31,7 @@ import java.time.Instant;
  */
 @Data
 @Document(collection = "integrity_sweep_run")
-public class IntegritySweepRun {
+public class IntegritySweepRunDto {
 
     @Id
     private String id;

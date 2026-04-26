@@ -19,7 +19,7 @@
 package org.saidone.service;
 
 import org.saidone.exception.NodeNotFoundOnVaultException;
-import org.saidone.model.NodeWrapper;
+import org.saidone.model.dto.NodeWrapperDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -27,7 +27,7 @@ import java.time.Instant;
 
 /**
  * Service abstraction for persisting and retrieving node metadata within the
- * vault. Implementations typically store {@link NodeWrapper} instances in a
+ * vault. Implementations typically store {@link NodeWrapperDto} instances in a
  * backing store such as MongoDB.
  *
  * <p>The API is intentionally minimal and focused on CRUD-style operations.
@@ -41,16 +41,16 @@ public interface NodeService {
      *
      * @param node the node wrapper to store
      */
-    void save(NodeWrapper node);
+    void save(NodeWrapperDto node);
 
     /**
      * Retrieves a node wrapper by its identifier.
      *
      * @param nodeId the Alfresco node identifier
-     * @return the stored {@link NodeWrapper}
+     * @return the stored {@link NodeWrapperDto}
      * @throws NodeNotFoundOnVaultException if the node does not exist in the vault
      */
-    NodeWrapper findById(String nodeId);
+    NodeWrapperDto findById(String nodeId);
 
     /**
      * Retrieves node wrappers archived within the specified date range using pagination.
@@ -60,17 +60,17 @@ public interface NodeService {
      * @param from     the lower bound of the archive date range, inclusive
      * @param to       the upper bound of the archive date range, inclusive
      * @param pageable pagination information
-     * @return page of {@link NodeWrapper}
+     * @return page of {@link NodeWrapperDto}
      */
-    Page<NodeWrapper> findByArchiveDateRange(Instant from, Instant to, Pageable pageable);
+    Page<NodeWrapperDto> findByArchiveDateRange(Instant from, Instant to, Pageable pageable);
 
     /**
      * Retrieves notarized node wrappers using pagination.
      *
      * @param pageable pagination information
-     * @return page of notarized {@link NodeWrapper}
+     * @return page of notarized {@link NodeWrapperDto}
      */
-    Page<NodeWrapper> findNotarized(Pageable pageable);
+    Page<NodeWrapperDto> findNotarized(Pageable pageable);
 
     /**
      * Retrieves all node wrappers having the given notarization transaction ID.
@@ -78,24 +78,24 @@ public interface NodeService {
      * been notarized.
      *
      * @param ntx the notarization transaction ID to filter by
-     * @return iterable collection of {@link NodeWrapper}
+     * @return iterable collection of {@link NodeWrapperDto}
      */
-    Iterable<NodeWrapper> findByNtx(String ntx);
+    Iterable<NodeWrapperDto> findByNtx(String ntx);
 
     /**
      * Retrieves all node wrappers associated with the specified encryption key version.
      *
      * @param kv the encryption key version to filter by
-     * @return iterable collection of {@link NodeWrapper}
+     * @return iterable collection of {@link NodeWrapperDto}
      */
-    Iterable<NodeWrapper> findByKv(int kv);
+    Iterable<NodeWrapperDto> findByKv(int kv);
 
     /**
      * Retrieves all stored node wrappers.
      *
-     * @return iterable collection of {@link NodeWrapper}
+     * @return iterable collection of {@link NodeWrapperDto}
      */
-    Iterable<NodeWrapper> findAll();
+    Iterable<NodeWrapperDto> findAll();
 
     /**
      * Removes the stored node metadata identified by the given ID.

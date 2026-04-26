@@ -31,8 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
-import org.saidone.model.Entry;
-import org.saidone.model.IntegritySweepRun;
+import org.saidone.model.dto.EntryDto;
+import org.saidone.model.dto.IntegritySweepRunDto;
 import org.saidone.service.AuthenticationService;
 import org.saidone.service.NodeService;
 import org.saidone.service.VaultService;
@@ -137,11 +137,11 @@ public class VaultApiController extends BaseComponent {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Nodes retrieved",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = Entry.class))),
+                                    schema = @Schema(implementation = EntryDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
             })
-    public ResponseEntity<Page<Entry>> searchNodes(
+    public ResponseEntity<Page<EntryDto>> searchNodes(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @RequestParam(required = false) Instant from,
             @RequestParam(required = false) Instant to,
@@ -163,7 +163,7 @@ public class VaultApiController extends BaseComponent {
 
         val pageable = PageRequest.of(page, size, Sort.by(dir, "adt"));
         val result = nodeService.findByArchiveDateRange(from, to, pageable)
-                .map(nodeWrapper -> new Entry(nodeWrapper.getNode()));
+                .map(nodeWrapper -> new EntryDto(nodeWrapper.getNode()));
         return ResponseEntity.ok(result);
     }
 
@@ -172,7 +172,7 @@ public class VaultApiController extends BaseComponent {
      *
      * @param auth   optional Basic authentication header
      * @param nodeId identifier of the node to retrieve
-     * @return the node metadata wrapped in an {@link Entry} object
+     * @return the node metadata wrapped in an {@link EntryDto} object
      */
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/nodes/{nodeId}")
@@ -185,7 +185,7 @@ public class VaultApiController extends BaseComponent {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Node metadata retrieved successfully",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = Entry.class))),
+                                    schema = @Schema(implementation = EntryDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized",
                             content = @Content),
                     @ApiResponse(responseCode = "404", description = "Node not found",
@@ -193,7 +193,7 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
-    public ResponseEntity<Entry> getNode(
+    public ResponseEntity<EntryDto> getNode(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
 
@@ -202,7 +202,7 @@ public class VaultApiController extends BaseComponent {
         }
 
         val node = vaultService.getNode(nodeId);
-        return ResponseEntity.ok(new Entry(node));
+        return ResponseEntity.ok(new EntryDto(node));
     }
 
     /**
@@ -527,11 +527,11 @@ public class VaultApiController extends BaseComponent {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Integrity sweep runs retrieved",
                             content = @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = IntegritySweepRun.class))),
+                                    schema = @Schema(implementation = IntegritySweepRunDto.class))),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
             })
-    public ResponseEntity<Page<IntegritySweepRun>> getIntegritySweepRuns(
+    public ResponseEntity<Page<IntegritySweepRunDto>> getIntegritySweepRuns(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "20") int size) {

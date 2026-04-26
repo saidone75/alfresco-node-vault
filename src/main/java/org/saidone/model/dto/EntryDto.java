@@ -16,19 +16,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.model;
+package org.saidone.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.alfresco.core.model.Node;
 
 /**
- * DTO used for invoking the Alfresco System API search endpoint. It mirrors
- * the minimal set of parameters supported by the service.
+ * Simple wrapper used when communicating with the Alfresco public API where
+ * responses are typically wrapped inside an {@code entry} JSON object.
  */
+@AllArgsConstructor
 @Data
-public class SystemSearchRequest {
-	
-	private String query;
-	private int maxItems;
-	private int skipCount;
+public class EntryDto {
+
+    @JsonProperty("entry")
+    private Node node;
 
 }

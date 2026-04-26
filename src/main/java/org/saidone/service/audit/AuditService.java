@@ -18,13 +18,14 @@
 
 package org.saidone.service.audit;
 
+import org.saidone.model.dto.AuditEntryDto;
 import org.springframework.data.domain.Pageable;
 
 import java.time.Instant;
 import java.util.List;
 
 /**
- * Service abstraction for persisting and querying {@link AuditEntry} objects.
+ * Service abstraction for persisting and querying {@link AuditEntryDto} objects.
  * <p>
  * Implementations are responsible for storing audit entries and retrieving
  * them using optional search criteria such as type or timestamp range.
@@ -42,7 +43,7 @@ public interface AuditService {
      *
      * @param auditEntry the entry to store
      */
-    void saveEntry(AuditEntry auditEntry);
+    void saveEntry(AuditEntryDto auditEntry);
 
     /**
      * Retrieve stored audit entries.
@@ -53,6 +54,6 @@ public interface AuditService {
      * @param pageable pagination information such as page number and size
      * @return list of matching audit entries ordered by timestamp descending
      */
-    List<AuditEntry> findEntries(String type, Instant from, Instant to, Pageable pageable);
+    List<AuditEntryDto> findEntries(String type, Instant from, Instant to, Pageable pageable);
 
 }

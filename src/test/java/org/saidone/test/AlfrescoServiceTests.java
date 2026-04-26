@@ -28,7 +28,7 @@ import lombok.val;
 import org.alfresco.core.model.PathElement;
 import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.*;
-import org.saidone.model.NodeWrapper;
+import org.saidone.model.dto.NodeWrapperDto;
 import org.saidone.model.alfresco.AlfrescoContentModel;
 import org.saidone.service.AlfrescoService;
 import org.saidone.service.VaultService;
@@ -127,9 +127,9 @@ class AlfrescoServiceTests extends BaseTest {
     @Order(70)
     @SneakyThrows
     void nodeWrapperTest() {
-        assertThrows(IllegalArgumentException.class, () -> new NodeWrapper(null));
+        assertThrows(IllegalArgumentException.class, () -> new NodeWrapperDto(null));
         val node = createNode();
-        val nodeWrapper = assertDoesNotThrow(() -> new NodeWrapper(node));
+        val nodeWrapper = assertDoesNotThrow(() -> new NodeWrapperDto(node));
         nodeWrapper.setNodeJson(UUID.randomUUID().toString());
         assertThrows(JsonProcessingException.class, nodeWrapper::getNode);
         nodeWrapper.setNodeJson(Strings.EMPTY);

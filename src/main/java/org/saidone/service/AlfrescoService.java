@@ -43,8 +43,8 @@ import org.saidone.exception.NodeNotFoundException;
 import org.saidone.exception.VaultException;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.misc.ProgressTrackingOutputStream;
-import org.saidone.model.NodeContentStream;
-import org.saidone.model.SystemSearchRequest;
+import org.saidone.model.dto.NodeContentStreamDto;
+import org.saidone.model.dto.SystemSearchRequestDto;
 import org.saidone.model.alfresco.AnvContentModel;
 import org.saidone.utils.CastUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -288,10 +288,10 @@ public class AlfrescoService extends BaseComponent {
      * Restores the content of a node by uploading the provided content stream.
      *
      * @param nodeId      the identifier of the node to update content for
-     * @param nodeContentStream the {@link NodeContentStream} containing the content stream and metadata
+     * @param nodeContentStream the {@link NodeContentStreamDto} containing the content stream and metadata
      */
     @SneakyThrows
-    public void restoreNodeContent(String nodeId, NodeContentStream nodeContentStream) {
+    public void restoreNodeContent(String nodeId, NodeContentStreamDto nodeContentStream) {
         val url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
         val conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod(HttpMethod.PUT.name());
@@ -361,7 +361,7 @@ public class AlfrescoService extends BaseComponent {
         if (pages == null || pages < 1) {
             pages = Integer.MAX_VALUE;
         }
-        val searchRequest = new SystemSearchRequest();
+        val searchRequest = new SystemSearchRequestDto();
         searchRequest.setQuery(query);
         searchRequest.setSkipCount(0);
         searchRequest.setMaxItems(config.getSearchBatchSize());
@@ -392,7 +392,7 @@ public class AlfrescoService extends BaseComponent {
      * @param systemSearchRequest the search request parameters
      * @return the {@link ResultSetPaging} containing search results
      */
-    private ResultSetPaging search(SystemSearchRequest systemSearchRequest) {
+    private ResultSetPaging search(SystemSearchRequestDto systemSearchRequest) {
         val searchRequest = new SearchRequest();
         val requestQuery = new RequestQuery();
         requestQuery.setLanguage(RequestQuery.LanguageEnum.AFTS);

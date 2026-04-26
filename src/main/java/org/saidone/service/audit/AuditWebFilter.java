@@ -24,6 +24,7 @@ import lombok.val;
 import org.apache.http.HttpHeaders;
 import org.jetbrains.annotations.NotNull;
 import org.saidone.component.BaseComponent;
+import org.saidone.model.dto.AuditEntryDto;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -53,7 +54,7 @@ import java.util.HashMap;
 @Slf4j
 public class AuditWebFilter extends BaseComponent implements WebFilter {
 
-    /** Service used to persist {@link AuditEntry} instances. */
+    /** Service used to persist {@link AuditEntryDto} instances. */
     private final AuditServiceImpl auditService;
 
     /**
@@ -89,7 +90,7 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
      * @param request the server request
      * @return populated audit entry for the request
      */
-    public static AuditEntry createRequestAuditEntry(ServerHttpRequest request) {
+    public static AuditEntryDto createRequestAuditEntry(ServerHttpRequest request) {
         val metadata = new HashMap<String, Serializable>();
         metadata.put(AuditEntryKeys.METADATA_ID, request.getId());
         if (request.getRemoteAddress() != null) {
@@ -98,7 +99,7 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
         metadata.put(AuditEntryKeys.METADATA_USER_AGENT, request.getHeaders().getFirst(HttpHeaders.USER_AGENT));
         metadata.put(AuditEntryKeys.METADATA_PATH, request.getPath().value());
         metadata.put(AuditEntryKeys.METADATA_METHOD, request.getMethod().toString());
-        val entry = new AuditEntry();
+        val entry = new AuditEntryDto();
         entry.setMetadata(metadata);
         entry.setType(AuditEntryKeys.REQUEST);
         return entry;
@@ -114,16 +115,15 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
      * @param response the server response
      * @return populated audit entry for the response
      */
-    public static AuditEntry createResponseAuditEntry(String id, ServerHttpResponse response) {
+    public static AuditEntryDto createResponseAuditEntry(String id, ServerHttpResponse response) {
         val metadata = new HashMap<String, Serializable>();
         metadata.put(AuditEntryKeys.METADATA_ID, id);
         metadata.put(AuditEntryKeys.METADATA_STATUS, response.getStatusCode() != null ?
                 response.getStatusCode().value() : null);
-        val entry = new AuditEntry();
+        val entry = new AuditEntryDto();
         entry.setMetadata(metadata);
         entry.setType(AuditEntryKeys.RESPONSE);
         return entry;
     }
 
 }
-

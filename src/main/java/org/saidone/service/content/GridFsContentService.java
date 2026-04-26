@@ -27,8 +27,8 @@ import org.saidone.component.BaseComponent;
 import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
-import org.saidone.model.NodeContentInfo;
-import org.saidone.model.NodeContentStream;
+import org.saidone.model.dto.NodeContentInfoDto;
+import org.saidone.model.dto.NodeContentStreamDto;
 import org.saidone.repository.GridFsRepositoryImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -95,16 +95,16 @@ public class GridFsContentService extends BaseComponent implements ContentServic
      * Retrieves the content of a node stored in GridFS by node ID.
      *
      * @param nodeId the ID of the node
-     * @return the {@link NodeContentStream} containing file name, content type, length and the content stream
+     * @return the {@link NodeContentStreamDto} containing file name, content type, length and the content stream
      * @throws NodeNotFoundOnVaultException if the node content is not found in the vault
      */
     @Override
-    public NodeContentStream getNodeContent(String nodeId) {
+    public NodeContentStreamDto getNodeContent(String nodeId) {
         val gridFSFile = gridFsRepository.findFileById(nodeId);
         if (gridFSFile == null) {
             throw new NodeNotFoundOnVaultException(nodeId);
         }
-        val nodeContent = new NodeContentStream();
+        val nodeContent = new NodeContentStreamDto();
         nodeContent.setFileName(gridFSFile.getFilename());
         if (gridFSFile.getMetadata() != null && gridFSFile.getMetadata().containsKey(MetadataKeys.CONTENT_TYPE)) {
             nodeContent.setContentType(gridFSFile.getMetadata().getString(MetadataKeys.CONTENT_TYPE));
@@ -118,16 +118,16 @@ public class GridFsContentService extends BaseComponent implements ContentServic
      * Retrieves metadata information about a node's content stored in GridFS.
      *
      * @param nodeId identifier of the node
-     * @return a {@link NodeContentInfo} describing the stored content
+     * @return a {@link NodeContentInfoDto} describing the stored content
      * @throws NodeNotFoundOnVaultException if the node content cannot be found
      */
     @Override
-    public NodeContentInfo getNodeContentInfo(String nodeId) {
+    public NodeContentInfoDto getNodeContentInfo(String nodeId) {
         val gridFSFile = gridFsRepository.findFileById(nodeId);
         if (gridFSFile == null) {
             throw new NodeNotFoundOnVaultException(nodeId);
         }
-        val info = new NodeContentInfo();
+        val info = new NodeContentInfoDto();
         info.setContentId(nodeId);
         info.setFileName(gridFSFile.getFilename());
         if (gridFSFile.getMetadata() != null) {
