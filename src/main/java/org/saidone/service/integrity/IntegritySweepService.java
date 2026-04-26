@@ -24,8 +24,8 @@ import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
 import org.saidone.exception.NotarizationException;
-import org.saidone.model.IntegritySweepRun;
-import org.saidone.model.NodeWrapper;
+import org.saidone.model.dto.IntegritySweepRunDto;
+import org.saidone.model.dto.NodeWrapperDto;
 import org.saidone.monitor.IntegritySweepMetrics;
 import org.saidone.service.NodeService;
 import org.saidone.service.notarization.NotarizationService;
@@ -57,8 +57,8 @@ public class IntegritySweepService extends BaseComponent {
     @Value("${application.integrity-sweep.batch-size:200}")
     private int batchSize;
 
-    public synchronized IntegritySweepRun runSweep(String trigger) {
-        val run = new IntegritySweepRun();
+    public synchronized IntegritySweepRunDto runSweep(String trigger) {
+        val run = new IntegritySweepRunDto();
         run.setStartedAt(Instant.now());
         run.setStatus("RUNNING");
         run.setTrigger(Strings.isBlank(trigger) ? "MANUAL" : trigger);
@@ -66,7 +66,7 @@ public class IntegritySweepService extends BaseComponent {
 
         try {
             Pageable pageable = PageRequest.of(0, Math.max(batchSize, 1), Sort.by(Sort.Direction.ASC, "_id"));
-            Page<NodeWrapper> page;
+            Page<NodeWrapperDto> page;
             do {
                 page = nodeService.findNotarized(pageable);
                 for (val node : page.getContent()) {
@@ -97,14 +97,14 @@ public class IntegritySweepService extends BaseComponent {
         return run;
     }
 
-    public Page<IntegritySweepRun> findRuns(Pageable pageable) {
+    public Page<IntegritySweepRunDto> findRuns(Pageable pageable) {
         val sort = pageable.getSort().isSorted()
                 ? pageable.getSort()
                 : Sort.by(Sort.Direction.DESC, "sat");
 
         val query = new Query().with(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort));
-        val content = mongoTemplate.find(query, IntegritySweepRun.class);
-        long total = mongoTemplate.count(new Query(), IntegritySweepRun.class);
+        val content = mongoTemplate.find(query, IntegritySweepRunDto.class);
+        long total = mongoTemplate.count(new Query(), IntegritySweepRunDto.class);
         return new org.springframework.data.domain.PageImpl<>(content, pageable, total);
     }
 

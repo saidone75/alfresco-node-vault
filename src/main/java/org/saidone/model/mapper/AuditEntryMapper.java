@@ -16,25 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.model;
+package org.saidone.model.mapper;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import org.mapstruct.Mapper;
+import org.saidone.model.dto.AuditEntryDto;
+import org.saidone.model.entity.AuditEntryEntity;
 
-import java.io.InputStream;
+import java.util.List;
 
-/**
- * Descriptor representing a node's binary data as an {@link InputStream} along
- * with its length. Extends {@link NodeContent} to also expose the file name and
- * content type.
- */
-@EqualsAndHashCode(callSuper = true)
-@Data
-public class NodeContentStream extends NodeContent {
+@Mapper(componentModel = "spring")
+public interface AuditEntryMapper {
 
-    /** Size of the content in bytes. */
-    private long length;
-    /** Stream providing access to the binary content. */
-    private InputStream contentStream;
+    AuditEntryEntity toEntity(AuditEntryDto dto);
+
+    AuditEntryDto toDto(AuditEntryEntity entity);
+
+    List<AuditEntryDto> toDtoList(List<AuditEntryEntity> entities);
 
 }

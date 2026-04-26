@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.service.audit.entity;
+package org.saidone.model.entity;
 
 import lombok.Data;
 import org.saidone.service.audit.AuditService;

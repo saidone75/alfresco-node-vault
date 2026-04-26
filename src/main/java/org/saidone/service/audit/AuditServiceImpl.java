@@ -21,8 +21,9 @@ package org.saidone.service.audit;
 import lombok.RequiredArgsConstructor;
 import lombok.val;
 import org.saidone.component.BaseComponent;
-import org.saidone.mapper.AuditEntryMapper;
-import org.saidone.service.audit.entity.AuditEntryEntity;
+import org.saidone.model.dto.AuditEntryDto;
+import org.saidone.model.mapper.AuditEntryMapper;
+import org.saidone.model.entity.AuditEntryEntity;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -38,7 +39,7 @@ import static org.saidone.service.audit.AuditEntryKeys.TIMESTAMP;
 import static org.saidone.service.audit.AuditEntryKeys.TYPE;
 
 /**
- * Service for persisting and retrieving {@link AuditEntry} instances.
+ * Service for persisting and retrieving {@link AuditEntryDto} instances.
  *
  * <p>Audit entries are stored in MongoDB via the configured {@link MongoTemplate}
  * and can be queried by type and timestamp range.</p>
@@ -59,7 +60,7 @@ public class AuditServiceImpl extends BaseComponent implements AuditService {
      *
      * @param auditEntry the entry to store
      */
-    public void saveEntry(AuditEntry auditEntry) {
+    public void saveEntry(AuditEntryDto auditEntry) {
         mongoTemplate.insert(auditEntryMapper.toEntity(auditEntry));
     }
 
@@ -73,7 +74,7 @@ public class AuditServiceImpl extends BaseComponent implements AuditService {
      * @return list of matching audit entries ordered by timestamp descending
      */
     @Override
-    public List<AuditEntry> findEntries(String type, Instant from, Instant to, Pageable pageable) {
+    public List<AuditEntryDto> findEntries(String type, Instant from, Instant to, Pageable pageable) {
         val criteriaList = new ArrayList<Criteria>();
         if (type != null) {
             criteriaList.add(Criteria.where(TYPE).is(type));

@@ -16,21 +16,19 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.mapper;
+package org.saidone.model.dto;
 
-import org.mapstruct.Mapper;
-import org.saidone.model.NodeWrapper;
-import org.saidone.model.entity.NodeEntity;
+import lombok.Data;
 
-import java.util.List;
-
-@Mapper(componentModel = "spring")
-public interface NodeMapper {
-
-    NodeEntity toEntity(NodeWrapper dto);
-
-    NodeWrapper toDto(NodeEntity entity);
-
-    List<NodeWrapper> toDtoList(List<NodeEntity> entities);
+/**
+ * DTO used for invoking the Alfresco System API search endpoint. It mirrors
+ * the minimal set of parameters supported by the service.
+ */
+@Data
+public class SystemSearchRequestDto {
+	
+	private String query;
+	private int maxItems;
+	private int skipCount;
 
 }

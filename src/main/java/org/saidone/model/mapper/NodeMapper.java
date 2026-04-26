@@ -16,18 +16,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package org.saidone.model;
+package org.saidone.model.mapper;
 
-import lombok.Data;
+import org.mapstruct.Mapper;
+import org.saidone.model.dto.NodeWrapperDto;
+import org.saidone.model.entity.NodeEntity;
 
-/**
- * Base class containing minimal information about node binary content. It is
- * extended by descriptors carrying additional metadata or a content stream.
- */
-@Data
-public abstract class NodeContent {
+import java.util.List;
 
-    protected String fileName;
-    protected String contentType;
+@Mapper(componentModel = "spring")
+public interface NodeMapper {
+
+    NodeEntity toEntity(NodeWrapperDto dto);
+
+    NodeWrapperDto toDto(NodeEntity entity);
+
+    List<NodeWrapperDto> toDtoList(List<NodeEntity> entities);
 
 }
