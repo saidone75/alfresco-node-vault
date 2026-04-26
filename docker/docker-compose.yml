@@ -127,7 +127,7 @@ services:
   anv-vault:
     image: anv:latest
     container_name: anv-vault
-    mem_limit: 256m
+    mem_limit: 512m
     build:
       dockerfile: ./docker/Dockerfile.vault
       context: ../
