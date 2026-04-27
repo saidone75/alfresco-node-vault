@@ -9,3 +9,8 @@ datasources:
     basicAuth: true
     basicAuthUser: admin
     basicAuthPassword: admin
+  - name: Loki
+    uid: anv-loki
+    type: loki
+    url: http://loki:3100
+    access: proxy
