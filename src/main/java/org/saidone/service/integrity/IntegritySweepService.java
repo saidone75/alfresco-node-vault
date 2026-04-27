@@ -71,16 +71,7 @@ public class IntegritySweepService extends BaseComponent {
                 page = nodeService.findNotarized(pageable);
                 for (val node : page.getContent()) {
                     run.setScanned(run.getScanned() + 1);
-                    try {
-                        notarizationService.checkNotarization(node.getId());
-                        run.setPassed(run.getPassed() + 1);
-                    } catch (NotarizationException e) {
-                        run.setFailed(run.getFailed() + 1);
-                        log.warn("Integrity check failed for node {}: {}", node.getId(), e.getMessage());
-                    } catch (Exception e) {
-                        run.setErrors(run.getErrors() + 1);
-                        log.error("Unexpected error during integrity check for node {}", node.getId(), e);
-                    }
+                    checkNodeIntegrity(run, node);
                 }
                 pageable = page.nextPageable();
             } while (page.hasNext());
@@ -95,6 +86,19 @@ public class IntegritySweepService extends BaseComponent {
             metrics.recordRun(run);
         }
         return run;
+    }
+
+    private void checkNodeIntegrity(IntegritySweepRunDto run, NodeWrapperDto node) {
+        try {
+            notarizationService.checkNotarization(node.getId());
+            run.setPassed(run.getPassed() + 1);
+        } catch (NotarizationException e) {
+            run.setFailed(run.getFailed() + 1);
+            log.warn("Integrity check failed for node {}: {}", node.getId(), e.getMessage());
+        } catch (Exception e) {
+            run.setErrors(run.getErrors() + 1);
+            log.error("Unexpected error during integrity check for node {}", node.getId(), e);
+        }
     }
 
     public Page<IntegritySweepRunDto> findRuns(Pageable pageable) {
