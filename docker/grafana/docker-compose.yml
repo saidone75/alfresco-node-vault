@@ -8,6 +8,25 @@ services:
       - "9090:9090"
     # extra_hosts:
     #   - "host.docker.internal:host-gateway"
+  loki:
+    image: ${LOKI_IMAGE}
+    container_name: anv-loki
+    command: -config.file=/etc/loki/config.yml
+    ports:
+      - "3100:3100"
+    volumes:
+      - ./grafana/loki-config.yml:/etc/loki/config.yml
+      - anv-loki-volume:/loki
+  promtail:
+    image: ${PROMTAIL_IMAGE}
+    container_name: anv-promtail
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - ./grafana/promtail-config.yml:/etc/promtail/config.yml
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - anv-promtail-volume:/tmp
+    depends_on:
+      - loki
   grafana:
     build:
       dockerfile: ./grafana/Dockerfile
@@ -36,3 +55,7 @@ services:
 volumes:
   anv-grafana-volume:
     name: grafana-data
+  anv-loki-volume:
+    name: loki-data
+  anv-promtail-volume:
+    name: promtail-data
