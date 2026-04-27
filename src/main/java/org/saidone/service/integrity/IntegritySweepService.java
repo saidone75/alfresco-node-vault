@@ -42,21 +42,44 @@ import java.time.Duration;
 import java.time.Instant;
 
 /**
- * Executes notarization integrity checks for notarized nodes and stores run summaries.
+ * Service responsible for running end-to-end integrity sweeps across notarized
+ * vault nodes.
+ *
+ * <p>Each sweep iterates through notarized nodes in batches, invokes
+ * {@link NotarizationService#checkNotarization(String)} for every node, and
+ * persists a summarized {@link IntegritySweepRunDto} document that captures
+ * run status, duration, and per-node outcomes.</p>
  */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class IntegritySweepService extends BaseComponent {
 
+    /** Service used to page and retrieve notarized nodes from the vault. */
     private final NodeService nodeService;
+    /** Service used to validate notarization data for each scanned node. */
     private final NotarizationService notarizationService;
+    /** MongoDB access used to persist and query integrity sweep run metadata. */
     private final MongoTemplate mongoTemplate;
+    /** Metrics collector for reporting completed sweep run statistics. */
     private final IntegritySweepMetrics metrics;
 
+    /** Maximum number of notarized nodes to process per page during a sweep. */
     @Value("${application.integrity-sweep.batch-size:200}")
     private int batchSize;
 
+    /**
+     * Executes a full integrity sweep for all notarized nodes.
+     *
+     * <p>The run is created with status {@code RUNNING}, updated as nodes are
+     * scanned, then finalized as {@code COMPLETED} or {@code FAILED}. The final
+     * run document is persisted and published to the metrics collector even when
+     * errors occur.</p>
+     *
+     * @param trigger the run trigger source (for example {@code MANUAL} or
+     *                {@code SCHEDULED}); blank values default to {@code MANUAL}
+     * @return persisted sweep run summary with timing and counters
+     */
     public synchronized IntegritySweepRunDto runSweep(String trigger) {
         val run = new IntegritySweepRunDto();
         run.setStartedAt(Instant.now());
@@ -88,6 +111,12 @@ public class IntegritySweepService extends BaseComponent {
         return run;
     }
 
+    /**
+     * Executes notarization verification for a single node and updates run counters.
+     *
+     * @param run  the currently active sweep run accumulator
+     * @param node the node to verify
+     */
     private void checkNodeIntegrity(IntegritySweepRunDto run, NodeWrapperDto node) {
         try {
             notarizationService.checkNotarization(node.getId());
@@ -101,6 +130,15 @@ public class IntegritySweepService extends BaseComponent {
         }
     }
 
+    /**
+     * Retrieves persisted integrity sweep runs using pagination.
+     *
+     * <p>If the caller does not provide explicit sort criteria, runs are
+     * returned in descending order by the {@code sat} field.</p>
+     *
+     * @param pageable paging and optional sorting information
+     * @return page of recorded {@link IntegritySweepRunDto} runs
+     */
     public Page<IntegritySweepRunDto> findRuns(Pageable pageable) {
         val sort = pageable.getSort().isSorted()
                 ? pageable.getSort()
