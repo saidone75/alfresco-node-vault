@@ -25,6 +25,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Stores the summary of a single integrity sweep execution.
@@ -63,5 +65,8 @@ public class IntegritySweepRunDto {
 
     @Field("err")
     private int errors;
+
+    @Field("fnd")
+    private List<String> failedNodeIds = new ArrayList<>();
 
 }

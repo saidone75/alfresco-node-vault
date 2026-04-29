@@ -123,9 +123,11 @@ public class IntegritySweepService extends BaseComponent {
             run.setPassed(run.getPassed() + 1);
         } catch (NotarizationException e) {
             run.setFailed(run.getFailed() + 1);
+            run.getFailedNodeIds().add(node.getId());
             log.warn("Integrity check failed for node {}: {}", node.getId(), e.getMessage());
         } catch (Exception e) {
             run.setErrors(run.getErrors() + 1);
+            run.getFailedNodeIds().add(node.getId());
             log.error("Unexpected error during integrity check for node {}", node.getId(), e);
         }
     }
