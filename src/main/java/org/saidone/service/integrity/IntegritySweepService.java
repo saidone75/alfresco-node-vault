@@ -24,6 +24,7 @@ import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
 import org.saidone.exception.NotarizationException;
+import org.saidone.model.dto.CorruptedNodeDto;
 import org.saidone.model.dto.IntegritySweepRunDto;
 import org.saidone.model.dto.NodeWrapperDto;
 import org.saidone.monitor.IntegritySweepMetrics;
@@ -36,6 +37,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -176,15 +178,35 @@ public class IntegritySweepService extends BaseComponent {
         try {
             notarizationService.checkNotarization(node.getId());
             run.setPassed(run.getPassed() + 1);
+            clearCorruptedNode(node.getId());
         } catch (NotarizationException e) {
             run.setFailed(run.getFailed() + 1);
             run.getFailedNodeIds().add(node.getId());
+            markCorruptedNode(node.getId(), e.getMessage(), run.getId());
             log.warn("Integrity check failed for node {}: {}", node.getId(), e.getMessage());
         } catch (Exception e) {
             run.setErrors(run.getErrors() + 1);
             run.getFailedNodeIds().add(node.getId());
+            markCorruptedNode(node.getId(), e.getClass().getSimpleName(), run.getId());
             log.error("Unexpected error during integrity check for node {}", node.getId(), e);
         }
+    }
+
+    private void markCorruptedNode(String nodeId, String reason, String runId) {
+        val now = Instant.now();
+        val query = Query.query(org.springframework.data.mongodb.core.query.Criteria.where("_id").is(nodeId));
+        val update = new Update()
+                .set("lfs", now)
+                .set("lat", now)
+                .set("frs", Strings.isBlank(reason) ? "UNKNOWN" : reason)
+                .set("rid", runId)
+                .inc("att", 1)
+                .setOnInsert("ffs", now);
+        mongoTemplate.upsert(query, update, CorruptedNodeDto.class);
+    }
+
+    private void clearCorruptedNode(String nodeId) {
+        mongoTemplate.remove(Query.query(org.springframework.data.mongodb.core.query.Criteria.where("_id").is(nodeId)), CorruptedNodeDto.class);
     }
 
     /**
@@ -204,6 +226,16 @@ public class IntegritySweepService extends BaseComponent {
         val query = new Query().with(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort));
         val content = mongoTemplate.find(query, IntegritySweepRunDto.class);
         long total = mongoTemplate.count(new Query(), IntegritySweepRunDto.class);
+        return new org.springframework.data.domain.PageImpl<>(content, pageable, total);
+    }
+
+    public Page<CorruptedNodeDto> findCorruptedNodes(Pageable pageable) {
+        val sort = pageable.getSort().isSorted()
+                ? pageable.getSort()
+                : Sort.by(Sort.Direction.DESC, "lfs");
+        val query = new Query().with(PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort));
+        val content = mongoTemplate.find(query, CorruptedNodeDto.class);
+        long total = mongoTemplate.count(new Query(), CorruptedNodeDto.class);
         return new org.springframework.data.domain.PageImpl<>(content, pageable, total);
     }
 
