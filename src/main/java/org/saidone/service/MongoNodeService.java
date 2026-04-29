@@ -1,5 +1,5 @@
 /*
- * Alfresco Node Vault - archive today, accelerate tomorrow
+ * Alfresco Node Vault - ad aeternam documentorum conservationem
  * Copyright (C) 2025-2026 Saidone
  *
  * This program is free software: you can redistribute it and/or modify
@@ -31,6 +31,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.List;
 
 /**
  * Default {@link NodeService} implementation that persists node metadata using
@@ -94,6 +95,16 @@ public class MongoNodeService extends BaseComponent implements NodeService {
     @Override
     public Page<NodeWrapperDto> findNotarized(Pageable pageable) {
         return mongoNodeRepository.findNotarized(pageable).map(nodeMapper::toDto);
+    }
+
+    @Override
+    public long countNotarized() {
+        return mongoNodeRepository.countNotarized();
+    }
+
+    @Override
+    public List<NodeWrapperDto> findNotarizedRandom(int size) {
+        return nodeMapper.toDtoList(mongoNodeRepository.findNotarizedRandom(size));
     }
 
     /**

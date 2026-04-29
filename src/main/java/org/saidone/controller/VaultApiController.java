@@ -1,5 +1,7 @@
+
+
 /*
- * Alfresco Node Vault - archive today, accelerate tomorrow
+ * Alfresco Node Vault - ad aeternam documentorum conservationem
  * Copyright (C) 2025-2026 Saidone
  *
  * This program is free software: you can redistribute it and/or modify
@@ -32,6 +34,7 @@ import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
 import org.saidone.model.dto.EntryDto;
+import org.saidone.model.dto.CorruptedNodeDto;
 import org.saidone.model.dto.IntegritySweepRunDto;
 import org.saidone.service.AuthenticationService;
 import org.saidone.service.NodeService;
@@ -542,6 +545,43 @@ public class VaultApiController extends BaseComponent {
 
         val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "sat"));
         return ResponseEntity.ok(integritySweepService.findRuns(pageable));
+    }
+
+    /**
+     * Lists nodes currently marked as potentially corrupted by integrity sweeps.
+     *
+     * @param auth optional Basic authentication header
+     * @param page page number
+     * @param size page size
+     * @return page of potentially corrupted nodes
+     */
+    @SecurityRequirement(name = "basicAuth")
+    @GetMapping("/integrity-sweeps/corrupted-nodes")
+    @Operation(
+            summary = "List potentially corrupted nodes",
+            description = "Returns nodes that failed integrity checks and should be reprocessed.",
+            parameters = {
+                    @Parameter(name = "page", description = "Page number", in = ParameterIn.QUERY),
+                    @Parameter(name = "size", description = "Page size", in = ParameterIn.QUERY)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Potentially corrupted nodes retrieved",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CorruptedNodeDto.class))),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+            })
+    public ResponseEntity<Page<CorruptedNodeDto>> getCorruptedNodes(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "20") int size) {
+
+        if (!authenticationService.isAuthorized(auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "lfs"));
+        return ResponseEntity.ok(integritySweepService.findCorruptedNodes(pageable));
     }
 
     /**

@@ -99,6 +99,10 @@ application:
     cron-expression: ${INTEGRITY_SWEEP_CRON_EXPRESSION:0 0 2 * * ?}
     enabled: ${INTEGRITY_SWEEP_ENABLED:false}
     batch-size: ${INTEGRITY_SWEEP_BATCH_SIZE:200}
+    hybrid-enabled: ${INTEGRITY_SWEEP_HYBRID_ENABLED:true}
+    random-batch-enabled: ${INTEGRITY_SWEEP_RANDOM_BATCH_ENABLED:true}
+    random-batch-threshold: ${INTEGRITY_SWEEP_RANDOM_BATCH_THRESHOLD:10000}
+    random-addon-size: ${INTEGRITY_SWEEP_RANDOM_ADDON_SIZE:50}
   service:
     alfresco:
       include:

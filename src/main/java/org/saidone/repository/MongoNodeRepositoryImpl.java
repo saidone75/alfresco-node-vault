@@ -1,5 +1,5 @@
 /*
- * Alfresco Node Vault - archive today, accelerate tomorrow
+ * Alfresco Node Vault - ad aeternam documentorum conservationem
  * Copyright (C) 2025-2026 Saidone
  *
  * This program is free software: you can redistribute it and/or modify
@@ -29,6 +29,7 @@ import org.saidone.model.entity.NodeEntity;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -263,6 +264,35 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
         long count = mongoOperations.count(new Query(criteria), NodeEntity.class);
         val content = mongoOperations.find(query, NodeEntity.class);
         return new PageImpl<>(content, pageable, count);
+    }
+
+    /**
+     * Counts notarized nodes (nodes with non-null notarization transaction id).
+     *
+     * @return number of notarized nodes
+     */
+    public long countNotarized() {
+        val criteria = Criteria.where(MetadataKeys.NOTARIZATION_TRANSACTION_ID).ne(null);
+        return mongoOperations.count(new Query(criteria), NodeEntity.class);
+    }
+
+    /**
+     * Retrieves a random sample of notarized nodes.
+     *
+     * @param size maximum number of nodes to sample
+     * @return random list of notarized nodes
+     */
+    public List<NodeEntity> findNotarizedRandom(int size) {
+        int sampleSize = Math.max(size, 0);
+        if (sampleSize == 0) {
+            return List.of();
+        }
+        val criteria = Criteria.where(MetadataKeys.NOTARIZATION_TRANSACTION_ID).ne(null);
+        val aggregation = Aggregation.newAggregation(
+                Aggregation.match(criteria),
+                Aggregation.sample(sampleSize)
+        );
+        return mongoOperations.aggregate(aggregation, NodeEntity.class, NodeEntity.class).getMappedResults();
     }
 
     /**

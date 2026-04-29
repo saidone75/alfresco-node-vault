@@ -19,16 +19,39 @@
 package org.saidone.model.dto;
 
 import lombok.Data;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
+import org.springframework.data.mongodb.core.mapping.Document;
+import org.springframework.data.mongodb.core.mapping.Field;
+
+import java.time.Instant;
 
 /**
- * DTO used for invoking the Alfresco System API search endpoint. It mirrors
- * the minimal set of parameters supported by the service.
+ * Tracks nodes that failed integrity checks and may require remediation/retry.
  */
 @Data
-public class SystemSearchRequestDto {
-	
-	private String query;
-	private int maxItems;
-	private int skipCount;
+@Document(collection = "integrity_corrupted_node")
+public class CorruptedNodeDto {
 
+    @Id
+    private String nodeId;
+
+    @Field("ffs")
+    private Instant firstFailedAt;
+
+    @Field("lfs")
+    @Indexed
+    private Instant lastFailedAt;
+
+    @Field("lat")
+    private Instant lastAttemptAt;
+
+    @Field("frs")
+    private String failureReason;
+
+    @Field("att")
+    private int attempts;
+
+    @Field("rid")
+    private String lastRunId;
 }

@@ -1,5 +1,5 @@
 /*
- * Alfresco Node Vault - archive today, accelerate tomorrow
+ * Alfresco Node Vault - ad aeternam documentorum conservationem
  * Copyright (C) 2025-2026 Saidone
  *
  * This program is free software: you can redistribute it and/or modify
@@ -71,6 +71,21 @@ public interface NodeService {
      * @return page of notarized {@link NodeWrapperDto}
      */
     Page<NodeWrapperDto> findNotarized(Pageable pageable);
+
+    /**
+     * Counts nodes that have already been notarized.
+     *
+     * @return number of notarized nodes
+     */
+    long countNotarized();
+
+    /**
+     * Retrieves a random sample of notarized nodes.
+     *
+     * @param size maximum number of nodes to return
+     * @return random notarized nodes
+     */
+    java.util.List<NodeWrapperDto> findNotarizedRandom(int size);
 
     /**
      * Retrieves all node wrappers having the given notarization transaction ID.

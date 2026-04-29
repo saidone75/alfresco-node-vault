@@ -1,5 +1,5 @@
 /*
- * Alfresco Node Vault - archive today, accelerate tomorrow
+ * Alfresco Node Vault - ad aeternam documentorum conservationem
  * Copyright (C) 2025-2026 Saidone
  *
  * This program is free software: you can redistribute it and/or modify
@@ -182,6 +182,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
                 return dis.getHash();
             }
         } catch (S3Exception e) {
+            log.error(e.getMessage());
             throw new VaultException(nodeId);
         }
     }
