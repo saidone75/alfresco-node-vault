@@ -40,6 +40,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Service responsible for running end-to-end integrity sweeps across notarized
@@ -67,6 +71,18 @@ public class IntegritySweepService extends BaseComponent {
     /** Maximum number of notarized nodes to process per page during a sweep. */
     @Value("${application.integrity-sweep.batch-size:200}")
     private int batchSize;
+    /** Enable random-sampled sweeps when notarized node count is high enough. */
+    @Value("${application.integrity-sweep.random-batch-enabled:true}")
+    private boolean randomBatchEnabled;
+    /** Minimum notarized node count required before using random batch sampling. */
+    @Value("${application.integrity-sweep.random-batch-threshold:10000}")
+    private long randomBatchThreshold;
+    /** Enables hybrid mode: deterministic coverage batch + optional random sample batch. */
+    @Value("${application.integrity-sweep.hybrid-enabled:true}")
+    private boolean hybridEnabled;
+    /** Number of random nodes to add in hybrid mode (0 disables random addon). */
+    @Value("${application.integrity-sweep.random-addon-size:50}")
+    private int randomAddonSize;
 
     /**
      * Executes a full integrity sweep for all notarized nodes.
@@ -88,16 +104,30 @@ public class IntegritySweepService extends BaseComponent {
         mongoTemplate.save(run);
 
         try {
-            Pageable pageable = PageRequest.of(0, Math.max(batchSize, 1), Sort.by(Sort.Direction.ASC, "_id"));
-            Page<NodeWrapperDto> page;
-            do {
-                page = nodeService.findNotarized(pageable);
-                for (val node : page.getContent()) {
-                    run.setScanned(run.getScanned() + 1);
-                    checkNodeIntegrity(run, node);
+            if (useReducedMode()) {
+                long notarizedCount = nodeService.countNotarized();
+                val coverageNodes = getCoverageBatch(notarizedCount);
+                log.info("Running integrity sweep coverage batch: {} nodes (total notarized: {})",
+                        coverageNodes.size(), notarizedCount);
+                processNodes(run, coverageNodes);
+
+                if (hybridEnabled && randomBatchEnabled && randomAddonSize > 0) {
+                    val sampledNodes = nodeService.findNotarizedRandom(randomAddonSize)
+                            .stream()
+                            .filter(node -> !containsNodeId(coverageNodes, node.getId()))
+                            .collect(Collectors.toList());
+                    log.info("Running integrity sweep random addon batch: {} nodes", sampledNodes.size());
+                    processNodes(run, sampledNodes);
                 }
-                pageable = page.nextPageable();
-            } while (page.hasNext());
+            } else {
+                Pageable pageable = PageRequest.of(0, Math.max(batchSize, 1), Sort.by(Sort.Direction.ASC, "_id"));
+                Page<NodeWrapperDto> page;
+                do {
+                    page = nodeService.findNotarized(pageable);
+                    processNodes(run, page.getContent());
+                    pageable = page.nextPageable();
+                } while (page.hasNext());
+            }
             run.setStatus("COMPLETED");
         } catch (Exception e) {
             run.setStatus("FAILED");
@@ -109,6 +139,31 @@ public class IntegritySweepService extends BaseComponent {
             metrics.recordRun(run);
         }
         return run;
+    }
+
+    private boolean useReducedMode() {
+        long notarizedCount = nodeService.countNotarized();
+        return notarizedCount > Math.max(randomBatchThreshold, 0);
+    }
+
+    private List<NodeWrapperDto> getCoverageBatch(long notarizedCount) {
+        int effectiveBatchSize = Math.max(batchSize, 1);
+        long totalPages = Math.max((long) Math.ceil((double) notarizedCount / effectiveBatchSize), 1L);
+        long epochDay = LocalDate.now(ZoneOffset.UTC).toEpochDay();
+        int pageIndex = (int) Math.floorMod(epochDay, totalPages);
+        Pageable pageable = PageRequest.of(pageIndex, effectiveBatchSize, Sort.by(Sort.Direction.ASC, "_id"));
+        return nodeService.findNotarized(pageable).getContent();
+    }
+
+    private boolean containsNodeId(List<NodeWrapperDto> nodes, String nodeId) {
+        return nodes.stream().anyMatch(node -> node.getId().equals(nodeId));
+    }
+
+    private void processNodes(IntegritySweepRunDto run, List<NodeWrapperDto> nodes) {
+        for (val node : nodes) {
+            run.setScanned(run.getScanned() + 1);
+            checkNodeIntegrity(run, node);
+        }
     }
 
     /**

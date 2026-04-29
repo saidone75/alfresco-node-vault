@@ -182,6 +182,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
                 return dis.getHash();
             }
         } catch (S3Exception e) {
+            log.error(e.getMessage());
             throw new VaultException(nodeId);
         }
     }

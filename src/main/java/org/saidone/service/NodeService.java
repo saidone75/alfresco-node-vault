@@ -73,6 +73,21 @@ public interface NodeService {
     Page<NodeWrapperDto> findNotarized(Pageable pageable);
 
     /**
+     * Counts nodes that have already been notarized.
+     *
+     * @return number of notarized nodes
+     */
+    long countNotarized();
+
+    /**
+     * Retrieves a random sample of notarized nodes.
+     *
+     * @param size maximum number of nodes to return
+     * @return random notarized nodes
+     */
+    java.util.List<NodeWrapperDto> findNotarizedRandom(int size);
+
+    /**
      * Retrieves all node wrappers having the given notarization transaction ID.
      * A {@code null} transaction ID is used to select nodes that have not yet
      * been notarized.
