@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [Unreleased]
+
+### Added
+- Introduced a hybrid integrity sweep with configurable coverage controls.
+- Added batching support for integrity sweeps and persistence of corrupted-node lists.
+- Improved integrity diagnostics by memorizing nodes that fail integrity sweeps.
+
+### Changed
+- Updated the project baseline for `0.9.1-SNAPSHOT` with Spring Boot 4.0.6 and Spring Cloud 2025.1.1.
+- Bumped key dependencies including AWS SDK modules to 2.42.41, Commons IO to 2.22.0, SpringDoc WebFlux UI to 3.0.3, and Datafaker to 2.5.4.
+- Upgraded Alfresco Java starters (`alfresco-acs-java-rest-api-spring-boot-starter` and `alfresco-java-event-api-spring-boot-starter`) to 7.3.1.
+- Replaced LocalStack with Moto for S3 integration testing and local emulation workflows.
+
 ## [0.9.0] - 2026-12-01
 
 ### Added
