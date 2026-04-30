@@ -236,6 +236,10 @@ public class AlfrescoService extends BaseComponent {
         nodesApi.deleteNode(nodeId, config.isPermanentlyDeleteNodes());
     }
 
+    public void deleteNode(String nodeId, boolean permanent) {
+        nodesApi.deleteNode(nodeId, permanent);
+    }
+
     /**
      * Restores a previously archived or deleted node into the repository.
      * <p>

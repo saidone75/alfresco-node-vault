@@ -57,6 +57,12 @@ public class VaultService extends BaseComponent {
     @Value("${application.service.vault.delete-on-alfresco}")
     private boolean deleteOnAlfresco;
 
+    @Value("${application.service.vault.delete-node.restore-on-alfresco}")
+    private boolean restoreOnAlfrescoOnDelete;
+
+    @Value("${application.service.vault.delete-node.delete-on-alfresco}")
+    private boolean deleteOnAlfrescoOnDelete;
+
     private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
 
     /**
@@ -158,6 +164,38 @@ public class VaultService extends BaseComponent {
         nodeWrapper.setRestored(true);
         nodeService.save(nodeWrapper);
         return newNodeId;
+    }
+
+    /**
+     * Deletes a node from the vault and optionally performs Alfresco side operations first.
+     * <p>
+     * Default behaviour:
+     * <ol>
+     *     <li>Restore node in Alfresco</li>
+     *     <li>Delete restored node in Alfresco (move to trash)</li>
+     *     <li>Delete node metadata and content from vault</li>
+     * </ol>
+     * If the original node already exists in Alfresco, restore and delete steps are skipped.
+     * </p>
+     *
+     * @param nodeId identifier of the node to delete
+     */
+    public void deleteNode(String nodeId) {
+        val nodeWrapper = getNodeWrapper(nodeId);
+        val node = nodeWrapper.getNode();
+        if (!alfrescoService.nodeExists(nodeId)) {
+            String restoredNodeId = null;
+            if (restoreOnAlfrescoOnDelete) {
+                restoredNodeId = restoreNode(nodeId, false);
+            }
+            if (deleteOnAlfrescoOnDelete) {
+                alfrescoService.deleteNode(restoredNodeId != null ? restoredNodeId : node.getId(), false);
+            }
+        } else {
+            log.info("Node {} already exists in Alfresco, skipping restore/delete-on-Alfresco steps.", nodeId);
+        }
+        contentService.deleteNodeContent(nodeId);
+        nodeService.deleteById(nodeId);
     }
 
     /**
