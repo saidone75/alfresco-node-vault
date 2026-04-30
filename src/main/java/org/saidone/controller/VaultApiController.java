@@ -45,6 +45,7 @@ import org.saidone.service.crypto.KeyService;
 import org.saidone.service.notarization.NotarizationService;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -107,6 +108,8 @@ public class VaultApiController extends BaseComponent {
      * Executor used for asynchronous operations.
      */
     private final TaskExecutor taskExecutor;
+    @Value("${application.service.vault.delete-node.api-enabled:false}")
+    private boolean deleteNodeApiEnabled;
 
     /**
      * Searches nodes archived within the specified date range with pagination support.
@@ -335,6 +338,34 @@ public class VaultApiController extends BaseComponent {
 
         vaultService.archiveNode(nodeId);
         return ResponseEntity.ok().body(String.format("Node %s successfully archived.", nodeId));
+    }
+
+    @SecurityRequirement(name = "basicAuth")
+    @DeleteMapping("/nodes/{nodeId}")
+    @Operation(
+            summary = "Delete a node from vault",
+            description = "Deletes the specified node from vault and optionally performs Alfresco restore/delete steps.",
+            parameters = {
+                    @Parameter(name = "nodeId", description = "Identifier of the node to delete", required = true, in = ParameterIn.PATH)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Node successfully deleted", content = @Content(mediaType = "text/plain")),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+                    @ApiResponse(responseCode = "403", description = "API disabled", content = @Content),
+                    @ApiResponse(responseCode = "404", description = "Node not found", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+            })
+    public ResponseEntity<String> deleteNode(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
+            @PathVariable String nodeId) {
+        if (!authenticationService.isAuthorized(auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        if (!deleteNodeApiEnabled) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Delete node API is disabled.");
+        }
+        vaultService.deleteNode(nodeId);
+        return ResponseEntity.ok().body(String.format("Node %s successfully deleted.", nodeId));
     }
 
     /**
