@@ -138,7 +138,6 @@ services:
       VAULT_URL: http://anv-hashicorp-vault:8200
       S3_ENDPOINT: http://anv-motoserver:5000
       ETH_RPC_URL: http://anv-ganache:8545
-      VAULT_DELETE_NODE_API_ENABLED: "true"
     ports:
       - "8086:8086"
 volumes:
