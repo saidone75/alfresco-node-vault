@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1.2
 
-ARG MAVEN_VERSION=3-sapmachine-21
+ARG MAVEN_VERSION=3-sapmachine-25
 ARG JAVA_VENDOR=azul/zulu-openjdk-alpine
-ARG JAVA_VERSION=21-jre-headless-latest
+ARG JAVA_VERSION=25-jre-headless-latest
 
 # --- Stage 1: Builder ---
 FROM maven:${MAVEN_VERSION} as builder
