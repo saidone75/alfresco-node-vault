@@ -20,6 +20,7 @@
 'Alfresco Node Vault'
 -header
 'Alfresco Node Vault'
+-notimestamp
 -use
 -version
 -windowtitle
