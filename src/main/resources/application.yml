@@ -119,6 +119,7 @@ application:
       chunk-size: 8192
     vault:
       hash-algorithm: ${VAULT_HASH_ALGORITHM:SHA-256}
+      auth-cache-ttl: ${VAULT_AUTH_CACHE_TTL:60s}
       double-check: ${VAULT_DOUBLE_CHECK:true}
       delete-on-alfresco: ${VAULT_DELETE_ON_ALFRESCO:true}
       delete-node:
