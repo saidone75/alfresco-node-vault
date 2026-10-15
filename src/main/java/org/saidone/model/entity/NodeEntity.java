@@ -49,9 +49,9 @@ public class NodeEntity {
     @Indexed
     private Instant archiveDate;
 
-    /** Flag indicating whether the node has been restored. */
-    @Field("res")
-    private boolean restored;
+    /** Identifier of the node created on Alfresco by the last restore, if any. */
+    @Field("rnid")
+    private String restoredNodeId;
 
     /** Flag signalling that the node is stored encrypted in {@link #nodeJson}. */
     @Field("enc")

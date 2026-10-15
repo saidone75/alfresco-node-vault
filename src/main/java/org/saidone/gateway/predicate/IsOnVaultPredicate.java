@@ -76,7 +76,7 @@ public class IsOnVaultPredicate extends AbstractRoutePredicateFactory<IsOnVaultP
             if (matcher.matches()) {
                 val nodeId = matcher.group(1);
                 log.debug("Detected node ID: {}", nodeId);
-                val isOnVault = mongoNodeRepository.findById(nodeId).isPresent();
+                val isOnVault = mongoNodeRepository.existsById(nodeId);
                 log.debug("Node {} {}found on the vault", nodeId, isOnVault ? Strings.EMPTY : "NOT ");
                 return isOnVault;
             }
