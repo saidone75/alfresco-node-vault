@@ -101,14 +101,15 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="annotations">@Service
 @ConfigurationProperties(prefix="application.service.vault.encryption.jca")
-@ConditionalOnExpression("${application.service.vault.encryption.enabled}.equals(true) and \'${application.service.vault.encryption.impl}\'.equals(\'jca\')")
+@ConditionalOnExpression("(\'${application.service.vault.encryption.content.enabled:false}\' == \'true\' or \'${application.service.vault.encryption.metadata.enabled:false}\' == \'true\') and \'${application.service.vault.encryption.impl}\'.equals(\'jca\')")
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">JcaCryptoServiceImpl</span>
 <span class="extends-implements">extends <a href="AbstractCryptoService.html" title="class in org.saidone.service.crypto">AbstractCryptoService</a>
 implements <a href="CryptoService.html" title="interface in org.saidone.service.crypto">CryptoService</a></span></div>
 <div class="block"><a href="CryptoService.html" title="interface in org.saidone.service.crypto"><code>CryptoService</code></a> implementation based on the JCA provider. It encrypts
- and decrypts data using AES in GCM mode. The bean is active when both
- <code>application.service.vault.encryption.enabled</code> is set to <code>true</code>
- and <code>application.service.vault.encryption.impl</code> is set to <code>jca</code>.
+ and decrypts data using AES in GCM mode. The bean is active when
+ <code>application.service.vault.encryption.impl</code> is set to <code>jca</code> and at
+ least one of <code>application.service.vault.encryption.content.enabled</code> or
+ <code>application.service.vault.encryption.metadata.enabled</code> is set to <code>true</code>.
  Random salt and IV values are produced for every operation and the secret key
  is derived using the configured KDF implementation.</div>
 </section>

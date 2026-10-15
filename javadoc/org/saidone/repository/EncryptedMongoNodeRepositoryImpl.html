@@ -100,7 +100,7 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="annotations">@Repository
-@ConditionalOnProperty(name={"application.service.vault.encryption.enabled","application.service.vault.encryption.metadata"},
+@ConditionalOnProperty(name="application.service.vault.encryption.metadata.enabled",
                        havingValue="true")
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">EncryptedMongoNodeRepositoryImpl</span>
 <span class="extends-implements">extends <a href="MongoNodeRepositoryImpl.html" title="class in org.saidone.repository">MongoNodeRepositoryImpl</a></span></div>
@@ -110,9 +110,8 @@ loadScripts(document, 'script');</script>
  <p>Encryption keys are supplied by <a href="../service/SecretService.html" title="class in org.saidone.service"><code>SecretService</code></a> and the actual
  cryptographic operations are delegated to <a href="../service/crypto/CryptoService.html" title="interface in org.saidone.service.crypto"><code>CryptoService</code></a>.</p>
 
- <p>The bean is activated only when both
- <code>application.service.vault.encryption.enabled</code> and
- <code>application.service.vault.encryption.metadata</code> are set to
+ <p>The bean is activated only when
+ <code>application.service.vault.encryption.metadata.enabled</code> is set to
  <code>true</code> in the application properties.</p></div>
 </section>
 <section class="summary">

@@ -102,7 +102,7 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="annotations">@Repository
-@ConditionalOnExpression("${application.service.vault.encryption.enabled}.equals(false) and \'${application.service.vault.storage.impl}\'.equals(\'gridfs\')")
+@ConditionalOnExpression("${application.service.vault.encryption.content.enabled}.equals(false) and \'${application.service.vault.storage.impl}\'.equals(\'gridfs\')")
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">GridFsRepositoryImpl</span>
 <span class="extends-implements">extends <a href="../component/BaseComponent.html" title="class in org.saidone.component">BaseComponent</a>
 implements <a href="GridFsRepository.html" title="interface in org.saidone.repository">GridFsRepository</a></span></div>
@@ -133,8 +133,8 @@ implements <a href="GridFsRepository.html" title="interface in org.saidone.repos
  </ul>
  <p>
  This implementation is registered in the Spring context only when the
- property <code>application.service.vault.encryption.enabled</code> is set to
- <code>false</code> (or is missing) <strong>and</strong>
+ property <code>application.service.vault.encryption.content.enabled</code> is set to
+ <code>false</code> <strong>and</strong>
  <code>application.service.vault.storage.impl</code> equals <code>"gridfs"</code>.
  <p>
  Extends <a href="../component/BaseComponent.html" title="class in org.saidone.component"><code>BaseComponent</code></a> to inherit standardized

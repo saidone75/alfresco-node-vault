@@ -102,7 +102,7 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="annotations">@Repository
-@ConditionalOnProperty(name="application.service.vault.encryption.enabled",
+@ConditionalOnProperty(name="application.service.vault.encryption.metadata.enabled",
                        havingValue="false",
                        matchIfMissing=true)
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">MongoNodeRepositoryImpl</span>
@@ -114,8 +114,9 @@ implements org.springframework.data.mongodb.repository.MongoRepository&lt;<a hre
  to perform database operations.</p>
 
  <p>Activation of this repository is controlled by the
- <code>application.service.vault.encryption.enabled</code> property: the bean is
- instantiated when the value is <code>false</code> or the property is missing.</p>
+ <code>application.service.vault.encryption.metadata.enabled</code> property: the bean is
+ instantiated when the value is <code>false</code> or the property is missing
+ (otherwise <a href="EncryptedMongoNodeRepositoryImpl.html" title="class in org.saidone.repository"><code>EncryptedMongoNodeRepositoryImpl</code></a> is used instead).</p>
 
  <p>Provides CRUD operations including insertion, saving, batch operations, and
  queries by <code>Example</code>, <code>Sort</code> or <code>Pageable</code>. It also supports
@@ -125,7 +126,7 @@ implements org.springframework.data.mongodb.repository.MongoRepository&lt;<a hre
  throws an <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/UnsupportedOperationException.html" title="class or interface in java.lang" class="external-link"><code>UnsupportedOperationException</code></a>.</p>
 
  <p>This class extends <a href="../component/BaseComponent.html" title="class in org.saidone.component"><code>BaseComponent</code></a> and is intended for scenarios
- where node encryption is disabled at the application level. It relies on
+ where node metadata encryption is disabled at the application level. It relies on
  <code>MongoOperations</code> for thread-safe persistence of <a href="../model/entity/NodeEntity.html" title="class in org.saidone.model.entity"><code>NodeEntity</code></a>
  documents.</p></div>
 </section>

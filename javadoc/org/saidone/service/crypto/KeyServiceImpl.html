@@ -98,13 +98,18 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="annotations">@Service
-@ConditionalOnExpression("${application.service.vault.encryption.enabled}.equals(true)")
+@ConditionalOnExpression("(\'${application.service.vault.encryption.content.enabled:false}\' == \'true\' or \'${application.service.vault.encryption.metadata.enabled:false}\' == \'true\')")
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">KeyServiceImpl</span>
 <span class="extends-implements">extends <a href="../../component/BaseComponent.html" title="class in org.saidone.component">BaseComponent</a>
 implements <a href="KeyService.html" title="interface in org.saidone.service.crypto">KeyService</a></span></div>
-<div class="block">Default <a href="KeyService.html" title="interface in org.saidone.service.crypto"><code>KeyService</code></a> implementation that re-encrypts node content by
- delegating node retrieval to <a href="../NodeService.html" title="interface in org.saidone.service"><code>NodeService</code></a> and content handling to
- <a href="../content/ContentService.html" title="interface in org.saidone.service.content"><code>ContentService</code></a>.</div>
+<div class="block">Default <a href="KeyService.html" title="interface in org.saidone.service.crypto"><code>KeyService</code></a> implementation that re-encrypts node content and
+ metadata by delegating node retrieval to <a href="../NodeService.html" title="interface in org.saidone.service"><code>NodeService</code></a> and content
+ handling to <a href="../content/ContentService.html" title="interface in org.saidone.service.content"><code>ContentService</code></a>.
+ <p>
+ The bean is active when at least one of
+ <code>application.service.vault.encryption.content.enabled</code> or
+ <code>application.service.vault.encryption.metadata.enabled</code> is set to
+ <code>true</code>.</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -186,8 +191,9 @@ implements <a href="KeyService.html" title="interface in org.saidone.service.cry
  version.
 
  <p>The node metadata is loaded from the <a href="../NodeService.html" title="interface in org.saidone.service"><code>NodeService</code></a>, its content
- is archived using the <a href="../content/ContentService.html" title="interface in org.saidone.service.content"><code>ContentService</code></a>, and the updated node is
- persisted.</p></div>
+ is archived again using the <a href="../content/ContentService.html" title="interface in org.saidone.service.content"><code>ContentService</code></a> when content
+ encryption is enabled, and the updated node is persisted (re-encrypting
+ metadata when metadata encryption is enabled).</p></div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="KeyService.html#updateKey(java.lang.String)">updateKey</a></code>&nbsp;in interface&nbsp;<code><a href="KeyService.html" title="interface in org.saidone.service.crypto">KeyService</a></code></dd>

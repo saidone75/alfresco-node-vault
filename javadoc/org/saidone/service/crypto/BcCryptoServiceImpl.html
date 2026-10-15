@@ -101,14 +101,15 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="annotations">@Service
 @ConfigurationProperties(prefix="application.service.vault.encryption.bc")
-@ConditionalOnExpression("${application.service.vault.encryption.enabled}.equals(true) and \'${application.service.vault.encryption.impl}\'.equals(\'bc\')")
+@ConditionalOnExpression("(\'${application.service.vault.encryption.content.enabled:false}\' == \'true\' or \'${application.service.vault.encryption.metadata.enabled:false}\' == \'true\') and \'${application.service.vault.encryption.impl}\'.equals(\'bc\')")
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">BcCryptoServiceImpl</span>
 <span class="extends-implements">extends <a href="AbstractCryptoService.html" title="class in org.saidone.service.crypto">AbstractCryptoService</a>
 implements <a href="CryptoService.html" title="interface in org.saidone.service.crypto">CryptoService</a></span></div>
 <div class="block">Cryptographic service based on the Bouncy Castle provider that performs
- ChaCha20-Poly1305 encryption. The bean is activated when both
- <code>application.service.vault.encryption.enabled</code> is set to <code>true</code>
- and <code>application.service.vault.encryption.impl</code> is set to <code>bc</code>.
+ ChaCha20-Poly1305 encryption. The bean is activated when
+ <code>application.service.vault.encryption.impl</code> is set to <code>bc</code> and at
+ least one of <code>application.service.vault.encryption.content.enabled</code> or
+ <code>application.service.vault.encryption.metadata.enabled</code> is set to <code>true</code>.
  Random salt and nonce values are generated for every operation and the
  encryption key is derived using the configured KDF implementation.</div>
 </section>

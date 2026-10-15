@@ -102,7 +102,7 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="annotations">@Service
-@ConditionalOnExpression("${application.service.vault.encryption.enabled}.equals(false) and \'${application.service.vault.storage.impl}\'.equals(\'s3\')")
+@ConditionalOnExpression("${application.service.vault.encryption.content.enabled}.equals(false) and \'${application.service.vault.storage.impl}\'.equals(\'s3\')")
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">S3RepositoryImpl</span>
 <span class="extends-implements">extends <a href="../component/BaseComponent.html" title="class in org.saidone.component">BaseComponent</a>
 implements <a href="S3Repository.html" title="interface in org.saidone.repository">S3Repository</a></span></div>
@@ -110,7 +110,7 @@ implements <a href="S3Repository.html" title="interface in org.saidone.repositor
  <code>S3Client</code>. The class exposes basic methods to upload and download
  objects using a provided <code>S3Client</code> instance.
  <p>
- The bean is created only when <code>application.service.vault.encryption.enabled</code>
+ The bean is created only when <code>application.service.vault.encryption.content.enabled</code>
  is set to <code>false</code> and <code>application.service.vault.storage.impl</code>
  equals <code>"s3"</code>.</div>
 </section>

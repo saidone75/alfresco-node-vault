@@ -100,12 +100,12 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="annotations">@Repository
-@ConditionalOnExpression("${application.service.vault.encryption.enabled}.equals(true) and \'${application.service.vault.storage.impl}\'.equals(\'gridfs\')")
+@ConditionalOnExpression("${application.service.vault.encryption.content.enabled}.equals(true) and \'${application.service.vault.storage.impl}\'.equals(\'gridfs\')")
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">EncryptedGridFsRepositoryImpl</span>
 <span class="extends-implements">extends <a href="GridFsRepositoryImpl.html" title="class in org.saidone.repository">GridFsRepositoryImpl</a></span></div>
 <div class="block">GridFS repository that transparently encrypts content before it is persisted
  and decrypts it when retrieved. The bean is loaded only when
- <code>application.service.vault.encryption.enabled</code> is <code>true</code> and
+ <code>application.service.vault.encryption.content.enabled</code> is <code>true</code> and
  <code>application.service.vault.storage.impl</code> equals <code>"gridfs"</code>.</div>
 </section>
 <section class="summary">

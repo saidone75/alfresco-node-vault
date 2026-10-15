@@ -427,7 +427,7 @@ loadScripts(document, 'script');</script>
 <dd><code>auth</code> - optional Basic authentication header</dd>
 <dd><code>nodeId</code> - identifier of the node whose key should be updated</dd>
 <dt>Returns:</dt>
-<dd>a confirmation message</dd>
+<dd>a confirmation message, or 403 when encryption is disabled</dd>
 </dl>
 </section>
 </li>
@@ -446,7 +446,7 @@ loadScripts(document, 'script');</script>
 <dd><code>auth</code> - optional Basic authentication header</dd>
 <dd><code>keyVersion</code> - version of the outdated encryption key</dd>
 <dt>Returns:</dt>
-<dd>a confirmation message</dd>
+<dd>a confirmation message, or 403 when encryption is disabled</dd>
 </dl>
 </section>
 </li>

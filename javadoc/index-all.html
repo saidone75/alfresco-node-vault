@@ -1303,6 +1303,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/config/EncryptionConfig.JcaProperties.html#%3Cinit%3E()" class="member-name-link">JcaProperties()</a> - Constructor for class org.saidone.config.<a href="org/saidone/config/EncryptionConfig.JcaProperties.html" title="class in org.saidone.config">EncryptionConfig.JcaProperties</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/model/mapper/NodeMapper.html#jsonToDocument(java.lang.String)" class="member-name-link">jsonToDocument(String)</a> - Method in interface org.saidone.model.mapper.<a href="org/saidone/model/mapper/NodeMapper.html" title="interface in org.saidone.model.mapper">NodeMapper</a></dt>
+<dd>&nbsp;</dd>
 </dl>
 <h2 class="title" id="I:K">K</h2>
 <dl class="index">
@@ -1322,9 +1324,9 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/service/crypto/KeyServiceImpl.html" class="type-name-link" title="class in org.saidone.service.crypto">KeyServiceImpl</a> - Class in <a href="org/saidone/service/crypto/package-summary.html">org.saidone.service.crypto</a></dt>
 <dd>
-<div class="block">Default <a href="org/saidone/service/crypto/KeyService.html" title="interface in org.saidone.service.crypto"><code>KeyService</code></a> implementation that re-encrypts node content by
- delegating node retrieval to <a href="org/saidone/service/NodeService.html" title="interface in org.saidone.service"><code>NodeService</code></a> and content handling to
- <a href="org/saidone/service/content/ContentService.html" title="interface in org.saidone.service.content"><code>ContentService</code></a>.</div>
+<div class="block">Default <a href="org/saidone/service/crypto/KeyService.html" title="interface in org.saidone.service.crypto"><code>KeyService</code></a> implementation that re-encrypts node content and
+ metadata by delegating node retrieval to <a href="org/saidone/service/NodeService.html" title="interface in org.saidone.service"><code>NodeService</code></a> and content
+ handling to <a href="org/saidone/service/content/ContentService.html" title="interface in org.saidone.service.content"><code>ContentService</code></a>.</div>
 </dd>
 <dt><a href="org/saidone/service/crypto/KeyServiceImpl.html#%3Cinit%3E()" class="member-name-link">KeyServiceImpl()</a> - Constructor for class org.saidone.service.crypto.<a href="org/saidone/service/crypto/KeyServiceImpl.html" title="class in org.saidone.service.crypto">KeyServiceImpl</a></dt>
 <dd>&nbsp;</dd>
@@ -2438,6 +2440,11 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/model/mapper/NodeMapperImpl.html#toEntity(org.saidone.model.dto.NodeWrapperDto)" class="member-name-link">toEntity(NodeWrapperDto)</a> - Method in class org.saidone.model.mapper.<a href="org/saidone/model/mapper/NodeMapperImpl.html" title="class in org.saidone.model.mapper">NodeMapperImpl</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/model/mapper/NodeMapper.html#toNodeJson(org.saidone.model.entity.NodeEntity)" class="member-name-link">toNodeJson(NodeEntity)</a> - Method in interface org.saidone.model.mapper.<a href="org/saidone/model/mapper/NodeMapper.html" title="interface in org.saidone.model.mapper">NodeMapper</a></dt>
+<dd>
+<div class="block">Returns the node JSON, taken from the BSON document when present or from
+ the JSON string otherwise (encrypted node or legacy record).</div>
+</dd>
 <dt><a href="org/saidone/service/audit/AuditEntryKeys.html#TYPE" class="member-name-link">TYPE</a> - Static variable in interface org.saidone.service.audit.<a href="org/saidone/service/audit/AuditEntryKeys.html" title="interface in org.saidone.service.audit">AuditEntryKeys</a></dt>
 <dd>
 <div class="block">Field name for the entry type.</div>

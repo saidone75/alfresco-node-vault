@@ -100,7 +100,7 @@ loadScripts(document, 'script');</script>
 </dl>
 <hr>
 <div class="type-signature"><span class="annotations">@Service
-@ConditionalOnExpression("${application.service.vault.encryption.enabled}.equals(true) and \'${application.service.vault.storage.impl}\'.equals(\'s3\')")
+@ConditionalOnExpression("${application.service.vault.encryption.content.enabled}.equals(true) and \'${application.service.vault.storage.impl}\'.equals(\'s3\')")
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">EncryptedS3RepositoryImpl</span>
 <span class="extends-implements">extends <a href="S3RepositoryImpl.html" title="class in org.saidone.repository">S3RepositoryImpl</a></span></div>
 <div class="block"><a href="S3RepositoryImpl.html" title="class in org.saidone.repository"><code>S3RepositoryImpl</code></a> variant that transparently encrypts data before
@@ -108,7 +108,7 @@ loadScripts(document, 'script');</script>
  the provided <a href="../service/crypto/CryptoService.html" title="interface in org.saidone.service.crypto"><code>CryptoService</code></a>.
  <p>
  The bean becomes active only when
- <code>application.service.vault.encryption.enabled</code> is <code>true</code> and
+ <code>application.service.vault.encryption.content.enabled</code> is <code>true</code> and
  <code>application.service.vault.storage.impl</code> equals <code>"s3"</code>.</div>
 </section>
 <section class="summary">
