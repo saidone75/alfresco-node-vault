@@ -126,8 +126,10 @@ application:
         restore-on-alfresco: ${VAULT_DELETE_NODE_RESTORE_ON_ALFRESCO:true}
         delete-on-alfresco: ${VAULT_DELETE_NODE_DELETE_ON_ALFRESCO:true}
       encryption:
-        enabled: ${VAULT_ENCRYPTION_ENABLED:true}
-        metadata: ${VAULT_ENCRYPT_METADATA:true}
+        content:
+          enabled: ${VAULT_ENCRYPT_CONTENT:true}
+        metadata:
+          enabled: ${VAULT_ENCRYPT_METADATA:true}
         vault-secret-kv-mount: ${VAULT_ENCRYPTION_KV_MOUNT:secret}
         vault-secret-path: ${VAULT_ENCRYPTION_SECRET_PATH:AlfrescoNodeVault}
         vault-secret-key: ${VAULT_ENCRYPTION_SECRET_KEY:anv.secret}

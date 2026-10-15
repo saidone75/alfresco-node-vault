@@ -68,8 +68,8 @@ import java.util.Map;
  * </ul>
  * <p>
  * This implementation is registered in the Spring context only when the
- * property {@code application.service.vault.encryption.enabled} is set to
- * {@code false} (or is missing) <strong>and</strong>
+ * property {@code application.service.vault.encryption.content.enabled} is set to
+ * {@code false} <strong>and</strong>
  * {@code application.service.vault.storage.impl} equals {@code "gridfs"}.
  * <p>
  * Extends {@link org.saidone.component.BaseComponent} to inherit standardized
@@ -80,7 +80,7 @@ import java.util.Map;
  */
 @Repository
 @ConditionalOnExpression(
-        "${application.service.vault.encryption.enabled}.equals(false) and '${application.service.vault.storage.impl}'.equals('gridfs')"
+        "${application.service.vault.encryption.content.enabled}.equals(false) and '${application.service.vault.storage.impl}'.equals('gridfs')"
 )
 @RequiredArgsConstructor
 @Slf4j

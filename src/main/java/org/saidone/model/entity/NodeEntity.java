@@ -21,9 +21,9 @@ package org.saidone.model.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.Document;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.time.Instant;
@@ -37,7 +37,7 @@ import java.time.Instant;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "alf_node")
+@org.springframework.data.mongodb.core.mapping.Document(collection = "alf_node")
 public class NodeEntity {
 
     /** Identifier of the wrapped Alfresco node. */
@@ -53,7 +53,7 @@ public class NodeEntity {
     @Field("res")
     private boolean restored;
 
-    /** Flag signalling that {@link #nodeJson} is encrypted. */
+    /** Flag signalling that the node is stored encrypted in {@link #nodeJson}. */
     @Field("enc")
     private boolean encrypted;
 
@@ -61,7 +61,11 @@ public class NodeEntity {
     @Field("kv")
     private int keyVersion;
 
-    /** JSON representation of the node. May be encrypted. */
+    /** BSON representation of the node. Set only when the node is not encrypted. */
+    @Field("nb")
+    private Document nodeDocument;
+
+    /** Encrypted JSON representation of the node. Set only when {@link #encrypted} is {@code true}. */
     @Field("nj")
     private String nodeJson;
 

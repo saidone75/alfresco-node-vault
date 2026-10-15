@@ -40,9 +40,10 @@ import java.security.SecureRandom;
 
 /**
  * {@link CryptoService} implementation based on the JCA provider. It encrypts
- * and decrypts data using AES in GCM mode. The bean is active when both
- * {@code application.service.vault.encryption.enabled} is set to {@code true}
- * and {@code application.service.vault.encryption.impl} is set to {@code jca}.
+ * and decrypts data using AES in GCM mode. The bean is active when
+ * {@code application.service.vault.encryption.impl} is set to {@code jca} and at
+ * least one of {@code application.service.vault.encryption.content.enabled} or
+ * {@code application.service.vault.encryption.metadata.enabled} is set to {@code true}.
  * Random salt and IV values are produced for every operation and the secret key
  * is derived using the configured KDF implementation.
  */
@@ -51,7 +52,7 @@ import java.security.SecureRandom;
 @Setter
 @ConfigurationProperties(prefix = "application.service.vault.encryption.jca")
 @ConditionalOnExpression(
-        "${application.service.vault.encryption.enabled}.equals(true) and '${application.service.vault.encryption.impl}'.equals('jca')"
+        "('${application.service.vault.encryption.content.enabled:false}' == 'true' or '${application.service.vault.encryption.metadata.enabled:false}' == 'true') and '${application.service.vault.encryption.impl}'.equals('jca')"
 )
 public class JcaCryptoServiceImpl extends AbstractCryptoService implements CryptoService {
 

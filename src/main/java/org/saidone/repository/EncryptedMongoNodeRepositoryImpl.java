@@ -20,6 +20,7 @@ package org.saidone.repository;
 
 import lombok.NonNull;
 import lombok.val;
+import org.bson.Document;
 import org.saidone.model.entity.NodeEntity;
 import org.saidone.service.SecretService;
 import org.saidone.service.crypto.CryptoService;
@@ -39,14 +40,12 @@ import java.util.Optional;
  * <p>Encryption keys are supplied by {@link SecretService} and the actual
  * cryptographic operations are delegated to {@link CryptoService}.</p>
  *
- * <p>The bean is activated only when both
- * {@code application.service.vault.encryption.enabled} and
- * {@code application.service.vault.encryption.metadata} are set to
+ * <p>The bean is activated only when
+ * {@code application.service.vault.encryption.metadata.enabled} is set to
  * {@code true} in the application properties.</p>
  */
 @Repository
-@ConditionalOnProperty(name = {"application.service.vault.encryption.enabled", "application.service.vault.encryption.metadata"},
-        havingValue = "true")
+@ConditionalOnProperty(name = "application.service.vault.encryption.metadata.enabled", havingValue = "true")
 public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
 
     /** Provides encryption material for node metadata. */
@@ -128,9 +127,10 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
      * @param <S>  the type of the node
      */
     private <S extends NodeEntity> void encryptNode(S node) {
-        if (node != null && node.getNodeJson() != null) {
+        if (node != null && node.getNodeDocument() != null) {
             val secret = secretService.getSecret();
-            node.setNodeJson(cryptoService.encryptText(node.getNodeJson(), secret));
+            node.setNodeJson(cryptoService.encryptText(node.getNodeDocument().toJson(), secret));
+            node.setNodeDocument(null);
             node.setEncrypted(true);
             node.setKeyVersion(secret.getVersion());
         }
@@ -144,7 +144,8 @@ public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
      */
     private <S extends NodeEntity> void decryptNode(S node) {
         if (node != null && node.getNodeJson() != null && node.isEncrypted()) {
-            node.setNodeJson(cryptoService.decryptText(node.getNodeJson()));
+            node.setNodeDocument(Document.parse(cryptoService.decryptText(node.getNodeJson())));
+            node.setNodeJson(null);
         }
     }
 

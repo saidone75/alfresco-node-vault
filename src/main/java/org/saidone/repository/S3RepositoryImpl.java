@@ -39,13 +39,13 @@ import java.util.HashMap;
  * {@link S3Client}. The class exposes basic methods to upload and download
  * objects using a provided {@code S3Client} instance.
  * <p>
- * The bean is created only when {@code application.service.vault.encryption.enabled}
+ * The bean is created only when {@code application.service.vault.encryption.content.enabled}
  * is set to {@code false} and {@code application.service.vault.storage.impl}
  * equals {@code "s3"}.
  */
 @Service
 @ConditionalOnExpression(
-        "${application.service.vault.encryption.enabled}.equals(false) and '${application.service.vault.storage.impl}'.equals('s3')"
+        "${application.service.vault.encryption.content.enabled}.equals(false) and '${application.service.vault.storage.impl}'.equals('s3')"
 )
 @RequiredArgsConstructor
 @Slf4j
