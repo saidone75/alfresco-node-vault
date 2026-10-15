@@ -73,6 +73,11 @@ public class VaultService extends BaseComponent {
      * optionally verifies the checksum and finally deletes the source node
      * from Alfresco.
      * </p>
+     * <p>
+     * A node already stored in the vault is never overwritten: only the
+     * optional deletion on Alfresco is performed, after verifying that the
+     * Alfresco content still matches the vault copy when double check is enabled.
+     * </p>
      *
      * @param nodeId the ID of the node to archive
      * @throws NodeNotFoundOnAlfrescoException if the node is not found in Alfresco
@@ -80,6 +85,28 @@ public class VaultService extends BaseComponent {
      */
     public void archiveNode(String nodeId) {
         log.info("Archiving node: {}", nodeId);
+        if (!nodeService.existsById(nodeId)) {
+            storeNode(nodeId);
+        } else {
+            log.info("Node {} is already in the vault, skipping storage", nodeId);
+            if (!alfrescoService.nodeExists(nodeId)) {
+                throw new NodeNotFoundOnAlfrescoException(nodeId);
+            }
+            // do not delete the node on Alfresco if its content differs from the vault copy
+            if (deleteOnAlfresco && doubleCheck) doubleCheck(nodeId);
+        }
+        if (deleteOnAlfresco) deleteNodeOnAlfresco(nodeId);
+    }
+
+    /**
+     * Stores node metadata and content in the vault, rolling back any partially
+     * persisted data on failure.
+     *
+     * @param nodeId the ID of the node to store
+     * @throws NodeNotFoundOnAlfrescoException if the node is not found in Alfresco
+     * @throws VaultException                  if any error occurs during storage
+     */
+    private void storeNode(String nodeId) {
         try {
             val node = alfrescoService.getNode(nodeId);
             val nodeContentInputStream = new ProgressTrackingInputStream(
@@ -95,13 +122,32 @@ public class VaultService extends BaseComponent {
             }
             nodeService.save(nodeWrapper);
             if (doubleCheck) doubleCheck(nodeId);
-            if (deleteOnAlfresco) alfrescoService.deleteNode(nodeId);
         } catch (FeignException.NotFound e) {
             throw new NodeNotFoundOnAlfrescoException(nodeId);
         } catch (Exception e) {
             log.trace(e.getMessage(), e);
             rollback(nodeId);
             throw new VaultException(String.format("Error archiving node %s: %s", nodeId, e.getMessage()));
+        }
+    }
+
+    /**
+     * Deletes an archived node on Alfresco.
+     * <p>
+     * At this point the vault copy is complete, so a failure must never trigger
+     * a rollback: the deletion may have succeeded even if the call failed (e.g. on
+     * a timeout). The error is logged and the deletion is retried on the next
+     * archiving run, since the node still matches the archiving query.
+     * </p>
+     *
+     * @param nodeId the ID of the archived node
+     */
+    private void deleteNodeOnAlfresco(String nodeId) {
+        try {
+            alfrescoService.deleteNode(nodeId);
+        } catch (Exception e) {
+            log.trace(e.getMessage(), e);
+            log.error("Node {} archived but not deleted on Alfresco: {}", nodeId, e.getMessage());
         }
     }
 

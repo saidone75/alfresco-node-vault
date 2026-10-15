@@ -82,6 +82,14 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      * {@inheritDoc}
      */
     @Override
+    public boolean existsById(String nodeId) {
+        return mongoNodeRepository.existsById(nodeId);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Page<NodeWrapperDto> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
         return mongoNodeRepository.findByArchiveDateRange(from, to, pageable).map(nodeMapper::toDto);
     }
