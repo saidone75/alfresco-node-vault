@@ -60,8 +60,8 @@ public class NodeWrapperDto {
     /** Timestamp when the node was archived. */
     private Instant archiveDate;
 
-    /** Flag indicating whether the node has been restored. */
-    private boolean restored;
+    /** Identifier of the node created on Alfresco by the last restore, if any. */
+    private String restoredNodeId;
 
     /** Flag signalling that {@link #nodeJson} is encrypted. */
     private boolean encrypted;

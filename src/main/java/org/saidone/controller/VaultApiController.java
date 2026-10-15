@@ -287,12 +287,14 @@ public class VaultApiController extends BaseComponent {
                     @Parameter(name = "restorePermissions", description = "Whether to restore permissions for the node", in = ParameterIn.QUERY)
             },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Node successfully restored",
+                    @ApiResponse(responseCode = "200", description = "Node successfully restored, or already restored",
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "401", description = "Unauthorized",
                             content = @Content),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
+                    @ApiResponse(responseCode = "409", description = "Restore of the node already in progress",
+                            content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })

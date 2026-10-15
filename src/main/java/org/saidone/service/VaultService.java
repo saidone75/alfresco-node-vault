@@ -27,12 +27,16 @@ import org.saidone.component.BaseComponent;
 import org.saidone.exception.HashesMismatchException;
 import org.saidone.exception.NodeNotFoundOnAlfrescoException;
 import org.saidone.exception.NodeNotFoundOnVaultException;
+import org.saidone.exception.NodeRestoreInProgressException;
 import org.saidone.exception.VaultException;
 import org.saidone.misc.ProgressTrackingInputStream;
 import org.saidone.model.dto.NodeWrapperDto;
 import org.saidone.service.content.ContentService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Service responsible for archiving, restoring and managing nodes in the vault.
@@ -64,6 +68,9 @@ public class VaultService extends BaseComponent {
     private boolean deleteOnAlfrescoOnDelete;
 
     private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
+
+    // IDs of the nodes being restored, to reject concurrent restores of the same node
+    private final Set<String> restoresInProgress = ConcurrentHashMap.newKeySet();
 
     /**
      * Archives a node by its ID.
@@ -200,22 +207,50 @@ public class VaultService extends BaseComponent {
      * Restores a node from the vault back to Alfresco.
      * <p>
      * Restores node metadata and content, optionally restoring permissions,
-     * and marks the node as restored in the vault.
+     * and records the ID of the restored node in the vault.
+     * </p>
+     * <p>
+     * The operation is idempotent: if the node created by a previous restore
+     * still exists in Alfresco, its ID is returned and no new node is created
+     * (e.g. when a client retries after a timeout). A node whose restored copy
+     * has been deleted from Alfresco can be restored again.
      * </p>
      *
      * @param nodeId             the ID of the node to restore
      * @param restorePermissions whether to restore permissions along with the node
-     * @return the new node ID assigned by Alfresco after restoration
-     * @throws NodeNotFoundOnVaultException if the node is not found in the vault
-     * @throws VaultException               if stored metadata cannot be parsed
+     * @return the ID of the node restored in Alfresco
+     * @throws NodeNotFoundOnVaultException    if the node is not found in the vault
+     * @throws NodeRestoreInProgressException  if a restore of the same node is already running
+     * @throws VaultException                  if stored metadata cannot be parsed
      */
     public String restoreNode(String nodeId, boolean restorePermissions) throws VaultException {
-        val nodeWrapper = getNodeWrapper(nodeId);
-        val newNodeId = alfrescoService.restoreNode(nodeWrapper.getNode(), restorePermissions);
-        alfrescoService.restoreNodeContent(newNodeId, contentService.getNodeContent(nodeId));
-        nodeWrapper.setRestored(true);
-        nodeService.save(nodeWrapper);
-        return newNodeId;
+        if (!restoresInProgress.add(nodeId)) {
+            throw new NodeRestoreInProgressException(nodeId);
+        }
+        try {
+            val nodeWrapper = getNodeWrapper(nodeId);
+            if (restoredNodeExists(nodeWrapper)) {
+                log.info("Node {} already restored as {}", nodeId, nodeWrapper.getRestoredNodeId());
+                return nodeWrapper.getRestoredNodeId();
+            }
+            val newNodeId = alfrescoService.restoreNode(nodeWrapper.getNode(), restorePermissions);
+            alfrescoService.restoreNodeContent(newNodeId, contentService.getNodeContent(nodeId));
+            nodeWrapper.setRestoredNodeId(newNodeId);
+            nodeService.save(nodeWrapper);
+            return newNodeId;
+        } finally {
+            restoresInProgress.remove(nodeId);
+        }
+    }
+
+    /**
+     * Checks whether the node created by the last restore still exists in Alfresco.
+     *
+     * @param nodeWrapper the vault node
+     * @return {@code true} if a restored copy of the node exists in Alfresco
+     */
+    private boolean restoredNodeExists(NodeWrapperDto nodeWrapper) {
+        return nodeWrapper.getRestoredNodeId() != null && alfrescoService.nodeExists(nodeWrapper.getRestoredNodeId());
     }
 
     /**
@@ -227,7 +262,8 @@ public class VaultService extends BaseComponent {
      *     <li>Delete restored node in Alfresco (move to trash)</li>
      *     <li>Delete node metadata and content from vault</li>
      * </ol>
-     * If the original node already exists in Alfresco, restore and delete steps are skipped.
+     * If the original node or a restored copy of it already exists in Alfresco,
+     * restore and delete steps are skipped.
      * </p>
      *
      * @param nodeId identifier of the node to delete
@@ -235,7 +271,7 @@ public class VaultService extends BaseComponent {
     public void deleteNode(String nodeId) {
         val nodeWrapper = getNodeWrapper(nodeId);
         val node = nodeWrapper.getNode();
-        if (!alfrescoService.nodeExists(nodeId)) {
+        if (!alfrescoService.nodeExists(nodeId) && !restoredNodeExists(nodeWrapper)) {
             String restoredNodeId = null;
             if (restoreOnAlfrescoOnDelete) {
                 restoredNodeId = restoreNode(nodeId, false);
@@ -244,7 +280,7 @@ public class VaultService extends BaseComponent {
                 alfrescoService.deleteNode(restoredNodeId != null ? restoredNodeId : node.getId(), false);
             }
         } else {
-            log.info("Node {} already exists in Alfresco, skipping restore/delete-on-Alfresco steps.", nodeId);
+            log.info("Node {} or its restored copy already exists in Alfresco, skipping restore/delete-on-Alfresco steps.", nodeId);
         }
         contentService.deleteNodeContent(nodeId);
         nodeService.deleteById(nodeId);
