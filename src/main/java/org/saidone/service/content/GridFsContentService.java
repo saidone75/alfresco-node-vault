@@ -76,6 +76,7 @@ public class GridFsContentService extends BaseComponent implements ContentServic
         try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
             val metadata = new HashMap<String, String>();
             metadata.put(MetadataKeys.UUID, node.getId());
+            metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
             gridFsRepository.saveFile(
                     digestInputStream,
                     node.getName(),
@@ -142,6 +143,9 @@ public class GridFsContentService extends BaseComponent implements ContentServic
             }
             if (gridFSFile.getMetadata().containsKey(MetadataKeys.ENCRYPTED)) {
                 info.setEncrypted(Boolean.TRUE.toString().equals(gridFSFile.getMetadata().getString(MetadataKeys.ENCRYPTED)));
+            }
+            if (gridFSFile.getMetadata().containsKey(MetadataKeys.KEY_VERSION)) {
+                info.setKeyVersion(Integer.parseInt(gridFSFile.getMetadata().getString(MetadataKeys.KEY_VERSION)));
             }
         }
         return info;

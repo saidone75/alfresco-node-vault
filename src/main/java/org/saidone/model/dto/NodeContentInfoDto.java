@@ -34,5 +34,6 @@ public class NodeContentInfoDto extends NodeContentDto {
     private String contentHashAlgorithm;
     private String contentHash;
     private boolean encrypted;
+    private int keyVersion;
 
 }

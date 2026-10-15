@@ -53,6 +53,14 @@ public interface NodeService {
     NodeWrapperDto findById(String nodeId);
 
     /**
+     * Checks whether a node is stored in the vault.
+     *
+     * @param nodeId identifier of the node
+     * @return {@code true} if the node metadata exists in the vault
+     */
+    boolean existsById(String nodeId);
+
+    /**
      * Retrieves node wrappers archived within the specified date range using pagination.
      * Both bounds are inclusive. Passing {@code null} for one of the parameters will
      * make the range open-ended on that side.
