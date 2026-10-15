@@ -157,15 +157,19 @@ public class AlfrescoService extends BaseComponent {
         val ticketBody = new TicketBody();
         ticketBody.setUserId(userId);
         ticketBody.setPassword(password);
-        if (authenticationApi.createTicket(ticketBody).getStatusCode().is2xxSuccessful()) {
-            try {
-                return Objects.requireNonNull(peopleApi.getPerson(userId, null).getBody()).getEntry().getCapabilities().isIsAdmin();
-            } catch (Exception e) {
-                log.error(e.getMessage());
-                return false;
-            }
-
-        } else return false;
+        try {
+            authenticationApi.createTicket(ticketBody);
+        } catch (FeignException.BadRequest | FeignException.Unauthorized | FeignException.Forbidden e) {
+            // Alfresco rejects invalid credentials with 403 (401/400 on malformed requests)
+            log.debug("Authentication failed for user {}: HTTP {}", userId, e.status());
+            return false;
+        }
+        try {
+            return Objects.requireNonNull(peopleApi.getPerson(userId, null).getBody()).getEntry().getCapabilities().isIsAdmin();
+        } catch (Exception e) {
+            log.error(e.getMessage());
+            return false;
+        }
     }
 
     /**
