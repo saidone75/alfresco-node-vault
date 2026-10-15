@@ -105,6 +105,11 @@ loadScripts(document, 'script');</script>
  The provided credentials are decoded and checked against Alfresco via
  <a href="AlfrescoService.html" title="class in org.saidone.service"><code>AlfrescoService</code></a> to verify that the user has administrative
  privileges.
+ </p>
+ <p>
+ Successful checks are cached for a configurable time, keyed by a hash of the
+ header, to avoid calling Alfresco on every request. Failed checks are never
+ cached, so the cache neither speeds up credential guessing nor grows with it.
  </p></div>
 </section>
 <section class="summary">
@@ -117,7 +122,8 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E()" class="member-name-link">AuthenticationService</a>()</code></div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.saidone.service.AlfrescoService,java.time.Duration)" class="member-name-link">AuthenticationService</a><wbr>(<a href="AlfrescoService.html" title="class in org.saidone.service">AlfrescoService</a>&nbsp;alfrescoService,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;authCacheTtl)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -160,9 +166,11 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;()">
+<section class="detail" id="&lt;init&gt;(org.saidone.service.AlfrescoService,java.time.Duration)">
 <h3>AuthenticationService</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">AuthenticationService</span>()</div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">AuthenticationService</span><wbr><span class="parameters">(<a href="AlfrescoService.html" title="class in org.saidone.service">AlfrescoService</a>&nbsp;alfrescoService,
+ @Value("${application.service.vault.auth-cache-ttl:60s}")
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;authCacheTtl)</span></div>
 </section>
 </li>
 </ul>

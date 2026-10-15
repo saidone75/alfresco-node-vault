@@ -550,7 +550,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Service responsible for validating Basic authentication headers.</div>
 </dd>
-<dt><a href="org/saidone/service/AuthenticationService.html#%3Cinit%3E()" class="member-name-link">AuthenticationService()</a> - Constructor for class org.saidone.service.<a href="org/saidone/service/AuthenticationService.html" title="class in org.saidone.service">AuthenticationService</a></dt>
+<dt><a href="org/saidone/service/AuthenticationService.html#%3Cinit%3E(org.saidone.service.AlfrescoService,java.time.Duration)" class="member-name-link">AuthenticationService(AlfrescoService, Duration)</a> - Constructor for class org.saidone.service.<a href="org/saidone/service/AuthenticationService.html" title="class in org.saidone.service">AuthenticationService</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/config/MongoDBConfig.html#autoIndexCreation()" class="member-name-link">autoIndexCreation()</a> - Method in class org.saidone.config.<a href="org/saidone/config/MongoDBConfig.html" title="class in org.saidone.config">MongoDBConfig</a></dt>
 <dd>&nbsp;</dd>
@@ -1215,6 +1215,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/controller/GlobalExceptionHandler.html#handleNodeNotFoundException(org.saidone.exception.NodeNotFoundException)" class="member-name-link">handleNodeNotFoundException(NodeNotFoundException)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/GlobalExceptionHandler.html" title="class in org.saidone.controller">GlobalExceptionHandler</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/controller/GlobalExceptionHandler.html#handleNodeRestoreInProgressException(org.saidone.exception.NodeRestoreInProgressException)" class="member-name-link">handleNodeRestoreInProgressException(NodeRestoreInProgressException)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/GlobalExceptionHandler.html" title="class in org.saidone.controller">GlobalExceptionHandler</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/controller/GlobalExceptionHandler.html#handleNotarizationException(org.saidone.exception.NotarizationException)" class="member-name-link">handleNotarizationException(NotarizationException)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/GlobalExceptionHandler.html" title="class in org.saidone.controller">GlobalExceptionHandler</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/controller/GlobalExceptionHandler.html#handleOutOfMemoryError(java.lang.OutOfMemoryError)" class="member-name-link">handleOutOfMemoryError(OutOfMemoryError)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/GlobalExceptionHandler.html" title="class in org.saidone.controller">GlobalExceptionHandler</a></dt>
@@ -1471,6 +1473,12 @@ loadScripts(document, 'script');</script>
 <div class="block">Thrown when a node cannot be located in the vault storage.</div>
 </dd>
 <dt><a href="org/saidone/exception/NodeNotFoundOnVaultException.html#%3Cinit%3E(java.lang.String)" class="member-name-link">NodeNotFoundOnVaultException(String)</a> - Constructor for exception class org.saidone.exception.<a href="org/saidone/exception/NodeNotFoundOnVaultException.html" title="class in org.saidone.exception">NodeNotFoundOnVaultException</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/saidone/exception/NodeRestoreInProgressException.html" class="type-name-link" title="class in org.saidone.exception">NodeRestoreInProgressException</a> - Exception Class in <a href="org/saidone/exception/package-summary.html">org.saidone.exception</a></dt>
+<dd>
+<div class="block">Thrown when a restore is requested for a node whose restore is already running.</div>
+</dd>
+<dt><a href="org/saidone/exception/NodeRestoreInProgressException.html#%3Cinit%3E(java.lang.String)" class="member-name-link">NodeRestoreInProgressException(String)</a> - Constructor for exception class org.saidone.exception.<a href="org/saidone/exception/NodeRestoreInProgressException.html" title="class in org.saidone.exception">NodeRestoreInProgressException</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/service/NodeService.html" class="type-name-link" title="interface in org.saidone.service">NodeService</a> - Interface in <a href="org/saidone/service/package-summary.html">org.saidone.service</a></dt>
 <dd>

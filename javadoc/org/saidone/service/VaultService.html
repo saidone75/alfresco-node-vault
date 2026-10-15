@@ -246,16 +246,23 @@ loadScripts(document, 'script');</script>
 <div class="block">Restores a node from the vault back to Alfresco.
  <p>
  Restores node metadata and content, optionally restoring permissions,
- and marks the node as restored in the vault.
+ and records the ID of the restored node in the vault.
+ </p>
+ <p>
+ The operation is idempotent: if the node created by a previous restore
+ still exists in Alfresco, its ID is returned and no new node is created
+ (e.g. when a client retries after a timeout). A node whose restored copy
+ has been deleted from Alfresco can be restored again.
  </p></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>nodeId</code> - the ID of the node to restore</dd>
 <dd><code>restorePermissions</code> - whether to restore permissions along with the node</dd>
 <dt>Returns:</dt>
-<dd>the new node ID assigned by Alfresco after restoration</dd>
+<dd>the ID of the node restored in Alfresco</dd>
 <dt>Throws:</dt>
 <dd><code><a href="../exception/NodeNotFoundOnVaultException.html" title="class in org.saidone.exception">NodeNotFoundOnVaultException</a></code> - if the node is not found in the vault</dd>
+<dd><code><a href="../exception/NodeRestoreInProgressException.html" title="class in org.saidone.exception">NodeRestoreInProgressException</a></code> - if a restore of the same node is already running</dd>
 <dd><code><a href="../exception/VaultException.html" title="class in org.saidone.exception">VaultException</a></code> - if stored metadata cannot be parsed</dd>
 </dl>
 </section>
@@ -272,7 +279,8 @@ loadScripts(document, 'script');</script>
      <li>Delete restored node in Alfresco (move to trash)</li>
      <li>Delete node metadata and content from vault</li>
  </ol>
- If the original node already exists in Alfresco, restore and delete steps are skipped.
+ If the original node or a restored copy of it already exists in Alfresco,
+ restore and delete steps are skipped.
  </p></div>
 <dl class="notes">
 <dt>Parameters:</dt>

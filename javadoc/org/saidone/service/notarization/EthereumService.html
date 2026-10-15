@@ -262,7 +262,9 @@ loadScripts(document, 'script');</script>
 <div class="block">Sends a zero-value transaction containing the given hash as data.
  <p>
  The transaction is signed with the configured credentials and addressed
- to the account defined in <a href="../../config/EthereumConfig.html" title="class in org.saidone.config"><code>EthereumConfig</code></a>.
+ to the account defined in <a href="../../config/EthereumConfig.html" title="class in org.saidone.config"><code>EthereumConfig</code></a>. The method waits for the
+ transaction to be mined successfully, so that a transaction rejected or
+ dropped by the network is never recorded as a notarization.
  </p></div>
 <dl class="notes">
 <dt>Specified by:</dt>
@@ -272,6 +274,8 @@ loadScripts(document, 'script');</script>
 <dd><code>hash</code> - the hash to store on the blockchain</dd>
 <dt>Returns:</dt>
 <dd>the resulting Ethereum transaction hash</dd>
+<dt>Throws:</dt>
+<dd><code><a href="../../exception/NotarizationException.html" title="class in org.saidone.exception">NotarizationException</a></code> - if the transaction is rejected, fails or is not mined in time</dd>
 </dl>
 </section>
 </li>

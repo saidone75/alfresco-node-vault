@@ -190,13 +190,16 @@ loadScripts(document, 'script');</script>
  <p>The run is created with status <code>RUNNING</code>, updated as nodes are
  scanned, then finalized as <code>COMPLETED</code> or <code>FAILED</code>. The final
  run document is persisted and published to the metrics collector even when
- errors occur.</p></div>
+ errors occur.</p>
+
+ <p>When notarization is disabled the sweep is skipped and no run is recorded.</p></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>trigger</code> - the run trigger source (for example <code>MANUAL</code> or
                 <code>SCHEDULED</code>); blank values default to <code>MANUAL</code></dd>
 <dt>Returns:</dt>
-<dd>persisted sweep run summary with timing and counters</dd>
+<dd>persisted sweep run summary with timing and counters, or <code>null</code>
+ if the sweep was skipped</dd>
 </dl>
 </section>
 </li>
