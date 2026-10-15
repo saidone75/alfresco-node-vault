@@ -43,6 +43,9 @@ import software.amazon.awssdk.services.s3.model.*;
 
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.util.HashMap;
 
@@ -98,7 +101,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
             log.trace("{}: {}", checksumAlgorithm, dis.getHash());
             val metadata = new HashMap<String, String>();
             metadata.put(MetadataKeys.UUID, node.getId());
-            metadata.put(MetadataKeys.FILENAME, node.getName());
+            metadata.put(MetadataKeys.FILENAME, encodeMetadataValue(node.getName()));
             metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
             metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
             metadata.put(MetadataKeys.CHECKSUM_VALUE, dis.getHash());
@@ -119,7 +122,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
             val head = s3Client.headObject(HeadObjectRequest.builder()
                     .bucket(s3Config.getBucket()).key(nodeId).build());
             val nodeContentStream = new NodeContentStreamDto();
-            nodeContentStream.setFileName(head.metadata().getOrDefault(MetadataKeys.FILENAME, nodeId));
+            nodeContentStream.setFileName(decodeMetadataValue(head.metadata().getOrDefault(MetadataKeys.FILENAME, nodeId)));
             nodeContentStream.setContentType(head.contentType());
             nodeContentStream.setLength(head.contentLength());
             nodeContentStream.setContentStream(s3Repository.getObject(s3Config.getBucket(), nodeId));
@@ -143,11 +146,12 @@ public class S3ContentService extends BaseComponent implements ContentService {
             val head = s3Client.headObject(HeadObjectRequest.builder()
                     .bucket(s3Config.getBucket()).key(nodeId).build());
             val nodeContentInfo = new NodeContentInfoDto();
-            nodeContentInfo.setFileName(head.metadata().getOrDefault(MetadataKeys.FILENAME, nodeId));
+            nodeContentInfo.setFileName(decodeMetadataValue(head.metadata().getOrDefault(MetadataKeys.FILENAME, nodeId)));
             nodeContentInfo.setContentType(head.contentType());
             nodeContentInfo.setContentId(nodeId);
             nodeContentInfo.setContentHashAlgorithm(head.metadata().get(MetadataKeys.CHECKSUM_ALGORITHM));
             nodeContentInfo.setContentHash(head.metadata().get(MetadataKeys.CHECKSUM_VALUE));
+            nodeContentInfo.setEncrypted(Boolean.parseBoolean(head.metadata().get(MetadataKeys.ENCRYPTED)));
             return nodeContentInfo;
         } catch (S3Exception e) {
             throw new NodeNotFoundOnVaultException(nodeId);
@@ -185,6 +189,26 @@ public class S3ContentService extends BaseComponent implements ContentService {
             log.error(e.getMessage());
             throw new VaultException(nodeId);
         }
+    }
+
+    /**
+     * Encodes a value for storage as S3 user metadata, which only allows US-ASCII characters.
+     *
+     * @param value raw value (e.g. a file name with non-ASCII characters)
+     * @return URL-encoded value
+     */
+    private static String encodeMetadataValue(String value) {
+        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Decodes a value previously encoded with {@link #encodeMetadataValue(String)}.
+     *
+     * @param value encoded value
+     * @return decoded value
+     */
+    private static String decodeMetadataValue(String value) {
+        return URLDecoder.decode(value, StandardCharsets.UTF_8);
     }
 
     @Override

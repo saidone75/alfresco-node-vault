@@ -72,6 +72,7 @@ public class S3RepositoryImpl extends BaseComponent implements S3Repository {
         val putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(node.getId())
+                .metadata(metadata)
                 .build();
         s3Client.putObject(putObjectRequest, RequestBody.fromContentProvider(ContentStreamProvider.fromInputStream(inputStream), node.getContent().getMimeType()));
     }
