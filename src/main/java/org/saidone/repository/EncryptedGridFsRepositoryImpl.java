@@ -38,12 +38,12 @@ import java.util.Map;
 /**
  * GridFS repository that transparently encrypts content before it is persisted
  * and decrypts it when retrieved. The bean is loaded only when
- * {@code application.service.vault.encryption.enabled} is {@code true} and
+ * {@code application.service.vault.encryption.content.enabled} is {@code true} and
  * {@code application.service.vault.storage.impl} equals {@code "gridfs"}.
  */
 @Repository
 @ConditionalOnExpression(
-        "${application.service.vault.encryption.enabled}.equals(true) and '${application.service.vault.storage.impl}'.equals('gridfs')"
+        "${application.service.vault.encryption.content.enabled}.equals(true) and '${application.service.vault.storage.impl}'.equals('gridfs')"
 )
 public class EncryptedGridFsRepositoryImpl extends GridFsRepositoryImpl {
 

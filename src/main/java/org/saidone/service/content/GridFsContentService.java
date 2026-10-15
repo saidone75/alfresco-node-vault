@@ -56,7 +56,7 @@ public class GridFsContentService extends BaseComponent implements ContentServic
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
 
-    @Value("${application.service.vault.encryption.enabled}")
+    @Value("${application.service.vault.encryption.content.enabled}")
     private boolean encryptionEnabled;
 
     private final GridFsRepositoryImpl gridFsRepository;

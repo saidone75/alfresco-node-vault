@@ -57,6 +57,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -95,9 +96,10 @@ public class VaultApiController extends BaseComponent {
     private final NotarizationService notarizationService;
 
     /**
-     * Manages encryption key rotation for node content.
+     * Manages encryption key rotation for node content and metadata. Empty when
+     * neither content nor metadata encryption is enabled.
      */
-    private final KeyService keyService;
+    private final Optional<KeyService> keyService;
 
     /**
      * Service responsible for integrity sweep executions.
@@ -464,7 +466,7 @@ public class VaultApiController extends BaseComponent {
      *
      * @param auth   optional Basic authentication header
      * @param nodeId identifier of the node whose key should be updated
-     * @return a confirmation message
+     * @return a confirmation message, or 403 when encryption is disabled
      */
     @SecurityRequirement(name = "basicAuth")
     @PostMapping("/nodes/{nodeId}/update-key")
@@ -479,6 +481,8 @@ public class VaultApiController extends BaseComponent {
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "401", description = "Unauthorized",
                             content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Encryption is disabled",
+                            content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -492,7 +496,10 @@ public class VaultApiController extends BaseComponent {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        keyService.updateKey(nodeId);
+        if (keyService.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Encryption is disabled: neither content nor metadata encryption is enabled.");
+        }
+        keyService.get().updateKey(nodeId);
         return ResponseEntity.ok(String.format("Encryption key updated for node %s.", nodeId));
     }
 
@@ -502,7 +509,7 @@ public class VaultApiController extends BaseComponent {
      *
      * @param auth       optional Basic authentication header
      * @param keyVersion version of the outdated encryption key
-     * @return a confirmation message
+     * @return a confirmation message, or 403 when encryption is disabled
      */
     @SecurityRequirement(name = "basicAuth")
     @PostMapping("/nodes/update-keys")
@@ -517,6 +524,8 @@ public class VaultApiController extends BaseComponent {
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "401", description = "Unauthorized",
                             content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Encryption is disabled",
+                            content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
@@ -528,11 +537,15 @@ public class VaultApiController extends BaseComponent {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        if (keyService.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Encryption is disabled: neither content nor metadata encryption is enabled.");
+        }
+
         // Re-key nodes asynchronously to avoid long blocking requests
         CompletableFuture.runAsync(() -> {
             try {
                 log.info("Starting key update for version {}", keyVersion);
-                keyService.updateKeys(keyVersion);
+                keyService.get().updateKeys(keyVersion);
                 log.info("Completed key update for version {}", keyVersion);
             } catch (Exception e) {
                 log.error("Error while updating keys for version {}", keyVersion, e);

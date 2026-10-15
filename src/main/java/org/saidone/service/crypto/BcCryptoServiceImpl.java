@@ -42,9 +42,10 @@ import java.security.Security;
 
 /**
  * Cryptographic service based on the Bouncy Castle provider that performs
- * ChaCha20-Poly1305 encryption. The bean is activated when both
- * {@code application.service.vault.encryption.enabled} is set to {@code true}
- * and {@code application.service.vault.encryption.impl} is set to {@code bc}.
+ * ChaCha20-Poly1305 encryption. The bean is activated when
+ * {@code application.service.vault.encryption.impl} is set to {@code bc} and at
+ * least one of {@code application.service.vault.encryption.content.enabled} or
+ * {@code application.service.vault.encryption.metadata.enabled} is set to {@code true}.
  * Random salt and nonce values are generated for every operation and the
  * encryption key is derived using the configured KDF implementation.
  */
@@ -53,7 +54,7 @@ import java.security.Security;
 @Setter
 @ConfigurationProperties(prefix = "application.service.vault.encryption.bc")
 @ConditionalOnExpression(
-        "${application.service.vault.encryption.enabled}.equals(true) and '${application.service.vault.encryption.impl}'.equals('bc')"
+        "('${application.service.vault.encryption.content.enabled:false}' == 'true' or '${application.service.vault.encryption.metadata.enabled:false}' == 'true') and '${application.service.vault.encryption.impl}'.equals('bc')"
 )
 public class BcCryptoServiceImpl extends AbstractCryptoService implements CryptoService {
 

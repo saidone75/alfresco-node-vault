@@ -50,8 +50,9 @@ import java.util.stream.Stream;
  * to perform database operations.</p>
  *
  * <p>Activation of this repository is controlled by the
- * {@code application.service.vault.encryption.enabled} property: the bean is
- * instantiated when the value is {@code false} or the property is missing.</p>
+ * {@code application.service.vault.encryption.metadata.enabled} property: the bean is
+ * instantiated when the value is {@code false} or the property is missing
+ * (otherwise {@link EncryptedMongoNodeRepositoryImpl} is used instead).</p>
  *
  * <p>Provides CRUD operations including insertion, saving, batch operations, and
  * queries by {@link Example}, {@link Sort} or {@link Pageable}. It also supports
@@ -61,13 +62,13 @@ import java.util.stream.Stream;
  * throws an {@link UnsupportedOperationException}.</p>
  *
  * <p>This class extends {@link BaseComponent} and is intended for scenarios
- * where node encryption is disabled at the application level. It relies on
+ * where node metadata encryption is disabled at the application level. It relies on
  * {@link MongoOperations} for thread-safe persistence of {@link NodeEntity}
  * documents.</p>
  */
 @Repository
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "application.service.vault.encryption.enabled", havingValue = "false", matchIfMissing = true)
+@ConditionalOnProperty(name = "application.service.vault.encryption.metadata.enabled", havingValue = "false", matchIfMissing = true)
 @Slf4j
 public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepository<NodeEntity, String> {
     /**

@@ -37,12 +37,12 @@ import java.util.HashMap;
  * the provided {@link CryptoService}.
  * <p>
  * The bean becomes active only when
- * {@code application.service.vault.encryption.enabled} is {@code true} and
+ * {@code application.service.vault.encryption.content.enabled} is {@code true} and
  * {@code application.service.vault.storage.impl} equals {@code "s3"}.
  */
 @Service
 @ConditionalOnExpression(
-        "${application.service.vault.encryption.enabled}.equals(true) and '${application.service.vault.storage.impl}'.equals('s3')"
+        "${application.service.vault.encryption.content.enabled}.equals(true) and '${application.service.vault.storage.impl}'.equals('s3')"
 )
 @Slf4j
 public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {

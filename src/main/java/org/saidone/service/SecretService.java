@@ -45,11 +45,16 @@ import java.util.concurrent.ExecutionException;
  * <p>When an error occurs while waiting for the asynchronous Vault call, methods in this class
  * log the exception, restore the interrupted status for {@link InterruptedException}, and return
  * {@code null} to indicate the secret could not be retrieved.</p>
+ *
+ * <p>The bean is active when at least one of
+ * {@code application.service.vault.encryption.content.enabled} or
+ * {@code application.service.vault.encryption.metadata.enabled} is set to
+ * {@code true}.</p>
  */
 @RequiredArgsConstructor
 @Service
 @Slf4j
-@ConditionalOnExpression("${application.service.vault.encryption.enabled}.equals(true)")
+@ConditionalOnExpression("('${application.service.vault.encryption.content.enabled:false}' == 'true' or '${application.service.vault.encryption.metadata.enabled:false}' == 'true')")
 public class SecretService extends BaseComponent {
 
     private final VaultTemplate vaultTemplate;
