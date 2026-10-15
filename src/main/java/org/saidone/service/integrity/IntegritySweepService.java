@@ -45,6 +45,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -63,8 +64,8 @@ public class IntegritySweepService extends BaseComponent {
 
     /** Service used to page and retrieve notarized nodes from the vault. */
     private final NodeService nodeService;
-    /** Service used to validate notarization data for each scanned node. */
-    private final NotarizationService notarizationService;
+    /** Service used to validate notarization data for each scanned node, absent when notarization is disabled. */
+    private final Optional<NotarizationService> notarizationService;
     /** MongoDB access used to persist and query integrity sweep run metadata. */
     private final MongoTemplate mongoTemplate;
     /** Metrics collector for reporting completed sweep run statistics. */
@@ -94,11 +95,18 @@ public class IntegritySweepService extends BaseComponent {
      * run document is persisted and published to the metrics collector even when
      * errors occur.</p>
      *
+     * <p>When notarization is disabled the sweep is skipped and no run is recorded.</p>
+     *
      * @param trigger the run trigger source (for example {@code MANUAL} or
      *                {@code SCHEDULED}); blank values default to {@code MANUAL}
-     * @return persisted sweep run summary with timing and counters
+     * @return persisted sweep run summary with timing and counters, or {@code null}
+     * if the sweep was skipped
      */
     public synchronized IntegritySweepRunDto runSweep(String trigger) {
+        if (notarizationService.isEmpty()) {
+            log.warn("Integrity sweep skipped: notarization is disabled");
+            return null;
+        }
         val run = new IntegritySweepRunDto();
         run.setStartedAt(Instant.now());
         run.setStatus("RUNNING");
@@ -176,7 +184,7 @@ public class IntegritySweepService extends BaseComponent {
      */
     private void checkNodeIntegrity(IntegritySweepRunDto run, NodeWrapperDto node) {
         try {
-            notarizationService.checkNotarization(node.getId());
+            notarizationService.get().checkNotarization(node.getId());
             run.setPassed(run.getPassed() + 1);
             clearCorruptedNode(node.getId());
         } catch (NotarizationException e) {
