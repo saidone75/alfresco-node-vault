@@ -769,7 +769,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/repository/GridFsRepositoryImpl.html#deleteFileById(java.lang.String)" class="member-name-link">deleteFileById(String)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/GridFsRepositoryImpl.html" title="class in org.saidone.repository">GridFsRepositoryImpl</a></dt>
 <dd>
-<div class="block">Deletes a file and its metadata from GridFS by UUID.</div>
+<div class="block">Deletes all the files stored for the given UUID from GridFS.</div>
 </dd>
 <dt><a href="org/saidone/service/AlfrescoService.html#deleteNode(java.lang.String)" class="member-name-link">deleteNode(String)</a> - Method in class org.saidone.service.<a href="org/saidone/service/AlfrescoService.html" title="class in org.saidone.service">AlfrescoService</a></dt>
 <dd>
@@ -909,6 +909,14 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/repository/MongoNodeRepositoryImpl.html#exists(org.springframework.data.domain.Example)" class="member-name-link">exists(Example&lt;S&gt;)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/MongoNodeRepositoryImpl.html" title="class in org.saidone.repository">MongoNodeRepositoryImpl</a></dt>
 <dt><a href="org/saidone/repository/MongoNodeRepositoryImpl.html#existsById(java.lang.String)" class="member-name-link">existsById(String)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/MongoNodeRepositoryImpl.html" title="class in org.saidone.repository">MongoNodeRepositoryImpl</a></dt>
+<dt><a href="org/saidone/service/MongoNodeService.html#existsById(java.lang.String)" class="member-name-link">existsById(String)</a> - Method in class org.saidone.service.<a href="org/saidone/service/MongoNodeService.html" title="class in org.saidone.service">MongoNodeService</a></dt>
+<dd>
+<div class="block">Checks whether a node is stored in the vault.</div>
+</dd>
+<dt><a href="org/saidone/service/NodeService.html#existsById(java.lang.String)" class="member-name-link">existsById(String)</a> - Method in interface org.saidone.service.<a href="org/saidone/service/NodeService.html" title="interface in org.saidone.service">NodeService</a></dt>
+<dd>
+<div class="block">Checks whether a node is stored in the vault.</div>
+</dd>
 </dl>
 <h2 class="title" id="I:F">F</h2>
 <dl class="index">
@@ -2342,7 +2350,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/repository/GridFsRepositoryImpl.html#saveFile(java.io.InputStream,java.lang.String,java.lang.String,java.util.Map)" class="member-name-link">saveFile(InputStream, String, String, Map&lt;String, String&gt;)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/GridFsRepositoryImpl.html" title="class in org.saidone.repository">GridFsRepositoryImpl</a></dt>
 <dd>
-<div class="block">Stores a new file in GridFS.</div>
+<div class="block">Stores a new file in GridFS, replacing any file previously stored for the same UUID.</div>
 </dd>
 <dt><a href="org/saidone/service/AlfrescoService.html#searchAndProcess(java.lang.String,java.lang.Integer,java.util.function.Consumer)" class="member-name-link">searchAndProcess(String, Integer, Consumer&lt;String&gt;)</a> - Method in class org.saidone.service.<a href="org/saidone/service/AlfrescoService.html" title="class in org.saidone.service">AlfrescoService</a></dt>
 <dd>
@@ -2530,7 +2538,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/repository/GridFsRepositoryImpl.html#updateFileMetadata(java.lang.String,java.util.Map)" class="member-name-link">updateFileMetadata(String, Map&lt;String, String&gt;)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/GridFsRepositoryImpl.html" title="class in org.saidone.repository">GridFsRepositoryImpl</a></dt>
 <dd>
-<div class="block">Updates the metadata document of a stored file.</div>
+<div class="block">Updates the metadata document of the most recently stored file for the given UUID.</div>
 </dd>
 <dt><a href="org/saidone/service/crypto/KeyService.html#updateKey(java.lang.String)" class="member-name-link">updateKey(String)</a> - Method in interface org.saidone.service.crypto.<a href="org/saidone/service/crypto/KeyService.html" title="interface in org.saidone.service.crypto">KeyService</a></dt>
 <dd>

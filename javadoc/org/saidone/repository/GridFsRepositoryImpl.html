@@ -115,7 +115,7 @@ implements <a href="GridFsRepository.html" title="interface in org.saidone.repos
  <code>MongoTemplate</code> for interactions with MongoDB and GridFS collections.
  <p>
  On initialization, an ascending index is automatically created on the
- <code>metadata.uuid</code> field in the <code>fs.files</code> collection to improve
+ <code>metadata.id</code> field in the <code>fs.files</code> collection to improve
  query performance for operations that search files by UUID.
  <p>
  Supports the following main operations:
@@ -185,7 +185,7 @@ implements <a href="GridFsRepository.html" title="interface in org.saidone.repos
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deleteFileById(java.lang.String)" class="member-name-link">deleteFileById</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uuid)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Deletes a file and its metadata from GridFS by UUID.</div>
+<div class="block">Deletes all the files stored for the given UUID from GridFS.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>com.mongodb.client.gridfs.model.GridFSFile</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#findFileById(java.lang.String)" class="member-name-link">findFileById</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uuid)</code></div>
@@ -209,13 +209,13 @@ implements <a href="GridFsRepository.html" title="interface in org.saidone.repos
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;contentType,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Stores a new file in GridFS.</div>
+<div class="block">Stores a new file in GridFS, replacing any file previously stored for the same UUID.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateFileMetadata(java.lang.String,java.util.Map)" class="member-name-link">updateFileMetadata</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uuid,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Updates the metadata document of a stored file.</div>
+<div class="block">Updates the metadata document of the most recently stored file for the given UUID.</div>
 </div>
 </div>
 </div>
@@ -274,7 +274,10 @@ implements <a href="GridFsRepository.html" title="interface in org.saidone.repos
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;fileName,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;contentType,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata)</span></div>
-<div class="block">Stores a new file in GridFS.</div>
+<div class="block">Stores a new file in GridFS, replacing any file previously stored for the same UUID.
+ <p>
+ The previous files are removed only after the new one has been fully written, so the
+ input stream may safely be read from the file being replaced (e.g. during re-keying).</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="GridFsRepository.html#saveFile(java.io.InputStream,java.lang.String,java.lang.String,java.util.Map)">saveFile</a></code>&nbsp;in interface&nbsp;<code><a href="GridFsRepository.html" title="interface in org.saidone.repository">GridFsRepository</a></code></dd>
@@ -291,7 +294,7 @@ implements <a href="GridFsRepository.html" title="interface in org.saidone.repos
 <h3>updateFileMetadata</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">updateFileMetadata</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uuid,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata)</span></div>
-<div class="block">Updates the metadata document of a stored file.</div>
+<div class="block">Updates the metadata document of the most recently stored file for the given UUID.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="GridFsRepository.html#updateFileMetadata(java.lang.String,java.util.Map)">updateFileMetadata</a></code>&nbsp;in interface&nbsp;<code><a href="GridFsRepository.html" title="interface in org.saidone.repository">GridFsRepository</a></code></dd>
@@ -305,7 +308,8 @@ implements <a href="GridFsRepository.html" title="interface in org.saidone.repos
 <section class="detail" id="findFileById(java.lang.String)">
 <h3>findFileById</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">com.mongodb.client.gridfs.model.GridFSFile</span>&nbsp;<span class="element-name">findFileById</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uuid)</span></div>
-<div class="block">Retrieves a file descriptor by UUID.</div>
+<div class="block">Retrieves a file descriptor by UUID. If more than one file matches, the most recently
+ uploaded one is returned.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="GridFsRepository.html#findFileById(java.lang.String)">findFileById</a></code>&nbsp;in interface&nbsp;<code><a href="GridFsRepository.html" title="interface in org.saidone.repository">GridFsRepository</a></code></dd>
@@ -320,7 +324,7 @@ implements <a href="GridFsRepository.html" title="interface in org.saidone.repos
 <section class="detail" id="deleteFileById(java.lang.String)">
 <h3>deleteFileById</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">deleteFileById</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uuid)</span></div>
-<div class="block">Deletes a file and its metadata from GridFS by UUID.</div>
+<div class="block">Deletes all the files stored for the given UUID from GridFS.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="GridFsRepository.html#deleteFileById(java.lang.String)">deleteFileById</a></code>&nbsp;in interface&nbsp;<code><a href="GridFsRepository.html" title="interface in org.saidone.repository">GridFsRepository</a></code></dd>

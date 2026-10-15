@@ -205,6 +205,11 @@ loadScripts(document, 'script');</script>
  binaries through the configured services with checksum information,
  optionally verifies the checksum and finally deletes the source node
  from Alfresco.
+ </p>
+ <p>
+ A node already stored in the vault is never overwritten: only the
+ optional deletion on Alfresco is performed, after verifying that the
+ Alfresco content still matches the vault copy when double check is enabled.
  </p></div>
 <dl class="notes">
 <dt>Parameters:</dt>
