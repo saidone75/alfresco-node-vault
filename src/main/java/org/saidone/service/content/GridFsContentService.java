@@ -76,6 +76,7 @@ public class GridFsContentService extends BaseComponent implements ContentServic
         try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
             val metadata = new HashMap<String, String>();
             metadata.put(MetadataKeys.UUID, node.getId());
+            metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
             gridFsRepository.saveFile(
                     digestInputStream,
                     node.getName(),

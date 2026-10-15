@@ -255,7 +255,9 @@ public class VaultApiController extends BaseComponent {
         val nodeContent = contentService.getNodeContent(nodeId);
 
         val headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType(nodeContent.getContentType()));
+        headers.setContentType(Strings.isNotBlank(nodeContent.getContentType())
+                ? MediaType.parseMediaType(nodeContent.getContentType())
+                : MediaType.APPLICATION_OCTET_STREAM);
         if (attachment) {
             headers.setContentDispositionFormData("attachment", nodeContent.getFileName());
         }
