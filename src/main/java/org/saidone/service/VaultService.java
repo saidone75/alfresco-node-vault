@@ -87,7 +87,13 @@ public class VaultService extends BaseComponent {
                     nodeId,
                     node.getContent().getSizeInBytes());
             contentService.archiveNodeContent(node, nodeContentInputStream);
-            nodeService.save(new NodeWrapperDto(node));
+            val nodeWrapper = new NodeWrapperDto(node);
+            // record the content key version so that key rotation can find the node even when metadata is not encrypted
+            val contentInfo = contentService.getNodeContentInfo(nodeId);
+            if (contentInfo.isEncrypted()) {
+                nodeWrapper.setKeyVersion(contentInfo.getKeyVersion());
+            }
+            nodeService.save(nodeWrapper);
             if (doubleCheck) doubleCheck(nodeId);
             if (deleteOnAlfresco) alfrescoService.deleteNode(nodeId);
         } catch (FeignException.NotFound e) {

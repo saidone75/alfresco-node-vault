@@ -144,6 +144,9 @@ public class GridFsContentService extends BaseComponent implements ContentServic
             if (gridFSFile.getMetadata().containsKey(MetadataKeys.ENCRYPTED)) {
                 info.setEncrypted(Boolean.TRUE.toString().equals(gridFSFile.getMetadata().getString(MetadataKeys.ENCRYPTED)));
             }
+            if (gridFSFile.getMetadata().containsKey(MetadataKeys.KEY_VERSION)) {
+                info.setKeyVersion(Integer.parseInt(gridFSFile.getMetadata().getString(MetadataKeys.KEY_VERSION)));
+            }
         }
         return info;
     }

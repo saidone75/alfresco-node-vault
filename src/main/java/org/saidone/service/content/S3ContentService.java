@@ -152,6 +152,9 @@ public class S3ContentService extends BaseComponent implements ContentService {
             nodeContentInfo.setContentHashAlgorithm(head.metadata().get(MetadataKeys.CHECKSUM_ALGORITHM));
             nodeContentInfo.setContentHash(head.metadata().get(MetadataKeys.CHECKSUM_VALUE));
             nodeContentInfo.setEncrypted(Boolean.parseBoolean(head.metadata().get(MetadataKeys.ENCRYPTED)));
+            if (head.metadata().containsKey(MetadataKeys.KEY_VERSION)) {
+                nodeContentInfo.setKeyVersion(Integer.parseInt(head.metadata().get(MetadataKeys.KEY_VERSION)));
+            }
             return nodeContentInfo;
         } catch (S3Exception e) {
             throw new NodeNotFoundOnVaultException(nodeId);

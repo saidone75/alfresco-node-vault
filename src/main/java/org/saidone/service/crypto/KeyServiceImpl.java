@@ -85,6 +85,7 @@ public class KeyServiceImpl extends BaseComponent implements KeyService {
             if (contentEncryptionEnabled) {
                 contentService.archiveNodeContent(nodeWrapper.getNode(),
                         contentService.getNodeContent(nodeId).getContentStream());
+                nodeWrapper.setKeyVersion(contentService.getNodeContentInfo(nodeId).getKeyVersion());
             }
             nodeService.save(nodeWrapper);
         } else {
