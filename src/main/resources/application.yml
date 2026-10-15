@@ -169,6 +169,8 @@ application:
           rpc-url: ${ETH_RPC_URL:http://localhost:8545}
           private-key: ${ETH_PRIVATE_KEY:4f3edf983ac636a65a842ce7c78d9aa706d3b113b37c7e9c79fc75a2e96c3e6a}
           auto-generate: ${ETH_AUTO_GENERATE:false}
+          receipt-polling-interval: ${ETH_RECEIPT_POLLING_INTERVAL:1000}
+          receipt-polling-attempts: ${ETH_RECEIPT_POLLING_ATTEMPTS:120}
   same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
 server:
   port: 8086
