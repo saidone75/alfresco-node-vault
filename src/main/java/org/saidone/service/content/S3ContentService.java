@@ -19,7 +19,6 @@
 package org.saidone.service.content;
 
 import jakarta.annotation.PreDestroy;
-import lombok.Cleanup;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +33,7 @@ import org.saidone.model.MetadataKeys;
 import org.saidone.model.dto.NodeContentInfoDto;
 import org.saidone.model.dto.NodeContentStreamDto;
 import org.saidone.repository.S3Repository;
+import org.saidone.utils.SecureTemporaryFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -92,10 +92,10 @@ public class S3ContentService extends BaseComponent implements ContentService {
     @Override
     @SneakyThrows
     public void archiveNodeContent(Node node, InputStream inputStream) {
-        @Cleanup("delete") val tempFile = Files.createTempFile("s3-upload-", ".bin").toFile();
-        try (val dis = new AnvDigestInputStream(inputStream, checksumAlgorithm);
-             val fos = Files.newOutputStream(tempFile.toPath());
-             val fis = Files.newInputStream(tempFile.toPath())) {
+        try (val tempFile = new SecureTemporaryFile("s3-upload-", ".bin");
+             val dis = new AnvDigestInputStream(inputStream, checksumAlgorithm);
+             val fos = Files.newOutputStream(tempFile.getPath());
+             val fis = Files.newInputStream(tempFile.getPath())) {
             dis.transferTo(fos);
             fos.flush();
             log.trace("{}: {}", checksumAlgorithm, dis.getHash());

@@ -26,7 +26,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
@@ -80,14 +79,28 @@ public class ResourceFileUtils {
                 if (is == null) {
                     throw new FileNotFoundException("Resource not found in file system or classpath: " + resourcePath);
                 }
-                val tempFile = destinationPath != null
-                        ? new File(destinationPath)
-                        : Files.createTempFile("resource-", file.getName().replaceAll("^.*\\.", ".")).toFile();
-                tempFile.deleteOnExit();
-                try (val fos = new FileOutputStream(tempFile)) {
-                    is.transferTo(fos);
+                val temporaryFile = destinationPath == null
+                        ? new SecureTemporaryFile("resource-", file.getName().replaceAll("^.*\\.", "."))
+                        : null;
+                val extractedFile = temporaryFile != null ? temporaryFile.getPath().toFile() : new File(destinationPath);
+                if (temporaryFile != null) {
+                    temporaryFile.deleteOnExit();
+                } else {
+                    extractedFile.deleteOnExit();
                 }
-                return tempFile;
+                try (val fos = new FileOutputStream(extractedFile)) {
+                    is.transferTo(fos);
+                } catch (IOException | RuntimeException e) {
+                    if (temporaryFile != null) {
+                        try {
+                            temporaryFile.close();
+                        } catch (IOException cleanupException) {
+                            e.addSuppressed(cleanupException);
+                        }
+                    }
+                    throw e;
+                }
+                return extractedFile;
             }
         }
     }
