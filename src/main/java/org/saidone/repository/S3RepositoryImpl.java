@@ -25,10 +25,12 @@ import org.alfresco.core.model.Node;
 import org.saidone.component.BaseComponent;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
+import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.http.ContentStreamProvider;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
@@ -87,6 +89,18 @@ public class S3RepositoryImpl extends BaseComponent implements S3Repository {
      */
     @Override
     public InputStream getObject(String bucketName, String nodeId) {
+        return getObjectStream(bucketName, nodeId);
+    }
+
+    /**
+     * Retrieves the raw object content for the given node id, exposing the
+     * object metadata through {@link ResponseInputStream#response()}.
+     *
+     * @param bucketName bucket containing the object
+     * @param nodeId     the node id / object key
+     * @return the object content stream along with its response metadata
+     */
+    protected ResponseInputStream<GetObjectResponse> getObjectStream(String bucketName, String nodeId) {
         return s3Client.getObject(GetObjectRequest.builder()
                 .bucket(bucketName).key(nodeId).build());
     }
