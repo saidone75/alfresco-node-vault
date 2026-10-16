@@ -201,8 +201,11 @@ implements org.springframework.web.server.WebFilter</span></div>
  information.
 
  <p>The request is audited before the rest of the filter chain executes.
- After the chain completes, a second entry is stored describing the
- response.</p></div>
+ After the chain completes, a second entry describing the response is
+ stored asynchronously, without delaying the completion signal.</p>
+
+ <p>Entries are persisted with blocking MongoDB calls, so they run on the
+ bounded elastic scheduler instead of the Netty event loop.</p></div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code>filter</code>&nbsp;in interface&nbsp;<code>org.springframework.web.server.WebFilter</code></dd>

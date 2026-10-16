@@ -179,6 +179,11 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a><wbr>&lt;org.springframework.web.server.ServerWebExchange&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#apply(org.saidone.gateway.predicate.IsOnVaultPredicate.Config)" class="member-name-link">apply</a><wbr>(@NonNull <a href="IsOnVaultPredicate.Config.html" title="class in org.saidone.gateway.predicate">IsOnVaultPredicate.Config</a>&nbsp;config)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">&nbsp;</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull org.springframework.cloud.gateway.handler.AsyncPredicate<wbr>&lt;org.springframework.web.server.ServerWebExchange&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#applyAsync(org.saidone.gateway.predicate.IsOnVaultPredicate.Config)" class="member-name-link">applyAsync</a><wbr>(@NonNull <a href="IsOnVaultPredicate.Config.html" title="class in org.saidone.gateway.predicate">IsOnVaultPredicate.Config</a>&nbsp;config)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Asynchronous variant used by the gateway route matching.</div>
+</div>
 </div>
 </div>
 </div>
@@ -190,7 +195,7 @@ loadScripts(document, 'script');</script>
 <code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.springframework.cloud.gateway.handler.predicate.RoutePredicateFactory">Methods inherited from interface&nbsp;org.springframework.cloud.gateway.handler.predicate.RoutePredicateFactory</h3>
-<code>apply, applyAsync, applyAsync, beforeApply, getConfigClass, name, newConfig</code></div>
+<code>apply, applyAsync, beforeApply, getConfigClass, name, newConfig</code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.springframework.cloud.gateway.support.ShortcutConfigurable">Methods inherited from interface&nbsp;org.springframework.cloud.gateway.support.ShortcutConfigurable</h3>
 <code>shortcutFieldOrder, shortcutFieldPrefix, shortcutType</code></div>
@@ -223,6 +228,14 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="apply(org.saidone.gateway.predicate.IsOnVaultPredicate.Config)">
 <h3>apply</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/function/Predicate.html" title="class or interface in java.util.function" class="external-link">Predicate</a>&lt;org.springframework.web.server.ServerWebExchange&gt;</span>&nbsp;<span class="element-name">apply</span><wbr><span class="parameters">(@NonNull <a href="IsOnVaultPredicate.Config.html" title="class in org.saidone.gateway.predicate">IsOnVaultPredicate.Config</a>&nbsp;config)</span></div>
+</section>
+</li>
+<li>
+<section class="detail" id="applyAsync(org.saidone.gateway.predicate.IsOnVaultPredicate.Config)">
+<h3>applyAsync</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">@NonNull org.springframework.cloud.gateway.handler.AsyncPredicate&lt;org.springframework.web.server.ServerWebExchange&gt;</span>&nbsp;<span class="element-name">applyAsync</span><wbr><span class="parameters">(@NonNull <a href="IsOnVaultPredicate.Config.html" title="class in org.saidone.gateway.predicate">IsOnVaultPredicate.Config</a>&nbsp;config)</span></div>
+<div class="block">Asynchronous variant used by the gateway route matching. The blocking MongoDB
+ lookup runs on the bounded elastic scheduler instead of the Netty event loop.</div>
 </section>
 </li>
 </ul>
