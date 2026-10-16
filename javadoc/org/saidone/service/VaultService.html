@@ -253,6 +253,12 @@ loadScripts(document, 'script');</script>
  still exists in Alfresco, its ID is returned and no new node is created
  (e.g. when a client retries after a timeout). A node whose restored copy
  has been deleted from Alfresco can be restored again.
+ </p>
+ <p>
+ If uploading content or saving the restored node ID fails, the newly created
+ node is permanently deleted on a best-effort basis and the original error is
+ rethrown. A process interruption, a lost creation response or failed cleanup
+ may still require manual reconciliation before retrying.
  </p></div>
 <dl class="notes">
 <dt>Parameters:</dt>
