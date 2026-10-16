@@ -29,6 +29,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.server.ServerWebInputException;
 import org.springframework.web.util.HtmlUtils;
 
 /**
@@ -50,6 +51,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleVaultException(VaultException e) {
         log.error(e.getMessage());
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+    }
+
+    @ExceptionHandler(ServerWebInputException.class)
+    @Operation(hidden = true)
+    public ResponseEntity<String> handleServerWebInputException(ServerWebInputException e) {
+        log.warn(e.getMessage());
+        return buildResponse(HttpStatus.BAD_REQUEST, "Invalid request");
     }
 
     @ExceptionHandler(NodeNotFoundException.class)

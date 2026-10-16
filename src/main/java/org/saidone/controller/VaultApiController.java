@@ -36,6 +36,7 @@ import org.saidone.component.BaseComponent;
 import org.saidone.model.dto.EntryDto;
 import org.saidone.model.dto.CorruptedNodeDto;
 import org.saidone.model.dto.IntegritySweepRunDto;
+import org.saidone.model.dto.NodeSearchRequestDto;
 import org.saidone.service.AuthenticationService;
 import org.saidone.service.NodeService;
 import org.saidone.service.VaultService;
@@ -115,6 +116,8 @@ public class VaultApiController extends BaseComponent {
     private static final String NOTARIZATION_DISABLED = "Notarization is disabled.";
     @Value("${application.service.vault.delete-node.api-enabled:false}")
     private boolean deleteNodeApiEnabled;
+    @Value("${application.service.vault.encryption.metadata.enabled:false}")
+    private boolean metadataEncryptionEnabled;
 
     /**
      * Searches nodes archived within the specified date range with pagination support.
@@ -174,6 +177,65 @@ public class VaultApiController extends BaseComponent {
 
         val pageable = PageRequest.of(page, size, Sort.by(dir, "adt"));
         val result = nodeService.findByArchiveDateRange(from, to, pageable)
+                .map(nodeWrapper -> new EntryDto(nodeWrapper.getNode()));
+        return ResponseEntity.ok(result);
+    }
+
+    /**
+     * Searches archived nodes by their metadata with pagination support.
+     * <p>
+     * All the supplied criteria must match. The search is available only when
+     * node metadata is not encrypted.
+     * </p>
+     *
+     * @param auth    optional Basic authentication header
+     * @param request search criteria
+     * @param page    page number
+     * @param size    page size
+     * @param dir     sort direction for archive date
+     * @return paginated list of node entries
+     */
+    @SecurityRequirement(name = "basicAuth")
+    @PostMapping("/advanced-search")
+    @Operation(
+            summary = "Advanced search of archived nodes",
+            description = "Search nodes by name, node type, creation and modification dates, mimetype, size, aspects and properties. Available only when metadata encryption is disabled.",
+            parameters = {
+                    @Parameter(name = "page", description = "Page number", in = ParameterIn.QUERY),
+                    @Parameter(name = "size", description = "Page size", in = ParameterIn.QUERY),
+                    @Parameter(name = "dir", description = "Sort direction for archive date (ASC or DESC)", in = ParameterIn.QUERY)
+            },
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Nodes retrieved",
+                            content = @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = EntryDto.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid search criteria", content = @Content),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Metadata encryption is enabled", content = @Content),
+                    @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+            })
+    public ResponseEntity<?> advancedSearchNodes(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
+            @RequestBody NodeSearchRequestDto request,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "20") int size,
+            @RequestParam(required = false, defaultValue = "ASC") Sort.Direction dir) {
+
+        if (!authenticationService.isAuthorized(auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        if (metadataEncryptionEnabled) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Advanced search is disabled: metadata encryption is enabled.");
+        }
+
+        if (request.getProperties() != null && request.getProperties().stream()
+                .anyMatch(p -> Strings.isBlank(p.getName()) || p.getValues() == null || p.getValues().isEmpty())) {
+            return ResponseEntity.badRequest().body("Property filters require a name and at least one value.");
+        }
+
+        val pageable = PageRequest.of(page, size, Sort.by(dir, "adt"));
+        val result = nodeService.search(request, pageable)
                 .map(nodeWrapper -> new EntryDto(nodeWrapper.getNode()));
         return ResponseEntity.ok(result);
     }

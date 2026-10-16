@@ -19,6 +19,7 @@
 package org.saidone.service;
 
 import org.saidone.exception.NodeNotFoundOnVaultException;
+import org.saidone.model.dto.NodeSearchRequestDto;
 import org.saidone.model.dto.NodeWrapperDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -71,6 +72,16 @@ public interface NodeService {
      * @return page of {@link NodeWrapperDto}
      */
     Page<NodeWrapperDto> findByArchiveDateRange(Instant from, Instant to, Pageable pageable);
+
+    /**
+     * Searches node wrappers by their metadata using pagination. All the supplied
+     * criteria must match. Encrypted node metadata cannot be searched.
+     *
+     * @param request  search criteria
+     * @param pageable pagination information
+     * @return page of matching {@link NodeWrapperDto}
+     */
+    Page<NodeWrapperDto> search(NodeSearchRequestDto request, Pageable pageable);
 
     /**
      * Retrieves notarized node wrappers using pagination.

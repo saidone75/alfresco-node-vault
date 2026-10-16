@@ -23,13 +23,16 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
+import org.bson.Document;
 import org.saidone.component.BaseComponent;
 import org.saidone.model.MetadataKeys;
+import org.saidone.model.dto.NodeSearchRequestDto;
 import org.saidone.model.entity.NodeEntity;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
+import org.springframework.data.mongodb.core.aggregation.AggregationExpression;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -38,9 +41,11 @@ import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
 /**
@@ -77,6 +82,9 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
      * queries.
      */
     private final MongoOperations mongoOperations;
+
+    /** Field holding the node as a BSON document. */
+    private static final String NODE_DOCUMENT = "nb";
 
     /**
      * {@inheritDoc}
@@ -317,6 +325,121 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
     public List<NodeEntity> findByKv(int kv) {
         val query = new Query(Criteria.where(MetadataKeys.KEY_VERSION).is(kv));
         return mongoOperations.find(query, NodeEntity.class);
+    }
+
+    /**
+     * Searches nodes by their metadata using pagination. All the supplied
+     * criteria must match. Only nodes stored as BSON documents (not encrypted)
+     * are taken into account.
+     *
+     * @param request  search criteria
+     * @param pageable pagination information
+     * @return page of matching nodes
+     */
+    public Page<NodeEntity> search(NodeSearchRequestDto request, Pageable pageable) {
+        val criteria = new ArrayList<Criteria>();
+        criteria.add(Criteria.where(NODE_DOCUMENT).exists(true));
+        if (request.getName() != null) {
+            criteria.add(Criteria.where(nodeField("name")).regex(wildcardToRegex(request.getName()), "i"));
+        }
+        if (request.getNodeType() != null) {
+            criteria.add(Criteria.where(nodeField("nodeType")).is(request.getNodeType()));
+        }
+        addDateRange(criteria, nodeField("createdAt"), request.getCreatedFrom(), request.getCreatedTo());
+        addDateRange(criteria, nodeField("modifiedAt"), request.getModifiedFrom(), request.getModifiedTo());
+        if (request.getMimeType() != null) {
+            criteria.add(Criteria.where(nodeField("content.mimeType")).is(request.getMimeType()));
+        }
+        if (request.getMinSize() != null || request.getMaxSize() != null) {
+            val size = Criteria.where(nodeField("content.sizeInBytes"));
+            if (request.getMinSize() != null) size.gte(request.getMinSize());
+            if (request.getMaxSize() != null) size.lte(request.getMaxSize());
+            criteria.add(size);
+        }
+        if (request.getAspects() != null && !request.getAspects().isEmpty()) {
+            criteria.add(Criteria.where(nodeField("aspectNames")).all(request.getAspects()));
+        }
+        if (request.getProperties() != null && !request.getProperties().isEmpty()) {
+            val propertyCriteria = request.getProperties().stream().map(MongoNodeRepositoryImpl::propertyCriteria).toList();
+            criteria.add(request.getPropertiesMatch() == NodeSearchRequestDto.Match.ANY
+                    ? new Criteria().orOperator(propertyCriteria)
+                    : new Criteria().andOperator(propertyCriteria));
+        }
+        val filter = new Criteria().andOperator(criteria);
+        long count = mongoOperations.count(new Query(filter), NodeEntity.class);
+        val content = mongoOperations.find(new Query(filter).with(pageable), NodeEntity.class);
+        return new PageImpl<>(content, pageable, count);
+    }
+
+    /**
+     * Builds the condition on a single node property.
+     *
+     * @param filter property condition
+     * @return criteria matching the property values
+     */
+    private static Criteria propertyCriteria(NodeSearchRequestDto.PropertyFilter filter) {
+        if (filter.getName() == null || filter.getValues() == null || filter.getValues().isEmpty()) {
+            throw new IllegalArgumentException("Property filters require a name and at least one value");
+        }
+        val property = Criteria.where(nodeField(String.format("properties.%s", filter.getName())));
+        return filter.getMatch() == NodeSearchRequestDto.Match.ALL
+                ? property.all(filter.getValues())
+                : property.in(filter.getValues());
+    }
+
+    /**
+     * Adds an inclusive range condition on a date stored as an ISO-8601 string.
+     * Dates are converted with {@code $dateFromString} because their string
+     * representation is not suitable for lexicographic comparison.
+     *
+     * @param criteria list the condition is added to
+     * @param field    path of the date field
+     * @param from     lower bound, inclusive. {@code null} for no lower bound.
+     * @param to       upper bound, inclusive. {@code null} for no upper bound.
+     */
+    private static void addDateRange(List<Criteria> criteria, String field, Instant from, Instant to) {
+        if (from != null) criteria.add(Criteria.expr(compareDate("$gte", field, from)));
+        if (to != null) criteria.add(Criteria.expr(compareDate("$lte", field, to)));
+    }
+
+    /**
+     * Builds an expression comparing a date stored as a string with the given instant.
+     */
+    private static AggregationExpression compareDate(String operator, String field, Instant value) {
+        val date = new Document("$dateFromString", new Document("dateString", String.format("$%s", field)).append("onError", null));
+        return context -> new Document(operator, List.of(date, Date.from(value)));
+    }
+
+    /**
+     * Returns the path of a field of the node BSON document.
+     *
+     * @param path path of the field inside the node
+     * @return full path of the field
+     */
+    private static String nodeField(String path) {
+        return String.format("%s.%s", NODE_DOCUMENT, path);
+    }
+
+    /**
+     * Converts a name pattern with {@code *} and {@code ?} wildcards into an
+     * anchored regular expression, quoting everything else.
+     */
+    private static String wildcardToRegex(String pattern) {
+        val regex = new StringBuilder("^");
+        val literal = new StringBuilder();
+        for (char c : pattern.toCharArray()) {
+            if (c == '*' || c == '?') {
+                if (!literal.isEmpty()) {
+                    regex.append(Pattern.quote(literal.toString()));
+                    literal.setLength(0);
+                }
+                regex.append(c == '*' ? ".*" : ".");
+            } else {
+                literal.append(c);
+            }
+        }
+        if (!literal.isEmpty()) regex.append(Pattern.quote(literal.toString()));
+        return regex.append('$').toString();
     }
 
     /**
