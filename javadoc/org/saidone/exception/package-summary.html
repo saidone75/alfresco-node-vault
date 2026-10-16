@@ -99,17 +99,25 @@ loadScripts(document, 'script');</script>
 <div class="block">Exception thrown when a node's checksum stored in Alfresco does not match the
  value stored in the vault.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab5"><a href="NodeNotFoundException.html" title="class in org.saidone.exception">NodeNotFoundException</a></div>
+<div class="col-first even-row-color class-summary class-summary-tab5"><a href="InvalidRequestException.html" title="class in org.saidone.exception">InvalidRequestException</a></div>
 <div class="col-last even-row-color class-summary class-summary-tab5">
+<div class="block">Thrown when a request carries invalid parameters or criteria.</div>
+</div>
+<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="NodeNotFoundException.html" title="class in org.saidone.exception">NodeNotFoundException</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab5">
 <div class="block">Generic exception thrown when a requested node cannot be located.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="NodeNotFoundOnAlfrescoException.html" title="class in org.saidone.exception">NodeNotFoundOnAlfrescoException</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab5">
+<div class="col-first even-row-color class-summary class-summary-tab5"><a href="NodeNotFoundOnAlfrescoException.html" title="class in org.saidone.exception">NodeNotFoundOnAlfrescoException</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab5">
 <div class="block">Thrown when a node cannot be located in Alfresco.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab5"><a href="NodeNotFoundOnVaultException.html" title="class in org.saidone.exception">NodeNotFoundOnVaultException</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab5">
+<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="NodeNotFoundOnVaultException.html" title="class in org.saidone.exception">NodeNotFoundOnVaultException</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab5">
 <div class="block">Thrown when a node cannot be located in the vault storage.</div>
+</div>
+<div class="col-first even-row-color class-summary class-summary-tab5"><a href="NodeNotNotarizedException.html" title="class in org.saidone.exception">NodeNotNotarizedException</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab5">
+<div class="block">Thrown when the notarization of a node is checked but the node has never been notarized.</div>
 </div>
 <div class="col-first odd-row-color class-summary class-summary-tab5"><a href="NodeRestoreInProgressException.html" title="class in org.saidone.exception">NodeRestoreInProgressException</a></div>
 <div class="col-last odd-row-color class-summary class-summary-tab5">
@@ -119,8 +127,12 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color class-summary class-summary-tab5">
 <div class="block">Raised to signal a failure while persisting or retrieving notarization data.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="VaultException.html" title="class in org.saidone.exception">VaultException</a></div>
+<div class="col-first odd-row-color class-summary class-summary-tab5"><a href="NotarizedHashMismatchException.html" title="class in org.saidone.exception">NotarizedHashMismatchException</a></div>
 <div class="col-last odd-row-color class-summary class-summary-tab5">
+<div class="block">Thrown when the hash of a node content does not match the notarized one.</div>
+</div>
+<div class="col-first even-row-color class-summary class-summary-tab5"><a href="VaultException.html" title="class in org.saidone.exception">VaultException</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab5">
 <div class="block">Base class for all runtime exceptions thrown by the Alfresco Node Vault.</div>
 </div>
 </div>

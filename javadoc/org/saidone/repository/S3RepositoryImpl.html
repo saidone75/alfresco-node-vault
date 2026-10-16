@@ -164,12 +164,19 @@ implements <a href="S3Repository.html" title="interface in org.saidone.repositor
 <div class="block">Retrieves the object content for the given node id using the underlying
  <code>S3Client</code>.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.io.InputStream)" class="member-name-link">putObject</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected software.amazon.awssdk.core.ResponseInputStream<wbr>&lt;software.amazon.awssdk.services.s3.model.GetObjectResponse&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getObjectStream(java.lang.String,java.lang.String)" class="member-name-link">getObjectStream</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Retrieves the raw object content for the given node id, exposing the
+ object metadata through <code>ResponseInputStream.response()</code>.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.io.InputStream)" class="member-name-link">putObject</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
  org.alfresco.core.model.Node&nbsp;node,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;inputStream)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Uploads the provided stream as an object to S3.</div>
 </div>
 </div>
@@ -258,6 +265,22 @@ implements <a href="S3Repository.html" title="interface in org.saidone.repositor
 <dd><code>nodeId</code> - the node id / object key</dd>
 <dt>Returns:</dt>
 <dd>the object content stream</dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="getObjectStream(java.lang.String,java.lang.String)">
+<h3>getObjectStream</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">software.amazon.awssdk.core.ResponseInputStream&lt;software.amazon.awssdk.services.s3.model.GetObjectResponse&gt;</span>&nbsp;<span class="element-name">getObjectStream</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId)</span></div>
+<div class="block">Retrieves the raw object content for the given node id, exposing the
+ object metadata through <code>ResponseInputStream.response()</code>.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>bucketName</code> - bucket containing the object</dd>
+<dd><code>nodeId</code> - the node id / object key</dd>
+<dt>Returns:</dt>
+<dd>the object content stream along with its response metadata</dd>
 </dl>
 </section>
 </li>

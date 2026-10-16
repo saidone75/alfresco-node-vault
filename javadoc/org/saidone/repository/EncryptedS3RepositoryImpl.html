@@ -104,7 +104,7 @@ loadScripts(document, 'script');</script>
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">EncryptedS3RepositoryImpl</span>
 <span class="extends-implements">extends <a href="S3RepositoryImpl.html" title="class in org.saidone.repository">S3RepositoryImpl</a></span></div>
 <div class="block"><a href="S3RepositoryImpl.html" title="class in org.saidone.repository"><code>S3RepositoryImpl</code></a> variant that transparently encrypts data before
- uploading to S3 and decrypts it when retrieved. Encryption is delegated to
+ uploading to S3 and decrypts it when retrieved, if marked as encrypted. Encryption is delegated to
  the provided <a href="../service/crypto/CryptoService.html" title="interface in org.saidone.service.crypto"><code>CryptoService</code></a>.
  <p>
  The bean becomes active only when
@@ -155,8 +155,7 @@ loadScripts(document, 'script');</script>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getObject(java.lang.String,java.lang.String)" class="member-name-link">getObject</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Retrieves the encrypted object content from S3 and returns a decrypted
- stream using the configured <a href="../service/crypto/CryptoService.html" title="interface in org.saidone.service.crypto"><code>CryptoService</code></a>.</div>
+<div class="block">Retrieves the object content from S3.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.io.InputStream)" class="member-name-link">putObject</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
@@ -169,6 +168,9 @@ loadScripts(document, 'script');</script>
 </div>
 </div>
 </div>
+<div class="inherited-list">
+<h3 id="methods-inherited-from-class-org.saidone.repository.S3RepositoryImpl">Methods inherited from class&nbsp;org.saidone.repository.<a href="S3RepositoryImpl.html" title="class in org.saidone.repository">S3RepositoryImpl</a></h3>
+<code><a href="S3RepositoryImpl.html#getObjectStream(java.lang.String,java.lang.String)">getObjectStream</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.saidone.component.BaseComponent">Methods inherited from class&nbsp;org.saidone.component.<a href="../component/BaseComponent.html" title="class in org.saidone.component">BaseComponent</a></h3>
 <code><a href="../component/BaseComponent.html#init()">init</a>, <a href="../component/BaseComponent.html#setApplicationContext(org.springframework.context.ApplicationContext)">setApplicationContext</a>, <a href="../component/BaseComponent.html#shutDown(int)">shutDown</a>, <a href="../component/BaseComponent.html#stop()">stop</a></code></div>
@@ -239,8 +241,8 @@ loadScripts(document, 'script');</script>
 <h3>getObject</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></span>&nbsp;<span class="element-name">getObject</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId)</span></div>
-<div class="block">Retrieves the encrypted object content from S3 and returns a decrypted
- stream using the configured <a href="../service/crypto/CryptoService.html" title="interface in org.saidone.service.crypto"><code>CryptoService</code></a>.</div>
+<div class="block">Retrieves the object content from S3.
+ If the object is encrypted, decrypts the content before returning.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="S3Repository.html#getObject(java.lang.String,java.lang.String)">getObject</a></code>&nbsp;in interface&nbsp;<code><a href="S3Repository.html" title="interface in org.saidone.repository">S3Repository</a></code></dd>
@@ -250,7 +252,7 @@ loadScripts(document, 'script');</script>
 <dd><code>bucketName</code> - bucket containing the object</dd>
 <dd><code>nodeId</code> - the node id / object key</dd>
 <dt>Returns:</dt>
-<dd>decrypted content stream</dd>
+<dd>the object content stream, decrypted if necessary</dd>
 </dl>
 </section>
 </li>

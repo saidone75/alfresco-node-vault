@@ -57,6 +57,8 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><a href="#org.saidone.controller">org.saidone.controller</a></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><a href="#org.saidone.exception">org.saidone.exception</a></div>
+<div class="col-last odd-row-color">&nbsp;</div>
 </div>
 <section class="class-uses">
 <ul class="block-list">
@@ -69,8 +71,32 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
-<div class="col-second even-row-color"><span class="type-name-label">GlobalExceptionHandler.</span><code><a href="../../controller/GlobalExceptionHandler.html#handleNotarizationException(org.saidone.exception.NotarizationException)" class="member-name-link">handleNotarizationException</a><wbr>(<a href="../NotarizationException.html" title="class in org.saidone.exception">NotarizationException</a>&nbsp;e)</code></div>
+<div class="col-second even-row-color"><span class="type-name-label">GlobalExceptionHandler.</span><code><a href="../../controller/GlobalExceptionHandler.html#handleNotarizationCheckException(org.saidone.exception.NotarizationException)" class="member-name-link">handleNotarizationCheckException</a><wbr>(<a href="../NotarizationException.html" title="class in org.saidone.exception">NotarizationException</a>&nbsp;e)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
+<div class="col-first odd-row-color"><code>org.springframework.http.ResponseEntity<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second odd-row-color"><span class="type-name-label">GlobalExceptionHandler.</span><code><a href="../../controller/GlobalExceptionHandler.html#handleNotarizationException(org.saidone.exception.NotarizationException)" class="member-name-link">handleNotarizationException</a><wbr>(<a href="../NotarizationException.html" title="class in org.saidone.exception">NotarizationException</a>&nbsp;e)</code></div>
+<div class="col-last odd-row-color">&nbsp;</div>
+</div>
+</section>
+</li>
+<li>
+<section class="detail" id="org.saidone.exception">
+<h2>Uses of <a href="../NotarizationException.html" title="class in org.saidone.exception">NotarizationException</a> in <a href="../package-summary.html">org.saidone.exception</a></h2>
+<div class="caption"><span>Subclasses of <a href="../NotarizationException.html" title="class in org.saidone.exception">NotarizationException</a> in <a href="../package-summary.html">org.saidone.exception</a></span></div>
+<div class="summary-table three-column-summary">
+<div class="table-header col-first">Modifier and Type</div>
+<div class="table-header col-second">Class</div>
+<div class="table-header col-last">Description</div>
+<div class="col-first even-row-color"><code>class&nbsp;</code></div>
+<div class="col-second even-row-color"><code><a href="../NodeNotNotarizedException.html" class="type-name-link" title="class in org.saidone.exception">NodeNotNotarizedException</a></code></div>
+<div class="col-last even-row-color">
+<div class="block">Thrown when the notarization of a node is checked but the node has never been notarized.</div>
+</div>
+<div class="col-first odd-row-color"><code>class&nbsp;</code></div>
+<div class="col-second odd-row-color"><code><a href="../NotarizedHashMismatchException.html" class="type-name-link" title="class in org.saidone.exception">NotarizedHashMismatchException</a></code></div>
+<div class="col-last odd-row-color">
+<div class="block">Thrown when the hash of a node content does not match the notarized one.</div>
+</div>
 </div>
 </section>
 </li>

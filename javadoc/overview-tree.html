@@ -195,6 +195,8 @@ loadScripts(document, 'script');</script>
 </li>
 <li class="circle">org.saidone.model.entity.<a href="org/saidone/model/entity/NodeEntity.html" class="type-name-link" title="class in org.saidone.model.entity">NodeEntity</a></li>
 <li class="circle">org.saidone.model.mapper.<a href="org/saidone/model/mapper/NodeMapperImpl.html" class="type-name-link" title="class in org.saidone.model.mapper">NodeMapperImpl</a> (implements org.saidone.model.mapper.<a href="org/saidone/model/mapper/NodeMapper.html" title="interface in org.saidone.model.mapper">NodeMapper</a>)</li>
+<li class="circle">org.saidone.model.dto.<a href="org/saidone/model/dto/NodeSearchRequestDto.html" class="type-name-link" title="class in org.saidone.model.dto">NodeSearchRequestDto</a></li>
+<li class="circle">org.saidone.model.dto.<a href="org/saidone/model/dto/NodeSearchRequestDto.PropertyFilter.html" class="type-name-link" title="class in org.saidone.model.dto">NodeSearchRequestDto.PropertyFilter</a></li>
 <li class="circle">org.saidone.model.dto.<a href="org/saidone/model/dto/NodeWrapperDto.html" class="type-name-link" title="class in org.saidone.model.dto">NodeWrapperDto</a></li>
 <li class="circle">org.saidone.config.<a href="org/saidone/config/OpenApiConfig.html" class="type-name-link" title="class in org.saidone.config">OpenApiConfig</a></li>
 <li class="circle">java.io.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/OutputStream.html" class="type-name-link external-link" title="class or interface in java.io">OutputStream</a> (implements java.io.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/Closeable.html" title="class or interface in java.io" class="external-link">Closeable</a>, java.io.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/Flushable.html" title="class or interface in java.io" class="external-link">Flushable</a>)
@@ -206,6 +208,7 @@ loadScripts(document, 'script');</script>
 </li>
 </ul>
 </li>
+<li class="circle">org.saidone.utils.<a href="org/saidone/utils/PageUtils.html" class="type-name-link" title="class in org.saidone.utils">PageUtils</a></li>
 <li class="circle">org.saidone.utils.<a href="org/saidone/utils/ResourceFileUtils.html" class="type-name-link" title="class in org.saidone.utils">ResourceFileUtils</a></li>
 <li class="circle">org.saidone.config.<a href="org/saidone/config/S3Config.html" class="type-name-link" title="class in org.saidone.config">S3Config</a></li>
 <li class="circle">org.saidone.service.crypto.<a href="org/saidone/service/crypto/Secret.html" class="type-name-link" title="class in org.saidone.service.crypto">Secret</a></li>
@@ -221,13 +224,19 @@ loadScripts(document, 'script');</script>
 <li class="circle">org.saidone.exception.<a href="org/saidone/exception/VaultException.html" class="type-name-link" title="class in org.saidone.exception">VaultException</a>
 <ul>
 <li class="circle">org.saidone.exception.<a href="org/saidone/exception/HashesMismatchException.html" class="type-name-link" title="class in org.saidone.exception">HashesMismatchException</a></li>
+<li class="circle">org.saidone.exception.<a href="org/saidone/exception/InvalidRequestException.html" class="type-name-link" title="class in org.saidone.exception">InvalidRequestException</a></li>
 <li class="circle">org.saidone.exception.<a href="org/saidone/exception/NodeNotFoundException.html" class="type-name-link" title="class in org.saidone.exception">NodeNotFoundException</a>
 <ul>
 <li class="circle">org.saidone.exception.<a href="org/saidone/exception/NodeNotFoundOnAlfrescoException.html" class="type-name-link" title="class in org.saidone.exception">NodeNotFoundOnAlfrescoException</a></li>
 <li class="circle">org.saidone.exception.<a href="org/saidone/exception/NodeNotFoundOnVaultException.html" class="type-name-link" title="class in org.saidone.exception">NodeNotFoundOnVaultException</a></li>
 </ul>
 </li>
-<li class="circle">org.saidone.exception.<a href="org/saidone/exception/NotarizationException.html" class="type-name-link" title="class in org.saidone.exception">NotarizationException</a></li>
+<li class="circle">org.saidone.exception.<a href="org/saidone/exception/NotarizationException.html" class="type-name-link" title="class in org.saidone.exception">NotarizationException</a>
+<ul>
+<li class="circle">org.saidone.exception.<a href="org/saidone/exception/NodeNotNotarizedException.html" class="type-name-link" title="class in org.saidone.exception">NodeNotNotarizedException</a></li>
+<li class="circle">org.saidone.exception.<a href="org/saidone/exception/NotarizedHashMismatchException.html" class="type-name-link" title="class in org.saidone.exception">NotarizedHashMismatchException</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -258,6 +267,20 @@ loadScripts(document, 'script');</script>
 <li class="circle">org.saidone.service.<a href="org/saidone/service/NodeService.html" class="type-name-link" title="interface in org.saidone.service">NodeService</a></li>
 <li class="circle">org.saidone.service.notarization.<a href="org/saidone/service/notarization/NotarizationService.html" class="type-name-link" title="interface in org.saidone.service.notarization">NotarizationService</a></li>
 <li class="circle">org.saidone.repository.<a href="org/saidone/repository/S3Repository.html" class="type-name-link" title="interface in org.saidone.repository">S3Repository</a></li>
+</ul>
+</section>
+<section class="hierarchy">
+<h2 title="Enum Class Hierarchy">Enum Class Hierarchy</h2>
+<ul>
+<li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" class="type-name-link external-link" title="class or interface in java.lang">Object</a>
+<ul>
+<li class="circle">java.lang.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Enum.html" class="type-name-link external-link" title="class or interface in java.lang">Enum</a>&lt;E&gt; (implements java.lang.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Comparable.html" title="class or interface in java.lang" class="external-link">Comparable</a>&lt;T&gt;, java.lang.constant.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/constant/Constable.html" title="class or interface in java.lang.constant" class="external-link">Constable</a>, java.io.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/Serializable.html" title="class or interface in java.io" class="external-link">Serializable</a>)
+<ul>
+<li class="circle">org.saidone.model.dto.<a href="org/saidone/model/dto/NodeSearchRequestDto.Match.html" class="type-name-link" title="enum class in org.saidone.model.dto">NodeSearchRequestDto.Match</a></li>
+</ul>
+</li>
+</ul>
+</li>
 </ul>
 </section>
 </main>

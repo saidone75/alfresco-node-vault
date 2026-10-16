@@ -189,6 +189,12 @@ implements <a href="NodeService.html" title="interface in org.saidone.service">N
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Persists the given wrapped node metadata.</div>
 </div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.data.domain.Page<wbr>&lt;<a href="../model/dto/NodeWrapperDto.html" title="class in org.saidone.model.dto">NodeWrapperDto</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#search(org.saidone.model.dto.NodeSearchRequestDto,org.springframework.data.domain.Pageable)" class="member-name-link">search</a><wbr>(<a href="../model/dto/NodeSearchRequestDto.html" title="class in org.saidone.model.dto">NodeSearchRequestDto</a>&nbsp;request,
+ org.springframework.data.domain.Pageable&nbsp;pageable)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Searches node wrappers by their metadata using pagination.</div>
+</div>
 </div>
 </div>
 </div>
@@ -290,6 +296,24 @@ implements <a href="NodeService.html" title="interface in org.saidone.service">N
 <dd><code>pageable</code> - pagination information</dd>
 <dt>Returns:</dt>
 <dd>page of <a href="../model/dto/NodeWrapperDto.html" title="class in org.saidone.model.dto"><code>NodeWrapperDto</code></a></dd>
+</dl>
+</section>
+</li>
+<li>
+<section class="detail" id="search(org.saidone.model.dto.NodeSearchRequestDto,org.springframework.data.domain.Pageable)">
+<h3>search</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.data.domain.Page&lt;<a href="../model/dto/NodeWrapperDto.html" title="class in org.saidone.model.dto">NodeWrapperDto</a>&gt;</span>&nbsp;<span class="element-name">search</span><wbr><span class="parameters">(<a href="../model/dto/NodeSearchRequestDto.html" title="class in org.saidone.model.dto">NodeSearchRequestDto</a>&nbsp;request,
+ org.springframework.data.domain.Pageable&nbsp;pageable)</span></div>
+<div class="block">Searches node wrappers by their metadata using pagination. All the supplied
+ criteria must match. Encrypted node metadata cannot be searched.</div>
+<dl class="notes">
+<dt>Specified by:</dt>
+<dd><code><a href="NodeService.html#search(org.saidone.model.dto.NodeSearchRequestDto,org.springframework.data.domain.Pageable)">search</a></code>&nbsp;in interface&nbsp;<code><a href="NodeService.html" title="interface in org.saidone.service">NodeService</a></code></dd>
+<dt>Parameters:</dt>
+<dd><code>request</code> - search criteria</dd>
+<dd><code>pageable</code> - pagination information</dd>
+<dt>Returns:</dt>
+<dd>page of matching <a href="../model/dto/NodeWrapperDto.html" title="class in org.saidone.model.dto"><code>NodeWrapperDto</code></a></dd>
 </dl>
 </section>
 </li>

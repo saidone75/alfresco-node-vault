@@ -87,6 +87,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Adds aspects to a node.</div>
 </dd>
+<dt><a href="org/saidone/controller/VaultApiController.html#advancedSearchNodes(java.lang.String,org.saidone.model.dto.NodeSearchRequestDto,int,int,org.springframework.data.domain.Sort.Direction)" class="member-name-link">advancedSearchNodes(String, NodeSearchRequestDto, int, int, Sort.Direction)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/VaultApiController.html" title="class in org.saidone.controller">VaultApiController</a></dt>
+<dd>
+<div class="block">Searches archived nodes by their metadata with pagination support.</div>
+</dd>
 <dt><a href="org/saidone/model/alfresco/AlfrescoContentModel.html" class="type-name-link" title="interface in org.saidone.model.alfresco">AlfrescoContentModel</a> - Interface in <a href="org/saidone/model/alfresco/package-summary.html">org.saidone.model.alfresco</a></dt>
 <dd>
 <div class="block">Constants representing the standard Alfresco content model.</div>
@@ -109,6 +113,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/config/AlfrescoServiceConfig.html#%3Cinit%3E()" class="member-name-link">AlfrescoServiceConfig()</a> - Constructor for class org.saidone.config.<a href="org/saidone/config/AlfrescoServiceConfig.html" title="class in org.saidone.config">AlfrescoServiceConfig</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/model/dto/NodeSearchRequestDto.Match.html#ALL" class="member-name-link">ALL</a> - Enum constant in enum class org.saidone.model.dto.<a href="org/saidone/model/dto/NodeSearchRequestDto.Match.html" title="enum class in org.saidone.model.dto">NodeSearchRequestDto.Match</a></dt>
+<dd>
+<div class="block">All must match (AND).</div>
+</dd>
 <dt><a href="org/saidone/model/alfresco/AnvContentModel.html#ANV_PREFIX" class="member-name-link">ANV_PREFIX</a> - Static variable in interface org.saidone.model.alfresco.<a href="org/saidone/model/alfresco/AnvContentModel.html" title="interface in org.saidone.model.alfresco">AnvContentModel</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/model/alfresco/AnvContentModel.html#ANV_URI" class="member-name-link">ANV_URI</a> - Static variable in interface org.saidone.model.alfresco.<a href="org/saidone/model/alfresco/AnvContentModel.html" title="interface in org.saidone.model.alfresco">AnvContentModel</a></dt>
@@ -129,6 +137,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/saidone/misc/AnvDigestInputStream.html#%3Cinit%3E(java.io.InputStream,java.lang.String)" class="member-name-link">AnvDigestInputStream(InputStream, String)</a> - Constructor for class org.saidone.misc.<a href="org/saidone/misc/AnvDigestInputStream.html" title="class in org.saidone.misc">AnvDigestInputStream</a></dt>
 <dd>
 <div class="block">Creates a new digesting stream using the supplied algorithm.</div>
+</dd>
+<dt><a href="org/saidone/model/dto/NodeSearchRequestDto.Match.html#ANY" class="member-name-link">ANY</a> - Enum constant in enum class org.saidone.model.dto.<a href="org/saidone/model/dto/NodeSearchRequestDto.Match.html" title="enum class in org.saidone.model.dto">NodeSearchRequestDto.Match</a></dt>
+<dd>
+<div class="block">At least one must match (OR).</div>
 </dd>
 <dt><a href="org/saidone/exception/ApiExceptionError.html" class="type-name-link" title="class in org.saidone.exception">ApiExceptionError</a> - Class in <a href="org/saidone/exception/package-summary.html">org.saidone.exception</a></dt>
 <dd>
@@ -855,7 +867,7 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/saidone/repository/EncryptedS3RepositoryImpl.html" class="type-name-link" title="class in org.saidone.repository">EncryptedS3RepositoryImpl</a> - Class in <a href="org/saidone/repository/package-summary.html">org.saidone.repository</a></dt>
 <dd>
 <div class="block"><a href="org/saidone/repository/S3RepositoryImpl.html" title="class in org.saidone.repository"><code>S3RepositoryImpl</code></a> variant that transparently encrypts data before
- uploading to S3 and decrypts it when retrieved.</div>
+ uploading to S3 and decrypts it when retrieved, if marked as encrypted.</div>
 </dd>
 <dt><a href="org/saidone/repository/EncryptedS3RepositoryImpl.html#%3Cinit%3E(software.amazon.awssdk.services.s3.S3Client,org.saidone.service.SecretService,org.saidone.service.crypto.CryptoService)" class="member-name-link">EncryptedS3RepositoryImpl(S3Client, SecretService, CryptoService)</a> - Constructor for class org.saidone.repository.<a href="org/saidone/repository/EncryptedS3RepositoryImpl.html" title="class in org.saidone.repository">EncryptedS3RepositoryImpl</a></dt>
 <dd>
@@ -1171,8 +1183,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/repository/EncryptedS3RepositoryImpl.html#getObject(java.lang.String,java.lang.String)" class="member-name-link">getObject(String, String)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/EncryptedS3RepositoryImpl.html" title="class in org.saidone.repository">EncryptedS3RepositoryImpl</a></dt>
 <dd>
-<div class="block">Retrieves the encrypted object content from S3 and returns a decrypted
- stream using the configured <a href="org/saidone/service/crypto/CryptoService.html" title="interface in org.saidone.service.crypto"><code>CryptoService</code></a>.</div>
+<div class="block">Retrieves the object content from S3.</div>
 </dd>
 <dt><a href="org/saidone/repository/S3Repository.html#getObject(java.lang.String,java.lang.String)" class="member-name-link">getObject(String, String)</a> - Method in interface org.saidone.repository.<a href="org/saidone/repository/S3Repository.html" title="interface in org.saidone.repository">S3Repository</a></dt>
 <dd>
@@ -1182,6 +1193,11 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Retrieves the object content for the given node id using the underlying
  <code>S3Client</code>.</div>
+</dd>
+<dt><a href="org/saidone/repository/S3RepositoryImpl.html#getObjectStream(java.lang.String,java.lang.String)" class="member-name-link">getObjectStream(String, String)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/S3RepositoryImpl.html" title="class in org.saidone.repository">S3RepositoryImpl</a></dt>
+<dd>
+<div class="block">Retrieves the raw object content for the given node id, exposing the
+ object metadata through <code>ResponseInputStream.response()</code>.</div>
 </dd>
 <dt><a href="org/saidone/service/SecretService.html#getSecret()" class="member-name-link">getSecret()</a> - Method in class org.saidone.service.<a href="org/saidone/service/SecretService.html" title="class in org.saidone.service">SecretService</a></dt>
 <dd>
@@ -1221,13 +1237,21 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/controller/GlobalExceptionHandler.html#handleException(java.lang.Exception)" class="member-name-link">handleException(Exception)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/GlobalExceptionHandler.html" title="class in org.saidone.controller">GlobalExceptionHandler</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/controller/GlobalExceptionHandler.html#handleInvalidRequestException(org.saidone.exception.InvalidRequestException)" class="member-name-link">handleInvalidRequestException(InvalidRequestException)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/GlobalExceptionHandler.html" title="class in org.saidone.controller">GlobalExceptionHandler</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/controller/GlobalExceptionHandler.html#handleNodeNotFoundException(org.saidone.exception.NodeNotFoundException)" class="member-name-link">handleNodeNotFoundException(NodeNotFoundException)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/GlobalExceptionHandler.html" title="class in org.saidone.controller">GlobalExceptionHandler</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/controller/GlobalExceptionHandler.html#handleNodeRestoreInProgressException(org.saidone.exception.NodeRestoreInProgressException)" class="member-name-link">handleNodeRestoreInProgressException(NodeRestoreInProgressException)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/GlobalExceptionHandler.html" title="class in org.saidone.controller">GlobalExceptionHandler</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/controller/GlobalExceptionHandler.html#handleNotarizationCheckException(org.saidone.exception.NotarizationException)" class="member-name-link">handleNotarizationCheckException(NotarizationException)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/GlobalExceptionHandler.html" title="class in org.saidone.controller">GlobalExceptionHandler</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/controller/GlobalExceptionHandler.html#handleNotarizationException(org.saidone.exception.NotarizationException)" class="member-name-link">handleNotarizationException(NotarizationException)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/GlobalExceptionHandler.html" title="class in org.saidone.controller">GlobalExceptionHandler</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/controller/GlobalExceptionHandler.html#handleOutOfMemoryError(java.lang.OutOfMemoryError)" class="member-name-link">handleOutOfMemoryError(OutOfMemoryError)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/GlobalExceptionHandler.html" title="class in org.saidone.controller">GlobalExceptionHandler</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/saidone/controller/GlobalExceptionHandler.html#handleResponseStatusException(org.springframework.web.server.ResponseStatusException)" class="member-name-link">handleResponseStatusException(ResponseStatusException)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/GlobalExceptionHandler.html" title="class in org.saidone.controller">GlobalExceptionHandler</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/saidone/controller/GlobalExceptionHandler.html#handleServerWebInputException(org.springframework.web.server.ServerWebInputException)" class="member-name-link">handleServerWebInputException(ServerWebInputException)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/GlobalExceptionHandler.html" title="class in org.saidone.controller">GlobalExceptionHandler</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/controller/GlobalExceptionHandler.html#handleVaultException(org.saidone.exception.VaultException)" class="member-name-link">handleVaultException(VaultException)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/GlobalExceptionHandler.html" title="class in org.saidone.controller">GlobalExceptionHandler</a></dt>
 <dd>&nbsp;</dd>
@@ -1292,6 +1316,12 @@ loadScripts(document, 'script');</script>
  vault nodes.</div>
 </dd>
 <dt><a href="org/saidone/service/integrity/IntegritySweepService.html#%3Cinit%3E()" class="member-name-link">IntegritySweepService()</a> - Constructor for class org.saidone.service.integrity.<a href="org/saidone/service/integrity/IntegritySweepService.html" title="class in org.saidone.service.integrity">IntegritySweepService</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/saidone/exception/InvalidRequestException.html" class="type-name-link" title="class in org.saidone.exception">InvalidRequestException</a> - Exception Class in <a href="org/saidone/exception/package-summary.html">org.saidone.exception</a></dt>
+<dd>
+<div class="block">Thrown when a request carries invalid parameters or criteria.</div>
+</dd>
+<dt><a href="org/saidone/exception/InvalidRequestException.html#%3Cinit%3E(java.lang.String)" class="member-name-link">InvalidRequestException(String)</a> - Constructor for exception class org.saidone.exception.<a href="org/saidone/exception/InvalidRequestException.html" title="class in org.saidone.exception">InvalidRequestException</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/service/AlfrescoService.html#isAdmin(java.lang.String,java.lang.String)" class="member-name-link">isAdmin(String, String)</a> - Method in class org.saidone.service.<a href="org/saidone/service/AlfrescoService.html" title="class in org.saidone.service">AlfrescoService</a></dt>
 <dd>
@@ -1482,12 +1512,32 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/exception/NodeNotFoundOnVaultException.html#%3Cinit%3E(java.lang.String)" class="member-name-link">NodeNotFoundOnVaultException(String)</a> - Constructor for exception class org.saidone.exception.<a href="org/saidone/exception/NodeNotFoundOnVaultException.html" title="class in org.saidone.exception">NodeNotFoundOnVaultException</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/exception/NodeNotNotarizedException.html" class="type-name-link" title="class in org.saidone.exception">NodeNotNotarizedException</a> - Exception Class in <a href="org/saidone/exception/package-summary.html">org.saidone.exception</a></dt>
+<dd>
+<div class="block">Thrown when the notarization of a node is checked but the node has never been notarized.</div>
+</dd>
+<dt><a href="org/saidone/exception/NodeNotNotarizedException.html#%3Cinit%3E(java.lang.String)" class="member-name-link">NodeNotNotarizedException(String)</a> - Constructor for exception class org.saidone.exception.<a href="org/saidone/exception/NodeNotNotarizedException.html" title="class in org.saidone.exception">NodeNotNotarizedException</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/exception/NodeRestoreInProgressException.html" class="type-name-link" title="class in org.saidone.exception">NodeRestoreInProgressException</a> - Exception Class in <a href="org/saidone/exception/package-summary.html">org.saidone.exception</a></dt>
 <dd>
 <div class="block">Thrown when a restore is requested for a node whose restore is already running.</div>
 </dd>
 <dt><a href="org/saidone/exception/NodeRestoreInProgressException.html#%3Cinit%3E(java.lang.String)" class="member-name-link">NodeRestoreInProgressException(String)</a> - Constructor for exception class org.saidone.exception.<a href="org/saidone/exception/NodeRestoreInProgressException.html" title="class in org.saidone.exception">NodeRestoreInProgressException</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/model/dto/NodeSearchRequestDto.html" class="type-name-link" title="class in org.saidone.model.dto">NodeSearchRequestDto</a> - Class in <a href="org/saidone/model/dto/package-summary.html">org.saidone.model.dto</a></dt>
+<dd>
+<div class="block">Criteria of the advanced search on archived node metadata.</div>
+</dd>
+<dt><a href="org/saidone/model/dto/NodeSearchRequestDto.html#%3Cinit%3E()" class="member-name-link">NodeSearchRequestDto()</a> - Constructor for class org.saidone.model.dto.<a href="org/saidone/model/dto/NodeSearchRequestDto.html" title="class in org.saidone.model.dto">NodeSearchRequestDto</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/saidone/model/dto/NodeSearchRequestDto.Match.html" class="type-name-link" title="enum class in org.saidone.model.dto">NodeSearchRequestDto.Match</a> - Enum Class in <a href="org/saidone/model/dto/package-summary.html">org.saidone.model.dto</a></dt>
+<dd>
+<div class="block">How multiple values or conditions are combined.</div>
+</dd>
+<dt><a href="org/saidone/model/dto/NodeSearchRequestDto.PropertyFilter.html" class="type-name-link" title="class in org.saidone.model.dto">NodeSearchRequestDto.PropertyFilter</a> - Class in <a href="org/saidone/model/dto/package-summary.html">org.saidone.model.dto</a></dt>
+<dd>
+<div class="block">Condition on a single node property.</div>
+</dd>
 <dt><a href="org/saidone/service/NodeService.html" class="type-name-link" title="interface in org.saidone.service">NodeService</a> - Interface in <a href="org/saidone/service/package-summary.html">org.saidone.service</a></dt>
 <dd>
 <div class="block">Service abstraction for persisting and retrieving node metadata within the
@@ -1517,6 +1567,12 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Contract for components able to notarize documents.</div>
 </dd>
+<dt><a href="org/saidone/exception/NotarizedHashMismatchException.html" class="type-name-link" title="class in org.saidone.exception">NotarizedHashMismatchException</a> - Exception Class in <a href="org/saidone/exception/package-summary.html">org.saidone.exception</a></dt>
+<dd>
+<div class="block">Thrown when the hash of a node content does not match the notarized one.</div>
+</dd>
+<dt><a href="org/saidone/exception/NotarizedHashMismatchException.html#%3Cinit%3E(java.lang.String)" class="member-name-link">NotarizedHashMismatchException(String)</a> - Constructor for exception class org.saidone.exception.<a href="org/saidone/exception/NotarizedHashMismatchException.html" title="class in org.saidone.exception">NotarizedHashMismatchException</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/service/notarization/AbstractNotarizationService.html#notarizeNode(java.lang.String)" class="member-name-link">notarizeNode(String)</a> - Method in class org.saidone.service.notarization.<a href="org/saidone/service/notarization/AbstractNotarizationService.html" title="class in org.saidone.service.notarization">AbstractNotarizationService</a></dt>
 <dd>
 <div class="block">Computes the hash of the node content and stores it through <a href="org/saidone/service/notarization/AbstractNotarizationService.html#putHash(java.lang.String,java.lang.String)"><code>AbstractNotarizationService.putHash(java.lang.String, java.lang.String)</code></a>.</div>
@@ -1595,6 +1651,16 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:P">P</h2>
 <dl class="index">
+<dt><a href="org/saidone/utils/PageUtils.html#pageRequest(int,int,org.springframework.data.domain.Sort)" class="member-name-link">pageRequest(int, int, Sort)</a> - Method in class org.saidone.utils.<a href="org/saidone/utils/PageUtils.html" title="class in org.saidone.utils">PageUtils</a></dt>
+<dd>
+<div class="block">Creates a <code>PageRequest</code> validating the supplied parameters.</div>
+</dd>
+<dt><a href="org/saidone/utils/PageUtils.html" class="type-name-link" title="class in org.saidone.utils">PageUtils</a> - Class in <a href="org/saidone/utils/package-summary.html">org.saidone.utils</a></dt>
+<dd>
+<div class="block">Utility class for building pagination requests from API parameters.</div>
+</dd>
+<dt><a href="org/saidone/utils/PageUtils.html#%3Cinit%3E()" class="member-name-link">PageUtils()</a> - Constructor for class org.saidone.utils.<a href="org/saidone/utils/PageUtils.html" title="class in org.saidone.utils">PageUtils</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/config/SecurityConfig.html#passwordEncoder()" class="member-name-link">passwordEncoder()</a> - Method in class org.saidone.config.<a href="org/saidone/config/SecurityConfig.html" title="class in org.saidone.config">SecurityConfig</a></dt>
 <dd>
 <div class="block">Password encoder used for the actuator admin user.</div>
@@ -2212,6 +2278,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/model/alfresco/AlfrescoContentModel.html#PROP_Y_RESOLUTION_LOCALNAME" class="member-name-link">PROP_Y_RESOLUTION_LOCALNAME</a> - Static variable in interface org.saidone.model.alfresco.<a href="org/saidone/model/alfresco/AlfrescoContentModel.html" title="interface in org.saidone.model.alfresco">AlfrescoContentModel</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/model/dto/NodeSearchRequestDto.PropertyFilter.html#%3Cinit%3E()" class="member-name-link">PropertyFilter()</a> - Constructor for class org.saidone.model.dto.<a href="org/saidone/model/dto/NodeSearchRequestDto.PropertyFilter.html" title="class in org.saidone.model.dto">NodeSearchRequestDto.PropertyFilter</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/service/notarization/AbstractNotarizationService.html#putHash(java.lang.String,java.lang.String)" class="member-name-link">putHash(String, String)</a> - Method in class org.saidone.service.notarization.<a href="org/saidone/service/notarization/AbstractNotarizationService.html" title="class in org.saidone.service.notarization">AbstractNotarizationService</a></dt>
 <dd>
 <div class="block">Persists the given hash.</div>
@@ -2367,6 +2435,18 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/saidone/repository/GridFsRepositoryImpl.html#saveFile(java.io.InputStream,java.lang.String,java.lang.String,java.util.Map)" class="member-name-link">saveFile(InputStream, String, String, Map&lt;String, String&gt;)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/GridFsRepositoryImpl.html" title="class in org.saidone.repository">GridFsRepositoryImpl</a></dt>
 <dd>
 <div class="block">Stores a new file in GridFS, replacing any file previously stored for the same UUID.</div>
+</dd>
+<dt><a href="org/saidone/repository/MongoNodeRepositoryImpl.html#search(org.saidone.model.dto.NodeSearchRequestDto,org.springframework.data.domain.Pageable)" class="member-name-link">search(NodeSearchRequestDto, Pageable)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/MongoNodeRepositoryImpl.html" title="class in org.saidone.repository">MongoNodeRepositoryImpl</a></dt>
+<dd>
+<div class="block">Searches nodes by their metadata using pagination.</div>
+</dd>
+<dt><a href="org/saidone/service/MongoNodeService.html#search(org.saidone.model.dto.NodeSearchRequestDto,org.springframework.data.domain.Pageable)" class="member-name-link">search(NodeSearchRequestDto, Pageable)</a> - Method in class org.saidone.service.<a href="org/saidone/service/MongoNodeService.html" title="class in org.saidone.service">MongoNodeService</a></dt>
+<dd>
+<div class="block">Searches node wrappers by their metadata using pagination.</div>
+</dd>
+<dt><a href="org/saidone/service/NodeService.html#search(org.saidone.model.dto.NodeSearchRequestDto,org.springframework.data.domain.Pageable)" class="member-name-link">search(NodeSearchRequestDto, Pageable)</a> - Method in interface org.saidone.service.<a href="org/saidone/service/NodeService.html" title="interface in org.saidone.service">NodeService</a></dt>
+<dd>
+<div class="block">Searches node wrappers by their metadata using pagination.</div>
 </dd>
 <dt><a href="org/saidone/service/AlfrescoService.html#searchAndProcess(java.lang.String,java.lang.Integer,java.util.function.Consumer)" class="member-name-link">searchAndProcess(String, Integer, Consumer&lt;String&gt;)</a> - Method in class org.saidone.service.<a href="org/saidone/service/AlfrescoService.html" title="class in org.saidone.service">AlfrescoService</a></dt>
 <dd>
@@ -2595,6 +2675,15 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:V">V</h2>
 <dl class="index">
+<dt><a href="org/saidone/model/dto/NodeSearchRequestDto.Match.html#valueOf(java.lang.String)" class="member-name-link">valueOf(String)</a> - Static method in enum class org.saidone.model.dto.<a href="org/saidone/model/dto/NodeSearchRequestDto.Match.html" title="enum class in org.saidone.model.dto">NodeSearchRequestDto.Match</a></dt>
+<dd>
+<div class="block">Returns the enum constant of this class with the specified name.</div>
+</dd>
+<dt><a href="org/saidone/model/dto/NodeSearchRequestDto.Match.html#values()" class="member-name-link">values()</a> - Static method in enum class org.saidone.model.dto.<a href="org/saidone/model/dto/NodeSearchRequestDto.Match.html" title="enum class in org.saidone.model.dto">NodeSearchRequestDto.Match</a></dt>
+<dd>
+<div class="block">Returns an array containing the constants of this enum class, in
+the order they are declared.</div>
+</dd>
 <dt><a href="org/saidone/controller/VaultApiController.html" class="type-name-link" title="class in org.saidone.controller">VaultApiController</a> - Class in <a href="org/saidone/controller/package-summary.html">org.saidone.controller</a></dt>
 <dd>
 <div class="block">REST controller that exposes operations for interacting with the vault.</div>
