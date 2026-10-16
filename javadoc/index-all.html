@@ -644,6 +644,8 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/filter/RecentlyProcessedFilter.html#cleanRecentlyProcessedNodes()" class="member-name-link">cleanRecentlyProcessedNodes()</a> - Method in class org.saidone.filter.<a href="org/saidone/filter/RecentlyProcessedFilter.html" title="class in org.saidone.filter">RecentlyProcessedFilter</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/utils/SecureTemporaryFile.html#close()" class="member-name-link">close()</a> - Method in class org.saidone.utils.<a href="org/saidone/utils/SecureTemporaryFile.html" title="class in org.saidone.utils">SecureTemporaryFile</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/model/alfresco/AlfrescoContentModel.html#CM_PREFIX" class="member-name-link">CM_PREFIX</a> - Static variable in interface org.saidone.model.alfresco.<a href="org/saidone/model/alfresco/AlfrescoContentModel.html" title="interface in org.saidone.model.alfresco">AlfrescoContentModel</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/model/alfresco/AlfrescoContentModel.html#CM_URI" class="member-name-link">CM_URI</a> - Static variable in interface org.saidone.model.alfresco.<a href="org/saidone/model/alfresco/AlfrescoContentModel.html" title="interface in org.saidone.model.alfresco">AlfrescoContentModel</a></dt>
@@ -1100,14 +1102,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns an input stream for the given GridFS file.</div>
 </dd>
-<dt><a href="org/saidone/utils/ResourceFileUtils.html#getFileFromResource(java.lang.String)" class="member-name-link">getFileFromResource(String)</a> - Method in class org.saidone.utils.<a href="org/saidone/utils/ResourceFileUtils.html" title="class in org.saidone.utils">ResourceFileUtils</a></dt>
-<dd>
-<div class="block">Obtains a file from either the filesystem or classpath resources.</div>
-</dd>
-<dt><a href="org/saidone/utils/ResourceFileUtils.html#getFileFromResource(java.lang.String,java.lang.String)" class="member-name-link">getFileFromResource(String, String)</a> - Method in class org.saidone.utils.<a href="org/saidone/utils/ResourceFileUtils.html" title="class in org.saidone.utils">ResourceFileUtils</a></dt>
-<dd>
-<div class="block">Retrieves a file from the given path, searching first in the filesystem and then in the classpath resources.</div>
-</dd>
 <dt><a href="org/saidone/service/AlfrescoService.html#getGuestHome()" class="member-name-link">getGuestHome()</a> - Method in class org.saidone.service.<a href="org/saidone/service/AlfrescoService.html" title="class in org.saidone.service">AlfrescoService</a></dt>
 <dd>
 <div class="block">Retrieves the "Guest Home" node from Alfresco repository.</div>
@@ -1125,6 +1119,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/saidone/service/notarization/EthereumService.html#getHash(java.lang.String)" class="member-name-link">getHash(String)</a> - Method in class org.saidone.service.notarization.<a href="org/saidone/service/notarization/EthereumService.html" title="class in org.saidone.service.notarization">EthereumService</a></dt>
 <dd>
 <div class="block">Fetches the hash data stored in the given Ethereum transaction.</div>
+</dd>
+<dt><a href="org/saidone/utils/ResourceFileUtils.html#getInputStreamFromResource(java.lang.String)" class="member-name-link">getInputStreamFromResource(String)</a> - Method in class org.saidone.utils.<a href="org/saidone/utils/ResourceFileUtils.html" title="class in org.saidone.utils">ResourceFileUtils</a></dt>
+<dd>
+<div class="block">Opens a resource, searching the filesystem first and then the classpath.</div>
 </dd>
 <dt><a href="org/saidone/controller/VaultApiController.html#getIntegritySweepRuns(java.lang.String,int,int)" class="member-name-link">getIntegritySweepRuns(String, int, int)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/VaultApiController.html" title="class in org.saidone.controller">VaultApiController</a></dt>
 <dd>
@@ -2332,7 +2330,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/utils/ResourceFileUtils.html" class="type-name-link" title="class in org.saidone.utils">ResourceFileUtils</a> - Class in <a href="org/saidone/utils/package-summary.html">org.saidone.utils</a></dt>
 <dd>
-<div class="block">Utility class providing methods to access files from filesystem or classpath resources.</div>
+<div class="block">Utility class for opening filesystem files and classpath resources as streams.</div>
 </dd>
 <dt><a href="org/saidone/utils/ResourceFileUtils.html#%3Cinit%3E()" class="member-name-link">ResourceFileUtils()</a> - Constructor for class org.saidone.utils.<a href="org/saidone/utils/ResourceFileUtils.html" title="class in org.saidone.utils">ResourceFileUtils</a></dt>
 <dd>&nbsp;</dd>
@@ -2472,6 +2470,12 @@ loadScripts(document, 'script');</script>
 <div class="block">Service responsible for reading encryption secrets from HashiCorp Vault.</div>
 </dd>
 <dt><a href="org/saidone/service/SecretService.html#%3Cinit%3E()" class="member-name-link">SecretService()</a> - Constructor for class org.saidone.service.<a href="org/saidone/service/SecretService.html" title="class in org.saidone.service">SecretService</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/saidone/utils/SecureTemporaryFile.html" class="type-name-link" title="class in org.saidone.utils">SecureTemporaryFile</a> - Class in <a href="org/saidone/utils/package-summary.html">org.saidone.utils</a></dt>
+<dd>
+<div class="block">Temporary file in a private directory, with permissions applied atomically at creation.</div>
+</dd>
+<dt><a href="org/saidone/utils/SecureTemporaryFile.html#%3Cinit%3E(java.lang.String,java.lang.String)" class="member-name-link">SecureTemporaryFile(String, String)</a> - Constructor for class org.saidone.utils.<a href="org/saidone/utils/SecureTemporaryFile.html" title="class in org.saidone.utils">SecureTemporaryFile</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/config/SecurityConfig.html" class="type-name-link" title="class in org.saidone.config">SecurityConfig</a> - Class in <a href="org/saidone/config/package-summary.html">org.saidone.config</a></dt>
 <dd>
