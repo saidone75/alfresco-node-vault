@@ -57,6 +57,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -92,12 +93,13 @@ public class VaultApiController extends BaseComponent {
     /**
      * Handles notarization requests for archived nodes.
      */
-    private final NotarizationService notarizationService;
+    private final Optional<NotarizationService> notarizationService;
 
     /**
-     * Manages encryption key rotation for node content.
+     * Manages encryption key rotation for node content and metadata. Empty when
+     * neither content nor metadata encryption is enabled.
      */
-    private final KeyService keyService;
+    private final Optional<KeyService> keyService;
 
     /**
      * Service responsible for integrity sweep executions.
@@ -108,6 +110,8 @@ public class VaultApiController extends BaseComponent {
      * Executor used for asynchronous operations.
      */
     private final TaskExecutor taskExecutor;
+
+    private static final String NOTARIZATION_DISABLED = "Notarization is disabled.";
     @Value("${application.service.vault.delete-node.api-enabled:false}")
     private boolean deleteNodeApiEnabled;
 
@@ -253,7 +257,9 @@ public class VaultApiController extends BaseComponent {
         val nodeContent = contentService.getNodeContent(nodeId);
 
         val headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType(nodeContent.getContentType()));
+        headers.setContentType(Strings.isNotBlank(nodeContent.getContentType())
+                ? MediaType.parseMediaType(nodeContent.getContentType())
+                : MediaType.APPLICATION_OCTET_STREAM);
         if (attachment) {
             headers.setContentDispositionFormData("attachment", nodeContent.getFileName());
         }
@@ -281,12 +287,14 @@ public class VaultApiController extends BaseComponent {
                     @Parameter(name = "restorePermissions", description = "Whether to restore permissions for the node", in = ParameterIn.QUERY)
             },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Node successfully restored",
+                    @ApiResponse(responseCode = "200", description = "Node successfully restored, or already restored",
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "401", description = "Unauthorized",
                             content = @Content),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
+                    @ApiResponse(responseCode = "409", description = "Restore of the node already in progress",
+                            content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
@@ -389,6 +397,8 @@ public class VaultApiController extends BaseComponent {
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "401", description = "Unauthorized",
                             content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Notarization is disabled",
+                            content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
                     @ApiResponse(responseCode = "409", description = "Node already notarized",
@@ -404,6 +414,10 @@ public class VaultApiController extends BaseComponent {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        if (notarizationService.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(NOTARIZATION_DISABLED);
+        }
+
         val nodeWrapper = nodeService.findById(nodeId);
         if (Strings.isNotBlank(nodeWrapper.getNotarizationTxId())) {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(String.format("Node %s is already notarized.", nodeId));
@@ -412,7 +426,7 @@ public class VaultApiController extends BaseComponent {
         CompletableFuture.runAsync(() -> {
             try {
                 log.info("Starting notarization for node {}", nodeId);
-                notarizationService.notarizeNode(nodeId);
+                notarizationService.get().notarizeNode(nodeId);
                 log.info("Completed notarization for node {}", nodeId);
             } catch (Exception e) {
                 log.error("Error while notarizing node {}", nodeId, e);
@@ -442,6 +456,8 @@ public class VaultApiController extends BaseComponent {
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "401", description = "Unauthorized",
                             content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Notarization is disabled",
+                            content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -455,7 +471,11 @@ public class VaultApiController extends BaseComponent {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        notarizationService.checkNotarization(nodeId);
+        if (notarizationService.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(NOTARIZATION_DISABLED);
+        }
+
+        notarizationService.get().checkNotarization(nodeId);
         return ResponseEntity.ok(String.format("Node %s is notarized and hashes match.", nodeId));
     }
 
@@ -464,7 +484,7 @@ public class VaultApiController extends BaseComponent {
      *
      * @param auth   optional Basic authentication header
      * @param nodeId identifier of the node whose key should be updated
-     * @return a confirmation message
+     * @return a confirmation message, or 403 when encryption is disabled
      */
     @SecurityRequirement(name = "basicAuth")
     @PostMapping("/nodes/{nodeId}/update-key")
@@ -479,6 +499,8 @@ public class VaultApiController extends BaseComponent {
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "401", description = "Unauthorized",
                             content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Encryption is disabled",
+                            content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
@@ -492,7 +514,10 @@ public class VaultApiController extends BaseComponent {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        keyService.updateKey(nodeId);
+        if (keyService.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Encryption is disabled: neither content nor metadata encryption is enabled.");
+        }
+        keyService.get().updateKey(nodeId);
         return ResponseEntity.ok(String.format("Encryption key updated for node %s.", nodeId));
     }
 
@@ -502,7 +527,7 @@ public class VaultApiController extends BaseComponent {
      *
      * @param auth       optional Basic authentication header
      * @param keyVersion version of the outdated encryption key
-     * @return a confirmation message
+     * @return a confirmation message, or 403 when encryption is disabled
      */
     @SecurityRequirement(name = "basicAuth")
     @PostMapping("/nodes/update-keys")
@@ -517,6 +542,8 @@ public class VaultApiController extends BaseComponent {
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "401", description = "Unauthorized",
                             content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Encryption is disabled",
+                            content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
@@ -528,11 +555,15 @@ public class VaultApiController extends BaseComponent {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
+        if (keyService.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Encryption is disabled: neither content nor metadata encryption is enabled.");
+        }
+
         // Re-key nodes asynchronously to avoid long blocking requests
         CompletableFuture.runAsync(() -> {
             try {
                 log.info("Starting key update for version {}", keyVersion);
-                keyService.updateKeys(keyVersion);
+                keyService.get().updateKeys(keyVersion);
                 log.info("Completed key update for version {}", keyVersion);
             } catch (Exception e) {
                 log.error("Error while updating keys for version {}", keyVersion, e);
@@ -630,6 +661,8 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "200", description = "Integrity sweep required",
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Notarization is disabled",
+                            content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
             })
     public ResponseEntity<String> runIntegritySweep(
@@ -637,6 +670,11 @@ public class VaultApiController extends BaseComponent {
 
         if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        // integrity sweeps verify content against the notarized hashes
+        if (notarizationService.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(NOTARIZATION_DISABLED);
         }
 
         CompletableFuture.runAsync(() -> integritySweepService.runSweep("MANUAL"), taskExecutor);

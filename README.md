@@ -107,8 +107,8 @@ Global configuration is stored in `application.yml` file, the relevant parameter
 | VAULT_HASH_ALGORITHM             | SHA-256                                    | Hash stored as metadata on GridFS or S3 object metadata             |
 | VAULT_DOUBLE_CHECK               | true                                       | Double check content integrity before removing document on Alfresco |
 | VAULT_DELETE_ON_ALFRESCO         | true                                       | Delete document on Alfresco after archiving                         |
-| VAULT_ENCRYPTION_ENABLED         | true                                       | Enable content encryption                                           |
-| VAULT_ENCRYPT_METADATA           | true                                       | Encrypt also metadata                                               |
+| VAULT_ENCRYPT_CONTENT            | true                                       | Enable binary content encryption (S3, GridFS)                       |
+| VAULT_ENCRYPT_METADATA           | true                                       | Enable node metadata encryption on MongoDB                          |
 | VAULT_URL                        | http://localhost:8200                      | Vault secret engine URI                                             |
 | VAULT_ENCRYPTION_KV_MOUNT        | secret                                     | Vault secret engine mount path                                      |
 | VAULT_ENCRYPTION_SECRET_PATH     | AlfrescoNodeVault                          | Path of encryption secret in Vault secret engine                    |

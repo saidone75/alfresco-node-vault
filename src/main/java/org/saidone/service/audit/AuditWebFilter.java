@@ -33,6 +33,7 @@ import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
 import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -62,8 +63,11 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
      * information.
      *
      * <p>The request is audited before the rest of the filter chain executes.
-     * After the chain completes, a second entry is stored describing the
-     * response.</p>
+     * After the chain completes, a second entry describing the response is
+     * stored asynchronously, without delaying the completion signal.</p>
+     *
+     * <p>Entries are persisted with blocking MongoDB calls, so they run on the
+     * bounded elastic scheduler instead of the Netty event loop.</p>
      *
      * @param exchange the current server exchange
      * @param chain    the remaining web filter chain
@@ -73,11 +77,25 @@ public class AuditWebFilter extends BaseComponent implements WebFilter {
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
         val requestEntry = createRequestAuditEntry(exchange.getRequest());
-        auditService.saveEntry(requestEntry);
-        return chain.filter(exchange).doFinally(signal -> {
-            val responseEntry = createResponseAuditEntry((String) requestEntry.getMetadata().get(AuditEntryKeys.METADATA_ID), exchange.getResponse());
-            auditService.saveEntry(responseEntry);
-        });
+        return saveEntry(requestEntry)
+                .then(chain.filter(exchange))
+                .doFinally(signal -> {
+                    val responseEntry = createResponseAuditEntry((String) requestEntry.getMetadata().get(AuditEntryKeys.METADATA_ID), exchange.getResponse());
+                    saveEntry(responseEntry).subscribe(null,
+                            e -> log.error("Unable to save response audit entry: {}", e.getMessage()));
+                });
+    }
+
+    /**
+     * Persist an audit entry on the bounded elastic scheduler.
+     *
+     * @param entry the audit entry to save
+     * @return completion signal of the save operation
+     */
+    private Mono<Void> saveEntry(AuditEntryDto entry) {
+        return Mono.fromRunnable(() -> auditService.saveEntry(entry))
+                .subscribeOn(Schedulers.boundedElastic())
+                .then();
     }
 
     /**

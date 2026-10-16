@@ -119,6 +119,7 @@ application:
       chunk-size: 8192
     vault:
       hash-algorithm: ${VAULT_HASH_ALGORITHM:SHA-256}
+      auth-cache-ttl: ${VAULT_AUTH_CACHE_TTL:60s}
       double-check: ${VAULT_DOUBLE_CHECK:true}
       delete-on-alfresco: ${VAULT_DELETE_ON_ALFRESCO:true}
       delete-node:
@@ -126,8 +127,10 @@ application:
         restore-on-alfresco: ${VAULT_DELETE_NODE_RESTORE_ON_ALFRESCO:true}
         delete-on-alfresco: ${VAULT_DELETE_NODE_DELETE_ON_ALFRESCO:true}
       encryption:
-        enabled: ${VAULT_ENCRYPTION_ENABLED:true}
-        metadata: ${VAULT_ENCRYPT_METADATA:true}
+        content:
+          enabled: ${VAULT_ENCRYPT_CONTENT:true}
+        metadata:
+          enabled: ${VAULT_ENCRYPT_METADATA:true}
         vault-secret-kv-mount: ${VAULT_ENCRYPTION_KV_MOUNT:secret}
         vault-secret-path: ${VAULT_ENCRYPTION_SECRET_PATH:AlfrescoNodeVault}
         vault-secret-key: ${VAULT_ENCRYPTION_SECRET_KEY:anv.secret}
@@ -167,6 +170,8 @@ application:
           rpc-url: ${ETH_RPC_URL:http://localhost:8545}
           private-key: ${ETH_PRIVATE_KEY:4f3edf983ac636a65a842ce7c78d9aa706d3b113b37c7e9c79fc75a2e96c3e6a}
           auto-generate: ${ETH_AUTO_GENERATE:false}
+          receipt-polling-interval: ${ETH_RECEIPT_POLLING_INTERVAL:1000}
+          receipt-polling-attempts: ${ETH_RECEIPT_POLLING_ATTEMPTS:120}
   same-node-processing-threshold: ${SAME_NODE_PROCESSING_THRESHOLD:10000}
 server:
   port: 8086

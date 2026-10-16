@@ -1,0 +1,26 @@
+name: Maven Dependency Submission
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  dependency-submission:
+    runs-on: ubuntu-latest
+    name: Submit dependency graph
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          distribution: 'zulu'
+          java-version: '21'
+          cache: 'maven'
+      - name: Submit Maven dependency tree
+        uses: advanced-security/maven-dependency-submission-action@v6.0.1
+        with:
+          ignore-maven-wrapper: true

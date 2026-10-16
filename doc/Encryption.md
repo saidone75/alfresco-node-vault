@@ -18,10 +18,12 @@ application:
   service:
     vault:
       encryption:
-        # Enable/disable encryption functionality
-        enabled: ${VAULT_ENCRYPTION_ENABLED:true}
-        # Enable/disable metadata encryption
-        metadata: ${VAULT_ENCRYPT_METADATA:true}
+        content:
+          # Enable/disable binary content encryption (S3, GridFS)
+          enabled: ${VAULT_ENCRYPT_CONTENT:true}
+        metadata:
+          # Enable/disable node metadata encryption on MongoDB
+          enabled: ${VAULT_ENCRYPT_METADATA:true}
         # Master encryption key
         secret: ${VAULT_ENCRYPTION_SECRET:changeme}
         # Encryption implementation: 'jca' or 'bc'

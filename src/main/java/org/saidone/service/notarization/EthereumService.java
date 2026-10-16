@@ -33,6 +33,7 @@ import org.web3j.protocol.Web3j;
 import org.web3j.protocol.core.methods.request.Transaction;
 import org.web3j.protocol.http.HttpService;
 import org.web3j.tx.RawTransactionManager;
+import org.web3j.tx.response.PollingTransactionReceiptProcessor;
 import org.web3j.utils.Numeric;
 
 import java.io.IOException;
@@ -150,12 +151,15 @@ public class EthereumService extends AbstractNotarizationService {
      * Sends a zero-value transaction containing the given hash as data.
      * <p>
      * The transaction is signed with the configured credentials and addressed
-     * to the account defined in {@link EthereumConfig}.
+     * to the account defined in {@link EthereumConfig}. The method waits for the
+     * transaction to be mined successfully, so that a transaction rejected or
+     * dropped by the network is never recorded as a notarization.
      * </p>
      *
      * @param nodeId the node identifier
      * @param hash   the hash to store on the blockchain
      * @return the resulting Ethereum transaction hash
+     * @throws NotarizationException if the transaction is rejected, fails or is not mined in time
      */
     @Override
     protected String putHash(String nodeId, String hash) {
@@ -185,8 +189,20 @@ public class EthereumService extends AbstractNotarizationService {
                     config.getAccount(),
                     data,
                     BigInteger.ZERO);
+            if (tx.hasError()) {
+                throw new NotarizationException(tx.getError().getMessage());
+            }
             val txHash = tx.getTransactionHash();
-            log.debug("Notarized node {} with tx id {}", nodeId, txHash);
+            log.debug("Sent notarization tx {} for node {}, waiting for receipt", txHash, nodeId);
+
+            val receipt = new PollingTransactionReceiptProcessor(
+                    web3j,
+                    config.getReceiptPollingInterval(),
+                    config.getReceiptPollingAttempts()).waitForTransactionReceipt(txHash);
+            if (!receipt.isStatusOK()) {
+                throw new NotarizationException(String.format("transaction %s failed with status %s", txHash, receipt.getStatus()));
+            }
+            log.debug("Notarized node {} with tx id {} in block {}", nodeId, txHash, receipt.getBlockNumber());
             return txHash;
         } catch (Exception e) {
             log.trace(e.getMessage(), e);

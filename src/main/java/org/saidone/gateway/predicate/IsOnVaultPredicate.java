@@ -23,10 +23,14 @@ import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.jspecify.annotations.NonNull;
 import org.saidone.repository.MongoNodeRepositoryImpl;
+import org.springframework.cloud.gateway.handler.AsyncPredicate;
 import org.springframework.cloud.gateway.handler.predicate.AbstractRoutePredicateFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -70,18 +74,36 @@ public class IsOnVaultPredicate extends AbstractRoutePredicateFactory<IsOnVaultP
 
     @Override
     public @NonNull Predicate<ServerWebExchange> apply(@NonNull Config config) {
-        return exchange -> {
-            val path = exchange.getRequest().getURI().getPath();
-            val matcher = NODE_CONTENT_PATTERN.matcher(path);
-            if (matcher.matches()) {
-                val nodeId = matcher.group(1);
-                log.debug("Detected node ID: {}", nodeId);
-                val isOnVault = mongoNodeRepository.findById(nodeId).isPresent();
-                log.debug("Node {} {}found on the vault", nodeId, isOnVault ? Strings.EMPTY : "NOT ");
-                return isOnVault;
-            }
-            return false;
-        };
+        return exchange -> extractNodeId(exchange).map(this::isOnVault).orElse(false);
+    }
+
+    /**
+     * Asynchronous variant used by the gateway route matching. The blocking MongoDB
+     * lookup runs on the bounded elastic scheduler instead of the Netty event loop.
+     */
+    @Override
+    public @NonNull AsyncPredicate<ServerWebExchange> applyAsync(@NonNull Config config) {
+        return exchange -> extractNodeId(exchange)
+                .map(nodeId -> Mono.fromCallable(() -> isOnVault(nodeId))
+                        .subscribeOn(Schedulers.boundedElastic()))
+                .orElseGet(() -> Mono.just(false));
+    }
+
+    private static Optional<String> extractNodeId(ServerWebExchange exchange) {
+        val path = exchange.getRequest().getURI().getPath();
+        val matcher = NODE_CONTENT_PATTERN.matcher(path);
+        if (matcher.matches()) {
+            val nodeId = matcher.group(1);
+            log.debug("Detected node ID: {}", nodeId);
+            return Optional.of(nodeId);
+        }
+        return Optional.empty();
+    }
+
+    private boolean isOnVault(String nodeId) {
+        val isOnVault = mongoNodeRepository.existsById(nodeId);
+        log.debug("Node {} {}found on the vault", nodeId, isOnVault ? Strings.EMPTY : "NOT ");
+        return isOnVault;
     }
 
 }

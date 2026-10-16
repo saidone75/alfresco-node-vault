@@ -21,6 +21,7 @@ package org.saidone.controller;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.extern.slf4j.Slf4j;
 import org.saidone.exception.NodeNotFoundException;
+import org.saidone.exception.NodeRestoreInProgressException;
 import org.saidone.exception.NotarizationException;
 import org.saidone.exception.VaultException;
 import org.springframework.http.HttpStatus;
@@ -54,6 +55,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handleNodeNotFoundException(NodeNotFoundException e) {
         log.error(e.getMessage());
         return buildResponse(HttpStatus.NOT_FOUND, "Node not found");
+    }
+
+    @ExceptionHandler(NodeRestoreInProgressException.class)
+    @Operation(hidden = true)
+    public ResponseEntity<String> handleNodeRestoreInProgressException(NodeRestoreInProgressException e) {
+        log.warn(e.getMessage());
+        return buildResponse(HttpStatus.CONFLICT, e.getMessage());
     }
 
     @ExceptionHandler(OutOfMemoryError.class)

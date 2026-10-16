@@ -18,7 +18,9 @@
 
 package org.saidone.model.mapper;
 
+import org.bson.Document;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.saidone.model.dto.NodeWrapperDto;
 import org.saidone.model.entity.NodeEntity;
 
@@ -27,10 +29,28 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface NodeMapper {
 
+    @Mapping(target = "nodeDocument", source = "nodeJson")
+    @Mapping(target = "nodeJson", ignore = true)
     NodeEntity toEntity(NodeWrapperDto dto);
 
+    @Mapping(target = "nodeJson", source = "entity")
     NodeWrapperDto toDto(NodeEntity entity);
 
     List<NodeWrapperDto> toDtoList(List<NodeEntity> entities);
+
+    default Document jsonToDocument(String json) {
+        return json == null ? null : Document.parse(json);
+    }
+
+    /**
+     * Returns the node JSON, taken from the BSON document when present or from
+     * the JSON string otherwise (encrypted node or legacy record).
+     */
+    default String toNodeJson(NodeEntity entity) {
+        if (entity.getNodeDocument() != null) {
+            return entity.getNodeDocument().toJson();
+        }
+        return entity.getNodeJson();
+    }
 
 }

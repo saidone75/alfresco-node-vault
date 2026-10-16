@@ -39,13 +39,13 @@ import java.util.HashMap;
  * {@link S3Client}. The class exposes basic methods to upload and download
  * objects using a provided {@code S3Client} instance.
  * <p>
- * The bean is created only when {@code application.service.vault.encryption.enabled}
+ * The bean is created only when {@code application.service.vault.encryption.content.enabled}
  * is set to {@code false} and {@code application.service.vault.storage.impl}
  * equals {@code "s3"}.
  */
 @Service
 @ConditionalOnExpression(
-        "${application.service.vault.encryption.enabled}.equals(false) and '${application.service.vault.storage.impl}'.equals('s3')"
+        "${application.service.vault.encryption.content.enabled}.equals(false) and '${application.service.vault.storage.impl}'.equals('s3')"
 )
 @RequiredArgsConstructor
 @Slf4j
@@ -72,6 +72,7 @@ public class S3RepositoryImpl extends BaseComponent implements S3Repository {
         val putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(node.getId())
+                .metadata(metadata)
                 .build();
         s3Client.putObject(putObjectRequest, RequestBody.fromContentProvider(ContentStreamProvider.fromInputStream(inputStream), node.getContent().getMimeType()));
     }

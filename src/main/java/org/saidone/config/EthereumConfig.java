@@ -66,6 +66,14 @@ public class EthereumConfig {
      * Whether to automatically generate a new Ethereum account at startup.
      */
     private boolean autoGenerate;
+    /**
+     * Interval in milliseconds between polls for the receipt of a sent transaction.
+     */
+    private long receiptPollingInterval = 1000;
+    /**
+     * Maximum number of polls for the receipt of a sent transaction before giving up.
+     */
+    private int receiptPollingAttempts = 120;
 
     /**
      * Generates an Ethereum account if {@link #autoGenerate} is enabled.

@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.bson.Document;
 import org.saidone.component.BaseComponent;
+import org.saidone.model.MetadataKeys;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
@@ -50,7 +51,7 @@ import java.util.Map;
  * {@code MongoTemplate} for interactions with MongoDB and GridFS collections.
  * <p>
  * On initialization, an ascending index is automatically created on the
- * {@code metadata.uuid} field in the {@code fs.files} collection to improve
+ * {@code metadata.id} field in the {@code fs.files} collection to improve
  * query performance for operations that search files by UUID.
  * <p>
  * Supports the following main operations:
@@ -68,8 +69,8 @@ import java.util.Map;
  * </ul>
  * <p>
  * This implementation is registered in the Spring context only when the
- * property {@code application.service.vault.encryption.enabled} is set to
- * {@code false} (or is missing) <strong>and</strong>
+ * property {@code application.service.vault.encryption.content.enabled} is set to
+ * {@code false} <strong>and</strong>
  * {@code application.service.vault.storage.impl} equals {@code "gridfs"}.
  * <p>
  * Extends {@link org.saidone.component.BaseComponent} to inherit standardized
@@ -80,7 +81,7 @@ import java.util.Map;
  */
 @Repository
 @ConditionalOnExpression(
-        "${application.service.vault.encryption.enabled}.equals(false) and '${application.service.vault.storage.impl}'.equals('gridfs')"
+        "${application.service.vault.encryption.content.enabled}.equals(false) and '${application.service.vault.storage.impl}'.equals('gridfs')"
 )
 @RequiredArgsConstructor
 @Slf4j
@@ -90,7 +91,8 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
     private final GridFsOperations gridFsOperations;
     private final MongoTemplate mongoTemplate;
 
-    private static final String UUID_FIELD = "metadata.uuid";
+    private static final String UUID_FIELD = String.format("metadata.%s", MetadataKeys.UUID);
+    private static final String FILES_COLLECTION = "fs.files";
 
     /**
      * Initializes the component by creating an index on the
@@ -104,9 +106,8 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
     public void init() {
         super.init();
         try {
-            val indexOps = mongoTemplate.indexOps("fs.files");
-            val index = new Index().on(UUID_FIELD, Sort.Direction.ASC).named("metadata_uuid_index");
-            indexOps.createIndex(index);
+            val indexOps = mongoTemplate.indexOps(FILES_COLLECTION);
+            indexOps.createIndex(new Index().on(UUID_FIELD, Sort.Direction.ASC).named("metadata_id_index"));
         } catch (Exception e) {
             log.error("Unable to start {}", this.getClass().getSimpleName());
             super.shutDown(1);
@@ -114,7 +115,10 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
     }
 
     /**
-     * Stores a new file in GridFS.
+     * Stores a new file in GridFS, replacing any file previously stored for the same UUID.
+     * <p>
+     * The previous files are removed only after the new one has been fully written, so the
+     * input stream may safely be read from the file being replaced (e.g. during re-keying).
      *
      * @param inputStream the stream containing the file content
      * @param fileName    name of the file to store
@@ -123,49 +127,68 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
      */
     @Override
     public void saveFile(InputStream inputStream, String fileName, String contentType, Map<String, String> metadata) {
-        gridFsTemplate.store(
+        val fileId = gridFsTemplate.store(
                 inputStream,
                 fileName,
                 contentType,
                 new Document(metadata)
         );
+        val uuid = metadata.get(MetadataKeys.UUID);
+        if (uuid != null) {
+            val previousFiles = new Query(uuidCriteria(uuid)).addCriteria(Criteria.where("_id").ne(fileId));
+            gridFsTemplate.delete(previousFiles);
+        }
     }
 
     /**
-     * Updates the metadata document of a stored file.
+     * Updates the metadata document of the most recently stored file for the given UUID.
      *
      * @param uuid     unique identifier of the file
      * @param metadata key/value pairs to merge into the existing metadata
      */
     @Override
     public void updateFileMetadata(String uuid, Map<String, String> metadata) {
-        val query = new Query(Criteria.where(UUID_FIELD).is(uuid));
+        val file = findFileById(uuid);
+        if (file == null) {
+            log.warn("No file found for node {}, metadata not updated", uuid);
+            return;
+        }
         val update = new Update();
         metadata.forEach((key, value) -> update.set(String.format("metadata.%s", key), value));
-        mongoTemplate.updateFirst(query, update, "fs.files");
+        mongoTemplate.updateFirst(new Query(Criteria.where("_id").is(file.getObjectId())), update, FILES_COLLECTION);
     }
 
     /**
-     * Retrieves a file descriptor by UUID.
+     * Retrieves a file descriptor by UUID. If more than one file matches, the most recently
+     * uploaded one is returned.
      *
      * @param uuid unique identifier of the file
      * @return the matching {@link GridFSFile} or {@code null} if not found
      */
     @Override
     public GridFSFile findFileById(String uuid) {
-        val query = new Query(Criteria.where(UUID_FIELD).is(uuid));
-        return gridFsTemplate.findOne(query);
+        val query = new Query(uuidCriteria(uuid)).with(Sort.by(Sort.Direction.DESC, "uploadDate"));
+        return gridFsTemplate.find(query).first();
     }
 
     /**
-     * Deletes a file and its metadata from GridFS by UUID.
+     * Deletes all the files stored for the given UUID from GridFS.
      *
      * @param uuid unique identifier of the file
      */
     @Override
     public void deleteFileById(String uuid) {
-        val query = new Query(Criteria.where(UUID_FIELD).is(uuid));
-        gridFsTemplate.delete(query);
+        gridFsTemplate.delete(new Query(uuidCriteria(uuid)));
+    }
+
+    /**
+     * Builds the criteria matching a file by node UUID.
+     *
+     * @param uuid unique identifier of the file
+     * @return criteria matching the file
+     */
+    private static Criteria uuidCriteria(String uuid) {
+        return Criteria.where(UUID_FIELD).is(uuid);
     }
 
     /**
