@@ -108,7 +108,9 @@ public abstract class BaseTest {
     @SneakyThrows
     public Node createNode(File file) {
         val nodeBodyCreate = new NodeBodyCreate();
-        nodeBodyCreate.setName(String.format("%s.%s", generateName(), file.getName().replaceAll("^.*\\.(.*)$", "$1")));
+        val fileName = file.getName();
+        val extension = fileName.substring(fileName.lastIndexOf('.') + 1);
+        nodeBodyCreate.setName(String.format("%s.%s", generateName(), extension));
         nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
         // apply dublin core metadata to half of the documents on average
         if (faker.random().nextBoolean()) {
@@ -133,7 +135,8 @@ public abstract class BaseTest {
     @SneakyThrows
     public Node createNode(URL url) {
         if (!downloadedFiles.containsKey(url.toString())) {
-            val extension = url.getPath().replaceAll("^.*\\.(.*)$", "$1");
+            val path = url.getPath();
+            val extension = path.substring(path.lastIndexOf('.') + 1);
             val tmpFile = File.createTempFile("anv-", String.format(".%s", extension));
             tmpFile.deleteOnExit();
             FileUtils.copyURLToFile(url, tmpFile);
