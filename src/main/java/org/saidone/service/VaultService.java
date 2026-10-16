@@ -20,6 +20,7 @@ package org.saidone.service;
 
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.core.model.Node;
@@ -215,6 +216,12 @@ public class VaultService extends BaseComponent {
      * (e.g. when a client retries after a timeout). A node whose restored copy
      * has been deleted from Alfresco can be restored again.
      * </p>
+     * <p>
+     * If uploading content or saving the restored node ID fails, the newly created
+     * node is permanently deleted on a best-effort basis and the original error is
+     * rethrown. A process interruption, a lost creation response or failed cleanup
+     * may still require manual reconciliation before retrying.
+     * </p>
      *
      * @param nodeId             the ID of the node to restore
      * @param restorePermissions whether to restore permissions along with the node
@@ -223,6 +230,7 @@ public class VaultService extends BaseComponent {
      * @throws NodeRestoreInProgressException  if a restore of the same node is already running
      * @throws VaultException                  if stored metadata cannot be parsed
      */
+    @SneakyThrows
     public String restoreNode(String nodeId, boolean restorePermissions) throws VaultException {
         if (!restoresInProgress.add(nodeId)) {
             throw new NodeRestoreInProgressException(nodeId);
@@ -234,9 +242,19 @@ public class VaultService extends BaseComponent {
                 return nodeWrapper.getRestoredNodeId();
             }
             val newNodeId = alfrescoService.restoreNode(nodeWrapper.getNode(), restorePermissions);
-            alfrescoService.restoreNodeContent(newNodeId, contentService.getNodeContent(nodeId));
-            nodeWrapper.setRestoredNodeId(newNodeId);
-            nodeService.save(nodeWrapper);
+            try {
+                alfrescoService.restoreNodeContent(newNodeId, contentService.getNodeContent(nodeId));
+                nodeWrapper.setRestoredNodeId(newNodeId);
+                nodeService.save(nodeWrapper);
+            } catch (Exception e) {
+                try {
+                    alfrescoService.deleteNode(newNodeId, true);
+                } catch (Exception cleanupException) {
+                    e.addSuppressed(cleanupException);
+                    log.error("Could not remove failed restore {} for node {}", newNodeId, nodeId, cleanupException);
+                }
+                throw e;
+            }
             return newNodeId;
         } finally {
             restoresInProgress.remove(nodeId);
