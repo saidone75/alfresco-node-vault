@@ -42,7 +42,11 @@ import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.function.Supplier;
+import java.util.stream.Stream;
 
 import org.apache.commons.io.FileUtils;
 
@@ -67,6 +71,17 @@ public abstract class BaseTest {
     protected static final Faker faker = new Faker();
     private static final HashMap<String, Integer> names = new HashMap<>();
     private static final HashMap<String, File> downloadedFiles = new HashMap<>();
+    private static final List<String> PUBLISHERS = fakeValues(() -> faker.company().name());
+    private static final List<String> CONTRIBUTORS = fakeValues(() -> faker.artist().name());
+    private static final List<String> SUBJECTS = fakeValues(() -> faker.book().genre());
+
+    private static List<String> fakeValues(Supplier<String> generator) {
+        return Stream.generate(generator).distinct().limit(5).toList();
+    }
+
+    private static String randomElement(List<String> values) {
+        return values.get(faker.random().nextInt(values.size()));
+    }
 
     @BeforeEach
     public void before(TestInfo testInfo) {
@@ -95,7 +110,15 @@ public abstract class BaseTest {
         val nodeBodyCreate = new NodeBodyCreate();
         nodeBodyCreate.setName(String.format("%s.%s", generateName(), file.getName().replaceAll("^.*\\.(.*)$", "$1")));
         nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
-        val node = Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, true, null, null, null, null).getBody()).getEntry();
+        // apply dublin core metadata to half of the documents on average
+        if (faker.random().nextBoolean()) {
+            nodeBodyCreate.setAspectNames(List.of(AlfrescoContentModel.ASP_DUBLINCORE));
+            nodeBodyCreate.setProperties(Map.of(
+                    AlfrescoContentModel.PROP_PUBLISHER, randomElement(PUBLISHERS),
+                    AlfrescoContentModel.PROP_CONTRIBUTOR, randomElement(CONTRIBUTORS),
+                    AlfrescoContentModel.PROP_SUBJECT, randomElement(SUBJECTS)));
+        }
+        val node =Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, true, null, null, null, null).getBody()).getEntry();
         nodesApi.updateNodeContent(node.getId(), Files.readAllBytes(file.toPath()), null, null, null, null, null);
         log.debug("Node {} created with name: {}", node.getId(), node.getName());
         return node;

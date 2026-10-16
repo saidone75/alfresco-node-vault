@@ -75,7 +75,7 @@ class AuditApiControllerTests extends BaseTest {
         auditService.saveEntry(auditEntry);
         auditService.saveEntry(auditEntry);
 
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/api/audit")
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path("/api/v1/audit")
                         .queryParam("type", "test")
                         .build())
                 .header(HttpHeaders.AUTHORIZATION, basicAuth)

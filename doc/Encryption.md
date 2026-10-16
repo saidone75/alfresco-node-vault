@@ -20,10 +20,10 @@ application:
       encryption:
         content:
           # Enable/disable binary content encryption (S3, GridFS)
-          enabled: ${VAULT_ENCRYPT_CONTENT:true}
+          enabled: ${VAULT_ENCRYPT_CONTENT:false}
         metadata:
           # Enable/disable node metadata encryption on MongoDB
-          enabled: ${VAULT_ENCRYPT_METADATA:true}
+          enabled: ${VAULT_ENCRYPT_METADATA:false}
         # Master encryption key
         secret: ${VAULT_ENCRYPTION_SECRET:changeme}
         # Encryption implementation: 'jca' or 'bc'
@@ -143,7 +143,7 @@ Uses the Bouncy Castle provider to implement ChaCha20-Poly1305 authenticated enc
     - Each encryption operation uses a new random nonce/IV
     - The system prepends the key version, salt and nonce/IV to the encrypted data for decryption
 
-5. **Processing Model**:
+3. **Processing Model**:
     - The system uses streaming encryption/decryption to handle large files efficiently
     - Minimal memory footprint even with large files
 
@@ -183,9 +183,33 @@ Where:
 
 This structure ensures that everything needed for decryption (except the master
 secret) travels with the ciphertext. For reference, see the implementations in
-[JcaCryptoServiceImpl.java](../src/main/java/org/saidone/service/JcaCryptoServiceImpl.java)
+[JcaCryptoServiceImpl.java](../src/main/java/org/saidone/service/crypto/JcaCryptoServiceImpl.java)
 and
-[BcCryptoServiceImpl.java](../src/main/java/org/saidone/service/BcCryptoServiceImpl.java).
+[BcCryptoServiceImpl.java](../src/main/java/org/saidone/service/crypto/BcCryptoServiceImpl.java).
+
+## Key Rotation
+
+The encryption secret is read from a versioned key/value secret engine (HashiCorp Vault), and every encrypted payload
+records the version of the secret used. To rotate the key:
+
+1. Store a new version of the secret at the configured path (`VAULT_ENCRYPTION_SECRET_PATH`, key
+   `VAULT_ENCRYPTION_SECRET_KEY`). New nodes are encrypted with the latest version, while previous versions stay
+   available for decryption.
+2. Re-encrypt the existing nodes with `POST /api/v1/vault/nodes/update-keys?keyVersion=<old version>`, or a single node
+   with `POST /api/v1/vault/nodes/{nodeId}/update-key` (see [RestApi.md](RestApi.md)).
+
+## Changing the Encryption Configuration
+
+Content and metadata encryption are enabled independently and are recorded per node, so the configuration can change
+only in some directions once data is stored:
+
+- **Enabling encryption** is supported: existing content and metadata stay readable and new nodes are stored
+  encrypted. Existing nodes are not re-encrypted.
+- **Disabling encryption** with encrypted data already stored is not supported: encrypted content would be returned as
+  is and encrypted metadata could not be read.
+- **Changing `impl`, the KDF or its parameters, or the salt and nonce/IV lengths** with encrypted data already stored
+  is not supported: these settings are not recorded with the data and the existing payloads could no longer be
+  decrypted. Use key rotation to change the secret instead.
 
 ## Development Recommendations
 

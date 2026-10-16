@@ -8,7 +8,7 @@ It helps detect tampering, missing proofs, or unexpected verification errors ove
 You can run Integrity Sweep in two complementary ways:
 
 - **Scheduled mode** with `INTEGRITY_SWEEP_ENABLED=true` and a cron defined in `INTEGRITY_SWEEP_CRON_EXPRESSION`
-- **On-demand mode** through REST API `POST /api/vault/integrity-sweeps/run`
+- **On-demand mode** through REST API `POST /api/v1/vault/integrity-sweeps/run`
 
 ## Run results and monitoring
 
@@ -19,7 +19,7 @@ Each sweep run stores:
 - duration
 - counters: `scanned`, `passed`, `failed`, `errors`
 
-Historical runs are available via `GET /api/vault/integrity-sweeps`.
+Historical runs are available via `GET /api/v1/vault/integrity-sweeps`.
 
 ## Hybrid mode + controlled coverage for large notarized datasets
 

@@ -7,17 +7,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
-- Introduced a hybrid integrity sweep with configurable coverage controls.
-- Added batching support for integrity sweeps and persistence of corrupted-node lists.
-- Improved integrity diagnostics by memorizing nodes that fail integrity sweeps.
+- Advanced search API (`POST /api/v1/vault/advanced-search`) on node metadata: name with `*` and `?` wildcards, node type, creation and modification dates, mimetype, size, aspects and custom properties, combining values and conditions with `ANY`/`ALL`. Available only when metadata encryption is disabled.
+- Delete node API (`DELETE /api/v1/vault/nodes/{nodeId}`), disabled by default (`${VAULT_DELETE_NODE_API_ENABLED:false}`).
+- Integrity sweep, scheduled or on demand, with hybrid mode and configurable coverage, batching, persistence of corrupted-node lists and Grafana dashboard.
+- Separate flags for content and metadata encryption (`${VAULT_ENCRYPT_CONTENT}` and `${VAULT_ENCRYPT_METADATA}`); non-encrypted metadata is stored as a BSON document.
+- Caching of successful API authorizations (`${VAULT_AUTH_CACHE_TTL:60s}`).
+- Loki and Promtail in the Docker setup for log aggregation.
 
 ### Changed
-- Updated the project baseline for `0.9.1-SNAPSHOT` with Spring Boot 4.0.6 and Spring Cloud 2025.1.1.
-- Bumped key dependencies including AWS SDK modules to 2.42.41, Commons IO to 2.22.0, SpringDoc WebFlux UI to 3.0.3, and Datafaker to 2.5.4.
-- Upgraded Alfresco Java starters (`alfresco-acs-java-rest-api-spring-boot-starter` and `alfresco-java-event-api-spring-boot-starter`) to 7.3.1.
-- Replaced LocalStack with Moto for S3 integration testing and local emulation workflows.
+- **Breaking:** REST APIs are now versioned under `/api/v1` (`/api/v1/vault` and `/api/v1/audit`).
+- Reviewed API error responses: invalid parameters, request bodies and pagination return `400` instead of `500`; checking the notarization of a node that is not notarized, or whose hash does not match, returns `409` instead of `500`; all plain-text responses use the `text/plain` content type.
+- Node restore is idempotent.
+- The content key version is recorded on archived nodes, so key rotation also finds nodes with plain metadata.
+- Blocking operations no longer run on the Netty event loop.
+- Upgraded to Spring Boot 4.1.1 and Spring Cloud 2025.1.3, Alfresco Java starters 7.3.3, AWS SDK 2.55.5, web3j 6.0.0, SpringDoc WebFlux UI 3.1.1, Bouncy Castle 1.86 and Datafaker 2.7.0.
+- Fixed Maven dependency convergence by importing the AWS SDK BOM and pinning transitive versions.
+- Docker: Java 25 runtime (Azul Zulu), Moto instead of LocalStack, modular Compose files; the vault image build copies only the build inputs.
+- CI: Maven dependency submission replaces OWASP Dependency-Check and GitHub Actions are pinned to commit SHAs.
 
-## [0.9.0] - 2026-12-01
+### Fixed
+- Reflected XSS in plain-text API responses.
+- S3 content is decrypted only when marked as encrypted, so content stored before enabling encryption can still be read.
+- A failed archiving rollback no longer deletes valid vault data.
+- GridFS lookup key and duplicate files per node; the content type is stored under the `ct` metadata key.
+- S3 user metadata is persisted on content upload.
+- Invalid API credentials return `401` instead of `500`.
+- Startup with notarization disabled.
+- Notarization waits for transactions to be successfully mined.
+- Checking whether a node is on the vault no longer decrypts its metadata.
+
+## [0.9.0] - 2026-01-12
 
 ### Added
 - New `delete-on-alfresco` flag (`${VAULT_DELETE_ON_ALFRESCO:true}`) in configuration.
@@ -44,7 +63,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Corrected encryption flag parsing in `GridFsContentService`.
 - Fixed typos and Javadoc placement issues.
 
-## [0.2.0] - 2025-07-07
+## [0.0.2] - 2025-07-07
 
 ### Added
 - **Audit trail**: incoming requests and outgoing responses are now audited and stored in a MongoDB time series collection. Entries are accessible via the new `/api/audit` endpoint.

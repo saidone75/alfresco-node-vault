@@ -27,13 +27,14 @@ import org.saidone.service.crypto.CryptoService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.io.InputStream;
 import java.util.HashMap;
 
 /**
  * {@link S3RepositoryImpl} variant that transparently encrypts data before
- * uploading to S3 and decrypts it when retrieved. Encryption is delegated to
+ * uploading to S3 and decrypts it when retrieved, if marked as encrypted. Encryption is delegated to
  * the provided {@link CryptoService}.
  * <p>
  * The bean becomes active only when
@@ -88,16 +89,30 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
     }
 
     /**
-     * Retrieves the encrypted object content from S3 and returns a decrypted
-     * stream using the configured {@link CryptoService}.
+     * Retrieves the object content from S3.
+     * If the object is encrypted, decrypts the content before returning.
      *
      * @param bucketName bucket containing the object
      * @param nodeId     the node id / object key
-     * @return decrypted content stream
+     * @return the object content stream, decrypted if necessary
      */
     @Override
     public InputStream getObject(String bucketName, String nodeId) {
-        return cryptoService.decrypt(super.getObject(bucketName, nodeId));
+        val objectStream = getObjectStream(bucketName, nodeId);
+        if (isEncrypted(objectStream.response())) {
+            return cryptoService.decrypt(objectStream);
+        }
+        return objectStream;
+    }
+
+    /**
+     * Checks if a given S3 object is marked as encrypted.
+     *
+     * @param response the response of the get object request
+     * @return true if the object is encrypted, false otherwise
+     */
+    private boolean isEncrypted(GetObjectResponse response) {
+        return Boolean.parseBoolean(response.metadata().get(MetadataKeys.ENCRYPTED));
     }
 
 }

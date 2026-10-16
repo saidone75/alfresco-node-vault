@@ -15,9 +15,11 @@ RUN --mount=type=bind,source=pom.xml,target=pom.xml \
     mvn -s .m2/settings.xml -Dmaven.repo.local=/root/.m2/repository \
     dependency:go-offline -B
 
-COPY . .
+COPY pom.xml .
+COPY src src
 
-RUN --mount=type=cache,target=/root/.m2 \
+RUN --mount=type=bind,source=.m2/settings.xml,target=.m2/settings.xml \
+    --mount=type=cache,target=/root/.m2 \
     mvn -s .m2/settings.xml -Dmaven.repo.local=/root/.m2/repository \
     clean package -DskipTests -Dlicense.skip=true
 

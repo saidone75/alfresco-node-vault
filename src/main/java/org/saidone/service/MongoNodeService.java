@@ -24,6 +24,7 @@ import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.model.mapper.NodeMapper;
+import org.saidone.model.dto.NodeSearchRequestDto;
 import org.saidone.model.dto.NodeWrapperDto;
 import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.springframework.data.domain.Page;
@@ -92,6 +93,14 @@ public class MongoNodeService extends BaseComponent implements NodeService {
     @Override
     public Page<NodeWrapperDto> findByArchiveDateRange(Instant from, Instant to, Pageable pageable) {
         return mongoNodeRepository.findByArchiveDateRange(from, to, pageable).map(nodeMapper::toDto);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Page<NodeWrapperDto> search(NodeSearchRequestDto request, Pageable pageable) {
+        return mongoNodeRepository.search(request, pageable).map(nodeMapper::toDto);
     }
 
     /**
