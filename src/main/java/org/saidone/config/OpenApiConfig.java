@@ -18,7 +18,9 @@
 
 package org.saidone.config;
 
+import io.swagger.v3.oas.annotations.OpenAPIDefinition;
 import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.info.Info;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.context.annotation.Configuration;
@@ -27,10 +29,24 @@ import org.springframework.context.annotation.Configuration;
  * Registers OpenAPI components and security scheme for the REST API.
  */
 @Configuration
+@OpenAPIDefinition(info = @Info(
+        title = "Alfresco Node Vault API",
+        version = "v1",
+        description = """
+                Archive, retrieve, restore and notarize Alfresco nodes.
+
+                Paginated endpoints accept `page` (zero-based) and `size`; dates are ISO-8601 instants.
+                Operations return a plain-text confirmation and errors a plain-text description.
+                Endpoints of features disabled by configuration return `403`.
+
+                Requests to the Alfresco REST API for archived nodes are also served by the vault: see
+                [RestApi.md](https://github.com/saidone75/alfresco-node-vault/blob/main/doc/RestApi.md).
+                """))
 @SecurityScheme(
         name = "basicAuth",
         type = SecuritySchemeType.HTTP,
-        scheme = "basic"
+        scheme = "basic",
+        description = "Credentials of an Alfresco administrator."
 )
 @SecurityRequirement(name = "basicAuth")
 public class OpenApiConfig {

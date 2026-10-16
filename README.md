@@ -71,7 +71,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Secure and decoupled design that suits zero trust environments
 - Focus on [strong encryption](doc/Encryption.md) option for both content and metadata
 - Passwords securely stored in a secret engine
-- REST API with Alfresco proxy support
+- [REST API](doc/RestApi.md) with Alfresco proxy support and metadata search
 - Engineered for flexibility and bespoke integrations
 - No installation or changes required on Alfresco
 - 100% test coverage
@@ -97,9 +97,9 @@ Global configuration is stored in `application.yml` file, the relevant parameter
 | ALFRESCO_PASSWORD                | admin                                      | Password for the Alfresco user                                      |
 | ACTIVE_MQ_URL                    | tcp://localhost:61616                      | ActiveMQ broker URL                                                 |
 | MONGODB_URL                      | mongodb://localhost:27017                  | MongoDB connection string                                           |
-| S3_ENDPOINT                      | http://localhost:4566                      | S3 object storage endpoint                                          |
-| S3_KEY                           | test                                       | Key for S3 authentication                                           |
-| S3_SECRET                        | test                                       | Secret for S3 authentication                                        |
+| S3_ENDPOINT                      | http://localhost:5000                      | S3 object storage endpoint                                          |
+| S3_KEY                           | testing                                    | Key for S3 authentication                                           |
+| S3_SECRET                        | testing                                    | Secret for S3 authentication                                        |
 | EVENT_HANDLER_ENABLED            | false                                      | Event based archive behaviour switch                                |
 | ARCHIVING_JOB_ENABLED            | true                                       | Archiving scheduled job switch                                      |
 | ARCHIVING_JOB_CRON_EXPRESSION    | 0 0/5 2-6 * * ?                            | Scheduled job cron expression                                       |
@@ -107,16 +107,18 @@ Global configuration is stored in `application.yml` file, the relevant parameter
 | VAULT_HASH_ALGORITHM             | SHA-256                                    | Hash stored as metadata on GridFS or S3 object metadata             |
 | VAULT_DOUBLE_CHECK               | true                                       | Double check content integrity before removing document on Alfresco |
 | VAULT_DELETE_ON_ALFRESCO         | true                                       | Delete document on Alfresco after archiving                         |
-| VAULT_ENCRYPT_CONTENT            | true                                       | Enable binary content encryption (S3, GridFS)                       |
-| VAULT_ENCRYPT_METADATA           | true                                       | Enable node metadata encryption on MongoDB                          |
+| VAULT_DELETE_NODE_API_ENABLED    | false                                      | Enable the delete node API                                          |
+| VAULT_AUTH_CACHE_TTL             | 60s                                        | Cache duration of successful API authentications                    |
+| VAULT_ENCRYPT_CONTENT            | false                                      | Enable binary content encryption (S3, GridFS)                       |
+| VAULT_ENCRYPT_METADATA           | false                                      | Enable node metadata encryption on MongoDB                          |
 | VAULT_URL                        | http://localhost:8200                      | Vault secret engine URI                                             |
 | VAULT_ENCRYPTION_KV_MOUNT        | secret                                     | Vault secret engine mount path                                      |
 | VAULT_ENCRYPTION_SECRET_PATH     | AlfrescoNodeVault                          | Path of encryption secret in Vault secret engine                    |
 | VAULT_ENCRYPTION_SECRET_KEY      | anv.secret                                 | Key name of encryption secret                                       |
-| AUDIT_ENABLED                    | false                                      | Enable web request auditing                                         |
+| AUDIT_TTL_DAYS                   | 60                                         | Retention of audit entries in days                                  |
 | NOTARIZATION_ENABLED             | true                                       | Enable notarization service                                         |
 | NOTARIZATION_JOB_ENABLED         | false                                      | Document notarization job switch                                    |
-| NOTARIZATION_JOB_CRON_EXPRESSION | 0 0/30 * * * ?                             | Cron expression for notarization job                                |
+| NOTARIZATION_JOB_CRON_EXPRESSION | 0 0/5 * * * ?                              | Cron expression for notarization job                                |
 | INTEGRITY_SWEEP_ENABLED          | false                                      | Enable scheduled integrity sweep job                                |
 | INTEGRITY_SWEEP_CRON_EXPRESSION  | 0 0 2 * * ?                                | Cron expression for integrity sweep job                             |
 | INTEGRITY_SWEEP_BATCH_SIZE       | 200                                        | Number of notarized nodes processed per sweep page                  |
@@ -182,6 +184,28 @@ production you will likely point to hardened images or custom deployments.
 cd anv
 java -jar anv.jar
 ```
+
+## REST API
+
+The REST API is versioned under `/api/v1` and requires Basic authentication with Alfresco administrator credentials:
+
+- `/api/v1/vault` to search, retrieve, archive, restore, notarize and re-encrypt nodes and to run integrity sweeps
+- `/api/v1/audit` to read the audit trail
+
+Requests to the Alfresco REST API for archived nodes are transparently served by the vault. The OpenAPI documentation
+served at `/swagger` is the reference of every endpoint, while [RestApi.md](doc/RestApi.md) covers authentication, the
+Alfresco proxy and the common conventions.
+
+## Known limitations
+
+- **Enabling encryption** on a vault that already holds data is supported: existing content and metadata stay
+  readable and new nodes are stored encrypted, but existing nodes are not re-encrypted.
+- **Disabling encryption** when encrypted data is already stored is not supported: encrypted content would be returned
+  as is and encrypted metadata could not be read.
+- **Changing the encryption implementation or its parameters** (`impl`, KDF, salt and nonce/IV lengths) is not supported
+  when encrypted data is already stored, since they are not recorded with the data and are required for decryption.
+  Use [key rotation](doc/Encryption.md#key-rotation) to change the secret.
+- The **advanced search** is available only when metadata encryption is disabled.
 
 ## Documentation
 
