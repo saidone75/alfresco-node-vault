@@ -33,6 +33,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
+import org.saidone.exception.InvalidRequestException;
 import org.saidone.model.dto.EntryDto;
 import org.saidone.model.dto.CorruptedNodeDto;
 import org.saidone.model.dto.IntegritySweepRunDto;
@@ -48,7 +49,7 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
+import org.saidone.utils.PageUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -70,7 +71,7 @@ import java.util.concurrent.CompletableFuture;
  * </p>
  */
 @RestController
-@RequestMapping("/api/vault")
+@RequestMapping("/api/v1/vault")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Vault API", description = "Vault operations")
@@ -114,6 +115,7 @@ public class VaultApiController extends BaseComponent {
     private final TaskExecutor taskExecutor;
 
     private static final String NOTARIZATION_DISABLED = "Notarization is disabled.";
+    private static final String ENCRYPTION_DISABLED = "Encryption is disabled: neither content nor metadata encryption is enabled.";
     @Value("${application.service.vault.delete-node.api-enabled:false}")
     private boolean deleteNodeApiEnabled;
     @Value("${application.service.vault.encryption.metadata.enabled:false}")
@@ -152,6 +154,7 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "200", description = "Nodes retrieved",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = EntryDto.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
             })
@@ -175,7 +178,7 @@ public class VaultApiController extends BaseComponent {
             from = to.minus(1, ChronoUnit.DAYS);
         }
 
-        val pageable = PageRequest.of(page, size, Sort.by(dir, "adt"));
+        val pageable = PageUtils.pageRequest(page, size, Sort.by(dir, "adt"));
         val result = nodeService.findByArchiveDateRange(from, to, pageable)
                 .map(nodeWrapper -> new EntryDto(nodeWrapper.getNode()));
         return ResponseEntity.ok(result);
@@ -209,9 +212,9 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "200", description = "Nodes retrieved",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = EntryDto.class))),
-                    @ApiResponse(responseCode = "400", description = "Invalid search criteria", content = @Content),
+                    @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-                    @ApiResponse(responseCode = "403", description = "Metadata encryption is enabled", content = @Content),
+                    @ApiResponse(responseCode = "403", description = "Metadata encryption is enabled", content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
             })
     public ResponseEntity<?> advancedSearchNodes(
@@ -226,15 +229,15 @@ public class VaultApiController extends BaseComponent {
         }
 
         if (metadataEncryptionEnabled) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Advanced search is disabled: metadata encryption is enabled.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).contentType(MediaType.TEXT_PLAIN).body("Advanced search is disabled: metadata encryption is enabled.");
         }
 
         if (request.getProperties() != null && request.getProperties().stream()
                 .anyMatch(p -> Strings.isBlank(p.getName()) || p.getValues() == null || p.getValues().isEmpty())) {
-            return ResponseEntity.badRequest().body("Property filters require a name and at least one value.");
+            throw new InvalidRequestException("Property filters require a name and at least one value");
         }
 
-        val pageable = PageRequest.of(page, size, Sort.by(dir, "adt"));
+        val pageable = PageUtils.pageRequest(page, size, Sort.by(dir, "adt"));
         val result = nodeService.search(request, pageable)
                 .map(nodeWrapper -> new EntryDto(nodeWrapper.getNode()));
         return ResponseEntity.ok(result);
@@ -427,7 +430,7 @@ public class VaultApiController extends BaseComponent {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Node successfully deleted", content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
-                    @ApiResponse(responseCode = "403", description = "API disabled", content = @Content),
+                    @ApiResponse(responseCode = "403", description = "API disabled", content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "404", description = "Node not found", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
             })
@@ -438,7 +441,7 @@ public class VaultApiController extends BaseComponent {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         if (!deleteNodeApiEnabled) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Delete node API is disabled.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).contentType(MediaType.TEXT_PLAIN).body("Delete node API is disabled.");
         }
         vaultService.deleteNode(nodeId);
         return ResponseEntity.ok()
@@ -485,7 +488,7 @@ public class VaultApiController extends BaseComponent {
         }
 
         if (notarizationService.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(NOTARIZATION_DISABLED);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).contentType(MediaType.TEXT_PLAIN).body(NOTARIZATION_DISABLED);
         }
 
         val nodeWrapper = nodeService.findById(nodeId);
@@ -534,6 +537,8 @@ public class VaultApiController extends BaseComponent {
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
+                    @ApiResponse(responseCode = "409", description = "Node not notarized or hashes do not match",
+                            content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
@@ -546,11 +551,13 @@ public class VaultApiController extends BaseComponent {
         }
 
         if (notarizationService.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(NOTARIZATION_DISABLED);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).contentType(MediaType.TEXT_PLAIN).body(NOTARIZATION_DISABLED);
         }
 
         notarizationService.get().checkNotarization(nodeId);
-        return ResponseEntity.ok(String.format("Node %s is notarized and hashes match.", nodeId));
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(String.format("Node %s is notarized and hashes match.", HtmlUtils.htmlEscape(nodeId)));
     }
 
     /**
@@ -589,10 +596,12 @@ public class VaultApiController extends BaseComponent {
         }
 
         if (keyService.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Encryption is disabled: neither content nor metadata encryption is enabled.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).contentType(MediaType.TEXT_PLAIN).body(ENCRYPTION_DISABLED);
         }
         keyService.get().updateKey(nodeId);
-        return ResponseEntity.ok(String.format("Encryption key updated for node %s.", nodeId));
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(String.format("Encryption key updated for node %s.", HtmlUtils.htmlEscape(nodeId)));
     }
 
     /**
@@ -614,6 +623,8 @@ public class VaultApiController extends BaseComponent {
             responses = {
                     @ApiResponse(responseCode = "200", description = "Update required",
                             content = @Content(mediaType = "text/plain")),
+                    @ApiResponse(responseCode = "400", description = "Invalid request",
+                            content = @Content),
                     @ApiResponse(responseCode = "401", description = "Unauthorized",
                             content = @Content),
                     @ApiResponse(responseCode = "403", description = "Encryption is disabled",
@@ -630,7 +641,7 @@ public class VaultApiController extends BaseComponent {
         }
 
         if (keyService.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Encryption is disabled: neither content nor metadata encryption is enabled.");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).contentType(MediaType.TEXT_PLAIN).body(ENCRYPTION_DISABLED);
         }
 
         // Re-key nodes asynchronously to avoid long blocking requests
@@ -643,7 +654,9 @@ public class VaultApiController extends BaseComponent {
                 log.error("Error while updating keys for version {}", keyVersion, e);
             }
         }, taskExecutor);
-        return ResponseEntity.ok("Update required.");
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body("Update required.");
     }
 
     /**
@@ -667,6 +680,7 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "200", description = "Integrity sweep runs retrieved",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = IntegritySweepRunDto.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
             })
@@ -679,7 +693,7 @@ public class VaultApiController extends BaseComponent {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "sat"));
+        val pageable = PageUtils.pageRequest(page, size, Sort.by(Sort.Direction.DESC, "sat"));
         return ResponseEntity.ok(integritySweepService.findRuns(pageable));
     }
 
@@ -704,6 +718,7 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "200", description = "Potentially corrupted nodes retrieved",
                             content = @Content(mediaType = "application/json",
                                     schema = @Schema(implementation = CorruptedNodeDto.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
             })
@@ -716,7 +731,7 @@ public class VaultApiController extends BaseComponent {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "lfs"));
+        val pageable = PageUtils.pageRequest(page, size, Sort.by(Sort.Direction.DESC, "lfs"));
         return ResponseEntity.ok(integritySweepService.findCorruptedNodes(pageable));
     }
 
@@ -748,11 +763,13 @@ public class VaultApiController extends BaseComponent {
 
         // integrity sweeps verify content against the notarized hashes
         if (notarizationService.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(NOTARIZATION_DISABLED);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).contentType(MediaType.TEXT_PLAIN).body(NOTARIZATION_DISABLED);
         }
 
         CompletableFuture.runAsync(() -> integritySweepService.runSweep("MANUAL"), taskExecutor);
-        return ResponseEntity.ok("Integrity sweep required.");
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body("Integrity sweep required.");
     }
 
 }

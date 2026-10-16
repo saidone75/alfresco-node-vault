@@ -99,13 +99,13 @@ class VaultApiControllerTests extends BaseTest {
     @SneakyThrows
     void getNodeTest() {
         val nodeId = createNode().getId();
-        performRequestAndProcess(HttpMethod.GET, "/api/vault/nodes/{nodeId}", new Object[]{nodeId},
+        performRequestAndProcess(HttpMethod.GET, "/api/v1/vault/nodes/{nodeId}", new Object[]{nodeId},
                 null, 404, String.class, body -> {
                     assertEquals("Node not found", body);
                     assertFalse(body.contains(nodeId));
                 });
         vaultService.archiveNode(nodeId);
-        performRequestAndProcess(HttpMethod.GET, "/api/vault/nodes/{nodeId}", new Object[]{nodeId},
+        performRequestAndProcess(HttpMethod.GET, "/api/v1/vault/nodes/{nodeId}", new Object[]{nodeId},
                 null, 200, String.class, body -> assertTrue(body.contains(nodeId)));
     }
 
@@ -114,13 +114,13 @@ class VaultApiControllerTests extends BaseTest {
     @SneakyThrows
     void getNodeContentTest() {
         val nodeId = createNode().getId();
-        performRequestAndProcess(HttpMethod.GET, "/api/vault/nodes/{nodeId}/content", new Object[]{nodeId},
+        performRequestAndProcess(HttpMethod.GET, "/api/v1/vault/nodes/{nodeId}/content", new Object[]{nodeId},
                 null, 404, String.class, body -> {
                     assertEquals("Node not found", body);
                     assertFalse(body.contains(nodeId));
                 });
         vaultService.archiveNode(nodeId);
-        performRequestAndProcess(HttpMethod.GET, "/api/vault/nodes/{nodeId}/content", new Object[]{nodeId},
+        performRequestAndProcess(HttpMethod.GET, "/api/v1/vault/nodes/{nodeId}/content", new Object[]{nodeId},
                 null, 200, byte[].class, body -> assertTrue(body.length > 0));
     }
 
@@ -130,10 +130,10 @@ class VaultApiControllerTests extends BaseTest {
     void searchNodesByArchiveDateTest() {
         val nodeId = createNode().getId();
         vaultService.archiveNode(nodeId);
-        performRequestAndProcess(HttpMethod.GET, "/api/vault/search?page={page}&size={size}&dir={dir}", new Object[]{0, 10, "DESC"},
+        performRequestAndProcess(HttpMethod.GET, "/api/v1/vault/search?page={page}&size={size}&dir={dir}", new Object[]{0, 10, "DESC"},
                 null, 200, String.class, body -> assertTrue(body.contains(nodeId)));
         vaultService.archiveNode(createNode().getId());
-        performRequestAndProcess(HttpMethod.GET, "/api/vault/search?page={page}&size={size}&dir={dir}", new Object[]{0, 1, "DESC"},
+        performRequestAndProcess(HttpMethod.GET, "/api/v1/vault/search?page={page}&size={size}&dir={dir}", new Object[]{0, 1, "DESC"},
                 null, 200, String.class, body -> assertFalse(body.contains(nodeId)));
     }
 
@@ -142,7 +142,7 @@ class VaultApiControllerTests extends BaseTest {
     @SneakyThrows
     void restoreNodeTest() {
         val nodeId = createNode().getId();
-        performRequestAndProcess(HttpMethod.POST, "/api/vault/nodes/{nodeId}/restore", new Object[]{nodeId},
+        performRequestAndProcess(HttpMethod.POST, "/api/v1/vault/nodes/{nodeId}/restore", new Object[]{nodeId},
                 Strings.EMPTY, 404, String.class, body -> {
                     assertEquals("Node not found", body);
                     assertFalse(body.contains(nodeId));
@@ -155,7 +155,7 @@ class VaultApiControllerTests extends BaseTest {
             assertTrue(matcher.matches());
             result.set(matcher.group(2));
         };
-        performRequestAndProcess(HttpMethod.POST, "/api/vault/nodes/{nodeId}/restore", new Object[]{nodeId},
+        performRequestAndProcess(HttpMethod.POST, "/api/v1/vault/nodes/{nodeId}/restore", new Object[]{nodeId},
                 Strings.EMPTY, 200, String.class, consumer);
         assertDoesNotThrow(() -> alfrescoService.getNode(result.get()));
     }
@@ -165,9 +165,9 @@ class VaultApiControllerTests extends BaseTest {
     @SneakyThrows
     void archiveNodeTest() {
         val nodeId = createNode().getId();
-        performRequestAndProcess(HttpMethod.POST, "/api/vault/nodes/{nodeId}/archive", new Object[]{nodeId},
+        performRequestAndProcess(HttpMethod.POST, "/api/v1/vault/nodes/{nodeId}/archive", new Object[]{nodeId},
                 Strings.EMPTY, 200, String.class, body -> assertTrue(body.contains(nodeId)));
-        performRequestAndProcess(HttpMethod.POST, "/api/vault/nodes/{nodeId}/archive", new Object[]{nodeId},
+        performRequestAndProcess(HttpMethod.POST, "/api/v1/vault/nodes/{nodeId}/archive", new Object[]{nodeId},
                 Strings.EMPTY, 404, String.class, body -> {
                     assertEquals("Node not found", body);
                     assertFalse(body.contains(nodeId));

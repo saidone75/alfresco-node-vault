@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.bson.Document;
 import org.saidone.component.BaseComponent;
+import org.saidone.exception.InvalidRequestException;
 import org.saidone.model.MetadataKeys;
 import org.saidone.model.dto.NodeSearchRequestDto;
 import org.saidone.model.entity.NodeEntity;
@@ -379,7 +380,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
      */
     private static Criteria propertyCriteria(NodeSearchRequestDto.PropertyFilter filter) {
         if (filter.getName() == null || filter.getValues() == null || filter.getValues().isEmpty()) {
-            throw new IllegalArgumentException("Property filters require a name and at least one value");
+            throw new InvalidRequestException("Property filters require a name and at least one value");
         }
         val property = Criteria.where(nodeField(String.format("properties.%s", filter.getName())));
         return filter.getMatch() == NodeSearchRequestDto.Match.ALL

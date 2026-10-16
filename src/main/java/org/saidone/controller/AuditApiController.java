@@ -33,7 +33,7 @@ import org.saidone.component.BaseComponent;
 import org.saidone.service.AuthenticationService;
 import org.saidone.model.dto.AuditEntryDto;
 import org.saidone.service.audit.AuditServiceImpl;
-import org.springframework.data.domain.PageRequest;
+import org.saidone.utils.PageUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -51,7 +51,7 @@ import java.util.List;
  * </p>
  */
 @RestController
-@RequestMapping("/api/audit")
+@RequestMapping("/api/v1/audit")
 @RequiredArgsConstructor
 @Tag(name = "Audit API", description = "Audit log operations")
 public class AuditApiController extends BaseComponent {
@@ -84,6 +84,7 @@ public class AuditApiController extends BaseComponent {
             },
             responses = {
                     @ApiResponse(responseCode = "200", description = "Entries retrieved", content = @Content(mediaType = "application/json", schema = @Schema(implementation = AuditEntryDto.class))),
+                    @ApiResponse(responseCode = "400", description = "Invalid request", content = @Content),
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
             })
@@ -100,7 +101,7 @@ public class AuditApiController extends BaseComponent {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        val pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.ASC, "archiveDate"));
+        val pageable = PageUtils.pageRequest(page, size, Sort.by(Sort.Direction.ASC, "archiveDate"));
         val list = auditService.findEntries(type, from, to, pageable);
         return ResponseEntity.ok(list);
     }

@@ -24,7 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
-import org.saidone.exception.NotarizationException;
+import org.saidone.exception.NodeNotNotarizedException;
+import org.saidone.exception.NotarizedHashMismatchException;
 import org.saidone.service.NodeService;
 import org.saidone.service.content.ContentService;
 import org.springframework.beans.factory.annotation.Value;
@@ -96,19 +97,20 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
      * the hash computed from the current content.</p>
      *
      * @param nodeId the identifier of the node to check
-     * @throws NotarizationException if the node is not notarized or hashes do not match
+     * @throws NodeNotNotarizedException     if the node is not notarized
+     * @throws NotarizedHashMismatchException if the hashes do not match
      */
     @SneakyThrows
     public void checkNotarization(String nodeId) {
         log.debug("Checking notarization for node {}", nodeId);
         val notarizationTransactionId = nodeService.findById(nodeId).getNotarizationTxId();
         if (Strings.isBlank(notarizationTransactionId)) {
-            throw new NotarizationException(String.format("Node %s is not notarized", nodeId));
+            throw new NodeNotNotarizedException(nodeId);
         }
         val notarizedHash = getHash(notarizationTransactionId);
         val actualHash = contentService.computeHash(nodeId, checksumAlgorithm);
         if (!notarizedHash.equals(actualHash)) {
-            throw new NotarizationException(String.format("Node %s is notarized but hashes do not match.", nodeId));
+            throw new NotarizedHashMismatchException(nodeId);
         }
     }
 
