@@ -38,7 +38,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.saidone.utils.ResourceFileUtils;
 
-import java.nio.file.Files;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
@@ -71,10 +70,11 @@ class AlfrescoServiceTests extends BaseTest {
     @Order(20)
     @SneakyThrows
     void getNodeContentTest() {
-        val file = ResourceFileUtils.getFileFromResource("sample.pdf");
-        val nodeId = createNode(file).getId();
+        val nodeId = createNode().getId();
         @Cleanup val inputStream = assertDoesNotThrow(() -> alfrescoService.getNodeContent(nodeId));
-        assertArrayEquals(Files.readAllBytes(file.toPath()), inputStream.readAllBytes());
+        try (val resource = ResourceFileUtils.getInputStreamFromResource("sample.pdf")) {
+            assertArrayEquals(resource.readAllBytes(), inputStream.readAllBytes());
+        }
     }
 
     @Test
