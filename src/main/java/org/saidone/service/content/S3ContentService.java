@@ -98,13 +98,14 @@ public class S3ContentService extends BaseComponent implements ContentService {
              val fis = Files.newInputStream(tempFile.getPath())) {
             dis.transferTo(fos);
             fos.flush();
-            log.trace("{}: {}", checksumAlgorithm, dis.getHash());
+            val checksum = dis.getHash();
+            log.trace("{}: {}", checksumAlgorithm, checksum);
             val metadata = new HashMap<String, String>();
             metadata.put(MetadataKeys.UUID, node.getId());
             metadata.put(MetadataKeys.FILENAME, encodeMetadataValue(node.getName()));
             metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
             metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
-            metadata.put(MetadataKeys.CHECKSUM_VALUE, dis.getHash());
+            metadata.put(MetadataKeys.CHECKSUM_VALUE, checksum);
             s3Repository.putObject(s3Config.getBucket(), node, metadata, fis);
         }
     }
