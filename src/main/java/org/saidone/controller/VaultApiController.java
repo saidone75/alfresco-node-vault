@@ -54,6 +54,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.HtmlUtils;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -308,7 +309,10 @@ public class VaultApiController extends BaseComponent {
         }
 
         val newNodeId = vaultService.restoreNode(nodeId, restorePermissions);
-        return ResponseEntity.ok().body(String.format("Node %s successfully restored as %s", nodeId, newNodeId));
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(String.format("Node %s successfully restored as %s",
+                        HtmlUtils.htmlEscape(nodeId), HtmlUtils.htmlEscape(String.valueOf(newNodeId))));
     }
 
     /**
@@ -345,7 +349,9 @@ public class VaultApiController extends BaseComponent {
         }
 
         vaultService.archiveNode(nodeId);
-        return ResponseEntity.ok().body(String.format("Node %s successfully archived.", nodeId));
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(String.format("Node %s successfully archived.", HtmlUtils.htmlEscape(nodeId)));
     }
 
     @SecurityRequirement(name = "basicAuth")
@@ -373,7 +379,9 @@ public class VaultApiController extends BaseComponent {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Delete node API is disabled.");
         }
         vaultService.deleteNode(nodeId);
-        return ResponseEntity.ok().body(String.format("Node %s successfully deleted.", nodeId));
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(String.format("Node %s successfully deleted.", HtmlUtils.htmlEscape(nodeId)));
     }
 
     /**
@@ -420,7 +428,9 @@ public class VaultApiController extends BaseComponent {
 
         val nodeWrapper = nodeService.findById(nodeId);
         if (Strings.isNotBlank(nodeWrapper.getNotarizationTxId())) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(String.format("Node %s is already notarized.", nodeId));
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .contentType(MediaType.TEXT_PLAIN)
+                    .body(String.format("Node %s is already notarized.", HtmlUtils.htmlEscape(nodeId)));
         }
         // Run notarization asynchronously to avoid blocking the caller
         CompletableFuture.runAsync(() -> {
@@ -432,7 +442,9 @@ public class VaultApiController extends BaseComponent {
                 log.error("Error while notarizing node {}", nodeId, e);
             }
         }, taskExecutor);
-        return ResponseEntity.ok().body(String.format("Notarization for node %s required.", nodeId));
+        return ResponseEntity.ok()
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(String.format("Notarization for node %s required.", HtmlUtils.htmlEscape(nodeId)));
     }
 
     /**

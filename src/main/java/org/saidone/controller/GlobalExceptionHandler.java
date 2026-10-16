@@ -25,9 +25,11 @@ import org.saidone.exception.NodeRestoreInProgressException;
 import org.saidone.exception.NotarizationException;
 import org.saidone.exception.VaultException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.util.HtmlUtils;
 
 /**
  * Global exception handler for REST controllers.
@@ -80,7 +82,9 @@ public class GlobalExceptionHandler {
     }
 
     private ResponseEntity<String> buildResponse(HttpStatus status, String message) {
-        return ResponseEntity.status(status).body(message);
+        return ResponseEntity.status(status)
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(HtmlUtils.htmlEscape(String.valueOf(message)));
     }
 
 }
