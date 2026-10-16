@@ -22,3 +22,5 @@ jobs:
           cache: 'maven'
       - name: Submit Maven dependency tree
         uses: advanced-security/maven-dependency-submission-action@v6.0.1
+        with:
+          ignore-maven-wrapper: true
