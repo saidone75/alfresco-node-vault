@@ -21,7 +21,6 @@ package org.saidone.test;
 import lombok.val;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
-import org.saidone.utils.ResourceFileUtils;
 import org.saidone.utils.SecureTemporaryFile;
 
 import java.io.IOException;
@@ -63,20 +62,6 @@ class SecureTemporaryFileTests {
         });
         assertFalse(Files.exists(path));
         assertFalse(Files.exists(path.getParent()));
-    }
-
-    @Test
-    void extractsClasspathResourceIntoProtectedFile() throws IOException {
-        val path = ResourceFileUtils.getFileFromResource("sample.pdf").toPath();
-        try (val resource = getClass().getClassLoader().getResourceAsStream("sample.pdf")) {
-            assertNotNull(resource);
-            assertArrayEquals(resource.readAllBytes(), Files.readAllBytes(path));
-            assertPrivatePermissions(path, false);
-            assertPrivatePermissions(path.getParent(), true);
-        } finally {
-            Files.deleteIfExists(path);
-            Files.deleteIfExists(path.getParent());
-        }
     }
 
     private static void assertPrivatePermissions(Path path, boolean directory) throws IOException {

@@ -22,87 +22,49 @@ import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * Utility class providing methods to access files from filesystem or classpath resources.
+ * Utility class for opening filesystem files and classpath resources as streams.
  * <p>
- * This class offers methods to obtain a {@link File} instance from a specified resource path.
- * It first attempts to locate the file in the local filesystem using an absolute or relative path.
- * If the file is not found in the filesystem, it will attempt to locate and extract the resource from the classpath.
- * When accessing resources from the classpath, the method creates a temporary file which will be deleted on JVM exit,
- * or will use a specified destination path if provided.
- * Logging is used to notify where the file was found or if a resource is being loaded from the classpath.
+ * Resource paths are resolved against the filesystem first, accepting both absolute
+ * and relative paths. If no regular file is found, the resource is looked up using
+ * this class's class loader. Classpath resources, including those packaged inside
+ * JAR files, are read directly without extraction to temporary files.
+ * </p>
+ * <p>
+ * Callers are responsible for closing each returned {@link InputStream}, preferably
+ * with a try-with-resources statement. Missing resources and failures to open a
+ * stream are reported through {@link IOException}.
+ * </p>
  */
 @UtilityClass
 @Slf4j
 public class ResourceFileUtils {
 
     /**
-     * Obtains a file from either the filesystem or classpath resources.
+     * Opens a resource, searching the filesystem first and then the classpath.
+     * The caller must close the returned stream.
      *
-     * @param resourcePath the path to the resource, either absolute path in the filesystem or a classpath resource
-     * @return the {@link File} object representing the resource
-     * @throws IOException if an I/O error occurs while accessing the resource
+     * @param resourcePath absolute or relative filesystem path, or classpath resource name
+     * @return stream containing the resource's bytes
+     * @throws IOException if the resource cannot be found or opened
      */
-    public File getFileFromResource(String resourcePath) throws IOException {
-        return getFileFromResource(resourcePath, null);
-    }
-
-    /**
-     * Retrieves a file from the given path, searching first in the filesystem and then in the classpath resources.
-     * <br>
-     * If the specified resource path exists as a file in the filesystem, a {@link File} object pointing to this location is returned.
-     * If the file does not exist, the method attempts to locate the resource in the application's classpath. If found,
-     * it will extract the resource as a temporary file, or use a specific destination path if provided.
-     * If a temporary file is created, it will be marked for deletion on JVM exit.
-     *
-     * @param resourcePath    the path to the resource in the filesystem or the name of the classpath resource
-     * @param destinationPath optional path for the extracted resource file (used if resource is found in classpath);
-     *                        if null, a temporary file is created
-     * @return a {@link File} object representing the file or a copy of the extracted classpath resource
-     * @throws IOException           if an I/O error occurs during file access or resource extraction
-     */
-    public File getFileFromResource(String resourcePath, String destinationPath) throws IOException {
+    public InputStream getInputStreamFromResource(String resourcePath) throws IOException {
         val filePath = Path.of(resourcePath);
-        val file = filePath.toFile();
-        if (file.exists() && file.isFile()) {
-            log.info("Found file as absolute path => {}", resourcePath);
-            return file;
-        } else {
-            log.info("Looking for resource in classpath => {}", resourcePath);
-            try (var is = ResourceFileUtils.class.getClassLoader().getResourceAsStream(resourcePath)) {
-                if (is == null) {
-                    throw new FileNotFoundException("Resource not found in file system or classpath: " + resourcePath);
-                }
-                val temporaryFile = destinationPath == null
-                        ? new SecureTemporaryFile("resource-", file.getName().replaceAll("^.*\\.", "."))
-                        : null;
-                val extractedFile = temporaryFile != null ? temporaryFile.getPath().toFile() : new File(destinationPath);
-                if (temporaryFile != null) {
-                    temporaryFile.deleteOnExit();
-                } else {
-                    extractedFile.deleteOnExit();
-                }
-                try (val fos = new FileOutputStream(extractedFile)) {
-                    is.transferTo(fos);
-                } catch (IOException | RuntimeException e) {
-                    if (temporaryFile != null) {
-                        try {
-                            temporaryFile.close();
-                        } catch (IOException cleanupException) {
-                            e.addSuppressed(cleanupException);
-                        }
-                    }
-                    throw e;
-                }
-                return extractedFile;
-            }
+        if (Files.isRegularFile(filePath)) {
+            log.info("Found file in filesystem => {}", resourcePath);
+            return Files.newInputStream(filePath);
         }
+        log.info("Looking for resource in classpath => {}", resourcePath);
+        val inputStream = ResourceFileUtils.class.getClassLoader().getResourceAsStream(resourcePath);
+        if (inputStream == null) {
+            throw new FileNotFoundException("Resource not found in file system or classpath: " + resourcePath);
+        }
+        return inputStream;
     }
-
 }

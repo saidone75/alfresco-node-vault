@@ -107,8 +107,11 @@ public abstract class BaseTest {
 
     @SneakyThrows
     public Node createNode(File file) {
+        return createNode(file.getName(), Files.readAllBytes(file.toPath()));
+    }
+
+    private Node createNode(String fileName, byte[] content) {
         val nodeBodyCreate = new NodeBodyCreate();
-        val fileName = file.getName();
         val extension = fileName.substring(fileName.lastIndexOf('.') + 1);
         nodeBodyCreate.setName(String.format("%s.%s", generateName(), extension));
         nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_CONTENT);
@@ -121,15 +124,16 @@ public abstract class BaseTest {
                     AlfrescoContentModel.PROP_SUBJECT, randomElement(SUBJECTS)));
         }
         val node =Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, true, null, null, null, null).getBody()).getEntry();
-        nodesApi.updateNodeContent(node.getId(), Files.readAllBytes(file.toPath()), null, null, null, null, null);
+        nodesApi.updateNodeContent(node.getId(), content, null, null, null, null, null);
         log.debug("Node {} created with name: {}", node.getId(), node.getName());
         return node;
     }
 
     @SneakyThrows
     public Node createNode() {
-        val file = ResourceFileUtils.getFileFromResource("sample.pdf");
-        return createNode(file);
+        try (val inputStream = ResourceFileUtils.getInputStreamFromResource("sample.pdf")) {
+            return createNode("sample.pdf", inputStream.readAllBytes());
+        }
     }
 
     @SneakyThrows

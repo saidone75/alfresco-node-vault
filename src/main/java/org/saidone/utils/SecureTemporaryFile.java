@@ -95,12 +95,6 @@ public final class SecureTemporaryFile implements AutoCloseable {
         };
     }
 
-    /** Registers the directory first so JVM shutdown deletes the file before its directory. */
-    public void deleteOnExit() {
-        directory.toFile().deleteOnExit();
-        path.toFile().deleteOnExit();
-    }
-
     @Override
     public void close() throws IOException {
         try {
