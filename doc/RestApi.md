@@ -43,6 +43,14 @@ listed in the OpenAPI documentation.
 | `409`  | Conflicting state: restore already in progress, node already notarized, node not notarized or hashes not matching the notarized ones |
 | `500`  | Internal server error                                                                           |
 
+## Restore retries
+
+A completed restore returns the existing Alfresco node ID while that node still exists.
+If uploading content or saving the restored node ID fails, the vault attempts to permanently delete only the
+node created by that attempt, then reports the original error. After successful cleanup, a retry creates a new node.
+A process interruption, a lost creation response or failed cleanup may leave a node requiring manual reconciliation.
+Concurrent restores of the same node are prevented within one application instance only.
+
 ## Advanced search example
 
 `POST /api/v1/vault/advanced-search` searches the archived nodes by their metadata; the meaning of each criterion is
