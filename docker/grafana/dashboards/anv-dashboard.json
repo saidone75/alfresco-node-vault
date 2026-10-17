@@ -140,25 +140,16 @@
               "type": "special"
             }
           ],
-          "max": 100,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
                 "color": "rgba(50, 172, 45, 0.97)"
-              },
-              {
-                "color": "rgba(237, 129, 40, 0.89)",
-                "value": 70
-              },
-              {
-                "color": "rgba(245, 54, 54, 0.9)",
-                "value": 90
               }
             ]
           },
-          "unit": "percent"
+          "unit": "suffix:MiB"
         },
         "overrides": []
       },
@@ -194,7 +185,7 @@
             "type": "prometheus",
             "uid": "anv-prometheus"
           },
-          "expr": "sum(jvm_memory_used_bytes{application=\"$application\", instance=~\"$instance\", area=\"heap\"})*100/sum(jvm_memory_max_bytes{application=\"$application\",instance=~\"$instance\", area=\"heap\"})",
+          "expr": "sum(jvm_memory_used_bytes{application=\"$application\", instance=~\"$instance\", area=\"heap\"}) / 1048576",
           "format": "time_series",
           "interval": "",
           "intervalFactor": 1,
@@ -857,7 +848,9 @@
       },
       "fieldConfig": {
         "defaults": {
-          "custom": {}
+          "custom": {},
+          "unit": "suffix:MiB",
+          "decimals": 1
         },
         "overrides": []
       },
@@ -879,7 +872,7 @@
             "type": "prometheus",
             "uid": "anv-prometheus"
           },
-          "expr": "jvm_memory_used_bytes{instance=~\"$instance\", application=\"$application\", id=\"$memory_pool_heap\"}",
+          "expr": "jvm_memory_used_bytes{instance=~\"$instance\", application=\"$application\", id=\"$memory_pool_heap\"} / 1048576",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Used",
@@ -890,7 +883,7 @@
             "type": "prometheus",
             "uid": "anv-prometheus"
           },
-          "expr": "jvm_memory_committed_bytes{instance=~\"$instance\", application=\"$application\", id=\"$memory_pool_heap\"}",
+          "expr": "jvm_memory_committed_bytes{instance=~\"$instance\", application=\"$application\", id=\"$memory_pool_heap\"} / 1048576",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Commited",
@@ -901,7 +894,7 @@
             "type": "prometheus",
             "uid": "anv-prometheus"
           },
-          "expr": "jvm_memory_max_bytes{instance=~\"$instance\", application=\"$application\", id=\"$memory_pool_heap\"}",
+          "expr": "jvm_memory_max_bytes{instance=~\"$instance\", application=\"$application\", id=\"$memory_pool_heap\"} / 1048576",
           "format": "time_series",
           "intervalFactor": 1,
           "legendFormat": "Max",
