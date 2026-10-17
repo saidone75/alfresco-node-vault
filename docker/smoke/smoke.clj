@@ -2,7 +2,7 @@
 ;; SPDX-License-Identifier: GPL-3.0-or-later
 
 (ns anv.smoke
-  "HTTP smoke checks for the isolated Alfresco Node Vault Compose stack."
+  "End-to-end smoke checks for the isolated Alfresco Node Vault Compose stack."
   (:require [babashka.http-client :as http]
             [cheshire.core :as json]
             [clojure.java.io :as io]

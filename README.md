@@ -146,7 +146,8 @@ The script creates an `anv/` directory containing `anv.jar` together with
 ## Testing
 
 For a containerized check of archiving, downloading and restoring on S3 and GridFS, with and without encryption,
-run the [Docker smoke test](doc/SmokeTest.md). It checks content hashes and restore retries in an isolated stack.
+run `./smoke-tests.sh` (Linux/macOS) or `smoke-tests.bat` (Windows).
+These [end-to-end smoke tests](doc/SmokeTest.md) check content hashes and restore retries in an isolated Docker stack.
 
 For integration tests you can use `vault.(sh|bat)` script to start all needed containers, then
 

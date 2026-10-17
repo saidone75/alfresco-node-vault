@@ -1,6 +1,25 @@
-# Docker smoke test
+# End-to-end smoke tests
 
-Run this from the repository root with Docker Compose 2.24.4 or later:
+The suite exercises Alfresco, the vault application and storage services together to check the essential
+workflows. It is an end-to-end integration suite used as a smoke check, rather than only a startup check.
+
+With Docker Compose 2.24.4 or later, launch the environment and tests using:
+
+```bash
+./smoke-tests.sh
+```
+
+On Windows:
+
+```cmd
+smoke-tests.bat
+```
+
+Both scripts resolve paths relative to their own location, validate the Compose configuration, build the images,
+start the required services and run the suite. They return the runner's exit code, or the configuration error code
+if validation fails. The services remain running afterwards for inspection; cleanup commands are shown below.
+
+The equivalent Docker command, run from the repository root, is:
 
 ```console
 docker compose --env-file docker/.env -f docker/smoke/compose.yml run --build --rm smoke
@@ -77,8 +96,8 @@ starting a fresh stack after stopping Vault.
 
 ## Scope
 
-This is a release smoke test, not a load test or a backup recovery test. It exercises the default encryption
-provider and KDF, with content and metadata encryption enabled together. It does not cover mixed encryption
+These are end-to-end smoke tests, not a full regression suite, load test or backup recovery test. They exercise
+the default encryption provider and KDF, with content and metadata encryption enabled together. They do not cover mixed encryption
 settings, key rotation, notarization, interrupted restores or application restarts.
 
 Docker Desktop on Windows runs these Linux containers; a separate native Windows run is needed to validate NTFS
