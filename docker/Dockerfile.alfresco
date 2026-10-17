@@ -1,5 +1,5 @@
-ARG ACS_IMAGE
-ARG ACS_VERSION
+ARG ACS_IMAGE=alfresco/alfresco-content-repository-community
+ARG ACS_VERSION=26.2.0
 FROM ${ACS_IMAGE}:${ACS_VERSION}
 
 ARG TOMCAT_DIR=/usr/local/tomcat

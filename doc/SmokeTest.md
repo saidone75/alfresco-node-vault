@@ -17,9 +17,14 @@ smoke-tests.bat
 
 Both scripts resolve paths relative to their own location, validate the Compose configuration, build the images,
 start the required services and run the suite. They return the runner's exit code, or the configuration error code
-if validation fails. The services remain running afterwards for inspection; cleanup commands are shown below.
+if validation fails. By default they stop all containers in the smoke stack after the run, including when the
+tests fail. Volumes, logs and the JSON report are retained. If the tests pass but stopping the stack fails, the
+launcher returns the stop command's error code.
 
-The equivalent Docker command, run from the repository root, is:
+To leave the services running for inspection, use `./smoke-tests.sh --keep-running` or
+`smoke-tests.bat --keep-running` on Windows.
+
+To run directly without automatic shutdown, use this Docker command from the repository root:
 
 ```console
 docker compose --env-file docker/.env -f docker/smoke/compose.yml run --build --rm smoke
@@ -83,8 +88,9 @@ in the host environment before running Compose. For example, in PowerShell:
 $env:SMOKE_LARGE_FILE_MB = "32"
 ```
 
-The services remain running after the runner exits, so logs and storage can be inspected. After collecting the
-report, stop the stack and remove its test data:
+With `--keep-running`, services remain running after the runner exits for inspection. Otherwise the launchers
+stop them automatically. After collecting the report, remove the stopped containers and test data (or stop and
+remove them if they are still running):
 
 ```console
 docker compose --env-file docker/.env -f docker/smoke/compose.yml down -v
