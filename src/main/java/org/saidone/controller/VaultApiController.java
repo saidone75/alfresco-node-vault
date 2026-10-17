@@ -217,7 +217,7 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "403", description = "Metadata encryption is enabled", content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
             })
-    public ResponseEntity<?> advancedSearchNodes(
+    public ResponseEntity<Object> advancedSearchNodes(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @RequestBody NodeSearchRequestDto request,
             @RequestParam(required = false, defaultValue = "0") int page,
