@@ -1,0 +1,183 @@
+# Requires Docker Compose 2.24.4+ for !override. No host ports or external volumes.
+name: anv-smoke
+
+x-runner: &runner
+  image: babashka/babashka:1.12.213
+  entrypoint: ["bb", "/smoke/smoke.clj"]
+  volumes:
+    - ./smoke.clj:/smoke/smoke.clj:ro
+    - ../../src/test/resources/sample.pdf:/smoke/sample.pdf:ro
+    - reports:/reports
+  environment: &runner-env
+    SMOKE_WAIT_SECONDS: ${SMOKE_WAIT_SECONDS:-900}
+
+x-app: &app
+  image: anv-smoke:local
+  build:
+    context: ../..
+    dockerfile: docker/Dockerfile.vault
+  mem_limit: 512m
+  depends_on:
+    prepare:
+      condition: service_completed_successfully
+  environment: &app-env
+    ALFRESCO_BASE_PATH: http://alfresco:8080
+    ACTIVE_MQ_URL: tcp://activemq:61616
+    MONGODB_URL: mongodb://mongo:27017
+    VAULT_URL: http://secrets:8200
+    VAULT_ENCRYPTION_SECRET_PATH: AlfrescoNodeVaultSmoke
+    S3_ENDPOINT: http://motoserver:5000
+    ARCHIVING_JOB_ENABLED: "false"
+    EVENT_HANDLER_ENABLED: "false"
+    NOTARIZATION_ENABLED: "false"
+    NOTARIZATION_JOB_ENABLED: "false"
+    INTEGRITY_SWEEP_ENABLED: "false"
+    VAULT_DOUBLE_CHECK: "true"
+    VAULT_DELETE_ON_ALFRESCO: "true"
+    VAULT_DELETE_NODE_API_ENABLED: "true"
+    VAULT_DELETE_NODE_RESTORE_ON_ALFRESCO: "false"
+    VAULT_DELETE_NODE_DELETE_ON_ALFRESCO: "false"
+
+services:
+  alfresco:
+    extends:
+      file: ../docker-compose.yml
+      service: alfresco
+    container_name: anv-smoke-alfresco
+    image: anv-smoke-alfresco:local
+    ports: !override []
+    volumes: !override
+      - acs:/usr/local/tomcat/alf_data
+    depends_on:
+      postgres:
+        condition: service_healthy
+      activemq:
+        condition: service_started
+      solr6:
+        condition: service_started
+
+  postgres:
+    extends:
+      file: ../docker-compose.yml
+      service: postgres
+    container_name: anv-smoke-postgres
+    ports: !override []
+    volumes: !override
+      - postgres:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U alfresco -d alfresco"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+
+  solr6:
+    extends:
+      file: ../docker-compose.yml
+      service: solr6
+    container_name: anv-smoke-solr
+    ports: !override []
+    volumes: !override
+      - solr:/opt/alfresco-search-services/data
+
+  activemq:
+    extends:
+      file: ../docker-compose.yml
+      service: activemq
+    container_name: anv-smoke-activemq
+    ports: !override []
+
+  mongo:
+    extends:
+      file: ../mongo/docker-compose.yml
+      service: mongo
+    container_name: anv-smoke-mongo
+    ports: !override []
+    volumes: !override
+      - mongo:/data/db
+
+  secrets:
+    extends:
+      file: ../hashicorp-vault/docker-compose.yml
+      service: anv-hashicorp-vault
+    container_name: anv-smoke-secrets
+    ports: !override []
+
+  motoserver:
+    extends:
+      file: ../motoserver/docker-compose.yml
+      service: motoserver
+    container_name: anv-smoke-moto
+    ports: !override []
+
+  prepare:
+    <<: *runner
+    command: ["prepare"]
+    depends_on:
+      alfresco:
+        condition: service_started
+      mongo:
+        condition: service_started
+      secrets:
+        condition: service_started
+      motoserver:
+        condition: service_started
+
+  app-s3-plain:
+    <<: *app
+    environment:
+      <<: *app-env
+      APPLICATION_SERVICE_VAULT_STORAGE_IMPL: s3
+      SPRING_DATA_MONGODB_DATABASE: smoke_s3_plain
+      APPLICATION_SERVICE_VAULT_STORAGE_S3_BUCKET: anv-smoke-s3-plain
+      VAULT_ENCRYPT_CONTENT: "false"
+      VAULT_ENCRYPT_METADATA: "false"
+
+  app-gridfs-plain:
+    <<: *app
+    environment:
+      <<: *app-env
+      APPLICATION_SERVICE_VAULT_STORAGE_IMPL: gridfs
+      SPRING_DATA_MONGODB_DATABASE: smoke_gridfs_plain
+      VAULT_ENCRYPT_CONTENT: "false"
+      VAULT_ENCRYPT_METADATA: "false"
+
+  app-s3-encrypted:
+    <<: *app
+    environment:
+      <<: *app-env
+      APPLICATION_SERVICE_VAULT_STORAGE_IMPL: s3
+      SPRING_DATA_MONGODB_DATABASE: smoke_s3_encrypted
+      APPLICATION_SERVICE_VAULT_STORAGE_S3_BUCKET: anv-smoke-s3-encrypted
+      VAULT_ENCRYPT_CONTENT: "true"
+      VAULT_ENCRYPT_METADATA: "true"
+
+  app-gridfs-encrypted:
+    <<: *app
+    environment:
+      <<: *app-env
+      APPLICATION_SERVICE_VAULT_STORAGE_IMPL: gridfs
+      SPRING_DATA_MONGODB_DATABASE: smoke_gridfs_encrypted
+      VAULT_ENCRYPT_CONTENT: "true"
+      VAULT_ENCRYPT_METADATA: "true"
+
+  smoke:
+    <<: *runner
+    environment:
+      <<: *runner-env
+      SMOKE_LARGE_FILE_MB: ${SMOKE_LARGE_FILE_MB:-8}
+    depends_on:
+      app-s3-plain:
+        condition: service_started
+      app-gridfs-plain:
+        condition: service_started
+      app-s3-encrypted:
+        condition: service_started
+      app-gridfs-encrypted:
+        condition: service_started
+
+volumes:
+  acs:
+  postgres:
+  solr:
+  mongo:
+  reports:
