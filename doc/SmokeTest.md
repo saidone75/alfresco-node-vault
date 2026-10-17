@@ -1,6 +1,30 @@
-# Docker smoke test
+# End-to-end smoke tests
 
-Run this from the repository root with Docker Compose 2.24.4 or later:
+The suite exercises Alfresco, the vault application and storage services together to check the essential
+workflows. It is an end-to-end integration suite used as a smoke check, rather than only a startup check.
+
+With Docker Compose 2.24.4 or later, launch the environment and tests using:
+
+```bash
+./smoke-tests.sh
+```
+
+On Windows:
+
+```cmd
+smoke-tests.bat
+```
+
+Both scripts resolve paths relative to their own location, validate the Compose configuration, build the images,
+start the required services and run the suite. They return the runner's exit code, or the configuration error code
+if validation fails. By default they stop all containers in the smoke stack after the run, including when the
+tests fail. Volumes, logs and the JSON report are retained. If the tests pass but stopping the stack fails, the
+launcher returns the stop command's error code.
+
+To leave the services running for inspection, use `./smoke-tests.sh --keep-running` or
+`smoke-tests.bat --keep-running` on Windows.
+
+To run directly without automatic shutdown, use this Docker command from the repository root:
 
 ```console
 docker compose --env-file docker/.env -f docker/smoke/compose.yml run --build --rm smoke
@@ -64,8 +88,9 @@ in the host environment before running Compose. For example, in PowerShell:
 $env:SMOKE_LARGE_FILE_MB = "32"
 ```
 
-The services remain running after the runner exits, so logs and storage can be inspected. After collecting the
-report, stop the stack and remove its test data:
+With `--keep-running`, services remain running after the runner exits for inspection. Otherwise the launchers
+stop them automatically. After collecting the report, remove the stopped containers and test data (or stop and
+remove them if they are still running):
 
 ```console
 docker compose --env-file docker/.env -f docker/smoke/compose.yml down -v
@@ -77,8 +102,8 @@ starting a fresh stack after stopping Vault.
 
 ## Scope
 
-This is a release smoke test, not a load test or a backup recovery test. It exercises the default encryption
-provider and KDF, with content and metadata encryption enabled together. It does not cover mixed encryption
+These are end-to-end smoke tests, not a full regression suite, load test or backup recovery test. They exercise
+the default encryption provider and KDF, with content and metadata encryption enabled together. They do not cover mixed encryption
 settings, key rotation, notarization, interrupted restores or application restarts.
 
 Docker Desktop on Windows runs these Linux containers; a separate native Windows run is needed to validate NTFS

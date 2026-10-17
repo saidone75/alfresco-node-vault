@@ -2,7 +2,7 @@
 ;; SPDX-License-Identifier: GPL-3.0-or-later
 
 (ns anv.smoke
-  "HTTP smoke checks for the isolated Alfresco Node Vault Compose stack."
+  "End-to-end smoke checks for the isolated Alfresco Node Vault Compose stack."
   (:require [babashka.http-client :as http]
             [cheshire.core :as json]
             [clojure.java.io :as io]
@@ -166,7 +166,7 @@
     (let [data (byte-array (* size-mb 1024 1024))]
       (.nextBytes (Random. 0) data)
       [["empty.bin" "application/octet-stream" (byte-array 0)]
-       ["documento-città.pdf" "application/pdf" (Files/readAllBytes (.toPath (io/file "/smoke/sample.pdf")))]
+       ["Nuntereggae più.pdf" "application/pdf" (Files/readAllBytes (.toPath (io/file "/smoke/sample.pdf")))]
        ["large.bin" "application/octet-stream" data]])))
 
 (defn -main [& args]

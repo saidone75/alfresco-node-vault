@@ -41,6 +41,7 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=admin
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Viewer
+      - 'GF_USERS_HOME_PAGE=/d/anv-dashboard/alfresco-node-vault-dashboard?orgId=1&from=now-15m&to=now&timezone=browser&var-application=&var-instance=$$__all&var-memory_pool_heap=$$__all&var-memory_pool_nonheap=$$__all&refresh=10s'
     volumes:
       - anv-grafana-volume:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning

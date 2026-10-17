@@ -1,6 +1,6 @@
 #!/bin/sh
 
-DOCKER_COMPOSE="docker-compose \
+DOCKER_COMPOSE="docker compose \
 -f docker/docker-compose.yml \
 -f docker/mongo/docker-compose.yml \
 -f docker/hashicorp-vault/docker-compose.yml \
