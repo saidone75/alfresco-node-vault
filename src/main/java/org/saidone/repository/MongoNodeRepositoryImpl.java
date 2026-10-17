@@ -124,9 +124,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
     @NonNull
     public <S extends NodeEntity> List<S> insert(@NonNull Iterable<S> entities) {
         List<S> result = new ArrayList<>();
-        for (S entity : entities) {
-            result.add(insert(entity));
-        }
+        entities.forEach(entity -> result.add(insert(entity)));
         return result;
     }
 
@@ -147,9 +145,7 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
     @NonNull
     public <S extends NodeEntity> List<S> saveAll(@NonNull Iterable<S> entities) {
         List<S> result = new ArrayList<>();
-        for (S entity : entities) {
-            result.add(save(entity));
-        }
+        entities.forEach(entity -> result.add(save(entity)));
         return result;
     }
 
