@@ -74,7 +74,6 @@ and the indefinite retention of all documents in the active repository (unsustai
 - [REST API](doc/RestApi.md) with Alfresco proxy support and metadata search
 - Engineered for flexibility and bespoke integrations
 - No installation or changes required on Alfresco
-- 100% test coverage
 - Prometheus monitoring support for metrics and health checks
 - Custom upload and download methods
 - Minimal memory footprint
