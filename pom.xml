@@ -28,7 +28,7 @@
     </parent>
     <groupId>org.saidone</groupId>
     <artifactId>anv</artifactId>
-    <version>0.9.1</version>
+    <version>0.9.2-SNAPSHOT</version>
     <name>alfresco-node-vault</name>
     <description>Alfresco Node Vault</description>
     <url/>
@@ -296,7 +296,6 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <finalName>anv</finalName>
                     <excludes>
                         <exclude>
                             <groupId>org.projectlombok</groupId>
