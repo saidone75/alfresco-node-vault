@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.9.1] - 2026-10-18
+
 ### Added
 - Isolated end-to-end smoke tests written in Clojure with Babashka for S3 and GridFS with and without encryption, checking archive/download/restore content hashes, restore retries and fixture cleanup. Bash and Windows batch launchers build and start the Docker environment and run the suite.
 - Advanced search API (`POST /api/v1/vault/advanced-search`) on node metadata: name with `*` and `?` wildcards, node type, creation and modification dates, mimetype, size, aspects and custom properties, combining values and conditions with `ANY`/`ALL`. Available only when metadata encryption is disabled.
