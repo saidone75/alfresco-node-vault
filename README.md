@@ -1,13 +1,19 @@
 # Alfresco Node Vault
 
+<img src="images/document-store-nonsense.png" alt="A long-nosed filing cabinet offers a file to a waiting gentleman while an endless bill coils around his feet." width="380">
+
+> There once was a document store<br>
+> That always required a bit more.<br>
+> To open one file,<br>
+> You'd wait quite a while,<br>
+> Then be billed for waiting some more.
+
 Alfresco Node Vault is an open-source solution for archiving historical documents outside Alfresco,
 reducing the active repository while keeping documents accessible through REST APIs and allowing
 them to be restored when needed. Designed for administrators and integrators managing growing
 repositories, it supports scheduled and on-demand archiving, storing metadata in MongoDB and
 content in GridFS or S3. Its Alfresco API proxy helps existing applications retrieve archived
 documents, while optional encryption and integrity checks protect the archived data.
-
-![Vault](images/vault.png)
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Javadoc](https://img.shields.io/badge/Javadoc-API-blue.svg)](https://saidone75.github.io/alfresco-node-vault/javadoc/)
@@ -16,6 +22,8 @@ documents, while optional encryption and integrity checks protect the archived d
 [![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=saidone75_alfresco-node-vault&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=saidone75_alfresco-node-vault)
 [![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=saidone75_alfresco-node-vault&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=saidone75_alfresco-node-vault)
 [![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=saidone75_alfresco-node-vault&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=saidone75_alfresco-node-vault)
+
+[Features](#key-features) · [Architecture](#architecture) · [Build](#build) · [REST API](#rest-api)
 
 ## The Long-term Document Management Challenge
 
