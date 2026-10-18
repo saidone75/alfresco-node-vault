@@ -1,5 +1,12 @@
 # Alfresco Node Vault
 
+Alfresco Node Vault is an open-source solution for archiving historical documents outside Alfresco,
+reducing the active repository while keeping documents accessible through REST APIs and allowing
+them to be restored when needed. Designed for administrators and integrators managing growing
+repositories, it supports scheduled and on-demand archiving, storing metadata in MongoDB and
+content in GridFS or S3. Its Alfresco API proxy helps existing applications retrieve archived
+documents, while optional encryption and integrity checks protect the archived data.
+
 ![Vault](images/vault.png)
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
