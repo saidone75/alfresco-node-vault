@@ -1,0 +1,10 @@
+services:
+  anv-vault:
+    environment:
+      VAULT_STORAGE_IMPL: ozone
+      OZONE_OM_ADDRESS: ozone-om:9862
+      OZONE_VOLUME: ${OZONE_VOLUME:-anv}
+      OZONE_BUCKET: ${OZONE_BUCKET:-content}
+    depends_on:
+      ozone-init:
+        condition: service_completed_successfully

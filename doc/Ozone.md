@@ -22,3 +22,59 @@ Allow sufficient temporary disk space for concurrent uploads.
 This backend uses Apache Ozone client 2.2.1. Changing the backend does not migrate
 existing binaries; validate a separate archive/download/restore cycle before
 switching an existing vault.
+
+## Docker development stack
+
+The Ozone variant replaces Moto/S3 with an Ozone Manager, a Storage Container
+Manager and one Datanode. It uses the native RPC backend and starts no S3 Gateway.
+The initializer waits for SCM to leave safe mode, creates the configured volume
+and bucket if absent, and checks a write/read/delete cycle before the app starts.
+
+From the repository root, create the external volumes used by the development
+services on the first run:
+
+```bash
+docker volume create anv-acs-volume
+docker volume create anv-postgres-volume
+docker volume create anv-ass-volume
+docker volume create anv-mongo-volume
+```
+
+Then start the complete development stack:
+
+```bash
+docker compose --env-file docker/.env -f docker/docker-compose.ozone.yml up --build -d
+```
+
+Stop it with the same Compose file:
+
+```bash
+docker compose --env-file docker/.env -f docker/docker-compose.ozone.yml down
+```
+
+Ozone data is retained in Compose-managed volumes. The usual development services
+publish their existing ports; Ozone is reached by the app through Docker's internal
+network. An application running on the host needs separate cluster networking
+configuration because native clients must reach the advertised Datanode addresses.
+Do not run the regular development stack and this variant simultaneously.
+
+`OZONE_IMAGE` and `OZONE_VERSION` in `docker/.env` select the server image (default
+`apache/ozone:2.2.1`). `OZONE_VOLUME` and `OZONE_BUCKET` select the application bucket.
+This is an unsecured, single-Datanode development setup using RATIS/ONE replication,
+not a production durability or availability configuration.
+
+## Ozone smoke test
+
+Run the isolated end-to-end suite with:
+
+```bash
+./smoke-tests.sh --ozone
+```
+
+On Windows, use `smoke-tests.bat --ozone`. Add `--keep-running` to retain running
+services for inspection. The Ozone suite has its own `anv-smoke-ozone` project,
+volumes and container names, without host ports or external data volumes.
+It checks plaintext and encrypted archive/download/restore flows, including
+empty files, Unicode filenames, checksums and restore retries.
+
+See [SmokeTest.md](SmokeTest.md#native-ozone-suite) for reports, diagnostics and cleanup.

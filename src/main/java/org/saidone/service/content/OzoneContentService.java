@@ -36,6 +36,7 @@ import org.saidone.model.dto.NodeContentStreamDto;
 import org.saidone.service.SecretService;
 import org.saidone.service.crypto.CryptoService;
 import org.saidone.utils.SecureTemporaryFile;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
@@ -66,10 +67,10 @@ public class OzoneContentService extends BaseComponent implements ContentService
 
     /** Existing bucket whose replication policy is used for uploads. */
     private final OzoneBucket bucket;
-    /** Stream encryption and decryption shared with the other storage backends. */
-    private final CryptoService cryptoService;
-    /** Provides versioned secrets for encrypted uploads. */
-    private final SecretService secretService;
+    /** Resolves the crypto service only when processing encrypted content. */
+    private final ObjectProvider<CryptoService> cryptoService;
+    /** Resolves versioned secrets only for encrypted uploads. */
+    private final ObjectProvider<SecretService> secretService;
 
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
@@ -96,9 +97,9 @@ public class OzoneContentService extends BaseComponent implements ContentService
             metadata.put(MetadataKeys.ENCRYPTED, Boolean.toString(encryptContent));
             InputStream payload = digest;
             if (encryptContent) {
-                val secret = secretService.getSecret();
+                val secret = secretService.getObject().getSecret();
                 metadata.put(MetadataKeys.KEY_VERSION, Integer.toString(secret.getVersion()));
-                payload = cryptoService.encrypt(digest, secret);
+                payload = cryptoService.getObject().encrypt(digest, secret);
             }
             try (val stored = payload; val output = Files.newOutputStream(temporary.getPath())) {
                 stored.transferTo(output);
@@ -197,7 +198,7 @@ public class OzoneContentService extends BaseComponent implements ContentService
         }
         try {
             return Boolean.parseBoolean(details.getMetadata().get(MetadataKeys.ENCRYPTED))
-                    ? cryptoService.decrypt(stream) : stream;
+                    ? cryptoService.getObject().decrypt(stream) : stream;
         } catch (RuntimeException e) {
             try {
                 stream.close();

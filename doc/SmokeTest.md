@@ -108,3 +108,52 @@ settings, key rotation, notarization, interrupted restores or application restar
 
 Docker Desktop on Windows runs these Linux containers; a separate native Windows run is needed to validate NTFS
 ACLs. Backup recovery must also be verified separately, including recovery of the required Vault key versions.
+
+## Native Ozone suite
+
+To test Ozone through the native Java RPC client instead of S3/GridFS, run:
+
+```bash
+./smoke-tests.sh --ozone
+```
+
+On Windows:
+
+```cmd
+smoke-tests.bat --ozone
+```
+
+Both launchers accept `--ozone --keep-running` in either order. The default suite
+is unchanged when `--ozone` is omitted. The Ozone variant uses
+`docker/smoke/compose-ozone.yml` and the separate `anv-smoke-ozone` project. It starts
+OM, SCM and one Datanode, with no Moto service or S3 Gateway. Provisioning waits
+for an operational data path before the applications start. Server image settings
+come from `OZONE_IMAGE` and `OZONE_VERSION` in `docker/.env`.
+
+| Storage | Content encryption | Metadata encryption |
+|---------|--------------------|---------------------|
+| Ozone RPC | Disabled | Disabled |
+| Ozone RPC | Enabled | Enabled |
+
+Both cases run all the checks described above with separate Mongo databases and
+Ozone buckets. Exit code `0` means both cases and cleanup passed. Allow roughly
+10 GiB of memory for this stack; it is a functional test with replication ONE,
+not a load or failover test. Run one smoke suite at a time.
+
+To run directly, retain services, and inspect results:
+
+```bash
+docker compose --env-file docker/.env -f docker/smoke/compose-ozone.yml run --build --rm smoke
+docker compose --env-file docker/.env -f docker/smoke/compose-ozone.yml logs --tail=200
+docker compose --env-file docker/.env -f docker/smoke/compose-ozone.yml run --rm --no-deps --entrypoint cat smoke /reports/report.json > ozone-smoke-report.json
+```
+
+After inspecting the report, stop and remove this suite's containers and data:
+
+```bash
+docker compose --env-file docker/.env -f docker/smoke/compose-ozone.yml down -v
+```
+
+As in the default suite, development Vault keys are lost when Vault stops. Remove
+the suite's data volumes before starting a fresh stack after stopping Vault.
+For the regular development variant, see [Ozone.md](Ozone.md#docker-development-stack).

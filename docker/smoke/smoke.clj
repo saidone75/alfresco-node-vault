@@ -18,7 +18,11 @@
 (def alfresco (env "ALFRESCO_URL" "http://alfresco:8080"))
 (def core "/alfresco/api/-default-/public/alfresco/versions/1")
 (def api "/api/v1/vault")
-(def cases ["s3-plain" "gridfs-plain" "s3-encrypted" "gridfs-encrypted"])
+(def cases (str/split (env "SMOKE_CASES" "s3-plain,gridfs-plain,s3-encrypted,gridfs-encrypted") #","))
+(when-not (and (seq cases)
+               (every? #{"s3-plain" "gridfs-plain" "s3-encrypted" "gridfs-encrypted"
+                         "ozone-plain" "ozone-encrypted"} cases))
+  (throw (ex-info "SMOKE_CASES contains an unsupported case" {:cases cases})))
 (def client (http/client {:connect-timeout 10000 :follow-redirects :never :version :http1.1}))
 
 (defn log! [& messages]
@@ -95,13 +99,14 @@
     (.nextBytes (SecureRandom.) secret)
     (request! vault :post "/v1/secret/data/AlfrescoNodeVaultSmoke"
               {:data {:data {"anv.secret" (hex secret)}} :auth? false :headers {"X-Vault-Token" "root"}}))
-  (let [s3 (env "S3_URL" "http://motoserver:5000")]
-    (wait-for! "Moto" #(request! s3 :get "/" {:auth? false}))
-    (doseq [case ["s3-plain" "s3-encrypted"]]
-      (request! s3 :put (str "/anv-smoke-" case)
-                {:auth? false :expected #{200 409} :headers {"Content-Type" "application/xml"}
-                 :data (str "<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">"
-                            "<LocationConstraint>eu-central-1</LocationConstraint></CreateBucketConfiguration>")})))
+  (when (some #(str/starts-with? % "s3-") cases)
+    (let [s3 (env "S3_URL" "http://motoserver:5000")]
+      (wait-for! "Moto" #(request! s3 :get "/" {:auth? false}))
+      (doseq [case ["s3-plain" "s3-encrypted"]]
+        (request! s3 :put (str "/anv-smoke-" case)
+                  {:auth? false :expected #{200 409} :headers {"Content-Type" "application/xml"}
+                   :data (str "<CreateBucketConfiguration xmlns=\"http://s3.amazonaws.com/doc/2006-03-01/\">"
+                              "<LocationConstraint>eu-central-1</LocationConstraint></CreateBucketConfiguration>")}))))
   (log! "Smoke secrets and buckets initialized"))
 
 (defn run-file! [case base folder-id node-ids [filename mime-type payload]]

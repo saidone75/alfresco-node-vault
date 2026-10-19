@@ -1,0 +1,10 @@
+# Complete development stack with native Ozone.
+# Run from the repository root with --env-file docker/.env.
+include:
+  - path:
+      - docker-compose.yml
+      - mongo/docker-compose.yml
+      - hashicorp-vault/docker-compose.yml
+      - ganache/docker-compose.yml
+      - ozone/docker-compose.yml
+      - ozone/vault.yml

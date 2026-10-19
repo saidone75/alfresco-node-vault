@@ -4,19 +4,22 @@
 set -euo pipefail
 
 keep_running=false
-case "${1:-}" in
-  --keep-running) keep_running=true ;;
-  "") ;;
-  *) echo "Usage: $0 [--keep-running]" >&2; exit 2 ;;
-esac
-if (( $# > 1 )); then
-  echo "Usage: $0 [--keep-running]" >&2
-  exit 2
-fi
+backend=default
+for argument in "$@"; do
+  case "$argument" in
+    --keep-running) keep_running=true ;;
+    --ozone) backend=ozone ;;
+    *) echo "Usage: $0 [--ozone] [--keep-running]" >&2; exit 2 ;;
+  esac
+done
 
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 
-compose=(docker compose --env-file docker/.env -f docker/smoke/compose.yml)
+compose_file=docker/smoke/compose.yml
+if [[ "$backend" == ozone ]]; then
+  compose_file=docker/smoke/compose-ozone.yml
+fi
+compose=(docker compose --env-file docker/.env -f "$compose_file")
 
 "${compose[@]}" config --quiet
 
