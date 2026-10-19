@@ -12,7 +12,7 @@ Alfresco Node Vault is an open-source solution for archiving historical document
 reducing the active repository while keeping documents accessible through REST APIs and allowing
 them to be restored when needed. Designed for administrators and integrators managing growing
 repositories, it supports scheduled and on-demand archiving, storing metadata in MongoDB and
-content in GridFS or S3. Its Alfresco API proxy helps existing applications retrieve archived
+content in GridFS, S3 or Apache Ozone. Its Alfresco API proxy helps existing applications retrieve archived
 documents, while optional encryption and integrity checks protect the archived data.
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
@@ -55,7 +55,7 @@ are removed from Alfresco and its database, freeing resources while keeping thos
 
 The application supports on-demand, event-driven and scheduled document archiving.
 
-Document metadata is stored in MongoDB, while content can be stored in either GridFS or AWS S3,
+Document metadata is stored in MongoDB, while content can be stored in GridFS, AWS S3 or [Apache Ozone](doc/Ozone.md),
 providing a flexible foundation for long-term storage.
 
 The application can also act as an Alfresco REST API proxy, allowing existing applications to retrieve
@@ -80,7 +80,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Free and open-source software, released under GPL v3 or later
 - Scheduled or on-demand archiving
 - MongoDB storage for document metadata and the audit trail
-- GridFS or S3 storage for document content
+- GridFS, S3 or [Apache Ozone](doc/Ozone.md) storage for document content
 - Optional blockchain document notarization to provide verifiable evidence of integrity
 - Scheduled and on-demand [integrity sweeps](doc/IntegritySweep.md) to verify notarized documents
 - Secure and decoupled design that suits zero trust environments
@@ -118,12 +118,12 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | ARCHIVING_JOB_ENABLED            | true                                       | Archiving scheduled job switch                                      |
 | ARCHIVING_JOB_CRON_EXPRESSION    | 0 0/5 2-6 * * ?                            | Scheduled job cron expression                                       |
 | ARCHIVING_JOB_QUERY              | TYPE:'cm:content' AND ASPECT:'anv:archive' | Query for selecting documents to be archived                        |
-| VAULT_HASH_ALGORITHM             | SHA-256                                    | Hash stored as metadata on GridFS or S3 object metadata             |
+| VAULT_HASH_ALGORITHM             | SHA-256                                    | Hash stored as content metadata in GridFS, S3 or Ozone             |
 | VAULT_DOUBLE_CHECK               | true                                       | Verify content integrity before removing a document from Alfresco |
 | VAULT_DELETE_ON_ALFRESCO         | true                                       | Delete the document from Alfresco after archiving                         |
 | VAULT_DELETE_NODE_API_ENABLED    | false                                      | Enable the delete node API                                          |
 | VAULT_AUTH_CACHE_TTL             | 60s                                        | Cache duration of successful API authentications                    |
-| VAULT_ENCRYPT_CONTENT            | false                                      | Enable binary content encryption (S3, GridFS)                       |
+| VAULT_ENCRYPT_CONTENT            | false                                      | Enable binary content encryption (S3, GridFS, Ozone)                       |
 | VAULT_ENCRYPT_METADATA           | false                                      | Enable document metadata encryption in MongoDB                          |
 | VAULT_URL                        | http://localhost:8200                      | Vault secret engine URI                                             |
 | VAULT_ENCRYPTION_KV_MOUNT        | secret                                     | Vault secret engine mount path                                      |

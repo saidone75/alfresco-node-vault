@@ -156,7 +156,12 @@ application:
         enabled: true
         ttl-days: ${AUDIT_TTL_DAYS:60}
       storage:
-        impl: s3
+        impl: ${VAULT_STORAGE_IMPL:s3}
+        ozone:
+          volume: ${OZONE_VOLUME:anv}
+          bucket: ${OZONE_BUCKET:content}
+          properties:
+            "[ozone.om.address]": ${OZONE_OM_ADDRESS:localhost:9862}
         s3:
           key: ${S3_KEY:testing}
           secret: ${S3_SECRET:testing}
