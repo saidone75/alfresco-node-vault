@@ -25,7 +25,7 @@ import lombok.val;
 import org.saidone.exception.InvalidRequestException;
 import org.saidone.exception.NodeNotFoundException;
 import org.saidone.exception.NodeNotNotarizedException;
-import org.saidone.exception.NodeRestoreInProgressException;
+import org.saidone.exception.NodeOperationInProgressException;
 import org.saidone.exception.NotarizationException;
 import org.saidone.exception.NotarizedHashMismatchException;
 import org.saidone.exception.VaultException;
@@ -89,9 +89,9 @@ public class GlobalExceptionHandler {
         return buildResponse(HttpStatus.NOT_FOUND, "Node not found");
     }
 
-    @ExceptionHandler(NodeRestoreInProgressException.class)
+    @ExceptionHandler(NodeOperationInProgressException.class)
     @Operation(hidden = true)
-    public ResponseEntity<String> handleNodeRestoreInProgressException(NodeRestoreInProgressException e) {
+    public ResponseEntity<String> handleNodeOperationInProgressException(NodeOperationInProgressException e) {
         log.warn(e.getMessage());
         return buildResponse(HttpStatus.CONFLICT, e.getMessage());
     }

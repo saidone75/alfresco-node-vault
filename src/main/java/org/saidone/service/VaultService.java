@@ -29,16 +29,14 @@ import org.saidone.component.BaseComponent;
 import org.saidone.exception.HashesMismatchException;
 import org.saidone.exception.NodeNotFoundOnAlfrescoException;
 import org.saidone.exception.NodeNotFoundOnVaultException;
-import org.saidone.exception.NodeRestoreInProgressException;
+import org.saidone.exception.NodeOperationInProgressException;
 import org.saidone.exception.VaultException;
 import org.saidone.misc.ProgressTrackingInputStream;
 import org.saidone.model.dto.NodeWrapperDto;
 import org.saidone.service.content.ContentService;
+import org.saidone.service.locking.VaultOperationCoordinator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Service responsible for archiving, restoring and managing nodes in the vault.
@@ -56,6 +54,7 @@ public class VaultService extends BaseComponent {
     private final AlfrescoService alfrescoService;
     private final NodeService nodeService;
     private final ContentService contentService;
+    private final VaultOperationCoordinator operationCoordinator;
 
     @Value("${application.service.vault.double-check}")
     private boolean doubleCheck;
@@ -70,9 +69,6 @@ public class VaultService extends BaseComponent {
     private boolean deleteOnAlfrescoOnDelete;
 
     private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
-
-    // IDs of the nodes being restored, to reject concurrent restores of the same node
-    private final Set<String> restoresInProgress = ConcurrentHashMap.newKeySet();
 
     /**
      * Archives a node by its ID.
@@ -93,6 +89,10 @@ public class VaultService extends BaseComponent {
      * @throws VaultException                  if any error occurs during archiving, including rollback
      */
     public void archiveNode(String nodeId) {
+        operationCoordinator.withNodeLock(nodeId, () -> doArchiveNode(nodeId));
+    }
+
+    private void doArchiveNode(String nodeId) {
         log.info("Archiving node: {}", nodeId);
         if (!nodeService.existsById(nodeId)) {
             storeNode(nodeId);
@@ -228,38 +228,35 @@ public class VaultService extends BaseComponent {
      * @param restorePermissions whether to restore permissions along with the node
      * @return the ID of the node restored in Alfresco
      * @throws NodeNotFoundOnVaultException    if the node is not found in the vault
-     * @throws NodeRestoreInProgressException  if a restore of the same node is already running
+     * @throws NodeOperationInProgressException if another operation on the same node is already running
      * @throws VaultException                  if stored metadata cannot be parsed
      */
-    @SneakyThrows
     public String restoreNode(String nodeId, boolean restorePermissions) throws VaultException {
-        if (!restoresInProgress.add(nodeId)) {
-            throw new NodeRestoreInProgressException(nodeId);
+        return operationCoordinator.withNodeLock(nodeId, () -> doRestoreNode(nodeId, restorePermissions));
+    }
+
+    @SneakyThrows
+    private String doRestoreNode(String nodeId, boolean restorePermissions) {
+        val nodeWrapper = getNodeWrapper(nodeId);
+        if (restoredNodeExists(nodeWrapper)) {
+            log.info("Node {} already restored as {}", nodeId, nodeWrapper.getRestoredNodeId());
+            return nodeWrapper.getRestoredNodeId();
         }
+        val newNodeId = alfrescoService.restoreNode(nodeWrapper.getNode(), restorePermissions);
         try {
-            val nodeWrapper = getNodeWrapper(nodeId);
-            if (restoredNodeExists(nodeWrapper)) {
-                log.info("Node {} already restored as {}", nodeId, nodeWrapper.getRestoredNodeId());
-                return nodeWrapper.getRestoredNodeId();
-            }
-            val newNodeId = alfrescoService.restoreNode(nodeWrapper.getNode(), restorePermissions);
+            alfrescoService.restoreNodeContent(newNodeId, contentService.getNodeContent(nodeId));
+            nodeWrapper.setRestoredNodeId(newNodeId);
+            nodeService.save(nodeWrapper);
+        } catch (Exception e) {
             try {
-                alfrescoService.restoreNodeContent(newNodeId, contentService.getNodeContent(nodeId));
-                nodeWrapper.setRestoredNodeId(newNodeId);
-                nodeService.save(nodeWrapper);
-            } catch (Exception e) {
-                try {
-                    alfrescoService.deleteNode(newNodeId, true);
-                } catch (Exception cleanupException) {
-                    e.addSuppressed(cleanupException);
-                    log.error("Could not remove failed restore {} for node {}", newNodeId, nodeId, cleanupException);
-                }
-                throw e;
+                alfrescoService.deleteNode(newNodeId, true);
+            } catch (Exception cleanupException) {
+                e.addSuppressed(cleanupException);
+                log.error("Could not remove failed restore {} for node {}", newNodeId, nodeId, cleanupException);
             }
-            return newNodeId;
-        } finally {
-            restoresInProgress.remove(nodeId);
+            throw e;
         }
+        return newNodeId;
     }
 
     /**
@@ -288,12 +285,16 @@ public class VaultService extends BaseComponent {
      * @param nodeId identifier of the node to delete
      */
     public void deleteNode(String nodeId) {
+        operationCoordinator.withNodeLock(nodeId, () -> doDeleteNode(nodeId));
+    }
+
+    private void doDeleteNode(String nodeId) {
         val nodeWrapper = getNodeWrapper(nodeId);
         val node = nodeWrapper.getNode();
         if (!alfrescoService.nodeExists(nodeId) && !restoredNodeExists(nodeWrapper)) {
             String restoredNodeId = null;
             if (restoreOnAlfrescoOnDelete) {
-                restoredNodeId = restoreNode(nodeId, false);
+                restoredNodeId = doRestoreNode(nodeId, false);
             }
             if (deleteOnAlfrescoOnDelete) {
                 alfrescoService.deleteNode(restoredNodeId != null ? restoredNodeId : node.getId(), false);

@@ -20,7 +20,6 @@
 package org.saidone.service.notarization;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.logging.log4j.util.Strings;
@@ -28,6 +27,7 @@ import org.saidone.component.BaseComponent;
 import org.saidone.exception.NodeNotNotarizedException;
 import org.saidone.exception.NotarizedHashMismatchException;
 import org.saidone.service.NodeService;
+import org.saidone.service.locking.VaultOperationCoordinator;
 import org.saidone.service.content.ContentService;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -50,6 +50,7 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
 
     /** Service providing access to node content for hashing. */
     private final ContentService contentService;
+    private final VaultOperationCoordinator operationCoordinator;
 
     /**
      * Algorithm used when computing hashes of node content. Value is read from
@@ -81,11 +82,18 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
      *
      * @param nodeId the identifier of the node to notarize
      */
-    @SneakyThrows
     public void notarizeNode(String nodeId) {
+        operationCoordinator.withNodeLock(nodeId, () -> doNotarizeNode(nodeId));
+    }
+
+    private void doNotarizeNode(String nodeId) {
+        val nodeWrapper = nodeService.findById(nodeId);
+        if (Strings.isNotBlank(nodeWrapper.getNotarizationTxId())) {
+            log.info("Node {} is already notarized, skipping", nodeId);
+            return;
+        }
         val hash = contentService.computeHash(nodeId, checksumAlgorithm);
         val txHash = putHash(nodeId, hash);
-        val nodeWrapper = nodeService.findById(nodeId);
         nodeWrapper.setNotarizationTxId(txHash);
         nodeService.save(nodeWrapper);
     }
@@ -101,8 +109,11 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
      * @throws NodeNotNotarizedException     if the node is not notarized
      * @throws NotarizedHashMismatchException if the hashes do not match
      */
-    @SneakyThrows
     public void checkNotarization(String nodeId) {
+        operationCoordinator.withNodeLock(nodeId, () -> doCheckNotarization(nodeId));
+    }
+
+    private void doCheckNotarization(String nodeId) {
         log.debug("Checking notarization for node {}", nodeId);
         val notarizationTransactionId = nodeService.findById(nodeId).getNotarizationTxId();
         if (Strings.isBlank(notarizationTransactionId)) {

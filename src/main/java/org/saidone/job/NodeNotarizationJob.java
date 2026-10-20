@@ -24,6 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.service.NodeService;
+import org.saidone.service.locking.VaultOperationCoordinator;
+import org.saidone.exception.NodeOperationInProgressException;
 import org.saidone.service.notarization.NotarizationService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -36,7 +38,7 @@ import org.springframework.stereotype.Component;
  * At each execution the job retrieves nodes where {@code ntx} is {@code null}
  * and delegates the notarization flow to {@link NotarizationService}. Successful
  * notarization stores the returned transaction id on the related node. Execution
- * is synchronized to avoid overlapping runs and enabled only when the property
+ * uses a shared ShedLock lock to avoid overlapping runs and is enabled only when the property
  * {@code application.notarization-job.enabled} is set to {@code true}.
  * </p>
  */
@@ -52,6 +54,7 @@ public class NodeNotarizationJob extends BaseComponent {
 
     /** Service responsible for notarization and transaction id persistence. */
     private final NotarizationService notarizationService;
+    private final VaultOperationCoordinator operationCoordinator;
 
     /**
      * Scheduled entry point triggered according to
@@ -60,19 +63,20 @@ public class NodeNotarizationJob extends BaseComponent {
      */
     @Scheduled(cron = "${application.notarization-job.cron-expression}")
     void notarize() {
-        doNotarize();
+        operationCoordinator.runJob("notarization", this::doNotarize);
     }
 
     /**
      * Iterates over all nodes with a missing transaction id and requests
      * notarization for each of them. Exceptions for individual nodes are
      * logged and do not stop processing of the remaining nodes.
-     * This method is synchronized to prevent concurrent executions.
      */
-    private synchronized void doNotarize() {
+    private void doNotarize() {
         for (val node : nodeService.findByNtx(null)) {
             try {
                 notarizationService.notarizeNode(node.getId());
+            } catch (NodeOperationInProgressException e) {
+                log.info("Skipping busy node {}; notarization can be retried on a later run", node.getId());
             } catch (Exception e) {
                 log.warn(e.getMessage(), e);
             }

@@ -25,11 +25,13 @@ import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
 import org.saidone.exception.NotarizationException;
+import org.saidone.exception.NodeOperationInProgressException;
 import org.saidone.model.dto.CorruptedNodeDto;
 import org.saidone.model.dto.IntegritySweepRunDto;
 import org.saidone.model.dto.NodeWrapperDto;
 import org.saidone.monitor.IntegritySweepMetrics;
 import org.saidone.service.NodeService;
+import org.saidone.service.locking.VaultOperationCoordinator;
 import org.saidone.service.notarization.NotarizationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -71,6 +73,7 @@ public class IntegritySweepService extends BaseComponent {
     private final MongoTemplate mongoTemplate;
     /** Metrics collector for reporting completed sweep run statistics. */
     private final IntegritySweepMetrics metrics;
+    private final VaultOperationCoordinator operationCoordinator;
 
     /** Maximum number of notarized nodes to process per page during a sweep. */
     @Value("${application.integrity-sweep.batch-size:200}")
@@ -101,9 +104,13 @@ public class IntegritySweepService extends BaseComponent {
      * @param trigger the run trigger source (for example {@code MANUAL} or
      *                {@code SCHEDULED}); blank values default to {@code MANUAL}
      * @return persisted sweep run summary with timing and counters, or {@code null}
-     * if the sweep was skipped
+     * if notarization is disabled or the shared sweep lock is unavailable
      */
-    public synchronized IntegritySweepRunDto runSweep(String trigger) {
+    public IntegritySweepRunDto runSweep(String trigger) {
+        return operationCoordinator.runJob("integrity-sweep", () -> doRunSweep(trigger));
+    }
+
+    private IntegritySweepRunDto doRunSweep(String trigger) {
         if (notarizationService.isEmpty()) {
             log.warn("Integrity sweep skipped: notarization is disabled");
             return null;
@@ -188,6 +195,10 @@ public class IntegritySweepService extends BaseComponent {
             notarizationService.get().checkNotarization(node.getId());
             run.setPassed(run.getPassed() + 1);
             clearCorruptedNode(node.getId());
+        } catch (NodeOperationInProgressException e) {
+            // Contention is a transient check error, not evidence of corrupted content.
+            run.setErrors(run.getErrors() + 1);
+            log.info("Integrity check skipped for busy node {}", node.getId());
         } catch (NotarizationException e) {
             run.setFailed(run.getFailed() + 1);
             run.getFailedNodeIds().add(node.getId());

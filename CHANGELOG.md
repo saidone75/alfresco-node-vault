@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- MongoDB-backed ShedLock coordination for node archiving, restore, deletion, key rotation, notarization and notarization checks, plus shared locks for archiving jobs, notarization jobs and manual or scheduled integrity sweeps. Node leases default to two minutes and job leases to one hour, with periodic renewal and configurable durations.
+
+### Changed
+- Concurrent synchronous operations on the same node return `409 Conflict` across cooperating instances. Background jobs skip busy nodes; bulk key rotation logs busy nodes and continues. Integrity checks on busy nodes count as check errors without marking content as corrupted.
+
 ### Fixed
 - Restore path creation resolves existing folders directly after a name conflict, without relying on paginated child listings. Other Alfresco errors are propagated, and files with conflicting names are rejected.
 

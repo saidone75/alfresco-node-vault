@@ -24,6 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.service.NodeService;
+import org.saidone.service.locking.VaultOperationCoordinator;
+import org.saidone.exception.NodeOperationInProgressException;
 import org.saidone.service.SecretService;
 import org.saidone.service.content.ContentService;
 import org.springframework.beans.factory.annotation.Value;
@@ -58,6 +60,7 @@ public class KeyServiceImpl extends BaseComponent implements KeyService {
      * Handles reading and writing of encrypted node content.
      */
     private final ContentService contentService;
+    private final VaultOperationCoordinator operationCoordinator;
     /**
      * Whether binary content is encrypted and must be re-encrypted on key rotation.
      */
@@ -77,6 +80,10 @@ public class KeyServiceImpl extends BaseComponent implements KeyService {
      */
     @Override
     public void updateKey(String nodeId) {
+        operationCoordinator.withNodeLock(nodeId, () -> doUpdateKey(nodeId));
+    }
+
+    private void doUpdateKey(String nodeId) {
         val nodeWrapper = nodeService.findById(nodeId);
         val actualKeyVersion = nodeWrapper.getKeyVersion();
         val lastKeyVersion = secretService.getSecret().getVersion();
@@ -104,7 +111,13 @@ public class KeyServiceImpl extends BaseComponent implements KeyService {
     @Override
     public void updateKeys(int sourceVersion) {
         val nodes = nodeService.findByKv(sourceVersion);
-        nodes.forEach(node -> updateKey(node.getId()));
+        nodes.forEach(node -> {
+            try {
+                updateKey(node.getId());
+            } catch (NodeOperationInProgressException e) {
+                log.warn("Skipping key update for busy node {}; retry the bulk update to include it", node.getId());
+            }
+        });
     }
 
 }
