@@ -360,7 +360,7 @@ public class VaultApiController extends BaseComponent {
                             content = @Content),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
-                    @ApiResponse(responseCode = "409", description = "Restore of the node already in progress",
+                    @ApiResponse(responseCode = "409", description = "Another operation on this node is already in progress",
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
@@ -403,6 +403,8 @@ public class VaultApiController extends BaseComponent {
                             content = @Content),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
+                    @ApiResponse(responseCode = "409", description = "Another operation on this node is already in progress",
+                            content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
@@ -433,6 +435,8 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content),
                     @ApiResponse(responseCode = "403", description = "API disabled", content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "404", description = "Node not found", content = @Content),
+                    @ApiResponse(responseCode = "409", description = "Another operation on this node is already in progress",
+                            content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
             })
     public ResponseEntity<String> deleteNode(
@@ -538,7 +542,7 @@ public class VaultApiController extends BaseComponent {
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
-                    @ApiResponse(responseCode = "409", description = "Node not notarized or hashes do not match",
+                    @ApiResponse(responseCode = "409", description = "Another operation on this node is in progress, node not notarized or hashes do not match",
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
@@ -585,6 +589,8 @@ public class VaultApiController extends BaseComponent {
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "404", description = "Node not found",
                             content = @Content),
+                    @ApiResponse(responseCode = "409", description = "Another operation on this node is already in progress",
+                            content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })

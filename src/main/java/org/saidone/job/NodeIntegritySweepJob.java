@@ -45,10 +45,11 @@ public class NodeIntegritySweepJob extends BaseComponent {
         doSweep();
     }
 
-    private synchronized void doSweep() {
+    private void doSweep() {
         log.info("Starting scheduled integrity sweep");
-        integritySweepService.runSweep("SCHEDULED");
-        log.info("Scheduled integrity sweep completed");
+        if (integritySweepService.runSweep("SCHEDULED") != null) {
+            log.info("Scheduled integrity sweep completed");
+        }
     }
 
 }

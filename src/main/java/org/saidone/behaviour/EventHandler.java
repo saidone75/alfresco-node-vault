@@ -33,6 +33,7 @@ import org.saidone.model.alfresco.AlfrescoContentModel;
 import org.saidone.model.alfresco.AnvContentModel;
 import org.saidone.component.BaseComponent;
 import org.saidone.service.VaultService;
+import org.saidone.exception.NodeOperationInProgressException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Component;
@@ -79,6 +80,8 @@ public class EventHandler extends BaseComponent implements OnNodeCreatedEventHan
         try {
             vaultService.archiveNode(nodeResource.getId());
             log.info("Node {} successfully archived", nodeResource.getId());
+        } catch (NodeOperationInProgressException e) {
+            log.warn("Archive event skipped for busy node {}; retry archiving through the API or a scheduled run", nodeResource.getId());
         } catch (Exception e) {
             log.error(e.getMessage());
         }

@@ -26,6 +26,7 @@ import lombok.val;
 import org.saidone.config.EthereumConfig;
 import org.saidone.exception.NotarizationException;
 import org.saidone.service.NodeService;
+import org.saidone.service.locking.VaultOperationCoordinator;
 import org.saidone.service.content.ContentService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
@@ -87,9 +88,10 @@ public class EthereumService extends AbstractNotarizationService {
      * @param nodeService    service used to interact with nodes
      * @param contentService service computing document hashes
      * @param config         Ethereum configuration properties
+     * @param operationCoordinator coordinator for operations on the same node
      */
-    public EthereumService(NodeService nodeService, ContentService contentService, EthereumConfig config) {
-        super(nodeService, contentService);
+    public EthereumService(NodeService nodeService, ContentService contentService, EthereumConfig config, VaultOperationCoordinator operationCoordinator) {
+        super(nodeService, contentService, operationCoordinator);
         this.config = config;
     }
 

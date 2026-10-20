@@ -19,13 +19,10 @@
 
 package org.saidone.exception;
 
-/**
- * Thrown when a restore is requested for a node whose restore is already running.
- */
-public class NodeRestoreInProgressException extends RuntimeException {
+/** Thrown when another operation holds the shared lock for a node. */
+public class NodeOperationInProgressException extends RuntimeException {
 
-    public NodeRestoreInProgressException(String nodeId) {
-        super(String.format("Restore of node %s is already in progress", nodeId));
+    public NodeOperationInProgressException(String nodeId) {
+        super(String.format("Another operation on node %s is already in progress", nodeId));
     }
-
 }

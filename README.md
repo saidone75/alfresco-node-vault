@@ -207,6 +207,11 @@ Native Ozone tests on the host require access to the Docker bridge network, as o
 Docker Engine. See [Ozone.md](doc/Ozone.md#tests) for networking requirements.
 On Windows, `vault.bat` starts S3; use `mvn test -Ps3`.
 
+## Concurrent operations
+
+ShedLock with MongoDB coordinates node operations and background jobs across instances.
+See [concurrency](doc/Concurrency.md) for configuration and limitations.
+
 ## Docker configuration
 
 The `docker` directory contains a `.env` file used by `docker-compose`.

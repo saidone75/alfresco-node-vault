@@ -40,7 +40,7 @@ listed in the OpenAPI documentation.
 | `401`  | Missing or invalid credentials                                                                  |
 | `403`  | The feature is disabled by configuration                                                        |
 | `404`  | Node not found on the vault or on Alfresco                                                      |
-| `409`  | Conflicting state: restore already in progress, node already notarized, node not notarized or hashes not matching the notarized ones |
+| `409`  | Conflicting state: another operation on the same node is in progress, node already notarized, node not notarized or hashes not matching the notarized ones |
 | `500`  | Internal server error                                                                           |
 
 ## Restore retries
@@ -49,7 +49,9 @@ A completed restore returns the existing Alfresco node ID while that node still 
 If uploading content or saving the restored node ID fails, the vault attempts to permanently delete only the
 node created by that attempt, then reports the original error. After successful cleanup, a retry creates a new node.
 A process interruption, a lost creation response or failed cleanup may leave a node requiring manual reconciliation.
-Concurrent restores of the same node are prevented within one application instance only.
+Operations on the same node share a MongoDB-backed ShedLock lock across cooperating instances.
+Synchronous requests return `409` if the lock is unavailable. Asynchronous requests report later
+conflicts in worker logs. See [concurrency](Concurrency.md) for lease durations and recovery limitations.
 
 ## Advanced search example
 

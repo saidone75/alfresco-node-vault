@@ -24,6 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.saidone.component.BaseComponent;
 import org.saidone.service.AlfrescoService;
 import org.saidone.service.VaultService;
+import org.saidone.service.locking.VaultOperationCoordinator;
+import org.saidone.exception.NodeOperationInProgressException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -36,7 +38,7 @@ import org.springframework.stereotype.Component;
  * This component runs only if the property 'application.archiving-job.enabled' is set to true.
  * It uses the AlfrescoService to search for nodes based on a query string and archives each found node
  * through the VaultService. The schedule for execution and the search query are defined in the application configuration.
- * Archiving execution is synchronized to avoid overlapping runs.
+ * A shared ShedLock lock prevents overlapping archiving jobs across instances.
  * <p>
  * The job is intended to automate the archival of nodes in regular intervals and ensure that
  * only one instance of the archive operation runs at any given time.
@@ -50,6 +52,7 @@ public class NodeArchivingJob extends BaseComponent {
 
     private final AlfrescoService alfrescoService;
     private final VaultService vaultService;
+    private final VaultOperationCoordinator operationCoordinator;
 
     @Value("${application.archiving-job.query}")
     private String query;
@@ -59,15 +62,20 @@ public class NodeArchivingJob extends BaseComponent {
      */
     @Scheduled(cron = "${application.archiving-job.cron-expression}")
     void archiveNodes() {
-        doArchiveNodes();
+        operationCoordinator.runJob("archiving", this::doArchiveNodes);
     }
 
     /**
      * Performs the actual archiving of nodes by searching with the configured query and processing each node.
-     * This method is synchronized to prevent concurrent execution.
      */
-    private synchronized void doArchiveNodes() {
-        alfrescoService.searchAndProcess(query, vaultService::archiveNode);
+    private void doArchiveNodes() {
+        alfrescoService.searchAndProcess(query, nodeId -> {
+            try {
+                vaultService.archiveNode(nodeId);
+            } catch (NodeOperationInProgressException e) {
+                log.info("Skipping busy node {}; archiving can be retried on a later run", nodeId);
+            }
+        });
     }
 
 }

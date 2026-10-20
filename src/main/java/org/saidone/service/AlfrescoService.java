@@ -40,7 +40,6 @@ import org.alfresco.search.model.SearchRequest;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.AlfrescoServiceConfig;
 import org.saidone.exception.ApiExceptionError;
-import org.saidone.exception.NodeNotFoundException;
 import org.saidone.exception.VaultException;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.misc.ProgressTrackingOutputStream;
@@ -99,6 +98,7 @@ public class AlfrescoService extends BaseComponent {
     private Node guestHome;
 
     private static final ObjectMapper OBJECT_MAPPER;
+
     static {
         OBJECT_MAPPER = new ObjectMapper();
         OBJECT_MAPPER.configure(DeserializationFeature.UNWRAP_ROOT_VALUE, true);
@@ -302,7 +302,7 @@ public class AlfrescoService extends BaseComponent {
     /**
      * Restores the content of a node by uploading the provided content stream.
      *
-     * @param nodeId      the identifier of the node to update content for
+     * @param nodeId            the identifier of the node to update content for
      * @param nodeContentStream the {@link NodeContentStreamDto} containing the content stream and metadata
      */
     @SneakyThrows
@@ -423,22 +423,21 @@ public class AlfrescoService extends BaseComponent {
     /**
      * Attempts to create a folder structure based on the provided path under the specified parent node.
      * For each element in the path, tries to create a folder with that name inside the current parent.
-     * If the folder already exists, retrieves its ID and proceeds to the next path element.
-     * If creation and lookup both fail, throws an exception.
+     * On a name conflict, resolves the existing child directly by relative path and verifies
+     * that it is a folder before proceeding. Other API errors propagate unchanged.
      *
      * @param parentId the ID of the parent node under which the folder structure should be created
      * @param path     the ordered list of folder names representing the path to create
      * @return the ID of the final node corresponding to the last path element
-     * @throws Exception if a folder cannot be created or found at any point in the path
      */
-    public String createPathIfNotExists(String parentId, List<String> path) throws Exception {
-        for (var pathPart : path) {
-            var nodeBodyCreate = new NodeBodyCreate();
+    public String createPathIfNotExists(String parentId, List<String> path) {
+        for (val pathPart : path) {
+            val nodeBodyCreate = new NodeBodyCreate();
             nodeBodyCreate.setName(pathPart);
             nodeBodyCreate.setNodeType("cm:folder");
             log.debug("Trying to create folder: {}", nodeBodyCreate.getName());
             try {
-                var nodeEntry = nodesApi.createNode(
+                val nodeEntry = nodesApi.createNode(
                         parentId,
                         nodeBodyCreate,
                         false,
@@ -449,29 +448,20 @@ public class AlfrescoService extends BaseComponent {
                 );
                 log.debug("Created folder: {}", Objects.requireNonNull(nodeEntry.getBody()).getEntry().getName());
                 parentId = Objects.requireNonNull(nodeEntry.getBody()).getEntry().getId();
-            } catch (FeignException ex) {
-                log.info("{}, getting children", getErrorKey(ex));
-                /* get children */
-                var children = nodesApi.listNodeChildren(
-                        parentId,
-                        null,
-                        null,
-                        null,
-                        "(isFolder=true)",
-                        null,
-                        null,
-                        null,
-                        null
-                );
-                var matchingChild = Objects.requireNonNull(children.getBody()).getList().getEntries().stream().filter(e -> e.getEntry().getName().equals(pathPart)).findFirst().orElse(null);
-                if (matchingChild != null) {
-                    log.info("Found matching child: {}", matchingChild.getEntry().getName());
-                    parentId = matchingChild.getEntry().getId();
-                } else {
-                    var message = String.format("Got %s but a child named %s does not exist", getErrorKey(ex), pathPart);
-                    log.error("{}", message);
-                    throw new NodeNotFoundException(message);
+            } catch (FeignException.Conflict e) {
+                log.debug("Cannot create folder '{}' under parent {} due to a name conflict; looking up the existing node", pathPart, parentId);
+                final Node existing;
+                try {
+                    existing = Objects.requireNonNull(nodesApi.getNode(parentId, null, pathPart, null).getBody()).getEntry();
+                } catch (RuntimeException lookupFailure) {
+                    lookupFailure.addSuppressed(e);
+                    throw lookupFailure;
                 }
+                if (!Boolean.TRUE.equals(existing.isIsFolder())) {
+                    // A file with the same name cannot be used as a parent folder.
+                    throw e;
+                }
+                parentId = existing.getId();
             }
         }
         return parentId;
