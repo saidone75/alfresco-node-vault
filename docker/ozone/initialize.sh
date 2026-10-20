@@ -3,28 +3,10 @@
 set -euo pipefail
 
 # Invoked through the image's entrypoint so OZONE-SITE.XML_* is applied.
-for attempt in {1..90}; do
-  if ozone admin safemode status | grep -q 'SCM is out of safe mode'; then
-    break
-  fi
-  if (( attempt == 90 )); then
-    echo "Ozone SCM did not leave safe mode" >&2
-    exit 1
-  fi
-  sleep 2
-done
-
-for attempt in {1..90}; do
-  if ozone sh volume info "/${OZONE_VOLUME}" >/dev/null 2>&1 ||
-     ozone sh volume create "/${OZONE_VOLUME}"; then
-    break
-  fi
-  if (( attempt == 90 )); then
-    echo "Cannot initialize Ozone volume ${OZONE_VOLUME}" >&2
-    exit 1
-  fi
-  sleep 2
-done
+# Compose waits for SCM to leave safe mode and for OM to accept RPC requests.
+if ! ozone sh volume info "/${OZONE_VOLUME}" >/dev/null 2>&1; then
+  ozone sh volume create "/${OZONE_VOLUME}"
+fi
 
 for bucket in ${OZONE_BUCKETS}; do
   if ! ozone sh bucket info "/${OZONE_VOLUME}/${bucket}" >/dev/null 2>&1; then

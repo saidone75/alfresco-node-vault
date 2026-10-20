@@ -27,8 +27,11 @@ switching an existing vault.
 
 The Ozone variant replaces Moto/S3 with an Ozone Manager, a Storage Container
 Manager and one Datanode. It uses the native RPC backend and starts no S3 Gateway.
-The initializer waits for SCM to leave safe mode, creates the configured volume
+Compose healthchecks wait for SCM to leave safe mode and for OM to accept RPC
+requests before starting the initializer. The initializer creates the configured volume
 and bucket if absent, and checks a write/read/delete cycle before the app starts.
+OM and Datanode start while SCM is becoming healthy, since SCM needs a registered
+Datanode to leave safe mode.
 
 From the repository root, create the external volumes used by the development
 services on the first run:
