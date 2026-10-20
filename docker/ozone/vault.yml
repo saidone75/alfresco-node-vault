@@ -1,5 +1,42 @@
+# Development-only monitoring; smoke tests use the shared Ozone services directly.
+x-recon-env: &recon-env
+  OZONE-SITE.XML_ozone.recon.address: ozone-recon:9891
+  no_proxy: ozone-om,ozone-scm,ozone-datanode,ozone-recon,localhost,127.0.0.1
+
 services:
+  ozone-scm:
+    environment:
+      <<: *recon-env
+
+  ozone-datanode:
+    environment:
+      <<: *recon-env
+
+  ozone-recon:
+    extends:
+      file: ozone/docker-compose.yml
+      service: ozone-datanode
+    hostname: ozone-recon
+    command: ["ozone", "recon"]
+    environment:
+      <<: *recon-env
+      OZONE-SITE.XML_ozone.recon.db.dir: /data/metadata/recon
+      OZONE-SITE.XML_ozone.recon.http-address: 0.0.0.0:9888
+    ports:
+      - "127.0.0.1:9888:9888"
+    volumes: !override
+      - ozone-recon:/data
+    depends_on: !override
+      ozone-scm:
+        condition: service_healthy
+      ozone-om:
+        condition: service_healthy
+      ozone-datanode:
+        condition: service_started
+
   ozone-om:
+    environment:
+      <<: *recon-env
     ports:
       - "127.0.0.1:9862:9862"
   anv-vault:
@@ -11,3 +48,6 @@ services:
     depends_on:
       ozone-init:
         condition: service_completed_successfully
+
+volumes:
+  ozone-recon:

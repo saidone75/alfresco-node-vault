@@ -69,6 +69,11 @@ Do not run the regular development stack and this variant simultaneously.
 This is an unsecured, single-Datanode development setup using RATIS/ONE replication,
 not a production durability or availability configuration.
 
+## Recon GUI
+
+Recon starts with the development stack at [http://localhost:9888](http://localhost:9888).
+It is excluded from smoke tests. Monitoring data is retained on stop and removed by `purge --ozone`.
+
 ## Integration tests
 
 After starting the development stack with `./vault.sh start --ozone`, run:
