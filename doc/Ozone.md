@@ -40,7 +40,10 @@ docker volume create anv-ass-volume
 docker volume create anv-mongo-volume
 ```
 
-Then start the complete development stack:
+Alternatively, `./vault.sh start --ozone` creates the external volumes and starts the stack
+with Grafana included. Use `./vault.sh stop --ozone` to stop it.
+
+To start the development stack directly:
 
 ```bash
 docker compose --env-file docker/.env -f docker/docker-compose.ozone.yml up --build -d
@@ -72,9 +75,9 @@ Run the isolated end-to-end suite with:
 ```
 
 On Windows, use `smoke-tests.bat --ozone`. Add `--keep-running` to retain running
-services for inspection. The Ozone suite has its own `anv-smoke-ozone` project,
-volumes and container names, without host ports or external data volumes.
+services for inspection. The Ozone cases use the shared `anv-smoke` project,
+with isolated volumes and container names, without host ports or external data volumes.
 It checks plaintext and encrypted archive/download/restore flows, including
 empty files, Unicode filenames, checksums and restore retries.
 
-See [SmokeTest.md](SmokeTest.md#native-ozone-suite) for reports, diagnostics and cleanup.
+See [SmokeTest.md](SmokeTest.md#native-ozone-cases) for reports, diagnostics and cleanup.

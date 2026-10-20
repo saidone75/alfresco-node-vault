@@ -4,22 +4,29 @@
 set -euo pipefail
 
 keep_running=false
-backend=default
+backend=s3
+backend_selected=false
 for argument in "$@"; do
   case "$argument" in
     --keep-running) keep_running=true ;;
-    --ozone) backend=ozone ;;
-    *) echo "Usage: $0 [--ozone] [--keep-running]" >&2; exit 2 ;;
+    --gridfs|--s3|--ozone|--all)
+      if [[ "$backend_selected" == true ]]; then
+        echo "Choose only one backend flag: --gridfs, --s3, --ozone or --all" >&2
+        exit 2
+      fi
+      backend=${argument#--}
+      backend_selected=true
+      ;;
+    *) echo "Usage: $0 [--gridfs|--s3|--ozone|--all] [--keep-running]" >&2; exit 2 ;;
   esac
 done
 
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 
-compose_file=docker/smoke/compose.yml
-if [[ "$backend" == ozone ]]; then
-  compose_file=docker/smoke/compose-ozone.yml
+compose=(docker compose --env-file docker/.env -f docker/smoke/compose.yml)
+if [[ "$backend" != all ]]; then
+  compose+=(-f "docker/smoke/compose-${backend}.yml")
 fi
-compose=(docker compose --env-file docker/.env -f "$compose_file")
 
 "${compose[@]}" config --quiet
 

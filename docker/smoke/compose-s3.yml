@@ -1,0 +1,13 @@
+# Optional overlay for running only s3 cases in the shared smoke stack.
+services:
+  prepare:
+    environment:
+      SMOKE_CASES: s3-plain,s3-encrypted
+  smoke:
+    environment:
+      SMOKE_CASES: s3-plain,s3-encrypted
+    depends_on: !override
+      app-s3-plain:
+        condition: service_started
+      app-s3-encrypted:
+        condition: service_started

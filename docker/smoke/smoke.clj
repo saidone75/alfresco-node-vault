@@ -18,7 +18,7 @@
 (def alfresco (env "ALFRESCO_URL" "http://alfresco:8080"))
 (def core "/alfresco/api/-default-/public/alfresco/versions/1")
 (def api "/api/v1/vault")
-(def cases (str/split (env "SMOKE_CASES" "s3-plain,gridfs-plain,s3-encrypted,gridfs-encrypted") #","))
+(def cases (str/split (env "SMOKE_CASES" "s3-plain,gridfs-plain,s3-encrypted,gridfs-encrypted,ozone-plain,ozone-encrypted") #","))
 (when-not (and (seq cases)
                (every? #{"s3-plain" "gridfs-plain" "s3-encrypted" "gridfs-encrypted"
                          "ozone-plain" "ozone-encrypted"} cases))

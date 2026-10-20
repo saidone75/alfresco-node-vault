@@ -109,6 +109,31 @@ services:
     container_name: anv-smoke-moto
     ports: !override []
 
+  ozone-scm:
+    extends:
+      file: ../ozone/docker-compose.yml
+      service: ozone-scm
+
+  ozone-om:
+    extends:
+      file: ../ozone/docker-compose.yml
+      service: ozone-om
+
+  ozone-datanode:
+    extends:
+      file: ../ozone/docker-compose.yml
+      service: ozone-datanode
+
+  ozone-init:
+    extends:
+      file: ../ozone/docker-compose.yml
+      service: ozone-init
+    volumes: !override
+      - ../ozone/initialize.sh:/init/initialize.sh:ro
+    environment:
+      OZONE_VOLUME: smoke
+      OZONE_BUCKETS: ozone-plain ozone-encrypted
+
   prepare:
     <<: *runner
     command: ["prepare"]
@@ -121,6 +146,8 @@ services:
         condition: service_started
       motoserver:
         condition: service_started
+      ozone-init:
+        condition: service_completed_successfully
 
   app-s3-plain:
     <<: *app
@@ -160,6 +187,30 @@ services:
       VAULT_ENCRYPT_CONTENT: "true"
       VAULT_ENCRYPT_METADATA: "true"
 
+  app-ozone-plain:
+    <<: *app
+    environment:
+      <<: *app-env
+      VAULT_STORAGE_IMPL: ozone
+      OZONE_OM_ADDRESS: ozone-om:9862
+      OZONE_VOLUME: smoke
+      OZONE_BUCKET: ozone-plain
+      SPRING_DATA_MONGODB_DATABASE: smoke_ozone_plain
+      VAULT_ENCRYPT_CONTENT: "false"
+      VAULT_ENCRYPT_METADATA: "false"
+
+  app-ozone-encrypted:
+    <<: *app
+    environment:
+      <<: *app-env
+      VAULT_STORAGE_IMPL: ozone
+      OZONE_OM_ADDRESS: ozone-om:9862
+      OZONE_VOLUME: smoke
+      OZONE_BUCKET: ozone-encrypted
+      SPRING_DATA_MONGODB_DATABASE: smoke_ozone_encrypted
+      VAULT_ENCRYPT_CONTENT: "true"
+      VAULT_ENCRYPT_METADATA: "true"
+
   smoke:
     <<: *runner
     environment:
@@ -174,6 +225,10 @@ services:
         condition: service_started
       app-gridfs-encrypted:
         condition: service_started
+      app-ozone-plain:
+        condition: service_started
+      app-ozone-encrypted:
+        condition: service_started
 
 volumes:
   acs:
@@ -181,3 +236,6 @@ volumes:
   solr:
   mongo:
   reports:
+  ozone-scm:
+  ozone-om:
+  ozone-data:

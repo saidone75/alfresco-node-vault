@@ -1,0 +1,4 @@
+services:
+  anv-vault:
+    environment:
+      VAULT_STORAGE_IMPL: gridfs

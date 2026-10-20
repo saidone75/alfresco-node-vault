@@ -162,9 +162,23 @@ The script creates an `anv/` directory containing `anv.jar` together with
 
 For a containerized check of archiving, downloading and restoring on S3 and GridFS, with and without encryption,
 run `./smoke-tests.sh` (Linux/macOS) or `smoke-tests.bat` (Windows).
-Use `./smoke-tests.sh --ozone` (or `smoke-tests.bat --ozone`) for the native Ozone backend.
+S3 is the default; use `--s3`, `--gridfs` or `--ozone` to select a backend, or `--all` to test all three.
 These [end-to-end smoke tests](doc/SmokeTest.md) check content hashes and restore retries in an isolated Docker stack.
 The launchers stop the smoke stack afterwards; pass `--keep-running` to leave it active for inspection.
+
+The development launcher `vault.sh` also defaults to S3 (Moto). Select the backend with:
+
+```bash
+./vault.sh start --s3
+./vault.sh start --gridfs
+./vault.sh start --ozone
+```
+
+Use the same flag for `stop`, `tail`, `build_start` and `purge`, for example
+`./vault.sh stop --ozone`. The optional `novault` argument still starts only infrastructure.
+Stop the current stack before switching backend. Switching does not migrate existing content.
+`purge --ozone` also removes the managed Ozone data volumes.
+These backend flags apply to `vault.sh`; `vault.bat` retains its existing S3 configuration.
 
 For integration tests, use `vault.sh` (Linux/macOS) or `vault.bat` (Windows) to start the required containers, then
 
