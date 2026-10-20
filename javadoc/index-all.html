@@ -171,6 +171,10 @@ loadScripts(document, 'script');</script>
 <div class="block">Archives the content of the given node by saving the content stream into a GridFS repository
  with associated metadata.</div>
 </dd>
+<dt><a href="org/saidone/service/content/OzoneContentService.html#archiveNodeContent(org.alfresco.core.model.Node,java.io.InputStream)" class="member-name-link">archiveNodeContent(Node, InputStream)</a> - Method in class org.saidone.service.content.<a href="org/saidone/service/content/OzoneContentService.html" title="class in org.saidone.service.content">OzoneContentService</a></dt>
+<dd>
+<div class="block">Saves the content of the provided node into the underlying store.</div>
+</dd>
 <dt><a href="org/saidone/service/content/S3ContentService.html#archiveNodeContent(org.alfresco.core.model.Node,java.io.InputStream)" class="member-name-link">archiveNodeContent(Node, InputStream)</a> - Method in class org.saidone.service.content.<a href="org/saidone/service/content/S3ContentService.html" title="class in org.saidone.service.content">S3ContentService</a></dt>
 <dd>
 <div class="block">Saves the content stream of the given node to S3.</div>
@@ -592,6 +596,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Field name for the request or response body.</div>
 </dd>
+<dt><a href="org/saidone/repository/OzoneRepositoryImpl.html#bucket" class="member-name-link">bucket</a> - Variable in class org.saidone.repository.<a href="org/saidone/repository/OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></dt>
+<dd>
+<div class="block">Ozone bucket used to perform the requests.</div>
+</dd>
 </dl>
 <h2 class="title" id="I:C">C</h2>
 <dl class="index">
@@ -678,6 +686,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/saidone/service/content/GridFsContentService.html#computeHash(java.lang.String,java.lang.String)" class="member-name-link">computeHash(String, String)</a> - Method in class org.saidone.service.content.<a href="org/saidone/service/content/GridFsContentService.html" title="class in org.saidone.service.content">GridFsContentService</a></dt>
 <dd>
 <div class="block">Computes the checksum of a node's content stored in GridFS using the provided algorithm.</div>
+</dd>
+<dt><a href="org/saidone/service/content/OzoneContentService.html#computeHash(java.lang.String,java.lang.String)" class="member-name-link">computeHash(String, String)</a> - Method in class org.saidone.service.content.<a href="org/saidone/service/content/OzoneContentService.html" title="class in org.saidone.service.content">OzoneContentService</a></dt>
+<dd>
+<div class="block">Computes the cryptographic hash of a stored node's content using the given algorithm.</div>
 </dd>
 <dt><a href="org/saidone/service/content/S3ContentService.html#computeHash(java.lang.String,java.lang.String)" class="member-name-link">computeHash(String, String)</a> - Method in class org.saidone.service.content.<a href="org/saidone/service/content/S3ContentService.html" title="class in org.saidone.service.content">S3ContentService</a></dt>
 <dd>
@@ -813,9 +825,21 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Removes the stored content associated with the given node identifier.</div>
 </dd>
+<dt><a href="org/saidone/service/content/OzoneContentService.html#deleteNodeContent(java.lang.String)" class="member-name-link">deleteNodeContent(String)</a> - Method in class org.saidone.service.content.<a href="org/saidone/service/content/OzoneContentService.html" title="class in org.saidone.service.content">OzoneContentService</a></dt>
+<dd>
+<div class="block">Deletes content associated with the given node id from the store.</div>
+</dd>
 <dt><a href="org/saidone/service/content/S3ContentService.html#deleteNodeContent(java.lang.String)" class="member-name-link">deleteNodeContent(String)</a> - Method in class org.saidone.service.content.<a href="org/saidone/service/content/S3ContentService.html" title="class in org.saidone.service.content">S3ContentService</a></dt>
 <dd>
 <div class="block">Removes the stored object associated with the given node id.</div>
+</dd>
+<dt><a href="org/saidone/repository/OzoneRepository.html#deleteObject(java.lang.String)" class="member-name-link">deleteObject(String)</a> - Method in interface org.saidone.repository.<a href="org/saidone/repository/OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></dt>
+<dd>
+<div class="block">Deletes the object stored for the given node id.</div>
+</dd>
+<dt><a href="org/saidone/repository/OzoneRepositoryImpl.html#deleteObject(java.lang.String)" class="member-name-link">deleteObject(String)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></dt>
+<dd>
+<div class="block">Deletes the object stored for the given node id.</div>
 </dd>
 <dt><a href="org/saidone/service/crypto/AbstractCryptoService.html#deriveSecretKey(org.saidone.service.crypto.Secret,java.lang.String,byte%5B%5D)" class="member-name-link">deriveSecretKey(Secret, String, byte[])</a> - Method in class org.saidone.service.crypto.<a href="org/saidone/service/crypto/AbstractCryptoService.html" title="class in org.saidone.service.crypto">AbstractCryptoService</a></dt>
 <dd>
@@ -865,6 +889,16 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/saidone/repository/EncryptedMongoNodeRepositoryImpl.html#%3Cinit%3E(org.springframework.data.mongodb.core.MongoOperations,org.saidone.service.SecretService,org.saidone.service.crypto.CryptoService)" class="member-name-link">EncryptedMongoNodeRepositoryImpl(MongoOperations, SecretService, CryptoService)</a> - Constructor for class org.saidone.repository.<a href="org/saidone/repository/EncryptedMongoNodeRepositoryImpl.html" title="class in org.saidone.repository">EncryptedMongoNodeRepositoryImpl</a></dt>
 <dd>
 <div class="block">Constructs an EncryptedMongoNodeRepositoryImpl with the given MongoOperations and CryptoService.</div>
+</dd>
+<dt><a href="org/saidone/repository/EncryptedOzoneRepositoryImpl.html" class="type-name-link" title="class in org.saidone.repository">EncryptedOzoneRepositoryImpl</a> - Class in <a href="org/saidone/repository/package-summary.html">org.saidone.repository</a></dt>
+<dd>
+<div class="block"><a href="org/saidone/repository/OzoneRepositoryImpl.html" title="class in org.saidone.repository"><code>OzoneRepositoryImpl</code></a> variant that transparently encrypts data before
+ uploading to Ozone and decrypts it when retrieved, if marked as encrypted.</div>
+</dd>
+<dt><a href="org/saidone/repository/EncryptedOzoneRepositoryImpl.html#%3Cinit%3E(org.apache.hadoop.ozone.client.OzoneBucket,org.saidone.service.SecretService,org.saidone.service.crypto.CryptoService)" class="member-name-link">EncryptedOzoneRepositoryImpl(OzoneBucket, SecretService, CryptoService)</a> - Constructor for class org.saidone.repository.<a href="org/saidone/repository/EncryptedOzoneRepositoryImpl.html" title="class in org.saidone.repository">EncryptedOzoneRepositoryImpl</a></dt>
+<dd>
+<div class="block">Creates a new repository instance using the given Ozone bucket and
+ cryptographic service.</div>
 </dd>
 <dt><a href="org/saidone/repository/EncryptedS3RepositoryImpl.html" class="type-name-link" title="class in org.saidone.repository">EncryptedS3RepositoryImpl</a> - Class in <a href="org/saidone/repository/package-summary.html">org.saidone.repository</a></dt>
 <dd>
@@ -1157,6 +1191,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Retrieves the content of a node stored in GridFS by node ID.</div>
 </dd>
+<dt><a href="org/saidone/service/content/OzoneContentService.html#getNodeContent(java.lang.String)" class="member-name-link">getNodeContent(String)</a> - Method in class org.saidone.service.content.<a href="org/saidone/service/content/OzoneContentService.html" title="class in org.saidone.service.content">OzoneContentService</a></dt>
+<dd>
+<div class="block">Retrieves previously archived content for the given node id.</div>
+</dd>
 <dt><a href="org/saidone/service/content/S3ContentService.html#getNodeContent(java.lang.String)" class="member-name-link">getNodeContent(String)</a> - Method in class org.saidone.service.content.<a href="org/saidone/service/content/S3ContentService.html" title="class in org.saidone.service.content">S3ContentService</a></dt>
 <dd>
 <div class="block">Retrieves the content of a node from S3.</div>
@@ -1173,6 +1211,11 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/saidone/service/content/GridFsContentService.html#getNodeContentInfo(java.lang.String)" class="member-name-link">getNodeContentInfo(String)</a> - Method in class org.saidone.service.content.<a href="org/saidone/service/content/GridFsContentService.html" title="class in org.saidone.service.content">GridFsContentService</a></dt>
 <dd>
 <div class="block">Retrieves metadata information about a node's content stored in GridFS.</div>
+</dd>
+<dt><a href="org/saidone/service/content/OzoneContentService.html#getNodeContentInfo(java.lang.String)" class="member-name-link">getNodeContentInfo(String)</a> - Method in class org.saidone.service.content.<a href="org/saidone/service/content/OzoneContentService.html" title="class in org.saidone.service.content">OzoneContentService</a></dt>
+<dd>
+<div class="block">Retrieves only metadata information about the stored content of the given
+ node without returning the binary stream.</div>
 </dd>
 <dt><a href="org/saidone/service/content/S3ContentService.html#getNodeContentInfo(java.lang.String)" class="member-name-link">getNodeContentInfo(String)</a> - Method in class org.saidone.service.content.<a href="org/saidone/service/content/S3ContentService.html" title="class in org.saidone.service.content">S3ContentService</a></dt>
 <dd>
@@ -1191,6 +1234,26 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Retrieves the object content for the given node id using the underlying
  <code>S3Client</code>.</div>
+</dd>
+<dt><a href="org/saidone/repository/EncryptedOzoneRepositoryImpl.html#getObject(java.lang.String,org.apache.hadoop.ozone.client.OzoneKeyDetails)" class="member-name-link">getObject(String, OzoneKeyDetails)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/EncryptedOzoneRepositoryImpl.html" title="class in org.saidone.repository">EncryptedOzoneRepositoryImpl</a></dt>
+<dd>
+<div class="block">Retrieves the object content from Ozone.</div>
+</dd>
+<dt><a href="org/saidone/repository/OzoneRepository.html#getObject(java.lang.String,org.apache.hadoop.ozone.client.OzoneKeyDetails)" class="member-name-link">getObject(String, OzoneKeyDetails)</a> - Method in interface org.saidone.repository.<a href="org/saidone/repository/OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></dt>
+<dd>
+<div class="block">Retrieves an object from Ozone previously stored for the given node id.</div>
+</dd>
+<dt><a href="org/saidone/repository/OzoneRepositoryImpl.html#getObject(java.lang.String,org.apache.hadoop.ozone.client.OzoneKeyDetails)" class="member-name-link">getObject(String, OzoneKeyDetails)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></dt>
+<dd>
+<div class="block">Retrieves an object from Ozone previously stored for the given node id.</div>
+</dd>
+<dt><a href="org/saidone/repository/OzoneRepository.html#getObjectDetails(java.lang.String)" class="member-name-link">getObjectDetails(String)</a> - Method in interface org.saidone.repository.<a href="org/saidone/repository/OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></dt>
+<dd>
+<div class="block">Retrieves the object metadata for the given node id.</div>
+</dd>
+<dt><a href="org/saidone/repository/OzoneRepositoryImpl.html#getObjectDetails(java.lang.String)" class="member-name-link">getObjectDetails(String)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></dt>
+<dd>
+<div class="block">Retrieves the object metadata for the given node id.</div>
 </dd>
 <dt><a href="org/saidone/repository/S3RepositoryImpl.html#getObjectStream(java.lang.String,java.lang.String)" class="member-name-link">getObjectStream(String, String)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/S3RepositoryImpl.html" title="class in org.saidone.repository">S3RepositoryImpl</a></dt>
 <dd>
@@ -1646,6 +1709,37 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/utils/package-summary.html">org.saidone.utils</a> - package org.saidone.utils</dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/config/OzoneConfig.html#ozoneBucket(org.apache.hadoop.ozone.client.OzoneClient)" class="member-name-link">ozoneBucket(OzoneClient)</a> - Method in class org.saidone.config.<a href="org/saidone/config/OzoneConfig.html" title="class in org.saidone.config">OzoneConfig</a></dt>
+<dd>
+<div class="block">Resolves the existing bucket and its replication configuration.</div>
+</dd>
+<dt><a href="org/saidone/config/OzoneConfig.html#ozoneClient()" class="member-name-link">ozoneClient()</a> - Method in class org.saidone.config.<a href="org/saidone/config/OzoneConfig.html" title="class in org.saidone.config">OzoneConfig</a></dt>
+<dd>
+<div class="block">Builds the RPC client using classpath configuration and property overrides.</div>
+</dd>
+<dt><a href="org/saidone/config/OzoneConfig.html" class="type-name-link" title="class in org.saidone.config">OzoneConfig</a> - Class in <a href="org/saidone/config/package-summary.html">org.saidone.config</a></dt>
+<dd>
+<div class="block">Configuration properties and bean factory for the native Ozone RPC client.</div>
+</dd>
+<dt><a href="org/saidone/config/OzoneConfig.html#%3Cinit%3E()" class="member-name-link">OzoneConfig()</a> - Constructor for class org.saidone.config.<a href="org/saidone/config/OzoneConfig.html" title="class in org.saidone.config">OzoneConfig</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/saidone/service/content/OzoneContentService.html" class="type-name-link" title="class in org.saidone.service.content">OzoneContentService</a> - Class in <a href="org/saidone/service/content/package-summary.html">org.saidone.service.content</a></dt>
+<dd>
+<div class="block"><a href="org/saidone/service/content/ContentService.html" title="interface in org.saidone.service.content"><code>ContentService</code></a> implementation that stores node binaries in Apache Ozone.</div>
+</dd>
+<dt><a href="org/saidone/service/content/OzoneContentService.html#%3Cinit%3E()" class="member-name-link">OzoneContentService()</a> - Constructor for class org.saidone.service.content.<a href="org/saidone/service/content/OzoneContentService.html" title="class in org.saidone.service.content">OzoneContentService</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/saidone/repository/OzoneRepository.html" class="type-name-link" title="interface in org.saidone.repository">OzoneRepository</a> - Interface in <a href="org/saidone/repository/package-summary.html">org.saidone.repository</a></dt>
+<dd>
+<div class="block">Abstraction over the minimal set of Ozone operations required by the vault.</div>
+</dd>
+<dt><a href="org/saidone/repository/OzoneRepositoryImpl.html" class="type-name-link" title="class in org.saidone.repository">OzoneRepositoryImpl</a> - Class in <a href="org/saidone/repository/package-summary.html">org.saidone.repository</a></dt>
+<dd>
+<div class="block">Default <a href="org/saidone/repository/OzoneRepository.html" title="interface in org.saidone.repository"><code>OzoneRepository</code></a> implementation relying on the native Ozone RPC
+ client <code>OzoneBucket</code>.</div>
+</dd>
+<dt><a href="org/saidone/repository/OzoneRepositoryImpl.html#%3Cinit%3E()" class="member-name-link">OzoneRepositoryImpl()</a> - Constructor for class org.saidone.repository.<a href="org/saidone/repository/OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></dt>
+<dd>&nbsp;</dd>
 </dl>
 <h2 class="title" id="I:P">P</h2>
 <dl class="index">
@@ -1676,6 +1770,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/service/crypto/AbstractCryptoService.Kdf.Pbkdf2.html#%3Cinit%3E()" class="member-name-link">Pbkdf2()</a> - Constructor for class org.saidone.service.crypto.<a href="org/saidone/service/crypto/AbstractCryptoService.Kdf.Pbkdf2.html" title="class in org.saidone.service.crypto">AbstractCryptoService.Kdf.Pbkdf2</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/repository/OzoneRepository.html#PLAINTEXT_LENGTH" class="member-name-link">PLAINTEXT_LENGTH</a> - Static variable in interface org.saidone.repository.<a href="org/saidone/repository/OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></dt>
+<dd>
+<div class="block">Metadata field recording the original content length, before encryption.</div>
+</dd>
 <dt><a href="org/saidone/misc/ProgressTrackingInputStream.html" class="type-name-link" title="class in org.saidone.misc">ProgressTrackingInputStream</a> - Class in <a href="org/saidone/misc/package-summary.html">org.saidone.misc</a></dt>
 <dd>
 <div class="block"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link"><code>InputStream</code></a> wrapper that logs read progress for debugging purposes.</div>
@@ -2286,6 +2384,20 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Sends a zero-value transaction containing the given hash as data.</div>
 </dd>
+<dt><a href="org/saidone/repository/EncryptedOzoneRepositoryImpl.html#putObject(java.lang.String,long,java.util.Map,java.io.InputStream)" class="member-name-link">putObject(String, long, Map&lt;String, String&gt;, InputStream)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/EncryptedOzoneRepositoryImpl.html" title="class in org.saidone.repository">EncryptedOzoneRepositoryImpl</a></dt>
+<dd>
+<div class="block">Encrypts the provided content stream and stores it in Ozone.</div>
+</dd>
+<dt><a href="org/saidone/repository/OzoneRepository.html#putObject(java.lang.String,long,java.util.Map,java.io.InputStream)" class="member-name-link">putObject(String, long, Map&lt;String, String&gt;, InputStream)</a> - Method in interface org.saidone.repository.<a href="org/saidone/repository/OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></dt>
+<dd>
+<div class="block">Uploads a node's content to the configured Ozone bucket using the node id as
+ object key.</div>
+</dd>
+<dt><a href="org/saidone/repository/OzoneRepositoryImpl.html#putObject(java.lang.String,long,java.util.Map,java.io.InputStream)" class="member-name-link">putObject(String, long, Map&lt;String, String&gt;, InputStream)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></dt>
+<dd>
+<div class="block">Uploads a node's content to the configured Ozone bucket using the node id as
+ object key.</div>
+</dd>
 <dt><a href="org/saidone/repository/EncryptedS3RepositoryImpl.html#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.io.InputStream)" class="member-name-link">putObject(String, Node, HashMap&lt;String, String&gt;, InputStream)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/EncryptedS3RepositoryImpl.html" title="class in org.saidone.repository">EncryptedS3RepositoryImpl</a></dt>
 <dd>
 <div class="block">Encrypts the provided content stream and stores it in S3.</div>
@@ -2726,6 +2838,11 @@ the order they are declared.</div>
 <dt><a href="org/saidone/misc/ProgressTrackingOutputStream.html#write(int)" class="member-name-link">write(int)</a> - Method in class org.saidone.misc.<a href="org/saidone/misc/ProgressTrackingOutputStream.html" title="class in org.saidone.misc">ProgressTrackingOutputStream</a></dt>
 <dd>
 <div class="block">Writes a single byte and updates the write progress.</div>
+</dd>
+<dt><a href="org/saidone/repository/OzoneRepositoryImpl.html#writeObject(java.lang.String,long,java.util.Map,java.io.InputStream)" class="member-name-link">writeObject(String, long, Map&lt;String, String&gt;, InputStream)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></dt>
+<dd>
+<div class="block">Uploads the provided stream as an object to Ozone, preserving the supplied
+ metadata.</div>
 </dd>
 </dl>
 <a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:J">J</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a><span class="vertical-separator">|</span><a href="constant-values.html">Constant&nbsp;Field&nbsp;Values</a><span class="vertical-separator">|</span><a href="serialized-form.html">Serialized&nbsp;Form</a></main>
