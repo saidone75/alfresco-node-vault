@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Fixed
+- Restore path creation resolves existing folders directly after a name conflict, without relying on paginated child listings. Other Alfresco errors are propagated, and files with conflicting names are rejected.
+
 ## [0.9.2] - 2026-10-20
 
 ### Added
