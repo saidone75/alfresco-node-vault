@@ -27,6 +27,7 @@ import lombok.val;
 import org.alfresco.core.handler.NodesApi;
 import org.saidone.repository.MongoNodeRepositoryImpl;
 import org.saidone.service.content.ContentService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -49,6 +50,9 @@ public class TestCleanupService {
     private final ContentService contentService;
     private final Set<String> nodeIds = ConcurrentHashMap.newKeySet();
 
+    @Value("${test.cleanup.enabled:true}")
+    private boolean enabled;
+
     @Setter
     private String parentId;
 
@@ -60,9 +64,14 @@ public class TestCleanupService {
     /**
      * Removes the test folder and only the recorded nodes at context shutdown.
      * Content is deleted before its metadata; unrelated records and collections are retained.
+     * Set {@code test.cleanup.enabled=false} to retain all test data.
      */
     @PreDestroy
     public void cleanUp() {
+        if (!enabled) {
+            log.info("Test cleanup disabled; retaining test data");
+            return;
+        }
         if (parentId == null) {
             return;
         }

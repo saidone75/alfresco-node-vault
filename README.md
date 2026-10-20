@@ -192,6 +192,15 @@ The profiles configure the application started by the tests; they do not start D
 Use one storage profile at a time. Load tests use the same profile, for example
 `mvn test -Pozone -Dtests=massive`.
 
+Cleanup is enabled by default and removes only nodes created by the tests.
+To retain test data, add `-Dtest.cleanup.enabled=false`, for example:
+
+```bash
+mvn test -Pozone -Dtest.cleanup.enabled=false
+```
+
+This setting applies to Maven integration tests; smoke tests manage their own cleanup.
+
 Native Ozone tests on the host require access to the Docker bridge network, as on a local Linux
 Docker Engine. See [Ozone.md](doc/Ozone.md#tests) for networking requirements.
 On Windows, `vault.bat` starts S3; use `mvn test -Ps3`.
