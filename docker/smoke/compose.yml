@@ -110,21 +110,25 @@ services:
     ports: !override []
 
   ozone-scm:
+    container_name: anv-smoke-ozone-scm
     extends:
       file: ../ozone/docker-compose.yml
       service: ozone-scm
 
   ozone-om:
+    container_name: anv-smoke-ozone-om
     extends:
       file: ../ozone/docker-compose.yml
       service: ozone-om
 
   ozone-datanode:
+    container_name: anv-smoke-ozone-datanode
     extends:
       file: ../ozone/docker-compose.yml
       service: ozone-datanode
 
   ozone-init:
+    container_name: anv-smoke-ozone-init
     extends:
       file: ../ozone/docker-compose.yml
       service: ozone-init

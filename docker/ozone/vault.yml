@@ -5,14 +5,17 @@ x-recon-env: &recon-env
 
 services:
   ozone-scm:
+    container_name: anv-ozone-scm
     environment:
       <<: *recon-env
 
   ozone-datanode:
+    container_name: anv-ozone-datanode
     environment:
       <<: *recon-env
 
   ozone-recon:
+    container_name: anv-ozone-recon
     extends:
       file: ozone/docker-compose.yml
       service: ozone-datanode
@@ -35,10 +38,14 @@ services:
         condition: service_started
 
   ozone-om:
+    container_name: anv-ozone-om
     environment:
       <<: *recon-env
     ports:
       - "127.0.0.1:9862:9862"
+  ozone-init:
+    container_name: anv-ozone-init
+
   anv-vault:
     environment:
       VAULT_STORAGE_IMPL: ozone
@@ -50,4 +57,11 @@ services:
         condition: service_completed_successfully
 
 volumes:
+  ozone-scm:
+    name: anv-ozone-scm-volume
+  ozone-om:
+    name: anv-ozone-om-volume
+  ozone-data:
+    name: anv-ozone-data-volume
   ozone-recon:
+    name: anv-ozone-recon-volume

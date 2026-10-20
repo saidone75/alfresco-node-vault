@@ -193,7 +193,7 @@ Use one storage profile at a time. Load tests use the same profile, for example
 `mvn test -Pozone -Dtests=massive`.
 
 Native Ozone tests on the host require access to the Docker bridge network, as on a local Linux
-Docker Engine. See [Ozone.md](doc/Ozone.md#integration-tests) for networking requirements.
+Docker Engine. See [Ozone.md](doc/Ozone.md#tests) for networking requirements.
 On Windows, `vault.bat` starts S3; use `mvn test -Ps3`.
 
 ## Docker configuration
