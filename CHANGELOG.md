@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.9.2] - 2026-10-20
+
+### Added
+- Native Apache Ozone content storage, with optional encryption, checksum verification and content metadata, alongside S3 and GridFS.
+- Ozone development and smoke-test Docker stacks, including healthcheck-based initialization, persistent data volumes and the Recon web UI.
+- Explicit Maven profiles (`s3`, `gridfs`, `ozone`) for selecting the integration-test storage backend.
+- Optional retention of integration-test fixtures with `-Dtest.cleanup.enabled=false`; cleanup remains enabled by default.
+
+### Changed
+- Unified smoke tests across S3, GridFS and Ozone, with backend selection in the Bash and Windows launchers.
+- Development launcher supports storage backend selection and stops all containers in its Compose project regardless of the previously selected backend, preserving data volumes.
+- Increased Alfresco and Share memory limits, clarified Grafana garbage-collection metrics and suppressed repetitive JMS header-mapping info logs.
+- Updated AWS SDK to 2.56.0, Nimbus JOSE JWT to 10.10, ASM to 9.11.1 and OkHttp JVM to 5.5.0; updated Versions Maven Plugin to 2.23.0 and CodeQL Action to 4.39.0.
+
+### Fixed
+- Versioned JAR naming in Maven, Docker and distribution scripts; distribution builds now run `clean package` and stop when Maven fails.
+- Smoke-test dependency startup when selecting an individual storage backend.
+
 ## [0.9.1] - 2026-10-18
 
 ### Added
