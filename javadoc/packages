@@ -15,6 +15,7 @@ org.saidone.repository
 org.saidone.gateway.predicate
 org.saidone.monitor
 org.saidone
+org.saidone.service.locking
 org.saidone.service
 org.saidone.service.content
 org.saidone.service.crypto

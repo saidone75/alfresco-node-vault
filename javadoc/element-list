@@ -20,5 +20,6 @@ org.saidone.service.audit
 org.saidone.service.content
 org.saidone.service.crypto
 org.saidone.service.integrity
+org.saidone.service.locking
 org.saidone.service.notarization
 org.saidone.utils
