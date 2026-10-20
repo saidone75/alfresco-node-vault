@@ -71,7 +71,7 @@ case "$command" in
     build) build ;;
     build_start) compose down; build; start; compose logs -f ;;
     start) start; compose logs -f ;;
-    stop) compose down ;;
+    stop) compose down --remove-orphans ;;
     purge) purge ;;
     tail) compose logs -f ;;
 esac

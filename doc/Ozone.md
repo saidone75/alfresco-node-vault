@@ -18,7 +18,7 @@ Secured clusters also require matching Hadoop configuration and a Kerberos ident
 
 ```bash
 ./vault.sh start --ozone
-./vault.sh stop --ozone
+./vault.sh stop
 ```
 
 The launcher prepares the Docker volumes and starts OM, SCM, one Datanode and Recon.

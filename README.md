@@ -174,8 +174,10 @@ The development launcher `vault.sh` also defaults to S3 (Moto). Select the backe
 ./vault.sh start --ozone
 ```
 
-Use the same flag for `stop`, `tail`, `build_start` and `purge`, for example
-`./vault.sh stop --ozone`. The optional `novault` argument still starts only infrastructure.
+`./vault.sh stop` removes all containers in the development Compose project, including
+backend services from previous runs, while retaining data volumes. No backend flag is needed.
+Use the matching backend flag for `tail`, `build_start` and `purge`.
+The optional `novault` argument still starts only infrastructure.
 Stop the current stack before switching backend. Switching does not migrate existing content.
 `purge --ozone` also removes the managed Ozone data volumes.
 These backend flags apply to `vault.sh`; `vault.bat` retains its existing S3 configuration.
