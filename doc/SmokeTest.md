@@ -31,15 +31,32 @@ or use `--all` for all six cases. These flags are mutually exclusive. For exampl
 ./smoke-tests.sh --ozone
 ```
 
-The same flags work with `smoke-tests.bat` on Windows. Each backend overlay selects its two
-application instances and only their required infrastructure: Moto for S3, Mongo for GridFS,
-and the native Ozone services and provisioning for Ozone. Alfresco, Mongo and Vault are shared
-by all backends. `--all` starts the complete stack.
+The same flags work with `smoke-tests.bat` on Windows. Each backend runs the same checks,
+with separate databases and content storage for the plaintext and encrypted cases.
+All backends use the same `anv-smoke` project, report location and lifecycle commands.
+Each backend overlay starts its two application instances and the required storage services:
+
+| Backend | Flag | Storage services |
+|---------|------|------------------|
+| S3 | `--s3` (default) | Moto S3 server |
+| GridFS | `--gridfs` | MongoDB |
+| Ozone | `--ozone` | Ozone Manager, Storage Container Manager and one Datanode (native RPC) |
+
+Alfresco, Mongo and Vault are shared by all backends. Storage is provisioned before the
+applications start. `--all` starts the complete stack. Any backend flag can be combined
+with `--keep-running` in either order.
 
 To leave the services running for inspection, use `./smoke-tests.sh --keep-running` or
 `smoke-tests.bat --keep-running` on Windows.
 
-To run all backends directly without automatic shutdown, use this Docker command from the repository root:
+To run a single backend directly without automatic shutdown, select its Compose overlay
+(`s3`, `gridfs` or `ozone`). For example:
+
+```console
+docker compose --env-file docker/.env -f docker/smoke/compose.yml -f docker/smoke/compose-s3.yml run --build --rm smoke
+```
+
+To run all backends directly, omit the overlay:
 
 ```console
 docker compose --env-file docker/.env -f docker/smoke/compose.yml run --build --rm smoke
@@ -47,25 +64,27 @@ docker compose --env-file docker/.env -f docker/smoke/compose.yml run --build --
 
 The application is built inside Docker and the runner uses Clojure on Babashka, with its built-in HTTP client
 and JSON support. No additional Clojure dependencies are downloaded at runtime. The first run downloads
-images and Maven dependencies and may take several minutes. Allow enough memory for Alfresco, Solr, Ozone and six
-application instances (approximately 12 GiB available to Docker is a useful starting point).
+images and Maven dependencies and may take several minutes. Memory requirements depend on the selected
+backend. For `--all`, allow for Alfresco, Solr, all storage services and six application instances
+(approximately 12 GiB available to Docker is a useful starting point).
 
-The stack uses its own `anv-smoke` project, container names, managed volumes, databases and S3 buckets. It does not
+The stack uses its own `anv-smoke` project, container names, managed volumes, databases and storage buckets. It does not
 publish host ports or use the external volumes belonging to the regular development stack. It reuses the service
 definitions and image versions from the existing Docker configuration. Run one smoke stack at a time.
 
 ## Checks
 
-The runner waits for Alfresco, initializes test-only Vault secrets and Moto buckets, then tests the selected cases from this matrix:
+The stack provisions the selected storage services, and the runner waits for Alfresco and initializes
+test-only Vault secrets and S3 buckets as needed. It then tests the selected cases from this matrix:
 
 | Storage | Content encryption | Metadata encryption |
 |---------|--------------------|---------------------|
 | S3      | Disabled           | Disabled            |
-| GridFS  | Disabled           | Disabled            |
 | S3      | Enabled            | Enabled             |
+| GridFS  | Disabled           | Disabled            |
 | GridFS  | Enabled            | Enabled             |
-| Ozone RPC | Disabled | Disabled |
-| Ozone RPC | Enabled | Enabled |
+| Ozone   | Disabled           | Disabled            |
+| Ozone   | Enabled            | Enabled             |
 
 Each case uses a new Alfresco folder containing an empty file, the repository's sample PDF with a non-ASCII
 filename, and a deterministic binary file (8 MiB by default). For every file it verifies:
@@ -86,6 +105,7 @@ checks print `PASS` lines with file size and hash; a JSON report includes the re
 
 ## Results and diagnostics
 
+The following commands apply to every backend and to `--all`.
 The JSON report is stored in the stack's `reports` volume. To copy it to the host after a run:
 
 ```console
@@ -125,26 +145,3 @@ settings, key rotation, notarization, interrupted restores or application restar
 
 Docker Desktop on Windows runs these Linux containers; a separate native Windows run is needed to validate NTFS
 ACLs. Backup recovery must also be verified separately, including recovery of the required Vault key versions.
-
-## Native Ozone cases
-
-With `--all`, the suite includes Ozone through the native Java RPC client alongside S3 and GridFS.
-All six cases share Alfresco, Mongo and Vault, and write a single JSON report.
-The stack starts OM, SCM and one Datanode, without an S3 Gateway. Provisioning waits
-for an operational data path before the applications start. Server image settings
-come from `OZONE_IMAGE` and `OZONE_VERSION` in `docker/.env`.
-This is a functional test with replication ONE, not a load or failover test.
-
-To run only the two Ozone cases, use `./smoke-tests.sh --ozone` or
-`smoke-tests.bat --ozone`. Both accept `--keep-running` in either order.
-This selects an overlay on the same `anv-smoke` stack and retains the same volumes
-and report location. Run one suite at a time; remove the data volumes after stopping Vault
-before starting a fresh stack, as described above.
-
-The equivalent direct command is:
-
-```console
-docker compose --env-file docker/.env -f docker/smoke/compose.yml -f docker/smoke/compose-ozone.yml run --build --rm smoke
-```
-
-For the regular development variant, see [Ozone.md](Ozone.md#docker-development-stack).

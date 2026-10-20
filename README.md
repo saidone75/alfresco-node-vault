@@ -55,7 +55,7 @@ are removed from Alfresco and its database, freeing resources while keeping thos
 
 The application supports on-demand, event-driven and scheduled document archiving.
 
-Document metadata is stored in MongoDB, while content can be stored in GridFS, AWS S3 or [Apache Ozone](doc/Ozone.md),
+Document metadata is stored in MongoDB, while content can be stored in GridFS, [AWS S3](doc/S3.md) or [Apache Ozone](doc/Ozone.md),
 providing a flexible foundation for long-term storage.
 
 The application can also act as an Alfresco REST API proxy, allowing existing applications to retrieve
@@ -80,7 +80,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Free and open-source software, released under GPL v3 or later
 - Scheduled or on-demand archiving
 - MongoDB storage for document metadata and the audit trail
-- GridFS, S3 or [Apache Ozone](doc/Ozone.md) storage for document content
+- GridFS, [S3](doc/S3.md) or [Apache Ozone](doc/Ozone.md) storage for document content
 - Optional blockchain document notarization to provide verifiable evidence of integrity
 - Scheduled and on-demand [integrity sweeps](doc/IntegritySweep.md) to verify notarized documents
 - Secure and decoupled design that suits zero trust environments
@@ -242,6 +242,8 @@ Alfresco proxy and the common conventions.
 - **Advanced search** is available only when metadata encryption is disabled.
 
 ## Documentation
+
+Storage configuration: [S3](doc/S3.md) and [Apache Ozone](doc/Ozone.md).
 
 See the [Javadoc API documentation](https://saidone75.github.io/alfresco-node-vault/javadoc/).
 

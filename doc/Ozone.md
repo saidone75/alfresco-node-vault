@@ -29,7 +29,8 @@ The Ozone variant replaces Moto/S3 with an Ozone Manager, a Storage Container
 Manager and one Datanode. It uses the native RPC backend and starts no S3 Gateway.
 Compose healthchecks wait for SCM to leave safe mode and for OM to accept RPC
 requests before starting the initializer. The initializer creates the configured volume
-and bucket if absent, and checks a write/read/delete cycle before the app starts.
+and bucket if absent before the app starts. The end-to-end smoke tests verify
+archiving, downloading and restoring content.
 OM and Datanode start while SCM is becoming healthy, since SCM needs a registered
 Datanode to leave safe mode.
 
@@ -83,4 +84,4 @@ with isolated volumes and container names, without host ports or external data v
 It checks plaintext and encrypted archive/download/restore flows, including
 empty files, Unicode filenames, checksums and restore retries.
 
-See [SmokeTest.md](SmokeTest.md#native-ozone-cases) for reports, diagnostics and cleanup.
+See [SmokeTest.md](SmokeTest.md) for reports, diagnostics and cleanup.
