@@ -180,15 +180,21 @@ Stop the current stack before switching backend. Switching does not migrate exis
 `purge --ozone` also removes the managed Ozone data volumes.
 These backend flags apply to `vault.sh`; `vault.bat` retains its existing S3 configuration.
 
-For integration tests, use `vault.sh` (Linux/macOS) or `vault.bat` (Windows) to start the required containers, then
+For integration tests, start the required containers, then select the matching Maven profile:
 
-`mvn test`
+| Development stack | Integration tests |
+|-------------------|-------------------|
+| `./vault.sh start --s3` | `mvn test -Ps3` (or `mvn test`, the default) |
+| `./vault.sh start --gridfs` | `mvn test -Pgridfs` |
+| `./vault.sh start --ozone` | `mvn test -Pozone` |
 
-runs the integration tests, while
+The profiles configure the application started by the tests; they do not start Docker services.
+Use one storage profile at a time. Load tests use the same profile, for example
+`mvn test -Pozone -Dtests=massive`.
 
-`mvn test -Dtests=massive`
-
-runs a load test.
+Native Ozone tests on the host require access to the Docker bridge network, as on a local Linux
+Docker Engine. See [Ozone.md](doc/Ozone.md#integration-tests) for networking requirements.
+On Windows, `vault.bat` starts S3; use `mvn test -Ps3`.
 
 ## Docker configuration
 

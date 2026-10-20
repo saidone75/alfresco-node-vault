@@ -1,4 +1,7 @@
 services:
+  ozone-om:
+    ports:
+      - "127.0.0.1:9862:9862"
   anv-vault:
     environment:
       VAULT_STORAGE_IMPL: ozone

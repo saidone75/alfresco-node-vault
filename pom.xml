@@ -50,6 +50,7 @@
         <awssdk.version>2.55.5</awssdk.version>
         <asm.version>9.7.1</asm.version>
         <tests>none()</tests>
+        <vault.storage.impl>s3</vault.storage.impl>
         <sonar.organization>saidone75</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
@@ -387,6 +388,9 @@
                 <version>3.6.0</version>
                 <configuration>
                     <groups>${tests}</groups>
+                    <systemPropertyVariables>
+                        <VAULT_STORAGE_IMPL>${vault.storage.impl}</VAULT_STORAGE_IMPL>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -423,4 +427,24 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>s3</id>
+            <properties>
+                <vault.storage.impl>s3</vault.storage.impl>
+            </properties>
+        </profile>
+        <profile>
+            <id>gridfs</id>
+            <properties>
+                <vault.storage.impl>gridfs</vault.storage.impl>
+            </properties>
+        </profile>
+        <profile>
+            <id>ozone</id>
+            <properties>
+                <vault.storage.impl>ozone</vault.storage.impl>
+            </properties>
+        </profile>
+    </profiles>
 </project>

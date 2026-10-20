@@ -60,15 +60,36 @@ docker compose --env-file docker/.env -f docker/docker-compose.ozone.yml down
 ```
 
 Ozone data is retained in Compose-managed volumes. The usual development services
-publish their existing ports; Ozone is reached by the app through Docker's internal
-network. An application running on the host needs separate cluster networking
-configuration because native clients must reach the advertised Datanode addresses.
+publish their existing ports; the containerized app reaches Ozone through Docker's internal network. The development
+stack also publishes OM RPC at `127.0.0.1:9862` for tests running on the host.
 Do not run the regular development stack and this variant simultaneously.
 
 `OZONE_IMAGE` and `OZONE_VERSION` in `docker/.env` select the server image (default
 `apache/ozone:2.2.1`). `OZONE_VOLUME` and `OZONE_BUCKET` select the application bucket.
 This is an unsecured, single-Datanode development setup using RATIS/ONE replication,
 not a production durability or availability configuration.
+
+## Integration tests
+
+After starting the development stack with `./vault.sh start --ozone`, run:
+
+```bash
+mvn test -Pozone
+```
+
+The Maven profile selects Ozone for the Spring application started by the tests.
+The backend flag passed to `vault.sh` configures containers only; it does not change
+Maven's default S3 selection. Use `-Ps3`, `-Pgridfs` or `-Pozone` to match the running stack.
+
+The native client connects to OM at `localhost:9862` and directly to the Datanode
+addresses returned by OM. This works with a local Linux Docker Engine whose bridge
+network is reachable from the host. Publishing the OM port alone is insufficient
+on Docker Desktop or a remote Docker daemon: those environments need routing to the
+advertised Datanode addresses, or tests executed inside the Docker network.
+The containerized [smoke tests](SmokeTest.md) already run inside that network.
+
+For an externally reachable cluster, override `OZONE_OM_ADDRESS`, `OZONE_VOLUME`
+and `OZONE_BUCKET` as needed. The bucket must already exist.
 
 ## Ozone smoke test
 
