@@ -50,6 +50,7 @@
         <awssdk.version>2.55.5</awssdk.version>
         <asm.version>9.7.1</asm.version>
         <tests>none()</tests>
+        <vault.storage.impl>s3</vault.storage.impl>
         <sonar.organization>saidone75</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
@@ -111,6 +112,69 @@
                 <artifactId>asm-util</artifactId>
                 <version>${asm.version}</version>
             </dependency>
+
+            <!-- begin Ozone transitive dependency alignment with application libraries -->
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>33.6.0-jre</version>
+            </dependency>
+            <dependency>
+                <groupId>io.dropwizard.metrics</groupId>
+                <artifactId>metrics-core</artifactId>
+                <version>3.2.5</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okio</groupId>
+                <artifactId>okio</artifactId>
+                <version>3.16.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okio</groupId>
+                <artifactId>okio-jvm</artifactId>
+                <version>3.16.4</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp</artifactId>
+                <version>5.3.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.errorprone</groupId>
+                <artifactId>error_prone_annotations</artifactId>
+                <version>2.50.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.bouncycastle</groupId>
+                <artifactId>bcpkix-jdk18on</artifactId>
+                <version>1.86</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-text</artifactId>
+                <version>1.14.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.codehaus.woodstox</groupId>
+                <artifactId>stax2-api</artifactId>
+                <version>4.2.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>4.5.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ratis</groupId>
+                <artifactId>ratis-thirdparty-misc</artifactId>
+                <version>1.0.11</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.re2j</groupId>
+                <artifactId>re2j</artifactId>
+                <version>1.7</version>
+            </dependency>
+            <!-- end Ozone transitive dependency alignment with application libraries -->
         </dependencies>
     </dependencyManagement>
     <dependencies>
@@ -196,6 +260,13 @@
             <artifactId>core</artifactId>
             <version>6.0.0</version>
         </dependency>
+        <!-- Shared by web3j and Ozone's OpenTelemetry exporter.
+             OkHttp 5 requires the JVM artifact explicitly on the compile classpath. -->
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp-jvm</artifactId>
+            <version>5.3.2</version>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -212,6 +283,14 @@
             <version>2.7.0</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- begin Ozone dependencies -->
+        <dependency>
+            <groupId>org.apache.ozone</groupId>
+            <artifactId>ozone-client</artifactId>
+            <version>2.2.1</version>
+        </dependency>
+        <!-- end Ozone dependencies -->
     </dependencies>
     <repositories>
         <repository>
@@ -309,6 +388,9 @@
                 <version>3.6.0</version>
                 <configuration>
                     <groups>${tests}</groups>
+                    <systemPropertyVariables>
+                        <VAULT_STORAGE_IMPL>${vault.storage.impl}</VAULT_STORAGE_IMPL>
+                    </systemPropertyVariables>
                 </configuration>
             </plugin>
             <plugin>
@@ -345,4 +427,24 @@
             </plugin>
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>s3</id>
+            <properties>
+                <vault.storage.impl>s3</vault.storage.impl>
+            </properties>
+        </profile>
+        <profile>
+            <id>gridfs</id>
+            <properties>
+                <vault.storage.impl>gridfs</vault.storage.impl>
+            </properties>
+        </profile>
+        <profile>
+            <id>ozone</id>
+            <properties>
+                <vault.storage.impl>ozone</vault.storage.impl>
+            </properties>
+        </profile>
+    </profiles>
 </project>

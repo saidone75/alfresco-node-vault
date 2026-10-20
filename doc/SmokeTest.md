@@ -1,110 +1,63 @@
 # End-to-end smoke tests
 
-The suite exercises Alfresco, the vault application and storage services together to check the essential
-workflows. It is an end-to-end integration suite used as a smoke check, rather than only a startup check.
-
-With Docker Compose 2.24.4 or later, launch the environment and tests using:
+Requires Docker Compose 2.24.4+. Run from the repository root:
 
 ```bash
-./smoke-tests.sh
+./smoke-tests.sh            # S3 (default)
+./smoke-tests.sh --s3
+./smoke-tests.sh --gridfs
+./smoke-tests.sh --ozone
+./smoke-tests.sh --all      # All three backends
 ```
 
-On Windows:
+On Windows, use `smoke-tests.bat` with the same flags. Select one backend flag;
+add `--keep-running` to leave services running for inspection.
 
-```cmd
-smoke-tests.bat
-```
+The launcher builds the application, starts the required services and stops them
+after the run, including on failure. Data and reports are retained. Exit code `0`
+means all selected checks, cleanup and shutdown succeeded.
 
-Both scripts resolve paths relative to their own location, validate the Compose configuration, build the images,
-start the required services and run the suite. They return the runner's exit code, or the configuration error code
-if validation fails. By default they stop all containers in the smoke stack after the run, including when the
-tests fail. Volumes, logs and the JSON report are retained. If the tests pass but stopping the stack fails, the
-launcher returns the stop command's error code.
-
-To leave the services running for inspection, use `./smoke-tests.sh --keep-running` or
-`smoke-tests.bat --keep-running` on Windows.
-
-To run directly without automatic shutdown, use this Docker command from the repository root:
-
-```console
-docker compose --env-file docker/.env -f docker/smoke/compose.yml run --build --rm smoke
-```
-
-The application is built inside Docker and the runner uses Clojure on Babashka, with its built-in HTTP client
-and JSON support. No additional Clojure dependencies are downloaded at runtime. The first run downloads
-images and Maven dependencies and may take several minutes. Allow enough memory for Alfresco, Solr and four
-application instances (approximately 8 GiB available to Docker is a useful starting point).
-
-The stack uses its own `anv-smoke` project, container names, managed volumes, databases and S3 buckets. It does not
-publish host ports or use the external volumes belonging to the regular development stack. It reuses the service
-definitions and image versions from the existing Docker configuration. Run one smoke stack at a time.
+The isolated `anv-smoke` stack shares Alfresco, Mongo and Vault across backends,
+with separate storage for each case, no published ports and no development volumes.
+Run one suite at a time. The first run may take several minutes; `--all` needs
+roughly 12 GiB available to Docker.
 
 ## Checks
 
-The runner waits for Alfresco, initializes test-only Vault secrets and Moto buckets, then tests these cases:
+Every backend runs two cases: content and metadata encryption both disabled,
+then both enabled. Each uses an empty file, a PDF with a non-ASCII filename
+and a deterministic binary file (8 MiB by default).
 
-| Storage | Content encryption | Metadata encryption |
-|---------|--------------------|---------------------|
-| S3      | Disabled           | Disabled            |
-| GridFS  | Disabled           | Disabled            |
-| S3      | Enabled            | Enabled             |
-| GridFS  | Enabled            | Enabled             |
+The suite checks upload integrity, archiving and source deletion, node metadata,
+download and restore sizes and SHA-256 hashes, restore permissions, and repeat
+restores without duplicates. Unauthenticated requests must return `401`.
+Only records and folders created by each case are removed; cleanup failures fail the suite.
 
-Each case uses a new Alfresco folder containing an empty file, the repository's sample PDF with a non-ASCII
-filename, and a deterministic binary file (8 MiB by default). For every file it verifies:
+Set `SMOKE_LARGE_FILE_MB` (1–256) or `SMOKE_WAIT_SECONDS` (default 900) in the host
+environment to change the binary size or startup timeout.
 
-1. The source upload contains the expected bytes.
-2. Archiving succeeds and the source node is removed from Alfresco.
-3. The vault returns the expected node ID and filename.
-4. Downloaded vault content has the same size and SHA-256 hash as the source.
-5. Restoring with permissions succeeds and the restored content has the same size and SHA-256 hash.
-6. A second restore returns the same node ID, and the folder contains no extra nodes.
+## Results and cleanup
 
-The runner also checks that an unauthenticated vault request returns `401`. At the end of each case it removes
-only the vault records and Alfresco folder created by that case. Cleanup errors fail the smoke test. No global
-database or bucket purge is performed by the runner.
-
-Exit code `0` means all four cases and their cleanup passed. Any failed check returns a nonzero code. Successful
-checks print `PASS` lines with file size and hash; a JSON report includes the result and node IDs for each case.
-
-## Results and diagnostics
-
-The JSON report is stored in the stack's `reports` volume. To copy it to the host after a run:
+These commands apply to every backend. Export the JSON report:
 
 ```console
 docker compose --env-file docker/.env -f docker/smoke/compose.yml run --rm --no-deps --entrypoint cat smoke /reports/report.json > smoke-report.json
 ```
 
-Inspect application and infrastructure logs with:
+Inspect logs:
 
 ```console
 docker compose --env-file docker/.env -f docker/smoke/compose.yml logs --tail=200
 ```
 
-To change file size or startup timeout, set `SMOKE_LARGE_FILE_MB` (1–256) or `SMOKE_WAIT_SECONDS` (default 900)
-in the host environment before running Compose. For example, in PowerShell:
-
-```powershell
-$env:SMOKE_LARGE_FILE_MB = "32"
-```
-
-With `--keep-running`, services remain running after the runner exits for inspection. Otherwise the launchers
-stop them automatically. After collecting the report, remove the stopped containers and test data (or stop and
-remove them if they are still running):
+Remove containers and test data after collecting the report:
 
 ```console
 docker compose --env-file docker/.env -f docker/smoke/compose.yml down -v
 ```
 
-This removes the smoke stack's volumes, including the report. Its Vault service runs in development mode, so
-its keys are lost when the service stops or its container is recreated. Remove the smoke data volumes before
-starting a fresh stack after stopping Vault.
+This also deletes the report. Remove these volumes before a fresh run after stopping
+Vault: its development-mode encryption keys are lost when the service stops.
 
-## Scope
-
-These are end-to-end smoke tests, not a full regression suite, load test or backup recovery test. They exercise
-the default encryption provider and KDF, with content and metadata encryption enabled together. They do not cover mixed encryption
-settings, key rotation, notarization, interrupted restores or application restarts.
-
-Docker Desktop on Windows runs these Linux containers; a separate native Windows run is needed to validate NTFS
-ACLs. Backup recovery must also be verified separately, including recovery of the required Vault key versions.
+The suite covers essential workflows, not load, failover or backup recovery.
+Mixed encryption settings, key rotation, notarization and interrupted restores are outside its scope.

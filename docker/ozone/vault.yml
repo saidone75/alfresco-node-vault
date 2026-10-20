@@ -1,0 +1,67 @@
+# Development-only monitoring; smoke tests use the shared Ozone services directly.
+x-recon-env: &recon-env
+  OZONE-SITE.XML_ozone.recon.address: ozone-recon:9891
+  no_proxy: ozone-om,ozone-scm,ozone-datanode,ozone-recon,localhost,127.0.0.1
+
+services:
+  ozone-scm:
+    container_name: anv-ozone-scm
+    environment:
+      <<: *recon-env
+
+  ozone-datanode:
+    container_name: anv-ozone-datanode
+    environment:
+      <<: *recon-env
+
+  ozone-recon:
+    container_name: anv-ozone-recon
+    extends:
+      file: ozone/docker-compose.yml
+      service: ozone-datanode
+    hostname: ozone-recon
+    command: ["ozone", "recon"]
+    environment:
+      <<: *recon-env
+      OZONE-SITE.XML_ozone.recon.db.dir: /data/metadata/recon
+      OZONE-SITE.XML_ozone.recon.http-address: 0.0.0.0:9888
+    ports:
+      - "127.0.0.1:9888:9888"
+    volumes: !override
+      - ozone-recon:/data
+    depends_on: !override
+      ozone-scm:
+        condition: service_healthy
+      ozone-om:
+        condition: service_healthy
+      ozone-datanode:
+        condition: service_started
+
+  ozone-om:
+    container_name: anv-ozone-om
+    environment:
+      <<: *recon-env
+    ports:
+      - "127.0.0.1:9862:9862"
+  ozone-init:
+    container_name: anv-ozone-init
+
+  anv-vault:
+    environment:
+      VAULT_STORAGE_IMPL: ozone
+      OZONE_OM_ADDRESS: ozone-om:9862
+      OZONE_VOLUME: ${OZONE_VOLUME:-anv}
+      OZONE_BUCKET: ${OZONE_BUCKET:-content}
+    depends_on:
+      ozone-init:
+        condition: service_completed_successfully
+
+volumes:
+  ozone-scm:
+    name: anv-ozone-scm-volume
+  ozone-om:
+    name: anv-ozone-om-volume
+  ozone-data:
+    name: anv-ozone-data-volume
+  ozone-recon:
+    name: anv-ozone-recon-volume

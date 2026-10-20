@@ -68,6 +68,9 @@ public abstract class BaseTest {
     @Autowired
     protected NodesApi nodesApi;
 
+    @Autowired
+    protected TestCleanupService testCleanupService;
+
     protected static String parentId;
     protected static final Faker faker = new Faker();
     private static final HashMap<String, Integer> names = new HashMap<>();
@@ -91,8 +94,8 @@ public abstract class BaseTest {
             nodeBodyCreate.setName(String.format("%s_test", faker.animal().name()));
             nodeBodyCreate.setNodeType(AlfrescoContentModel.TYPE_FOLDER);
             parentId = Objects.requireNonNull(nodesApi.createNode(alfrescoService.getGuestHome().getId(), nodeBodyCreate, null, null, null, null, null).getBody()).getEntry().getId();
-            TestCleanupService.setParentId(parentId);
         }
+        testCleanupService.setParentId(parentId);
         log.info("Running --> {}", testInfo.getDisplayName());
     }
 
@@ -125,6 +128,7 @@ public abstract class BaseTest {
                     AlfrescoContentModel.PROP_SUBJECT, randomElement(SUBJECTS)));
         }
         val node =Objects.requireNonNull(nodesApi.createNode(parentId, nodeBodyCreate, true, null, null, null, null).getBody()).getEntry();
+        testCleanupService.registerNode(node.getId());
         nodesApi.updateNodeContent(node.getId(), content, null, null, null, null, null);
         log.debug("Node {} created with name: {}", node.getId(), node.getName());
         return node;

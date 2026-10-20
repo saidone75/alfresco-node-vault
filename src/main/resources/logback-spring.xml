@@ -33,6 +33,8 @@
         </rollingPolicy>
     </appender>
 
+    <logger name="org.springframework.integration.jms.DefaultJmsHeaderMapper" level="warn"/>
+
     <springProfile name="dev|test">
         <logger name="org.saidone.service.AlfrescoService" additivity="false" level="trace">
             <appender-ref ref="CONSOLE"/>

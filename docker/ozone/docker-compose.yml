@@ -1,0 +1,92 @@
+# Native RPC storage for development and smoke tests; no S3 Gateway.
+x-ozone: &ozone
+  image: ${OZONE_IMAGE:-apache/ozone}:${OZONE_VERSION:-2.2.1}
+  environment: &ozone-env
+    OZONE-SITE.XML_ozone.om.address: ozone-om:9862
+    OZONE-SITE.XML_ozone.om.http-address: ozone-om:9874
+    OZONE-SITE.XML_ozone.scm.names: ozone-scm
+    OZONE-SITE.XML_ozone.scm.client.address: ozone-scm:9860
+    OZONE-SITE.XML_ozone.scm.block.client.address: ozone-scm:9863
+    OZONE-SITE.XML_ozone.metadata.dirs: /data/metadata
+    OZONE-SITE.XML_ozone.scm.datanode.id.dir: /data/metadata
+    OZONE-SITE.XML_hdds.datanode.dir: /data/hdds
+    OZONE-SITE.XML_ozone.security.enabled: "false"
+    OZONE-SITE.XML_ozone.replication: "1"
+    OZONE-SITE.XML_ozone.server.default.replication: "1"
+    OZONE-SITE.XML_hdds.scm.safemode.min.datanode: "1"
+    OZONE-SITE.XML_hdds.scm.wait.time.after.safemode.exit: 5s
+    OZONE-SITE.XML_ozone.scm.pipeline.creation.interval: 5s
+    OZONE-SITE.XML_hdds.datanode.volume.min.free.space: 100MB
+    OZONE-SITE.XML_hdds.datanode.volume.min.free.space.percent: "0"
+    OZONE-SITE.XML_ozone.scm.datanode.ratis.volume.free-space.min: 10MB
+    OZONE_OPTS: -Xms128m -Xmx512m
+    no_proxy: ozone-om,ozone-scm,ozone-datanode,localhost,127.0.0.1
+
+x-healthcheck: &healthcheck
+  interval: 5s
+  timeout: 20s
+  retries: 36
+  start_period: 20s
+
+services:
+  ozone-scm:
+    <<: *ozone
+    hostname: ozone-scm
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD-SHELL", "ozone admin safemode status | grep -q 'SCM is out of safe mode'"]
+    command: ["ozone", "scm"]
+    environment:
+      <<: *ozone-env
+      ENSURE_SCM_INITIALIZED: /data/metadata/scm/current/VERSION
+    volumes:
+      - ozone-scm:/data
+
+  ozone-om:
+    <<: *ozone
+    hostname: ozone-om
+    healthcheck:
+      <<: *healthcheck
+      test: ["CMD-SHELL", "ozone sh volume list >/dev/null"]
+    command: ["ozone", "om"]
+    environment:
+      <<: *ozone-env
+      ENSURE_OM_INITIALIZED: /data/metadata/om/current/VERSION
+      WAITFOR: ozone-scm:9876
+    depends_on:
+      ozone-scm:
+        condition: service_started
+    volumes:
+      - ozone-om:/data
+
+  ozone-datanode:
+    <<: *ozone
+    hostname: ozone-datanode
+    command: ["ozone", "datanode"]
+    depends_on:
+      ozone-scm:
+        condition: service_started
+    volumes:
+      - ozone-data:/data
+
+  ozone-init:
+    <<: *ozone
+    command: ["/bin/bash", "/init/initialize.sh"]
+    environment:
+      <<: *ozone-env
+      OZONE_VOLUME: ${OZONE_VOLUME:-anv}
+      OZONE_BUCKETS: ${OZONE_BUCKET:-content}
+    volumes:
+      - ./ozone/initialize.sh:/init/initialize.sh:ro
+    depends_on:
+      ozone-scm:
+        condition: service_healthy
+      ozone-om:
+        condition: service_healthy
+      ozone-datanode:
+        condition: service_started
+
+volumes:
+  ozone-scm:
+  ozone-om:
+  ozone-data:

@@ -1,0 +1,22 @@
+# Optional overlay for running only s3 cases in the shared smoke stack.
+services:
+  prepare:
+    environment:
+      SMOKE_CASES: s3-plain,s3-encrypted
+    depends_on: !override
+      alfresco:
+        condition: service_started
+      mongo:
+        condition: service_started
+      secrets:
+        condition: service_started
+      motoserver:
+        condition: service_started
+  smoke:
+    environment:
+      SMOKE_CASES: s3-plain,s3-encrypted
+    depends_on: !override
+      app-s3-plain:
+        condition: service_started
+      app-s3-encrypted:
+        condition: service_started

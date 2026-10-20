@@ -1028,7 +1028,7 @@
             "axisBorderShow": false,
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "",
+            "axisLabel": "Time spent in GC (%)",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "barWidthFactor": 0.6,
@@ -1058,6 +1058,7 @@
             }
           },
           "mappings": [],
+          "unit": "percentunit",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1108,7 +1109,8 @@
           "refId": "A"
         }
       ],
-      "title": "GC Stop the World Duration",
+      "description": "Percentage of elapsed time spent in stop-the-world GC pauses, by action and cause, based on the latest two samples within 5 minutes. For example, 2% corresponds to 20 ms of GC pause time per second.",
+      "title": "Time spent in GC (%)",
       "type": "timeseries"
     },
     {

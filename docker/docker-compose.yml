@@ -7,7 +7,7 @@ services:
         ACS_IMAGE: ${ACS_IMAGE}
         ACS_VERSION: ${ACS_VERSION}
     container_name: anv-alfresco
-    mem_limit: 1536m
+    mem_limit: 2g
     environment:
       JAVA_TOOL_OPTIONS: "
             -Dencryption.keystore.type=JCEKS
@@ -66,8 +66,9 @@ services:
   share:
     image: ${SHARE_IMAGE}:${SHARE_VERSION}
     container_name: anv-share
-    mem_limit: 512m
+    mem_limit: 1g
     environment:
+      JAVA_TOOL_OPTIONS: "-Xms128m -Xmx512m"
       REPO_HOST: alfresco
       REPO_PORT: 8080
     ports:

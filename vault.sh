@@ -1,78 +1,77 @@
 #!/bin/sh
+set -eu
 
-DOCKER_COMPOSE="docker compose \
--f docker/docker-compose.yml \
--f docker/mongo/docker-compose.yml \
--f docker/hashicorp-vault/docker-compose.yml \
--f docker/motoserver/docker-compose.yml \
--f docker/ganache/docker-compose.yml \
--f docker/grafana/docker-compose.yml \
---env-file docker/.env"
+usage() {
+    echo "Usage: $0 {build|build_start|start|stop|purge|tail} [--s3|--gridfs|--ozone] [novault]" >&2
+    exit 2
+}
 
+[ "$#" -gt 0 ] || usage
+command=$1
+shift
+backend=s3
+backend_selected=false
+novault=false
+for argument in "$@"; do
+    case "$argument" in
+        --s3|--gridfs|--ozone)
+            [ "$backend_selected" = false ] || usage
+            backend=${argument#--}
+            backend_selected=true
+            ;;
+        novault) novault=true ;;
+        *) usage ;;
+    esac
+done
+case "$command" in
+    build|build_start|start|stop|purge|tail) ;;
+    *) usage ;;
+esac
+
+cd -- "$(dirname -- "$0")"
 VOLUME_PREFIX=anv
 
+compose() {
+    case "$backend" in
+        s3) set -- -f docker/motoserver/docker-compose.yml -f docker/storage-s3.yml "$@" ;;
+        gridfs) set -- -f docker/storage-gridfs.yml "$@" ;;
+        ozone) set -- -f docker/ozone/docker-compose.yml -f docker/ozone/vault.yml "$@" ;;
+    esac
+    docker compose --env-file docker/.env \
+        -f docker/docker-compose.yml \
+        -f docker/mongo/docker-compose.yml \
+        -f docker/hashicorp-vault/docker-compose.yml \
+        -f docker/ganache/docker-compose.yml \
+        -f docker/grafana/docker-compose.yml "$@"
+}
+
 build() {
-  docker build -t anv:latest . -f docker/Dockerfile.vault
+    docker build -t anv:latest . -f docker/Dockerfile.vault
 }
 
 start() {
-    docker volume create $VOLUME_PREFIX-acs-volume
-    docker volume create $VOLUME_PREFIX-postgres-volume
-    docker volume create $VOLUME_PREFIX-ass-volume
-    docker volume create $VOLUME_PREFIX-mongo-volume
-    docker volume create $VOLUME_PREFIX-grafana-volume
-
-    if [ "$1" = "novault" ]; then
-       eval "$DOCKER_COMPOSE up --build -d --scale anv-vault=0"
+    for volume in acs postgres ass mongo grafana; do
+        docker volume create "$VOLUME_PREFIX-$volume-volume"
+    done
+    if [ "$novault" = true ]; then
+        compose up --build -d --scale anv-vault=0
     else
-      eval "$DOCKER_COMPOSE up --build -d"
+        compose up --build -d
     fi
 }
 
-down() {
-        eval "$DOCKER_COMPOSE down"
-}
-
 purge() {
-    docker volume rm -f $VOLUME_PREFIX-acs-volume
-    docker volume rm -f $VOLUME_PREFIX-postgres-volume
-    docker volume rm -f $VOLUME_PREFIX-ass-volume
-    docker volume rm -f $VOLUME_PREFIX-mongo-volume
-    docker volume rm -f $VOLUME_PREFIX-grafana-volume
+    compose down --volumes
+    for volume in acs postgres ass mongo grafana; do
+        docker volume rm -f "$VOLUME_PREFIX-$volume-volume"
+    done
 }
 
-tail() {
-    eval "$DOCKER_COMPOSE logs -f"
-}
-
-tail_all() {
-    eval "$DOCKER_COMPOSE logs --tail=\"all\""
-}
-
-case "$1" in
-  build)
-    build
-    ;;
-  build_start)
-    down
-    build
-    start "$2"
-    tail
-    ;;
-  start)
-    start "$2"
-    tail
-    ;;
-  stop)
-    down
-    ;;
-  purge)
-    down
-    purge
-    ;;
-  tail)
-    tail
-    ;;
-  *)
-    echo "Usage: $0 {build|build_start|start|stop|purge|tail} [novault]"
+case "$command" in
+    build) build ;;
+    build_start) compose down; build; start; compose logs -f ;;
+    start) start; compose logs -f ;;
+    stop) compose down --remove-orphans ;;
+    purge) purge ;;
+    tail) compose logs -f ;;
 esac
