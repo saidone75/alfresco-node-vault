@@ -32,7 +32,9 @@ or use `--all` for all six cases. These flags are mutually exclusive. For exampl
 ```
 
 The same flags work with `smoke-tests.bat` on Windows. Each backend overlay selects its two
-application instances; shared infrastructure is still started, including Moto and Ozone provisioning.
+application instances and only their required infrastructure: Moto for S3, Mongo for GridFS,
+and the native Ozone services and provisioning for Ozone. Alfresco, Mongo and Vault are shared
+by all backends. `--all` starts the complete stack.
 
 To leave the services running for inspection, use `./smoke-tests.sh --keep-running` or
 `smoke-tests.bat --keep-running` on Windows.
