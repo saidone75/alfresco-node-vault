@@ -4,8 +4,8 @@
 
 This document outlines the encryption capabilities available in the Alfresco Node Vault application. The system provides two alternative encryption implementations:
 
-1. **JCA Implementation** - Using AES-GCM
-2. **Bouncy Castle Implementation** - Using ChaCha20-Poly1305
+1. **AES-256-GCM** - selected by `impl: jca`
+2. **ChaCha20-Poly1305** - selected by `impl: bc`
 
 Both implementations provide authenticated encryption with strong security guarantees but offer different performance characteristics and compatibility options.
 
@@ -141,7 +141,7 @@ Uses the Bouncy Castle provider to implement ChaCha20-Poly1305 authenticated enc
 
 2. **Nonce/IV and Key Version Usage**:
     - Each encryption operation uses a new random nonce/IV
-    - The system prepends the key version, salt and nonce/IV to the encrypted data for decryption
+    - The system authenticates the complete ANV header, including cipher, KDF parameters, key version, salt and nonce
 
 3. **Processing Model**:
     - The system uses streaming encryption/decryption to handle large files efficiently
@@ -159,33 +159,56 @@ Uses the Bouncy Castle provider to implement ChaCha20-Poly1305 authenticated enc
 
 ## Format of Encrypted Data
 
-Every encrypted payload includes a short header with the key version, salt and
-nonce/IV. The algorithm, KDF parameters and field lengths come from configuration. The first 4 bytes store the **key version**, allowing for transparent
-key rotation. The remaining fields depend on the chosen provider:
+All newly encrypted binary content and Base64-encoded metadata use ANV v1:
 
-**JCA (AES‑GCM)**
-
-```
-[key version][salt][IV][encrypted data]
+```text
+[magic:4][version:1][headerLength:2][headerBody][ciphertext][tag:16]
 ```
 
-**Bouncy Castle (ChaCha20-Poly1305)**
+Integers are big-endian. `magic` is `89 41 4e 56`; version is `1`. Header length
+includes the seven-byte prefix and must not exceed 4096 bytes. The header body is:
 
-```
-[key version][salt][nonce][encrypted data]
-```
+| Field | Encoding |
+|-------|----------|
+| Cipher ID | 1 byte: 1 = AES-256-GCM, 2 = ChaCha20-Poly1305 |
+| Logical key reference | 1 byte: 1 = configured Vault secret |
+| Vault secret version | 4 bytes, positive integer |
+| KDF ID | 1 byte: 1 = PBKDF2-HMAC-SHA256, 2 = HKDF-SHA256, 3 = Argon2id |
+| KDF parameters | Algorithm-specific encoding below |
+| Salt | 2-byte length followed by 16..64 bytes |
+| Nonce | 2-byte length followed by exactly 12 bytes |
 
-Where:
-- `key version` is a 4 byte integer written in big-endian order
-- `salt` is used for key derivation (length defined by configuration)
-- `IV`/`nonce` is used by the encryption algorithm (length defined by configuration)
-- `encrypted data` also contains the authentication tag
+KDF parameter encodings:
 
-Decryption also requires the matching configuration and access to the recorded
-secret version. For reference, see the implementations in
-[JcaCryptoServiceImpl.java](../src/main/java/org/saidone/service/crypto/JcaCryptoServiceImpl.java)
-and
-[BcCryptoServiceImpl.java](../src/main/java/org/saidone/service/crypto/BcCryptoServiceImpl.java).
+- PBKDF2: 4-byte iteration count, between 100,000 and 10,000,000.
+- HKDF: 2-byte byte-length followed by UTF-8 `info`, at most 1024 bytes.
+- Argon2id: version byte `0x13`, then 4-byte memory in KiB (65,536..262,144),
+  iterations (3..10) and parallelism (1..16).
+
+Keys are always 256 bits; tags are always 128 bits. Vault secrets are UTF-8 bytes.
+PBKDF2 decodes them as UTF-8 characters for `PBEKeySpec`; HKDF and Argon2id use the
+bytes directly. Cipher IDs identify algorithms, independent of Java provider;
+both are processed incrementally using Bouncy Castle.
+
+The exact bytes of the entire header are supplied as AEAD additional authenticated
+data (AAD). Header and ciphertext alterations fail authentication. Parsing rejects
+unknown versions/IDs, trailing header fields, invalid lengths and excessive KDF
+costs before retrieving a secret. Header fields remain untrusted until the final
+tag is verified. Streaming decryption can yield plaintext before that point:
+consumers must read to EOF and handle errors; closing early does not authenticate
+the document. Consumers requiring verified plaintext before use must stage it and
+publish only after successful completion.
+
+Secret locations and credentials are not embedded in payloads. Logical reference
+1 resolves to the configured Vault mount/path/key, which must remain available
+along with the recorded secret versions.
+
+There is **no legacy reader**. Existing unversioned encrypted payloads are rejected.
+Export them using the previous application version before upgrading and reimport,
+or recreate disposable data. Unencrypted data is unaffected.
+
+Implementation: [AnvCryptoService.java](../src/main/java/org/saidone/service/crypto/AnvCryptoService.java)
+and [EncryptedPayloadHeader.java](../src/main/java/org/saidone/service/crypto/EncryptedPayloadHeader.java).
 
 ## Key Rotation
 
@@ -207,9 +230,10 @@ only in some directions once data is stored:
   encrypted. Existing nodes are not re-encrypted.
 - **Disabling encryption** with encrypted data already stored is not supported: encrypted content would be returned as
   is and encrypted metadata could not be read.
-- **Changing `impl`, the KDF or its parameters, or the salt and nonce/IV lengths** with encrypted data already stored
-  is not supported: these settings are not recorded with the data and the existing payloads could no longer be
-  decrypted. Use key rotation to change the secret instead.
+- **Changing `impl`, KDF parameters or salt length** affects new writes only. Existing ANV v1
+  payloads are decrypted using their authenticated header. Nonces must be 12 bytes.
+- Changing these settings does not migrate or re-encrypt existing data. Key rotation
+  still selects nodes by secret version; a current key version does not trigger a format or algorithm migration.
 
 ## Development Recommendations
 

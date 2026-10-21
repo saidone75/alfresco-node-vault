@@ -22,6 +22,7 @@ package org.saidone.config;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.Setter;
 import org.saidone.service.crypto.AbstractCryptoService;
@@ -53,6 +54,10 @@ public class EncryptionConfig {
     /** Fallback secret value when Vault is not available. */
     @Setter
     private String secret;
+
+    /** Cipher used for new payloads: jca (AES-256-GCM) or bc (ChaCha20-Poly1305). */
+    @Pattern(regexp = "jca|bc")
+    private String impl = "bc";
 
     /** Key derivation configuration. */
     @Valid

@@ -25,7 +25,7 @@ import java.io.InputStream;
  * Abstraction for stream based symmetric encryption and decryption services.
  * Implementations return {@link InputStream} instances that must be consumed
  * and closed by the caller. Concrete implementations include
- * {@link JcaCryptoServiceImpl} and {@link BcCryptoServiceImpl}.
+ * {@link AnvCryptoService}.
  */
 public interface CryptoService {
 
@@ -39,7 +39,9 @@ public interface CryptoService {
     InputStream encrypt(InputStream inputStream, Secret secret);
 
     /**
-     * Decrypts an encrypted data stream.
+     * Decrypts an ANV v1 encrypted data stream using its authenticated header.
+     * Plaintext may be yielded before tag verification: callers must consume to EOF
+     * and handle authentication failures. Closing early does not authenticate the payload.
      *
      * @param inputStream the encrypted data
      * @return a stream yielding the decrypted plaintext

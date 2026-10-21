@@ -274,9 +274,10 @@ Alfresco proxy and the common conventions.
   readable and newly archived documents are encrypted, but existing documents are not re-encrypted.
 - **Disabling encryption** when encrypted data is already stored is not supported: encrypted content would be returned
   as is and encrypted metadata could not be read.
-- **Changing the encryption implementation or its parameters** (`impl`, KDF, salt and nonce/IV lengths) is not supported
-  when encrypted data is already stored, since they are not recorded with the data and are required for decryption.
-  Use [key rotation](doc/Encryption.md#key-rotation) to change the secret.
+- **Encryption format:** encrypted content and metadata use the versioned ANV v1 format with an authenticated header.
+  Cipher and KDF settings can change for new writes; existing payloads retain their own parameters.
+  The previous unversioned encrypted format is not supported. Export with the previous application before upgrading
+  and reimport, or recreate disposable data. Keep the configured Vault secret location and required key versions available.
 - **Advanced search** is available only when metadata encryption is disabled.
 
 ## Documentation

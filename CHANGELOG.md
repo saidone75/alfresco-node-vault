@@ -7,16 +7,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- ANV v1 encrypted payloads with a versioned, authenticated binary header recording cipher, KDF parameters, logical key reference, Vault key version, salt and nonce; content and metadata remain readable after changing write settings.
 - Prometheus counters for archive, restore and delete outcomes, duration histograms and successfully archived content bytes, with a dedicated Grafana dashboard row; disable these metrics with `VAULT_OPERATION_METRICS_ENABLED=false`. Internal restore steps count only as part of delete, and archive retries do not increase byte counts.
 - Selectable Zulu, GraalVM Community or IBM Semeru/OpenJ9 Docker JVM runtimes via `VAULT_JVM_RUNTIME` in `docker/.env`.
 - Hourly, configurable node lock cleanup removes only `node:` locks expired for at least one hour, coordinated across instances through a separate job lock.
 - MongoDB-backed ShedLock coordination for node archiving, restore, deletion, key rotation, notarization and notarization checks, plus shared locks for archiving jobs, notarization jobs and manual or scheduled integrity sweeps. Node and job leases default to two minutes, with periodic renewal and configurable durations.
 
 ### Changed
+- **Breaking:** unversioned encrypted payloads are no longer supported. Export with the previous application before upgrading and reimport, or recreate disposable data. ANV v1 requires 12-byte nonces and bounded KDF costs.
 - Archiving uses a configurable fixed delay (ten seconds by default) in dev and Docker profiles; other profiles retain cron scheduling. Both modes share the distributed job lock.
 - Concurrent synchronous operations on the same node return `409 Conflict` across cooperating instances. Background jobs skip busy nodes; bulk key rotation logs busy nodes and continues. Integrity checks on busy nodes count as check errors without marking content as corrupted.
 
 ### Fixed
+- Development PostgreSQL 18 volume mount uses `/var/lib/postgresql`; Alfresco waits for the database healthcheck before starting.
 - Restore path creation resolves existing folders directly after a name conflict, without relying on paginated child listings. Other Alfresco errors are propagated, and files with conflicting names are rejected.
 
 ## [0.9.2] - 2026-10-20
