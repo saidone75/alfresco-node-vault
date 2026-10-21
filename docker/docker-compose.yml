@@ -131,6 +131,7 @@ services:
     mem_limit: 512m
     build:
       dockerfile: ./docker/Dockerfile.vault
+      target: ${VAULT_JVM_RUNTIME:-zulu}
       context: ../
     environment:
       ALFRESCO_BASE_PATH: http://alfresco:8080

@@ -3,6 +3,8 @@
 ARG MAVEN_VERSION=3-sapmachine-25
 ARG JAVA_VENDOR=azul/zulu-openjdk-alpine
 ARG JAVA_VERSION=25-jre-headless-latest
+ARG GRAALVM_VENDOR=ghcr.io/graalvm/jdk-community
+ARG GRAALVM_VERSION=25-ol10
 
 # --- Stage 1: Builder ---
 FROM maven:${MAVEN_VERSION} as builder
@@ -24,7 +26,7 @@ RUN --mount=type=bind,source=.m2/settings.xml,target=.m2/settings.xml \
     clean package -DskipTests -Dlicense.skip=true
 
 # --- Stage 2: Runtime ---
-FROM ${JAVA_VENDOR}:${JAVA_VERSION}
+FROM ${JAVA_VENDOR}:${JAVA_VERSION} AS zulu
 ARG UID=1010
 ARG GID=1010
 
@@ -43,3 +45,27 @@ ENV CONNECTION_TIMEOUT 10000
 ENV READ_TIMEOUT 10000
 
 ENTRYPOINT ["java", "-XX:MaxRAMPercentage=50", "-XX:+UseSerialGC", "-XX:+UseCompactObjectHeaders", "-jar", "/anv.jar"]
+
+# Alternative JVM runtime: the same JAR, without Native Image compilation.
+FROM ${GRAALVM_VENDOR}:${GRAALVM_VERSION} AS graalvm
+ARG UID=1010
+ARG GID=1010
+
+RUN microdnf install -y curl jq shadow-utils && microdnf clean all
+RUN groupadd --gid ${GID} spring && useradd --uid ${UID} --gid ${GID} --no-create-home spring
+
+WORKDIR /app
+USER spring:spring
+ARG JAR_FILE=/application/target/anv-*.jar
+COPY --from=builder ${JAR_FILE} anv.jar
+
+ENV SPRING_PROFILES_ACTIVE=docker \
+    APPLICATION_BASE_URL=http://127.0.0.1:10501 \
+    SHARED_FILES_PATH=/tmp/anv \
+    CONNECTION_TIMEOUT=10000 \
+    READ_TIMEOUT=10000
+
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=50", "-XX:+UseSerialGC", "-XX:+UseCompactObjectHeaders", "-jar", "/app/anv.jar"]
+
+# Plain docker build invocations retain the original runtime.
+FROM zulu AS runtime

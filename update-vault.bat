@@ -63,7 +63,7 @@ REM Validate configuration before building or touching the running container.
 IF ERRORLEVEL 1 EXIT /B 1
 
 echo Building new image...
-docker build -t anv:latest . -f docker/Dockerfile.vault
+%DOCKER_COMPOSE% build anv-vault
 IF ERRORLEVEL 1 EXIT /B 1
 
 echo Recreating only anv-vault with updated image...
