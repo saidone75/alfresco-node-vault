@@ -92,6 +92,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Prometheus monitoring support for metrics and health checks, including [vault operation metrics](doc/Metrics.md)
 - Custom upload and download methods
 - Minimal memory footprint
+- Three selectable Docker JVM runtimes: Azul Zulu, GraalVM Community and IBM Semeru/OpenJ9
 - Robust, enterprise-grade reliability and performance
 
 Pull requests are welcome!
