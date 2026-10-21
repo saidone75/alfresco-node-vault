@@ -88,11 +88,16 @@ search:
 application:
   locking:
     node-lock-at-most-for: ${VAULT_NODE_LOCK_AT_MOST_FOR:2m}
-    job-lock-at-most-for: ${VAULT_JOB_LOCK_AT_MOST_FOR:1h}
-    job-lock-at-least-for: ${VAULT_JOB_LOCK_AT_LEAST_FOR:1m}
+    job-lock-at-most-for: ${VAULT_JOB_LOCK_AT_MOST_FOR:2m}
+    job-lock-at-least-for: ${VAULT_JOB_LOCK_AT_LEAST_FOR:10s}
+  node-lock-cleanup:
+    enabled: ${NODE_LOCK_CLEANUP_ENABLED:true}
+    cron-expression: ${NODE_LOCK_CLEANUP_CRON_EXPRESSION:0 0 * * * ?}
   event-handler:
     enabled: ${EVENT_HANDLER_ENABLED:false}
   archiving-job:
+    scheduling-mode: ${ARCHIVING_JOB_SCHEDULING_MODE:cron}
+    fixed-delay: ${ARCHIVING_JOB_FIXED_DELAY:10s}
     cron-expression: ${ARCHIVING_JOB_CRON_EXPRESSION:0 0/5 2-6 * * ?}
     query: ${ARCHIVING_JOB_QUERY:TYPE:'cm:content' AND ASPECT:'anv:archive'}
     enabled: ${ARCHIVING_JOB_ENABLED:true}
