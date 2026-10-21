@@ -85,7 +85,7 @@ if exist "docker\docker-compose.yml" (
 EXIT /B 0
 
 :build
-docker build -t anv:latest . -f docker/Dockerfile.vault
+%DOCKER_COMPOSE% build anv-vault
 EXIT /B 0
 
 :tail

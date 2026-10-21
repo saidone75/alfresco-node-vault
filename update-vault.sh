@@ -43,6 +43,8 @@ compose() (
     fi
     if [ "$compose_action" = config ]; then
         docker compose "$@" config --quiet
+    elif [ "$compose_action" = build ]; then
+        docker compose "$@" build anv-vault
     else
         docker compose "$@" up -d --no-deps --no-build --force-recreate anv-vault
     fi
@@ -53,7 +55,8 @@ compose_action=config
 compose
 
 echo "Building new image..."
-docker build -t anv:latest . -f docker/Dockerfile.vault
+compose_action=build
+compose
 
 echo "Recreating only anv-vault with updated image..."
 compose_action=up

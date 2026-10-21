@@ -128,9 +128,10 @@ services:
   anv-vault:
     image: anv:latest
     container_name: anv-vault
-    mem_limit: 512m
+    mem_limit: 1g
     build:
       dockerfile: ./docker/Dockerfile.vault
+      target: ${VAULT_JVM_RUNTIME:-zulu}
       context: ../
     environment:
       ALFRESCO_BASE_PATH: http://alfresco:8080
@@ -139,6 +140,7 @@ services:
       VAULT_URL: http://anv-hashicorp-vault:8200
       S3_ENDPOINT: http://anv-motoserver:5000
       ETH_RPC_URL: http://anv-ganache:8545
+      VAULT_OPERATION_METRICS_ENABLED: "${VAULT_OPERATION_METRICS_ENABLED:-true}"
     ports:
       - "8086:8086"
 volumes:

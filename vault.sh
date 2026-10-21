@@ -46,7 +46,7 @@ compose() {
 }
 
 build() {
-    docker build -t anv:latest . -f docker/Dockerfile.vault
+    compose build anv-vault
 }
 
 start() {
