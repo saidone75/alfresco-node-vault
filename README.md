@@ -112,9 +112,11 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | ALFRESCO_PASSWORD                | admin                                      | Password for the Alfresco user                                      |
 | ACTIVE_MQ_URL                    | tcp://localhost:61616                      | ActiveMQ broker URL                                                 |
 | MONGODB_URL                      | mongodb://localhost:27017                  | MongoDB connection string                                           |
+| VAULT_STORAGE_IMPL               | s3                                         | Content storage backend: s3, gridfs or ozone                          |
 | S3_ENDPOINT                      | http://localhost:5000                      | S3 object storage endpoint                                          |
 | S3_KEY                           | testing                                    | Key for S3 authentication                                           |
 | S3_SECRET                        | testing                                    | Secret for S3 authentication                                        |
+| OZONE_OM_ADDRESS                 | localhost:9862                             | Ozone Manager RPC address (ozone-om:9862 in the Docker stack)         |
 | NODE_LOCK_CLEANUP_ENABLED       | true                                       | Remove node locks expired for at least one hour                      |
 | NODE_LOCK_CLEANUP_CRON_EXPRESSION | 0 0 * * * ?                               | Node lock cleanup cron (hourly by default)                           |
 | EVENT_HANDLER_ENABLED            | false                                      | Event based archive behaviour switch                                |
@@ -144,6 +146,9 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | INTEGRITY_SWEEP_BATCH_SIZE       | 200                                        | Number of notarized documents processed per sweep page                  |
 | ETH_RPC_URL                      | http://localhost:8545                      | Ethereum RPC endpoint                                               |
 | ETH_PRIVATE_KEY                  | 4f3edf983ac636a65a842ce7c78d9aa7...        | Private key used to sign transactions                               |
+
+The Ozone development stack runs without authentication. Secured clusters require
+Hadoop/Ozone security configuration and a Kerberos identity; see [Ozone configuration](doc/Ozone.md).
 
 ## Build
 
