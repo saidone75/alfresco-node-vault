@@ -40,7 +40,7 @@ loadScripts(document, 'script');</script>
 <p>Summary:</p>
 <ul>
 <li><a href="#nested-class-summary">Nested</a></li>
-<li><a href="#field-summary">Field</a></li>
+<li>Field</li>
 <li><a href="#constructor-summary">Constr</a></li>
 <li><a href="#method-summary">Method</a></li>
 </ul>
@@ -48,7 +48,7 @@ loadScripts(document, 'script');</script>
 <li>
 <p>Detail:</p>
 <ul>
-<li><a href="#field-detail">Field</a></li>
+<li>Field</li>
 <li><a href="#constructor-detail">Constr</a></li>
 <li><a href="#method-detail">Method</a></li>
 </ul>
@@ -60,13 +60,13 @@ loadScripts(document, 'script');</script>
 <ul class="sub-nav-list">
 <li>Summary:&nbsp;</li>
 <li><a href="#nested-class-summary">Nested</a>&nbsp;|&nbsp;</li>
-<li><a href="#field-summary">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor-summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method-summary">Method</a></li>
 </ul>
 <ul class="sub-nav-list">
 <li>Detail:&nbsp;</li>
-<li><a href="#field-detail">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor-detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method-detail">Method</a></li>
 </ul>
@@ -98,7 +98,7 @@ loadScripts(document, 'script');</script>
 </dl>
 <dl class="notes">
 <dt>Direct Known Subclasses:</dt>
-<dd><code><a href="BcCryptoServiceImpl.html" title="class in org.saidone.service.crypto">BcCryptoServiceImpl</a></code>, <code><a href="JcaCryptoServiceImpl.html" title="class in org.saidone.service.crypto">JcaCryptoServiceImpl</a></code></dd>
+<dd><code><a href="AnvCryptoService.html" title="class in org.saidone.service.crypto">AnvCryptoService</a></code></dd>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public abstract class </span><span class="element-name type-name-label">AbstractCryptoService</span>
@@ -125,21 +125,6 @@ implements <a href="CryptoService.html" title="interface in org.saidone.service.
 <div class="col-last even-row-color">
 <div class="block">Configuration holder for key derivation settings.</div>
 </div>
-</div>
-</section>
-</li>
-<!-- =========== FIELD SUMMARY =========== -->
-<li>
-<section class="field-summary" id="field-summary">
-<h2>Field Summary</h2>
-<div class="caption"><span>Fields</span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Field</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>protected @Valid @NotNull <a href="AbstractCryptoService.Kdf.html" title="class in org.saidone.service.crypto">AbstractCryptoService.Kdf</a></code></div>
-<div class="col-second even-row-color"><code><a href="#kdf" class="member-name-link">kdf</a></code></div>
-<div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
 </li>
@@ -173,9 +158,10 @@ implements <a href="CryptoService.html" title="interface in org.saidone.service.
 <div class="block">Decrypts a Base64 encoded encrypted text string</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected org.apache.commons.lang3.tuple.Pair<wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/javax/crypto/spec/SecretKeySpec.html" title="class or interface in javax.crypto.spec" class="external-link">SecretKeySpec</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deriveSecretKey(org.saidone.service.crypto.Secret,java.lang.String,byte%5B%5D)" class="member-name-link">deriveSecretKey</a><wbr>(<a href="Secret.html" title="class in org.saidone.service.crypto">Secret</a>&nbsp;secret,
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deriveSecretKey(org.saidone.service.crypto.Secret,java.lang.String,byte%5B%5D,org.saidone.service.crypto.AbstractCryptoService.Kdf)" class="member-name-link">deriveSecretKey</a><wbr>(<a href="Secret.html" title="class in org.saidone.service.crypto">Secret</a>&nbsp;secret,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;algorithm,
- byte[]&nbsp;salt)</code></div>
+ byte[]&nbsp;salt,
+ <a href="AbstractCryptoService.Kdf.html" title="class in org.saidone.service.crypto">AbstractCryptoService.Kdf</a>&nbsp;kdf)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Derives a secret key based on the specified key derivation function (KDF) implementation.</div>
 </div>
@@ -203,22 +189,6 @@ implements <a href="CryptoService.html" title="interface in org.saidone.service.
 </section>
 <section class="details">
 <ul class="details-list">
-<!-- ============ FIELD DETAIL =========== -->
-<li>
-<section class="field-details" id="field-detail">
-<h2>Field Details</h2>
-<ul class="member-list">
-<li>
-<section class="detail" id="kdf">
-<h3>kdf</h3>
-<div class="member-signature"><span class="annotations">@Valid
-@NotNull
-</span><span class="modifiers">protected</span>&nbsp;<span class="return-type">@Valid @NotNull <a href="AbstractCryptoService.Kdf.html" title="class in org.saidone.service.crypto">AbstractCryptoService.Kdf</a></span>&nbsp;<span class="element-name">kdf</span></div>
-</section>
-</li>
-</ul>
-</section>
-</li>
 <!-- ========= CONSTRUCTOR DETAIL ======== -->
 <li>
 <section class="constructor-details" id="constructor-detail">
@@ -239,11 +209,12 @@ implements <a href="CryptoService.html" title="interface in org.saidone.service.
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="deriveSecretKey(org.saidone.service.crypto.Secret,java.lang.String,byte[])">
+<section class="detail" id="deriveSecretKey(org.saidone.service.crypto.Secret,java.lang.String,byte[],org.saidone.service.crypto.AbstractCryptoService.Kdf)">
 <h3>deriveSecretKey</h3>
 <div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">org.apache.commons.lang3.tuple.Pair&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/javax/crypto/spec/SecretKeySpec.html" title="class or interface in javax.crypto.spec" class="external-link">SecretKeySpec</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Integer.html" title="class or interface in java.lang" class="external-link">Integer</a>&gt;</span>&nbsp;<span class="element-name">deriveSecretKey</span><wbr><span class="parameters">(<a href="Secret.html" title="class in org.saidone.service.crypto">Secret</a>&nbsp;secret,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;algorithm,
- byte[]&nbsp;salt)</span></div>
+ byte[]&nbsp;salt,
+ <a href="AbstractCryptoService.Kdf.html" title="class in org.saidone.service.crypto">AbstractCryptoService.Kdf</a>&nbsp;kdf)</span></div>
 <div class="block">Derives a secret key based on the specified key derivation function (KDF) implementation.
 
  <p>This method selects the key derivation algorithm implementation configured in <code>kdf</code>

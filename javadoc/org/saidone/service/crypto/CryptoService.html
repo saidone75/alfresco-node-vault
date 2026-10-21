@@ -89,14 +89,14 @@ loadScripts(document, 'script');</script>
 <section class="class-description" id="class-description">
 <dl class="notes">
 <dt>All Known Implementing Classes:</dt>
-<dd><code><a href="AbstractCryptoService.html" title="class in org.saidone.service.crypto">AbstractCryptoService</a></code>, <code><a href="BcCryptoServiceImpl.html" title="class in org.saidone.service.crypto">BcCryptoServiceImpl</a></code>, <code><a href="JcaCryptoServiceImpl.html" title="class in org.saidone.service.crypto">JcaCryptoServiceImpl</a></code></dd>
+<dd><code><a href="AbstractCryptoService.html" title="class in org.saidone.service.crypto">AbstractCryptoService</a></code>, <code><a href="AnvCryptoService.html" title="class in org.saidone.service.crypto">AnvCryptoService</a></code></dd>
 </dl>
 <hr>
 <div class="type-signature"><span class="modifiers">public interface </span><span class="element-name type-name-label">CryptoService</span></div>
 <div class="block">Abstraction for stream based symmetric encryption and decryption services.
  Implementations return <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link"><code>InputStream</code></a> instances that must be consumed
  and closed by the caller. Concrete implementations include
- <a href="JcaCryptoServiceImpl.html" title="class in org.saidone.service.crypto"><code>JcaCryptoServiceImpl</code></a> and <a href="BcCryptoServiceImpl.html" title="class in org.saidone.service.crypto"><code>BcCryptoServiceImpl</code></a>.</div>
+ <a href="AnvCryptoService.html" title="class in org.saidone.service.crypto"><code>AnvCryptoService</code></a>.</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
@@ -114,7 +114,7 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#decrypt(java.io.InputStream)" class="member-name-link">decrypt</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;inputStream)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Decrypts an encrypted data stream.</div>
+<div class="block">Decrypts an ANV v1 encrypted data stream using its authenticated header.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#decryptText(java.lang.String)" class="member-name-link">decryptText</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;encryptedText)</code></div>
@@ -166,7 +166,9 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="decrypt(java.io.InputStream)">
 <h3>decrypt</h3>
 <div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></span>&nbsp;<span class="element-name">decrypt</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;inputStream)</span></div>
-<div class="block">Decrypts an encrypted data stream.</div>
+<div class="block">Decrypts an ANV v1 encrypted data stream using its authenticated header.
+ Plaintext may be yielded before tag verification: callers must consume to EOF
+ and handle authentication failures. Closing early does not authenticate the payload.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>inputStream</code> - the encrypted data</dd>
