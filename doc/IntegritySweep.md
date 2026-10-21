@@ -25,7 +25,7 @@ Historical runs are available via `GET /api/v1/vault/integrity-sweeps`.
 
 When the number of notarized nodes exceeds a threshold, Integrity Sweep switches to a reduced strategy designed to keep runtime bounded while preserving coverage over time:
 
-- **Controlled coverage batch**: scans one deterministic page of notarized nodes (ordered by `_id`), rotating the page index daily.
+- **Controlled coverage batch**: scans one deterministic page of notarized nodes (ordered by `_id`), rotating the page index daily using the UTC date.
 - **Random addon batch (optional)**: adds a small random sample in the same run to increase anomaly discovery.
 
 - `INTEGRITY_SWEEP_HYBRID_ENABLED` (default: `true`)
@@ -35,3 +35,13 @@ When the number of notarized nodes exceeds a threshold, Integrity Sweep switches
 - `INTEGRITY_SWEEP_RANDOM_ADDON_SIZE` defines how many random nodes are added in hybrid mode
 
 If threshold is not reached, the sweep keeps the original full pagination behavior across all notarized nodes.
+
+Reduced mode is selected solely by the node-count threshold, even when
+`INTEGRITY_SWEEP_HYBRID_ENABLED=false`; that flag and
+`INTEGRITY_SWEEP_RANDOM_BATCH_ENABLED` control the random addon.
+`INTEGRITY_SWEEP_RANDOM_ADDON_SIZE` defaults to `50`.
+
+Notarization must be enabled. The manual endpoint returns immediately; a shared
+lock prevents overlapping manual and scheduled sweeps, and busy runs are skipped.
+A busy node increments `errors` without marking it corrupted. See
+[Concurrency.md](Concurrency.md) for coordination and recovery limits.

@@ -19,7 +19,7 @@ application:
     vault:
       encryption:
         content:
-          # Enable/disable binary content encryption (S3, GridFS)
+          # Enable/disable binary content encryption (S3, GridFS, Ozone)
           enabled: ${VAULT_ENCRYPT_CONTENT:false}
         metadata:
           # Enable/disable node metadata encryption on MongoDB
@@ -62,7 +62,7 @@ The system supports multiple key derivation functions for deriving encryption ke
 
 ### PBKDF2 (Default)
 
-**Configuration**: `kdf.type: "pbkdf2"`
+**Configuration**: `kdf.impl: "pbkdf2"`
 
 PBKDF2 (Password-Based Key Derivation Function 2) is a widely supported KDF that applies a pseudorandom function to derive keys.
 
@@ -73,7 +73,7 @@ PBKDF2 (Password-Based Key Derivation Function 2) is a widely supported KDF that
 
 ### Argon2
 
-**Configuration**: `kdf.type: "argon2"`
+**Configuration**: `kdf.impl: "argon2"`
 
 Argon2 is a modern KDF designed to be resistant to GPU, ASIC, and side-channel attacks. It won the Password Hashing Competition in 2015.
 
@@ -82,11 +82,11 @@ Argon2 is a modern KDF designed to be resistant to GPU, ASIC, and side-channel a
 - **Recommended Settings**:
     - memory: 65536 (64MB) or higher
     - parallelism: 4 (adjust based on available CPU cores)
-    - iterations-argon: 3-4
+    - iterations: 3-4
 
 ### HKDF
 
-**Configuration**: `kdf.type: "hkdf"`
+**Configuration**: `kdf.impl: "hkdf"`
 
 HKDF (HMAC-based Key Derivation Function) is designed for deriving keys from already-strong input keying material.
 
@@ -159,8 +159,8 @@ Uses the Bouncy Castle provider to implement ChaCha20-Poly1305 authenticated enc
 
 ## Format of Encrypted Data
 
-Every encrypted payload includes a short header with all the values required for
-decryption. The first 4 bytes store the **key version**, allowing for transparent
+Every encrypted payload includes a short header with the key version, salt and
+nonce/IV. The algorithm, KDF parameters and field lengths come from configuration. The first 4 bytes store the **key version**, allowing for transparent
 key rotation. The remaining fields depend on the chosen provider:
 
 **JCA (AES‑GCM)**
@@ -181,8 +181,8 @@ Where:
 - `IV`/`nonce` is used by the encryption algorithm (length defined by configuration)
 - `encrypted data` also contains the authentication tag
 
-This structure ensures that everything needed for decryption (except the master
-secret) travels with the ciphertext. For reference, see the implementations in
+Decryption also requires the matching configuration and access to the recorded
+secret version. For reference, see the implementations in
 [JcaCryptoServiceImpl.java](../src/main/java/org/saidone/service/crypto/JcaCryptoServiceImpl.java)
 and
 [BcCryptoServiceImpl.java](../src/main/java/org/saidone/service/crypto/BcCryptoServiceImpl.java).
