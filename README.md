@@ -192,11 +192,7 @@ To rebuild and recreate only the vault, leaving other services untouched, use:
 ./update-vault.sh
 ```
 
-Select the vault JVM in `docker/.env`: `VAULT_JVM_RUNTIME=zulu` (default) or
-`VAULT_JVM_RUNTIME=graalvm`. Then run `./update-vault.sh` to rebuild and recreate
-only the running vault, or `./vault.sh start --ozone` to start the Ozone stack.
-The `.bat` scripts use the same setting. GraalVM Community 25 runs the same JAR
-with SerialGC and a 50% maximum heap; this is not a native executable.
+Select the Docker JVM runtime in `docker/.env` with `VAULT_JVM_RUNTIME`: `zulu` (default), `graalvm` or `semeru`.
 
 For integration tests, start the required containers, then select the matching Maven profile:
 

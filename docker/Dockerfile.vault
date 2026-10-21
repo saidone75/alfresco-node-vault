@@ -5,6 +5,8 @@ ARG JAVA_VENDOR=azul/zulu-openjdk-alpine
 ARG JAVA_VERSION=25-jre-headless-latest
 ARG GRAALVM_VENDOR=ghcr.io/graalvm/jdk-community
 ARG GRAALVM_VERSION=25-ol10
+ARG SEMERU_VENDOR=ibm-semeru-runtimes
+ARG SEMERU_VERSION=open-25-jre
 
 # --- Stage 1: Builder ---
 FROM maven:${MAVEN_VERSION} as builder
@@ -66,6 +68,28 @@ ENV SPRING_PROFILES_ACTIVE=docker \
     READ_TIMEOUT=10000
 
 ENTRYPOINT ["java", "-XX:MaxRAMPercentage=50", "-XX:+UseSerialGC", "-XX:+UseCompactObjectHeaders", "-jar", "/app/anv.jar"]
+
+# OpenJ9 runtime: use its own GC policy instead of HotSpot-only options.
+FROM ${SEMERU_VENDOR}:${SEMERU_VERSION} AS semeru
+ARG UID=1010
+ARG GID=1010
+
+RUN apt-get update && apt-get install -y --no-install-recommends curl jq \
+    && rm -rf /var/lib/apt/lists/*
+RUN groupadd --gid ${GID} spring && useradd --uid ${UID} --gid ${GID} --no-create-home spring
+
+WORKDIR /app
+USER spring:spring
+ARG JAR_FILE=/application/target/anv-*.jar
+COPY --from=builder ${JAR_FILE} anv.jar
+
+ENV SPRING_PROFILES_ACTIVE=docker \
+    APPLICATION_BASE_URL=http://127.0.0.1:10501 \
+    SHARED_FILES_PATH=/tmp/anv \
+    CONNECTION_TIMEOUT=10000 \
+    READ_TIMEOUT=10000
+
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=50", "-Xgcpolicy:gencon", "-jar", "/app/anv.jar"]
 
 # Plain docker build invocations retain the original runtime.
 FROM zulu AS runtime
