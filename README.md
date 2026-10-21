@@ -155,7 +155,7 @@ To create a distribution package, run the build script for your platform:
 build.bat       # Windows
 ```
 
-The script creates an `anv/` directory containing `anv.jar` together with
+The script creates an `anv/` directory containing the versioned `anv-<version>.jar` together with
 `config/` and `log/` folders.
 
 ## Testing
@@ -214,18 +214,14 @@ See [concurrency](doc/Concurrency.md) for configuration and limitations.
 
 ## Docker configuration
 
-The `docker` directory contains a `.env` file used by `docker-compose`.
-Copy this file to create your own overrides:
+The helper scripts explicitly load `docker/.env` for Docker Compose interpolation.
+Edit that file to adjust development image versions, or export the corresponding
+variables in the shell before running `vault.sh` (shell values take precedence).
+A `docker/.env.local` file is not loaded automatically. When invoking Compose
+manually, pass override files explicitly with `--env-file`, after `docker/.env`,
+and use the same Compose files as the launcher for your backend.
 
-```bash
-cp docker/.env docker/.env.local
-# edit docker/.env.local and override the desired variables
-```
-
-Both `docker-compose` and the helper scripts will automatically pick up
-variables from `docker/.env.local` if present.  Use this mechanism to
-adjust image versions or swap services when moving from local
-development to a production setup. Key variables include:
+Key variables include:
 
 - `ACS_IMAGE` – Alfresco Content Services image name
 - `MONGO_IMAGE` – MongoDB image name
@@ -238,7 +234,8 @@ production you will likely point to hardened images or custom deployments.
 
 ```
 cd anv
-java -jar anv.jar
+java -jar anv-VERSION.jar
+# Replace VERSION with the version in the generated filename.
 ```
 
 ## REST API
