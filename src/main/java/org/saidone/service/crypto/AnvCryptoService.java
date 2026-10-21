@@ -33,6 +33,7 @@ import javax.crypto.spec.IvParameterSpec;
 import java.io.*;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
+import java.util.Objects;
 
 /** Writes ANV v1 payloads and selects decryption parameters exclusively from their headers. */
 @Service
@@ -88,7 +89,7 @@ public class AnvCryptoService extends AbstractCryptoService {
         if (secret == null || secret.getVersion() != h.keyVersion()) throw new IllegalArgumentException("Required Vault secret version is unavailable");
         val algorithm = h.cipher() == 1 ? "AES" : "ChaCha20";
         val key = deriveSecretKey(secret, algorithm, h.salt(), h.kdf()).getLeft();
-        // BC supports incremental processing for both algorithms without buffering a whole GCM document.
+        // BC supports incremental processing for both algorithms without buffering a whole GCM document
         val cipher = Cipher.getInstance(h.cipher() == 1 ? "AES/GCM/NoPadding" : "ChaCha20-Poly1305", PROVIDER);
         if (h.cipher() == 1) cipher.init(mode, key, new GCMParameterSpec(128, h.nonce()));
         else cipher.init(mode, key, new IvParameterSpec(h.nonce()));
@@ -101,39 +102,44 @@ public class AnvCryptoService extends AbstractCryptoService {
         private final InputStream source;
         private final Cipher cipher;
         private final byte[] input = new byte[8192];
-        private byte[] output = new byte[0];
+        private final byte[] output;
+        private final byte[] singleByte = new byte[1];
+        private int outputLength;
         private int position;
         private boolean finished;
         private boolean closed;
         private IOException failure;
 
-        TransformStream(InputStream source, Cipher cipher) { this.source = source; this.cipher = cipher; }
+        TransformStream(InputStream source, Cipher cipher) {
+            this.source = source;
+            this.cipher = cipher;
+            // Allow for a pending block/tag as well as the next input chunk.
+            output = new byte[Math.max(input.length, cipher.getOutputSize(input.length)) + Math.max(16, cipher.getBlockSize())];
+        }
 
         @Override public int read() throws IOException {
-            val one = new byte[1];
-            return read(one, 0, 1) < 0 ? -1 : one[0] & 0xff;
+            return read(singleByte, 0, 1) < 0 ? -1 : singleByte[0] & 0xff;
         }
 
         @Override public int read(byte[] target, int offset, int length) throws IOException {
-            java.util.Objects.checkFromIndexSize(offset, length, target.length);
+            Objects.checkFromIndexSize(offset, length, target.length);
             if (closed) throw new IOException("Stream closed");
             if (failure != null) throw failure;
             if (length == 0) return 0;
-            while (position == output.length) {
+            while (position == outputLength) {
                 if (finished) return -1;
                 val count = source.read(input);
                 if (count == 0) continue;
                 try {
-                    if (count < 0) { finished = true; output = cipher.doFinal(); }
-                    else output = cipher.update(input, 0, count);
-                    if (output == null) output = new byte[0];
+                    if (count < 0) { finished = true; outputLength = cipher.doFinal(output, 0); }
+                    else outputLength = cipher.update(input, 0, count, output, 0);
                     position = 0;
                 } catch (GeneralSecurityException e) {
                     failure = new IOException("ANV payload authentication failed or payload is truncated", e);
                     throw failure;
                 }
             }
-            val count = Math.min(length, output.length - position);
+            val count = Math.min(length, outputLength - position);
             System.arraycopy(output, position, target, offset, count);
             position += count;
             return count;
