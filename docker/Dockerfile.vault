@@ -42,4 +42,4 @@ ENV SHARED_FILES_PATH /tmp/anv
 ENV CONNECTION_TIMEOUT 10000
 ENV READ_TIMEOUT 10000
 
-ENTRYPOINT ["java", "-XX:MaxRAMPercentage=70", "-XX:+UseCompactObjectHeaders", "-jar", "/anv.jar"]
+ENTRYPOINT ["java", "-XX:MaxRAMPercentage=50", "-XX:+UseCompactObjectHeaders", "-jar", "/anv.jar"]
