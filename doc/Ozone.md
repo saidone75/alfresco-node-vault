@@ -12,7 +12,45 @@ versions are supported. Switching backend does not migrate existing content.
 
 For an external cluster, provision the volume and bucket first. Additional Hadoop/Ozone
 settings belong under `application.service.vault.storage.ozone.properties`.
-Secured clusters also require matching Hadoop configuration and a Kerberos identity.
+
+## Authentication
+
+The development stack disables Ozone security and requires no credentials.
+For secured clusters, the native RPC backend uses Kerberos authentication, as described
+in the official [Ozone Kerberos configuration guide](https://ozone.apache.org/docs/administrator-guide/configuration/security/kerberos/).
+`S3_KEY` and `S3_SECRET` apply only to the S3 backend and are not used by this client.
+
+Configure the cluster for secure operation and provide the application with matching
+Hadoop/Ozone client settings, including:
+
+```yaml
+application:
+  service:
+    vault:
+      storage:
+        ozone:
+          properties:
+            "[ozone.security.enabled]": "true"
+            "[hadoop.security.authentication]": kerberos
+            "[ozone.om.kerberos.principal]": om/_HOST@EXAMPLE.COM
+```
+
+Replace the example OM principal with the cluster's service principal. These settings
+describe the cluster's authentication requirements; they do not log the application in.
+The application process also needs Kerberos realm/KDC configuration (typically
+`/etc/krb5.conf`) and valid credentials for its own principal, with permission to access
+the configured volume and bucket.
+
+The current application does not expose Ozone username/password or principal/keytab
+environment variables, perform an explicit keytab login, or manage ticket renewal.
+A secured deployment must arrange credential acquisition and renewal for the JVM's
+Hadoop security context. Secure-cluster authentication is not exercised by the
+development stack or smoke tests.
+
+See [How Ozone Uses Kerberos](https://ozone.apache.org/docs/system-internals/security/kerberos/)
+for the authentication model. HTTP consoles use a separate
+[SPNEGO configuration](https://ozone.apache.org/docs/administrator-guide/configuration/security/https/);
+those settings do not configure this application's RPC authentication.
 
 ## Development stack
 
