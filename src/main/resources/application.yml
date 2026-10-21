@@ -86,6 +86,9 @@ search:
   service:
     path: /alfresco/api/-default-/public/search/versions/1
 application:
+  metrics:
+    vault-operations:
+      enabled: ${VAULT_OPERATION_METRICS_ENABLED:true}
   locking:
     node-lock-at-most-for: ${VAULT_NODE_LOCK_AT_MOST_FOR:2m}
     job-lock-at-most-for: ${VAULT_JOB_LOCK_AT_MOST_FOR:2m}

@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- Prometheus counters for archive, restore and delete outcomes, duration histograms and successfully archived content bytes, with a dedicated Grafana dashboard row; disable these metrics with `VAULT_OPERATION_METRICS_ENABLED=false`. Internal restore steps count only as part of delete, and archive retries do not increase byte counts.
 - Selectable Zulu, GraalVM Community or IBM Semeru/OpenJ9 Docker JVM runtimes via `VAULT_JVM_RUNTIME` in `docker/.env`.
 - Hourly, configurable node lock cleanup removes only `node:` locks expired for at least one hour, coordinated across instances through a separate job lock.
 - MongoDB-backed ShedLock coordination for node archiving, restore, deletion, key rotation, notarization and notarization checks, plus shared locks for archiving jobs, notarization jobs and manual or scheduled integrity sweeps. Node and job leases default to two minutes, with periodic renewal and configurable durations.

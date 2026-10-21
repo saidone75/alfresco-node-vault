@@ -89,7 +89,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - [REST API](doc/RestApi.md) with Alfresco proxy support and metadata search
 - Engineered for flexibility and bespoke integrations
 - No installation or changes required within Alfresco
-- Prometheus monitoring support for metrics and health checks
+- Prometheus monitoring support for metrics and health checks, including [vault operation metrics](doc/Metrics.md)
 - Custom upload and download methods
 - Minimal memory footprint
 - Robust, enterprise-grade reliability and performance
@@ -122,6 +122,7 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | ARCHIVING_JOB_FIXED_DELAY        | 10s                                        | Delay after each archiving run in fixed-delay mode                   |
 | ARCHIVING_JOB_CRON_EXPRESSION    | 0 0/5 2-6 * * ?                            | Scheduled job cron expression                                       |
 | ARCHIVING_JOB_QUERY              | TYPE:'cm:content' AND ASPECT:'anv:archive' | Query for selecting documents to be archived                        |
+| VAULT_OPERATION_METRICS_ENABLED | true                                       | Export operation counters, duration histograms and archived bytes |
 | VAULT_HASH_ALGORITHM             | SHA-256                                    | Hash stored as content metadata in GridFS, S3 or Ozone             |
 | VAULT_DOUBLE_CHECK               | true                                       | Verify content integrity before removing a document from Alfresco |
 | VAULT_DELETE_ON_ALFRESCO         | true                                       | Delete the document from Alfresco after archiving                         |

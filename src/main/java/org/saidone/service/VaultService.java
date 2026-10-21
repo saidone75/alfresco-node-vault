@@ -33,10 +33,15 @@ import org.saidone.exception.NodeOperationInProgressException;
 import org.saidone.exception.VaultException;
 import org.saidone.misc.ProgressTrackingInputStream;
 import org.saidone.model.dto.NodeWrapperDto;
+import org.saidone.monitor.VaultOperationMetrics;
+import org.saidone.monitor.VaultOperationMetrics.Operation;
+import org.saidone.monitor.VaultOperationMetrics.Outcome;
 import org.saidone.service.content.ContentService;
 import org.saidone.service.locking.VaultOperationCoordinator;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.function.Supplier;
 
 /**
  * Service responsible for archiving, restoring and managing nodes in the vault.
@@ -55,6 +60,7 @@ public class VaultService extends BaseComponent {
     private final NodeService nodeService;
     private final ContentService contentService;
     private final VaultOperationCoordinator operationCoordinator;
+    private final VaultOperationMetrics operationMetrics;
 
     @Value("${application.service.vault.double-check}")
     private boolean doubleCheck;
@@ -89,13 +95,16 @@ public class VaultService extends BaseComponent {
      * @throws VaultException                  if any error occurs during archiving, including rollback
      */
     public void archiveNode(String nodeId) {
-        operationCoordinator.withNodeLock(nodeId, () -> doArchiveNode(nodeId));
+        val archivedBytes = withOperationMetrics(Operation.ARCHIVE,
+                () -> operationCoordinator.withNodeLock(nodeId, () -> doArchiveNode(nodeId)));
+        operationMetrics.recordArchivedBytes(archivedBytes);
     }
 
-    private void doArchiveNode(String nodeId) {
+    private long doArchiveNode(String nodeId) {
+        long archivedBytes = 0;
         log.info("Archiving node: {}", nodeId);
         if (!nodeService.existsById(nodeId)) {
-            storeNode(nodeId);
+            archivedBytes = storeNode(nodeId);
         } else {
             log.info("Node {} is already in the vault, skipping storage", nodeId);
             if (!alfrescoService.nodeExists(nodeId)) {
@@ -105,6 +114,7 @@ public class VaultService extends BaseComponent {
             if (deleteOnAlfresco && doubleCheck) doubleCheck(nodeId);
         }
         if (deleteOnAlfresco) deleteNodeOnAlfresco(nodeId);
+        return archivedBytes;
     }
 
     /**
@@ -112,10 +122,11 @@ public class VaultService extends BaseComponent {
      * persisted data on failure.
      *
      * @param nodeId the ID of the node to store
+     * @return original content size in bytes after successful storage and optional verification
      * @throws NodeNotFoundOnAlfrescoException if the node is not found in Alfresco
      * @throws VaultException                  if any error occurs during storage
      */
-    private void storeNode(String nodeId) {
+    private long storeNode(String nodeId) {
         try {
             val node = alfrescoService.getNode(nodeId);
             val nodeContentInputStream = new ProgressTrackingInputStream(
@@ -131,6 +142,7 @@ public class VaultService extends BaseComponent {
             }
             nodeService.save(nodeWrapper);
             if (doubleCheck) doubleCheck(nodeId);
+            return node.getContent().getSizeInBytes();
         } catch (FeignException.NotFound e) {
             throw new NodeNotFoundOnAlfrescoException(nodeId);
         } catch (Exception e) {
@@ -232,7 +244,8 @@ public class VaultService extends BaseComponent {
      * @throws VaultException                  if stored metadata cannot be parsed
      */
     public String restoreNode(String nodeId, boolean restorePermissions) throws VaultException {
-        return operationCoordinator.withNodeLock(nodeId, () -> doRestoreNode(nodeId, restorePermissions));
+        return withOperationMetrics(Operation.RESTORE,
+                () -> operationCoordinator.withNodeLock(nodeId, () -> doRestoreNode(nodeId, restorePermissions)));
     }
 
     @SneakyThrows
@@ -285,7 +298,10 @@ public class VaultService extends BaseComponent {
      * @param nodeId identifier of the node to delete
      */
     public void deleteNode(String nodeId) {
-        operationCoordinator.withNodeLock(nodeId, () -> doDeleteNode(nodeId));
+        withOperationMetrics(Operation.DELETE, () -> {
+            operationCoordinator.withNodeLock(nodeId, () -> doDeleteNode(nodeId));
+            return null;
+        });
     }
 
     private void doDeleteNode(String nodeId) {
@@ -304,6 +320,23 @@ public class VaultService extends BaseComponent {
         }
         contentService.deleteNodeContent(nodeId);
         nodeService.deleteById(nodeId);
+    }
+
+    /** Measures public requests once; internal restore steps remain part of their parent operation. */
+    private <T> T withOperationMetrics(Operation operation, Supplier<T> action) {
+        if (!operationMetrics.isEnabled()) return action.get();
+        val startedAt = System.nanoTime();
+        Outcome outcome = Outcome.ERROR;
+        try {
+            val result = action.get();
+            outcome = Outcome.SUCCESS;
+            return result;
+        } catch (NodeOperationInProgressException e) {
+            outcome = Outcome.SKIPPED;
+            throw e;
+        } finally {
+            operationMetrics.recordOperation(operation, outcome, System.nanoTime() - startedAt);
+        }
     }
 
     /**
