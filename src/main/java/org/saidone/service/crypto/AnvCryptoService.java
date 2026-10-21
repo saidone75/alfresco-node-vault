@@ -113,7 +113,7 @@ public class AnvCryptoService extends AbstractCryptoService {
         TransformStream(InputStream source, Cipher cipher) {
             this.source = source;
             this.cipher = cipher;
-            // Allow for a pending block/tag as well as the next input chunk.
+            // allow for a pending block/tag as well as the next input chunk.
             output = new byte[Math.max(input.length, cipher.getOutputSize(input.length)) + Math.max(16, cipher.getBlockSize())];
         }
 
