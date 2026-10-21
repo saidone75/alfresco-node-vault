@@ -116,6 +116,8 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | S3_SECRET                        | testing                                    | Secret for S3 authentication                                        |
 | EVENT_HANDLER_ENABLED            | false                                      | Event based archive behaviour switch                                |
 | ARCHIVING_JOB_ENABLED            | true                                       | Archiving scheduled job switch                                      |
+| ARCHIVING_JOB_SCHEDULING_MODE    | cron (fixed-delay in dev/docker)            | Archiving schedule: cron or fixed-delay                              |
+| ARCHIVING_JOB_FIXED_DELAY        | 10s                                        | Delay after each archiving run in fixed-delay mode                   |
 | ARCHIVING_JOB_CRON_EXPRESSION    | 0 0/5 2-6 * * ?                            | Scheduled job cron expression                                       |
 | ARCHIVING_JOB_QUERY              | TYPE:'cm:content' AND ASPECT:'anv:archive' | Query for selecting documents to be archived                        |
 | VAULT_HASH_ALGORITHM             | SHA-256                                    | Hash stored as content metadata in GridFS, S3 or Ozone             |

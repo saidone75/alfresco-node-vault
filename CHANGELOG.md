@@ -7,9 +7,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
-- MongoDB-backed ShedLock coordination for node archiving, restore, deletion, key rotation, notarization and notarization checks, plus shared locks for archiving jobs, notarization jobs and manual or scheduled integrity sweeps. Node leases default to two minutes and job leases to one hour, with periodic renewal and configurable durations.
+- MongoDB-backed ShedLock coordination for node archiving, restore, deletion, key rotation, notarization and notarization checks, plus shared locks for archiving jobs, notarization jobs and manual or scheduled integrity sweeps. Node and job leases default to two minutes, with periodic renewal and configurable durations.
 
 ### Changed
+- Archiving uses a configurable fixed delay (ten seconds by default) in dev and Docker profiles; other profiles retain cron scheduling. Both modes share the distributed job lock.
 - Concurrent synchronous operations on the same node return `409 Conflict` across cooperating instances. Background jobs skip busy nodes; bulk key rotation logs busy nodes and continues. Integrity checks on busy nodes count as check errors without marking content as corrupted.
 
 ### Fixed

@@ -28,8 +28,6 @@ import org.saidone.service.locking.VaultOperationCoordinator;
 import org.saidone.exception.NodeOperationInProgressException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 /**
@@ -46,7 +44,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @ConditionalOnProperty(name = "application.archiving-job.enabled", havingValue = "true")
-@EnableScheduling
 @Slf4j
 public class NodeArchivingJob extends BaseComponent {
 
@@ -58,9 +55,8 @@ public class NodeArchivingJob extends BaseComponent {
     private String query;
 
     /**
-     * Scheduled method that triggers the archiving process according to the configured cron expression.
+     * Scheduled method that triggers the archiving process according to the configured scheduling mode.
      */
-    @Scheduled(cron = "${application.archiving-job.cron-expression}")
     void archiveNodes() {
         operationCoordinator.runJob("archiving", this::doArchiveNodes);
     }

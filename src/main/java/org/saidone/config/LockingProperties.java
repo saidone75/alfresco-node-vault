@@ -29,8 +29,8 @@ import java.time.Duration;
 @ConfigurationProperties("application.locking")
 public record LockingProperties(
         @DefaultValue("2m") Duration nodeLockAtMostFor,
-        @DefaultValue("1h") Duration jobLockAtMostFor,
-        @DefaultValue("1m") Duration jobLockAtLeastFor) {
+        @DefaultValue("2m") Duration jobLockAtMostFor,
+        @DefaultValue("10s") Duration jobLockAtLeastFor) {
 
     public LockingProperties {
         // KeepAliveLockProvider requires a lease of at least 30 seconds.
