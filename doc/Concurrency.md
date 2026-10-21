@@ -12,7 +12,7 @@ share a `node:<nodeId>` lock. Different nodes can run concurrently. Synchronous
 requests return `409 Conflict` when the node is busy; ordinary metadata and content
 reads do not acquire this lock.
 
-Archiving, notarization and integrity sweeps have separate job locks. Manual and
+Archiving, notarization, integrity sweeps and node lock cleanup have separate job locks. Manual and
 scheduled sweeps share the same lock. Busy jobs are skipped. Background operations
 log and skip busy nodes; retry through a later scheduled run or an explicit request.
 Archive events are not automatically retried by the handler, and bulk key rotation
@@ -41,6 +41,20 @@ job lease renews every minute, so jobs can run longer than two minutes; after a
 crash, another instance can acquire the lock once the last lease expires. Lease durations
 must be at least 30 seconds; the minimum job duration must be between zero and its
 lease duration. Do not delete active lock records or add a TTL index.
+
+## Node lock cleanup
+
+An enabled-by-default job runs hourly and removes only `node:` records with
+`lockUntil` at least one hour in the past. Job locks, active node locks and recently
+expired node locks remain. Configure `NODE_LOCK_CLEANUP_ENABLED` and
+`NODE_LOCK_CLEANUP_CRON_EXPRESSION` to disable or reschedule it. Cleanup runs under
+`job:node-lock-cleanup`, so cooperating instances skip overlapping cleanup runs.
+
+The deletion includes both the name prefix and expiration cutoff in its MongoDB
+filter, so a lock renewed or reacquired before deletion no longer matches. The
+MongoDB provider uses upsert to recreate a missing lock on its next acquisition.
+This cleanup depends on that provider behavior; reassess it if changing providers.
+It does not fix the expired-owner limitations described below.
 
 ## Limits
 

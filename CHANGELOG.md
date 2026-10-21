@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- Hourly, configurable node lock cleanup removes only `node:` locks expired for at least one hour, coordinated across instances through a separate job lock.
 - MongoDB-backed ShedLock coordination for node archiving, restore, deletion, key rotation, notarization and notarization checks, plus shared locks for archiving jobs, notarization jobs and manual or scheduled integrity sweeps. Node and job leases default to two minutes, with periodic renewal and configurable durations.
 
 ### Changed

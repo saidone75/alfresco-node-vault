@@ -90,6 +90,9 @@ application:
     node-lock-at-most-for: ${VAULT_NODE_LOCK_AT_MOST_FOR:2m}
     job-lock-at-most-for: ${VAULT_JOB_LOCK_AT_MOST_FOR:2m}
     job-lock-at-least-for: ${VAULT_JOB_LOCK_AT_LEAST_FOR:10s}
+  node-lock-cleanup:
+    enabled: ${NODE_LOCK_CLEANUP_ENABLED:true}
+    cron-expression: ${NODE_LOCK_CLEANUP_CRON_EXPRESSION:0 0 * * * ?}
   event-handler:
     enabled: ${EVENT_HANDLER_ENABLED:false}
   archiving-job:
