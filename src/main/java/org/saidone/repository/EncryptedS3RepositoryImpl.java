@@ -86,7 +86,7 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
         val secret = secretService.getSecret();
         metadata.put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString());
         metadata.put(MetadataKeys.KEY_VERSION, String.valueOf(secret.getVersion()));
-        super.putObject(bucketName, node, metadata, cryptoService.encrypt(inputStream, secretService.getSecret()));
+        super.putObject(bucketName, node, metadata, cryptoService.encrypt(inputStream, secret));
     }
 
     /**
