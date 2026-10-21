@@ -186,6 +186,12 @@ Stop the current stack before switching backend. Switching does not migrate exis
 `purge --ozone` also removes the managed Ozone data volumes.
 These backend flags apply to `vault.sh`; `vault.bat` retains its existing S3 configuration.
 
+To rebuild and recreate only the vault, leaving other services untouched, use:
+
+```bash
+./update-vault.sh
+```
+
 For integration tests, start the required containers, then select the matching Maven profile:
 
 | Development stack | Integration tests |
