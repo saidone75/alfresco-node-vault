@@ -34,7 +34,7 @@ import org.saidone.model.MetadataKeys;
 import org.saidone.model.dto.NodeContentInfoDto;
 import org.saidone.model.dto.NodeContentStreamDto;
 import org.saidone.repository.S3Repository;
-import org.saidone.service.crypto.ContentCipher;
+import org.saidone.service.crypto.ContentEncryptionService;
 import org.saidone.utils.SecureTemporaryFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -76,7 +76,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
     private String checksumAlgorithm;
 
     private final S3Repository s3Repository;
-    private final ContentCipher contentCipher;
+    private final ContentEncryptionService contentEncryptionService;
 
     private final S3Client s3Client;
     private final S3Config s3Config;
@@ -103,7 +103,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
             String checksum;
             // Encrypting while writing keeps plain content off the disk and needs a single temporary file.
             try (val dis = new AnvDigestInputStream(inputStream, checksumAlgorithm);
-                 val stored = contentCipher.toStoredContent(dis, metadata);
+                 val stored = contentEncryptionService.toStoredContent(dis, metadata);
                  val fos = Files.newOutputStream(tempFile.getPath())) {
                 stored.transferTo(fos);
                 checksum = dis.getHash();
@@ -212,7 +212,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
      */
     private InputStream readContent(String nodeId) {
         val object = s3Repository.getObject(s3Config.getBucket(), nodeId);
-        return contentCipher.fromStoredContent(object, Boolean.parseBoolean(object.response().metadata().get(MetadataKeys.ENCRYPTED)));
+        return contentEncryptionService.fromStoredContent(object, Boolean.parseBoolean(object.response().metadata().get(MetadataKeys.ENCRYPTED)));
     }
 
     /**

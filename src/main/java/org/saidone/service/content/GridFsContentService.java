@@ -32,7 +32,7 @@ import org.saidone.model.MetadataKeys;
 import org.saidone.model.dto.NodeContentInfoDto;
 import org.saidone.model.dto.NodeContentStreamDto;
 import org.saidone.repository.GridFsRepositoryImpl;
-import org.saidone.service.crypto.ContentCipher;
+import org.saidone.service.crypto.ContentEncryptionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -61,7 +61,7 @@ public class GridFsContentService extends BaseComponent implements ContentServic
     private String checksumAlgorithm;
 
     private final GridFsRepositoryImpl gridFsRepository;
-    private final ContentCipher contentCipher;
+    private final ContentEncryptionService contentEncryptionService;
 
     /**
      * Archives the content of the given node by saving the content stream into a GridFS repository
@@ -81,7 +81,7 @@ public class GridFsContentService extends BaseComponent implements ContentServic
             val metadata = new HashMap<String, String>();
             metadata.put(MetadataKeys.UUID, node.getId());
             metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
-            try (val stored = contentCipher.toStoredContent(digestInputStream, metadata)) {
+            try (val stored = contentEncryptionService.toStoredContent(digestInputStream, metadata)) {
                 gridFsRepository.saveFile(
                         stored,
                         node.getName(),
@@ -201,7 +201,7 @@ public class GridFsContentService extends BaseComponent implements ContentServic
      * @return the original content stream
      */
     private InputStream readContent(GridFSFile gridFSFile) {
-        return contentCipher.fromStoredContent(gridFsRepository.getFileContent(gridFSFile), isEncrypted(gridFSFile));
+        return contentEncryptionService.fromStoredContent(gridFsRepository.getFileContent(gridFSFile), isEncrypted(gridFSFile));
     }
 
     private static boolean isEncrypted(GridFSFile gridFSFile) {

@@ -30,7 +30,7 @@ import org.saidone.model.MetadataKeys;
 import org.saidone.model.dto.NodeContentInfoDto;
 import org.saidone.model.dto.NodeContentStreamDto;
 import org.saidone.repository.OzoneRepository;
-import org.saidone.service.crypto.ContentCipher;
+import org.saidone.service.crypto.ContentEncryptionService;
 import org.saidone.utils.SecureTemporaryFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -63,7 +63,7 @@ import java.util.Map;
 public class OzoneContentService extends BaseComponent implements ContentService {
 
     private final OzoneRepository ozoneRepository;
-    private final ContentCipher contentCipher;
+    private final ContentEncryptionService contentEncryptionService;
 
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
@@ -83,7 +83,7 @@ public class OzoneContentService extends BaseComponent implements ContentService
             // Encrypting while writing keeps plain content off the disk and needs a single temporary file.
             try (val counter = BoundedInputStream.builder().setInputStream(inputStream).get();
                  val digest = new AnvDigestInputStream(counter, checksumAlgorithm);
-                 val stored = contentCipher.toStoredContent(digest, metadata);
+                 val stored = contentEncryptionService.toStoredContent(digest, metadata);
                  val output = Files.newOutputStream(temporary.getPath())) {
                 stored.transferTo(output);
                 checksum = digest.getHash();
@@ -165,7 +165,7 @@ public class OzoneContentService extends BaseComponent implements ContentService
      * @throws IOException if the content cannot be retrieved
      */
     private InputStream readContent(String nodeId, Map<String, String> metadata) throws IOException {
-        return contentCipher.fromStoredContent(ozoneRepository.getObject(nodeId),
+        return contentEncryptionService.fromStoredContent(ozoneRepository.getObject(nodeId),
                 Boolean.parseBoolean(metadata.get(MetadataKeys.ENCRYPTED)));
     }
 }

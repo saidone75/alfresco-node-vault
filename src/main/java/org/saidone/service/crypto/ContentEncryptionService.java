@@ -21,6 +21,7 @@ package org.saidone.service.crypto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import org.saidone.component.BaseComponent;
 import org.saidone.model.MetadataKeys;
 import org.saidone.service.SecretService;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,7 +43,7 @@ import java.util.Optional;
  */
 @Service
 @RequiredArgsConstructor
-public class ContentCipher {
+public class ContentEncryptionService extends BaseComponent {
 
     private final Optional<SecretService> secretService;
     private final Optional<CryptoService> cryptoService;
