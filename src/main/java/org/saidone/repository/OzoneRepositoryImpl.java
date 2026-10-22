@@ -32,6 +32,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Map;
 
 /**
@@ -58,26 +60,19 @@ public class OzoneRepositoryImpl implements OzoneRepository {
      * {@inheritDoc}
      */
     @Override
-    public void putObject(String nodeId, long length, Map<String, String> metadata, InputStream content)
-            throws IOException {
+    public InputStream prepareContent(InputStream content, Map<String, String> metadata) {
         metadata.put(MetadataKeys.ENCRYPTED, Boolean.FALSE.toString());
-        metadata.put(PLAINTEXT_LENGTH, Long.toString(length));
-        writeObject(nodeId, length, metadata, content);
+        return content;
     }
 
     /**
-     * Uploads the provided stream as an object to Ozone, preserving the supplied
-     * metadata. Shared by the plaintext and encrypted implementations.
-     *
-     * @param nodeId   identifier of the node / object key
-     * @param length   exact stored content length, including any encryption overhead
-     * @param metadata object metadata to associate with the stored content
-     * @param content  stream of the content to store
-     * @throws IOException if the content cannot be stored
+     * {@inheritDoc}
      */
-    protected void writeObject(String nodeId, long length, Map<String, String> metadata, InputStream content) throws IOException {
-        try (val output = bucket.createKey(nodeId, length, bucket.getReplicationConfig(), metadata)) {
-            content.transferTo(output);
+    @Override
+    public void putObject(String nodeId, Path content, Map<String, String> metadata) throws IOException {
+        try (val input = Files.newInputStream(content);
+             val output = bucket.createKey(nodeId, Files.size(content), bucket.getReplicationConfig(), metadata)) {
+            input.transferTo(output);
         }
     }
 

@@ -82,9 +82,10 @@ public class S3ContentService extends BaseComponent implements ContentService {
     /**
      * Saves the content stream of the given node to S3.
      * <p>
-     * The method computes the checksum while copying the payload to a temporary file,
-     * then uploads that file with Alfresco metadata (UUID, file name, MIME type,
-     * checksum algorithm and checksum value).
+     * The method computes the checksum of the original content while writing the
+     * bytes to store, encrypted when content encryption is enabled, to a temporary
+     * file, then uploads that file with Alfresco metadata (UUID, file name, MIME
+     * type, checksum algorithm and checksum value).
      * </p>
      *
      * @param node        node whose content is being archived
@@ -96,14 +97,16 @@ public class S3ContentService extends BaseComponent implements ContentService {
         // The source stream is a resource too, so it is closed even if the temporary file cannot be created.
         try (inputStream;
              val tempFile = new SecureTemporaryFile("s3-upload-", ".bin")) {
+            val metadata = new HashMap<String, String>();
             String checksum;
+            // Encrypting while writing keeps plain content off the disk and needs a single temporary file.
             try (val dis = new AnvDigestInputStream(inputStream, checksumAlgorithm);
+                 val stored = s3Repository.prepareContent(dis, metadata);
                  val fos = Files.newOutputStream(tempFile.getPath())) {
-                dis.transferTo(fos);
+                stored.transferTo(fos);
                 checksum = dis.getHash();
             }
             log.trace("{}: {}", checksumAlgorithm, checksum);
-            val metadata = new HashMap<String, String>();
             metadata.put(MetadataKeys.UUID, node.getId());
             metadata.put(MetadataKeys.FILENAME, encodeMetadataValue(node.getName()));
             metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());

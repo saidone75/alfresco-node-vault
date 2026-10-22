@@ -19,22 +19,17 @@
 
 package org.saidone.repository;
 
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import lombok.val;
-import org.alfresco.core.model.Node;
 import org.saidone.model.MetadataKeys;
 import org.saidone.service.SecretService;
 import org.saidone.service.crypto.CryptoService;
-import org.saidone.utils.SecureTemporaryFile;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
 
 /**
@@ -71,31 +66,19 @@ public class EncryptedS3RepositoryImpl extends S3RepositoryImpl {
     }
 
     /**
-     * Encrypts the provided file and stores it in S3. The object's metadata is
-     * updated to mark it as encrypted before delegating to the parent
-     * implementation.
+     * Returns the encrypted stream of the provided content and marks the
+     * object's metadata as encrypted with the current key version.
      *
-     * @param bucketName destination bucket
-     * @param node       node whose id acts as the key
-     * @param metadata   optional object metadata to associate with the stored
-     *                   object
-     * @param content    file holding the content to encrypt and upload
+     * @param content  the original content
+     * @param metadata object metadata, updated with the encryption details
+     * @return the encrypted content stream
      */
     @Override
-    @SneakyThrows
-    public void putObject(String bucketName, Node node, HashMap<String, String> metadata, Path content) {
+    public InputStream prepareContent(InputStream content, HashMap<String, String> metadata) {
         val secret = secretService.getSecret();
         metadata.put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString());
         metadata.put(MetadataKeys.KEY_VERSION, String.valueOf(secret.getVersion()));
-        // The ciphertext goes to a temporary file so it is uploaded from disk, with its exact length, like plain content.
-        try (val temporary = new SecureTemporaryFile("s3-encrypted-", ".bin")) {
-            try (val plain = Files.newInputStream(content);
-                 val encrypted = cryptoService.encrypt(plain, secret);
-                 val output = Files.newOutputStream(temporary.getPath())) {
-                encrypted.transferTo(output);
-            }
-            super.putObject(bucketName, node, metadata, temporary.getPath());
-        }
+        return cryptoService.encrypt(content, secret);
     }
 
     /**

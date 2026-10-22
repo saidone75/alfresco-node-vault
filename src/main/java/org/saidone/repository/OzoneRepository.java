@@ -23,6 +23,7 @@ import org.apache.hadoop.ozone.client.OzoneKeyDetails;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.Map;
 
 /**
@@ -35,16 +36,28 @@ public interface OzoneRepository {
     String PLAINTEXT_LENGTH = "plaintext-length";
 
     /**
+     * Returns the stream of the bytes to store for the given content, encrypted
+     * when content encryption is enabled, and records in {@code metadata} how
+     * they are stored. The caller writes this stream to the file then passed to
+     * {@link #putObject}, so plain content never reaches the disk when
+     * encryption is enabled.
+     *
+     * @param content  the original content; closing the returned stream closes it
+     * @param metadata object metadata, updated with the storage details
+     * @return the stream of the bytes to store
+     */
+    InputStream prepareContent(InputStream content, Map<String, String> metadata);
+
+    /**
      * Uploads a node's content to the configured Ozone bucket using the node id as
      * object key.
      *
      * @param nodeId   identifier of the node / object key
-     * @param length   content length before encryption, in bytes
+     * @param content  file holding the bytes to store, as returned by {@link #prepareContent}
      * @param metadata object metadata to store alongside the binary content
-     * @param content  the stream providing the content to store
      * @throws IOException if the content cannot be stored
      */
-    void putObject(String nodeId, long length, Map<String, String> metadata, InputStream content) throws IOException;
+    void putObject(String nodeId, Path content, Map<String, String> metadata) throws IOException;
 
     /**
      * Retrieves an object from Ozone previously stored for the given node id.

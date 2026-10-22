@@ -23,6 +23,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.val;
 import lombok.SneakyThrows;
 import org.alfresco.core.model.Node;
+import org.apache.commons.io.input.BoundedInputStream;
 import org.saidone.component.BaseComponent;
 import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.model.MetadataKeys;
@@ -42,8 +43,9 @@ import java.util.HashMap;
 /**
  * {@link ContentService} implementation that stores node binaries in Apache Ozone.
  * <p>
- * During archival the content stream is written to a temporary file so the checksum can
- * be computed before uploading. The resulting hash and other metadata are persisted as
+ * During archival the content stream is written to a temporary file, encrypted when
+ * content encryption is enabled, so the checksum of the original content and the
+ * stored length are known before uploading. The resulting hash and other metadata are persisted as
  * Ozone key metadata. Retrieval operations return {@link NodeContentStreamDto} and
  * {@link NodeContentInfoDto} descriptors built from stored key details and content streams.
  * </p>
@@ -68,20 +70,28 @@ public class OzoneContentService extends BaseComponent implements ContentService
     @Override
     @SneakyThrows
     public void archiveNodeContent(Node node, InputStream inputStream) {
-        try (val temporary = new SecureTemporaryFile("ozone-upload-", ".bin");
-             val digest = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
-            try (val output = Files.newOutputStream(temporary.getPath())) {
-                digest.transferTo(output);
-            }
+        // The source stream is a resource too, so it is closed even if the temporary file cannot be created.
+        try (inputStream;
+             val temporary = new SecureTemporaryFile("ozone-upload-", ".bin")) {
             val metadata = new HashMap<String, String>();
+            String checksum;
+            long plaintextLength;
+            // Encrypting while writing keeps plain content off the disk and needs a single temporary file.
+            try (val counter = BoundedInputStream.builder().setInputStream(inputStream).get();
+                 val digest = new AnvDigestInputStream(counter, checksumAlgorithm);
+                 val stored = ozoneRepository.prepareContent(digest, metadata);
+                 val output = Files.newOutputStream(temporary.getPath())) {
+                stored.transferTo(output);
+                checksum = digest.getHash();
+                plaintextLength = counter.getCount();
+            }
             metadata.put(MetadataKeys.UUID, node.getId());
             metadata.put(MetadataKeys.FILENAME, node.getName());
             metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
             metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
-            metadata.put(MetadataKeys.CHECKSUM_VALUE, digest.getHash());
-            try (val source = Files.newInputStream(temporary.getPath())) {
-                ozoneRepository.putObject(node.getId(), Files.size(temporary.getPath()), metadata, source);
-            }
+            metadata.put(MetadataKeys.CHECKSUM_VALUE, checksum);
+            metadata.put(OzoneRepository.PLAINTEXT_LENGTH, Long.toString(plaintextLength));
+            ozoneRepository.putObject(node.getId(), temporary.getPath(), metadata);
         }
     }
 
