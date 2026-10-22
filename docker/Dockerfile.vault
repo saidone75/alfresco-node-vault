@@ -44,7 +44,7 @@ ENV SPRING_PROFILES_ACTIVE docker
 ENV APPLICATION_BASE_URL http://127.0.0.1:10501
 ENV SHARED_FILES_PATH /tmp/anv
 ENV CONNECTION_TIMEOUT 10000
-ENV READ_TIMEOUT 10000
+ENV READ_TIMEOUT 60000
 
 ENTRYPOINT ["java", "-XX:MaxRAMPercentage=50", "-XX:+UseSerialGC", "-XX:+UseCompactObjectHeaders", "-jar", "/anv.jar"]
 
@@ -65,7 +65,7 @@ ENV SPRING_PROFILES_ACTIVE=docker \
     APPLICATION_BASE_URL=http://127.0.0.1:10501 \
     SHARED_FILES_PATH=/tmp/anv \
     CONNECTION_TIMEOUT=10000 \
-    READ_TIMEOUT=10000
+    READ_TIMEOUT=60000
 
 ENTRYPOINT ["java", "-XX:MaxRAMPercentage=50", "-XX:+UseSerialGC", "-XX:+UseCompactObjectHeaders", "-jar", "/app/anv.jar"]
 
@@ -87,7 +87,7 @@ ENV SPRING_PROFILES_ACTIVE=docker \
     APPLICATION_BASE_URL=http://127.0.0.1:10501 \
     SHARED_FILES_PATH=/tmp/anv \
     CONNECTION_TIMEOUT=10000 \
-    READ_TIMEOUT=10000
+    READ_TIMEOUT=60000
 
 ENTRYPOINT ["java", "-XX:MaxRAMPercentage=50", "-Xgcpolicy:gencon", "-jar", "/app/anv.jar"]
 

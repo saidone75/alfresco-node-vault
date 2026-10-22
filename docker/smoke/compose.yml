@@ -17,6 +17,7 @@ x-app: &app
     context: ../..
     dockerfile: docker/Dockerfile.vault
   mem_limit: 512m
+  memswap_limit: 512m
   depends_on:
     prepare:
       condition: service_completed_successfully
@@ -109,23 +110,33 @@ services:
     container_name: anv-smoke-moto
     ports: !override []
 
+  # Ozone state lives in tmpfs so every run starts from a fresh cluster.
   ozone-scm:
     container_name: anv-smoke-ozone-scm
     extends:
       file: ../ozone/docker-compose.yml
       service: ozone-scm
+    volumes: !override []
+    tmpfs:
+      - /data
 
   ozone-om:
     container_name: anv-smoke-ozone-om
     extends:
       file: ../ozone/docker-compose.yml
       service: ozone-om
+    volumes: !override []
+    tmpfs:
+      - /data
 
   ozone-datanode:
     container_name: anv-smoke-ozone-datanode
     extends:
       file: ../ozone/docker-compose.yml
       service: ozone-datanode
+    volumes: !override []
+    tmpfs:
+      - /data
 
   ozone-init:
     container_name: anv-smoke-ozone-init
@@ -240,6 +251,3 @@ volumes:
   solr:
   mongo:
   reports:
-  ozone-scm:
-  ozone-om:
-  ozone-data:

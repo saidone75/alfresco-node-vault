@@ -46,7 +46,9 @@ import org.saidone.service.content.ContentService;
 import org.saidone.service.integrity.IntegritySweepService;
 import org.saidone.service.crypto.KeyService;
 import org.saidone.service.notarization.NotarizationService;
-import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
+import org.springframework.core.io.buffer.DefaultDataBufferFactory;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
@@ -58,7 +60,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.HtmlUtils;
+import reactor.core.publisher.Flux;
+import reactor.core.scheduler.Schedulers;
 
+import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -93,6 +98,7 @@ public class VaultApiController extends BaseComponent {
 
     private static final String NOTARIZATION_DISABLED = "Notarization is disabled.";
     private static final String ENCRYPTION_DISABLED = "Encryption is disabled: neither content nor metadata encryption is enabled.";
+    private static final int CONTENT_BUFFER_SIZE = 8192;
     @Value("${application.service.vault.delete-node.api-enabled:false}")
     private boolean deleteNodeApiEnabled;
     @Value("${application.service.vault.encryption.metadata.enabled:false}")
@@ -264,7 +270,7 @@ public class VaultApiController extends BaseComponent {
      * @param auth       optional Basic authentication header
      * @param nodeId     identifier of the node
      * @param attachment {@code true} if the content should be sent as a download attachment
-     * @return the streamed content wrapped as an {@link InputStreamResource}
+     * @return the streamed content
      */
     @SecurityRequirement(name = "basicAuth")
     @GetMapping("/nodes/{nodeId}/content")
@@ -286,7 +292,7 @@ public class VaultApiController extends BaseComponent {
                     @ApiResponse(responseCode = "500", description = "Internal server error",
                             content = @Content)
             })
-    public ResponseEntity<InputStreamResource> getNodeContent(
+    public ResponseEntity<Flux<DataBuffer>> getNodeContent(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId,
             @RequestParam(required = false, defaultValue = "true") boolean attachment) {
@@ -298,18 +304,28 @@ public class VaultApiController extends BaseComponent {
         log.debug("Streaming node content for node: {}", nodeId);
 
         val nodeContent = contentService.getNodeContent(nodeId);
-
-        val headers = new HttpHeaders();
-        headers.setContentType(Strings.isNotBlank(nodeContent.getContentType())
-                ? MediaType.parseMediaType(nodeContent.getContentType())
-                : MediaType.APPLICATION_OCTET_STREAM);
-        if (attachment) {
-            headers.setContentDispositionFormData("attachment", nodeContent.getFileName());
+        val contentStream = nodeContent.getContentStream();
+        try {
+            val headers = new HttpHeaders();
+            headers.setContentType(Strings.isNotBlank(nodeContent.getContentType())
+                    ? MediaType.parseMediaType(nodeContent.getContentType())
+                    : MediaType.APPLICATION_OCTET_STREAM);
+            if (attachment) {
+                headers.setContentDispositionFormData("attachment", nodeContent.getFileName());
+            }
+            val body = DataBufferUtils.readInputStream(() -> contentStream, DefaultDataBufferFactory.sharedInstance, CONTENT_BUFFER_SIZE)
+                    .subscribeOn(Schedulers.boundedElastic());
+            return ResponseEntity.ok()
+                    .headers(headers)
+                    .body(body);
+        } catch (RuntimeException e) {
+            try {
+                contentStream.close();
+            } catch (IOException closeError) {
+                e.addSuppressed(closeError);
+            }
+            throw e;
         }
-
-        return ResponseEntity.ok()
-                .headers(headers)
-                .body(new InputStreamResource(nodeContent.getContentStream()));
     }
 
     /**

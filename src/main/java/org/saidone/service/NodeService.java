@@ -108,22 +108,26 @@ public interface NodeService {
     java.util.List<NodeWrapperDto> findNotarizedRandom(int size);
 
     /**
-     * Retrieves all node wrappers having the given notarization transaction ID.
+     * Retrieves the IDs of all nodes having the given notarization transaction ID.
      * A {@code null} transaction ID is used to select nodes that have not yet
      * been notarized.
+     * <p>IDs are loaded lazily, one page at a time, so memory use does not grow
+     * with the number of matching nodes.</p>
      *
      * @param ntx the notarization transaction ID to filter by
-     * @return iterable collection of {@link NodeWrapperDto}
+     * @return the matching node IDs, in ascending order
      */
-    Iterable<NodeWrapperDto> findByNtx(String ntx);
+    Iterable<String> findIdsByNtx(String ntx);
 
     /**
-     * Retrieves all node wrappers associated with the specified encryption key version.
+     * Retrieves the IDs of all nodes associated with the specified encryption key version.
+     * <p>IDs are loaded lazily, one page at a time, so memory use does not grow
+     * with the number of matching nodes.</p>
      *
      * @param kv the encryption key version to filter by
-     * @return iterable collection of {@link NodeWrapperDto}
+     * @return the matching node IDs, in ascending order
      */
-    Iterable<NodeWrapperDto> findByKv(int kv);
+    Iterable<String> findIdsByKv(int kv);
 
     /**
      * Retrieves all stored node wrappers.

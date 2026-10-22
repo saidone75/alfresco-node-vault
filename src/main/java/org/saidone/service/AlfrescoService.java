@@ -52,6 +52,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
@@ -196,10 +197,27 @@ public class AlfrescoService extends BaseComponent {
      */
     @SneakyThrows
     public InputStream getNodeContent(String nodeId) {
+        return openContentConnection(nodeId).getInputStream();
+    }
+
+    /**
+     * Opens an authenticated connection to the content endpoint of a node.
+     * <p>
+     * The read timeout applies to each read, not to the whole transfer, so
+     * large contents are not cut off.
+     * </p>
+     *
+     * @param nodeId the identifier of the node
+     * @return the connection, not yet connected
+     * @throws IOException if the connection cannot be opened
+     */
+    private HttpURLConnection openContentConnection(String nodeId) throws IOException {
         val url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
         val conn = (HttpURLConnection) url.openConnection();
+        conn.setConnectTimeout(config.getConnectTimeout());
+        conn.setReadTimeout(config.getReadTimeout());
         conn.setRequestProperty(HttpHeaders.AUTHORIZATION, basicAuth);
-        return conn.getInputStream();
+        return conn;
     }
 
     /**
@@ -307,8 +325,7 @@ public class AlfrescoService extends BaseComponent {
      */
     @SneakyThrows
     public void restoreNodeContent(String nodeId, NodeContentStreamDto nodeContentStream) {
-        val url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
-        val conn = (HttpURLConnection) url.openConnection();
+        val conn = openContentConnection(nodeId);
         conn.setRequestMethod(HttpMethod.PUT.name());
         conn.setDoOutput(true);
         conn.setRequestProperty(HttpHeaders.AUTHORIZATION, basicAuth);
