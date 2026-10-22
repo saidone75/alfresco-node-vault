@@ -17,6 +17,7 @@ x-app: &app
     context: ../..
     dockerfile: docker/Dockerfile.vault
   mem_limit: 512m
+  memswap_limit: 512m
   depends_on:
     prepare:
       condition: service_completed_successfully
