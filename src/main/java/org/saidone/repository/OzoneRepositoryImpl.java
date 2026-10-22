@@ -26,7 +26,6 @@ import org.apache.hadoop.ozone.client.OzoneBucket;
 import org.apache.hadoop.ozone.client.OzoneKeyDetails;
 import org.apache.hadoop.ozone.om.exceptions.OMException;
 import org.saidone.exception.NodeNotFoundOnVaultException;
-import org.saidone.model.MetadataKeys;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
@@ -41,29 +40,19 @@ import java.util.Map;
  * client {@link OzoneBucket}. The class exposes basic methods to upload and download
  * objects using a provided {@code OzoneBucket} instance.
  * <p>
- * The bean is created only when {@code application.service.vault.encryption.content.enabled}
- * is set to {@code false} or omitted and {@code application.service.vault.storage.impl}
+ * The bean is created only when {@code application.service.vault.storage.impl}
  * equals {@code "ozone"}.
  */
 @Service
 @RequiredArgsConstructor
-@ConditionalOnExpression("'${application.service.vault.storage.impl}' == 'ozone' and '${application.service.vault.encryption.content.enabled:false}' == 'false'")
+@ConditionalOnExpression("'${application.service.vault.storage.impl}' == 'ozone'")
 public class OzoneRepositoryImpl implements OzoneRepository {
 
     /**
      * Ozone bucket used to perform the requests. Its replication policy is used
      * when uploading objects.
      */
-    protected final OzoneBucket bucket;
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public InputStream prepareContent(InputStream content, Map<String, String> metadata) {
-        metadata.put(MetadataKeys.ENCRYPTED, Boolean.FALSE.toString());
-        return content;
-    }
+    private final OzoneBucket bucket;
 
     /**
      * {@inheritDoc}
@@ -80,7 +69,7 @@ public class OzoneRepositoryImpl implements OzoneRepository {
      * {@inheritDoc}
      */
     @Override
-    public InputStream getObject(String nodeId, OzoneKeyDetails details) throws IOException {
+    public InputStream getObject(String nodeId) throws IOException {
         try {
             return bucket.readKey(nodeId);
         } catch (OMException e) {

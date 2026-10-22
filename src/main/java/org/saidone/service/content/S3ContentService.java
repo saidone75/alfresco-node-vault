@@ -34,6 +34,7 @@ import org.saidone.model.MetadataKeys;
 import org.saidone.model.dto.NodeContentInfoDto;
 import org.saidone.model.dto.NodeContentStreamDto;
 import org.saidone.repository.S3Repository;
+import org.saidone.service.crypto.ContentCipher;
 import org.saidone.utils.SecureTemporaryFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
@@ -75,6 +76,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
     private String checksumAlgorithm;
 
     private final S3Repository s3Repository;
+    private final ContentCipher contentCipher;
 
     private final S3Client s3Client;
     private final S3Config s3Config;
@@ -101,7 +103,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
             String checksum;
             // Encrypting while writing keeps plain content off the disk and needs a single temporary file.
             try (val dis = new AnvDigestInputStream(inputStream, checksumAlgorithm);
-                 val stored = s3Repository.prepareContent(dis, metadata);
+                 val stored = contentCipher.toStoredContent(dis, metadata);
                  val fos = Files.newOutputStream(tempFile.getPath())) {
                 stored.transferTo(fos);
                 checksum = dis.getHash();
@@ -132,7 +134,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
             nodeContentStream.setFileName(decodeMetadataValue(head.metadata().getOrDefault(MetadataKeys.FILENAME, nodeId)));
             nodeContentStream.setContentType(head.contentType());
             nodeContentStream.setLength(head.contentLength());
-            nodeContentStream.setContentStream(s3Repository.getObject(s3Config.getBucket(), nodeId));
+            nodeContentStream.setContentStream(readContent(nodeId));
             return nodeContentStream;
         } catch (S3Exception e) {
             throw new NodeNotFoundOnVaultException(nodeId);
@@ -191,7 +193,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
     @SneakyThrows
     public String computeHash(String nodeId, String algorithm) {
         try {
-            try (val dis = new AnvDigestInputStream(s3Repository.getObject(s3Config.getBucket(), nodeId), algorithm)) {
+            try (val dis = new AnvDigestInputStream(readContent(nodeId), algorithm)) {
                 dis.transferTo(OutputStream.nullOutputStream());
                 return dis.getHash();
             }
@@ -199,6 +201,18 @@ public class S3ContentService extends BaseComponent implements ContentService {
             log.error(e.getMessage());
             throw new VaultException(nodeId);
         }
+    }
+
+    /**
+     * Reads the original content of a stored object, decrypting it when its
+     * metadata marks it as encrypted.
+     *
+     * @param nodeId identifier of the node
+     * @return the original content stream
+     */
+    private InputStream readContent(String nodeId) {
+        val object = s3Repository.getObject(s3Config.getBucket(), nodeId);
+        return contentCipher.fromStoredContent(object, Boolean.parseBoolean(object.response().metadata().get(MetadataKeys.ENCRYPTED)));
     }
 
     /**

@@ -30,15 +30,18 @@ import org.saidone.model.MetadataKeys;
 import org.saidone.model.dto.NodeContentInfoDto;
 import org.saidone.model.dto.NodeContentStreamDto;
 import org.saidone.repository.OzoneRepository;
+import org.saidone.service.crypto.ContentCipher;
 import org.saidone.utils.SecureTemporaryFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * {@link ContentService} implementation that stores node binaries in Apache Ozone.
@@ -60,6 +63,7 @@ import java.util.HashMap;
 public class OzoneContentService extends BaseComponent implements ContentService {
 
     private final OzoneRepository ozoneRepository;
+    private final ContentCipher contentCipher;
 
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
@@ -79,7 +83,7 @@ public class OzoneContentService extends BaseComponent implements ContentService
             // Encrypting while writing keeps plain content off the disk and needs a single temporary file.
             try (val counter = BoundedInputStream.builder().setInputStream(inputStream).get();
                  val digest = new AnvDigestInputStream(counter, checksumAlgorithm);
-                 val stored = ozoneRepository.prepareContent(digest, metadata);
+                 val stored = contentCipher.toStoredContent(digest, metadata);
                  val output = Files.newOutputStream(temporary.getPath())) {
                 stored.transferTo(output);
                 checksum = digest.getHash();
@@ -107,7 +111,7 @@ public class OzoneContentService extends BaseComponent implements ContentService
         result.setContentType(details.getMetadata().get(MetadataKeys.CONTENT_TYPE));
         result.setLength(Long.parseLong(details.getMetadata().getOrDefault(
                 OzoneRepository.PLAINTEXT_LENGTH, Long.toString(details.getDataSize()))));
-        result.setContentStream(ozoneRepository.getObject(nodeId, details));
+        result.setContentStream(readContent(nodeId, details.getMetadata()));
         return result;
     }
 
@@ -145,9 +149,23 @@ public class OzoneContentService extends BaseComponent implements ContentService
     @SneakyThrows
     public String computeHash(String nodeId, String algorithm) {
         val details = ozoneRepository.getObjectDetails(nodeId);
-        try (val digest = new AnvDigestInputStream(ozoneRepository.getObject(nodeId, details), algorithm)) {
+        try (val digest = new AnvDigestInputStream(readContent(nodeId, details.getMetadata()), algorithm)) {
             digest.transferTo(OutputStream.nullOutputStream());
             return digest.getHash();
         }
+    }
+
+    /**
+     * Reads the original content of a stored object, decrypting it when its
+     * metadata marks it as encrypted.
+     *
+     * @param nodeId   identifier of the node
+     * @param metadata stored object metadata
+     * @return the original content stream
+     * @throws IOException if the content cannot be retrieved
+     */
+    private InputStream readContent(String nodeId, Map<String, String> metadata) throws IOException {
+        return contentCipher.fromStoredContent(ozoneRepository.getObject(nodeId),
+                Boolean.parseBoolean(metadata.get(MetadataKeys.ENCRYPTED)));
     }
 }
