@@ -91,6 +91,7 @@ search:
   service:
     path: /alfresco/api/-default-/public/search/versions/1
 application:
+  temp-dir: ${SHARED_FILES_PATH:${java.io.tmpdir}/anv}
   metrics:
     vault-operations:
       enabled: ${VAULT_OPERATION_METRICS_ENABLED:true}
