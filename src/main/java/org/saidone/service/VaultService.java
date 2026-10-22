@@ -76,7 +76,8 @@ public class VaultService extends BaseComponent {
     @Value("${application.service.vault.delete-node.delete-on-alfresco}")
     private boolean deleteOnAlfrescoOnDelete;
 
-    private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
+    @Value("${application.service.vault.hash-algorithm:SHA-256}")
+    private String checksumAlgorithm;
 
     /**
      * Archives a node by its ID.
@@ -381,10 +382,10 @@ public class VaultService extends BaseComponent {
      * @throws VaultException          if any error occurs during hash calculation or comparison
      */
     public void doubleCheck(String nodeId) {
-        log.debug("Comparing {} hashes for node: {}", DOUBLE_CHECK_ALGORITHM, nodeId);
+        log.debug("Comparing {} hashes for node: {}", checksumAlgorithm, nodeId);
         try {
-            val alfrescoHash = alfrescoService.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
-            val vaultHash = contentService.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
+            val alfrescoHash = alfrescoService.computeHash(nodeId, checksumAlgorithm);
+            val vaultHash = contentService.computeHash(nodeId, checksumAlgorithm);
             if (alfrescoHash.equals(vaultHash)) {
                 log.debug("Digest check passed for node: {}", nodeId);
             } else {

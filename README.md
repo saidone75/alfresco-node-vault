@@ -153,6 +153,9 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | ETH_RPC_URL                       | http://localhost:8545                      | Ethereum RPC endpoint                                                                     |
 | ETH_PRIVATE_KEY                   | 4f3edf983ac636a65a842ce7c78d9aa7...        | Private key used to sign transactions                                                     |
 
+Transfer checksums verify document integrity before source deletion, not for cryptographic purposes.
+`VAULT_HASH_ALGORITHM` defaults to SHA-256 and also applies to optional blockchain notarization.
+
 The Ozone development stack runs without authentication. Secured clusters require
 Hadoop/Ozone security configuration and a Kerberos identity; see [Ozone configuration](doc/Ozone.md).
 
