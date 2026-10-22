@@ -142,6 +142,10 @@ application:
       auth-cache-ttl: ${VAULT_AUTH_CACHE_TTL:60s}
       double-check: ${VAULT_DOUBLE_CHECK:true}
       delete-on-alfresco: ${VAULT_DELETE_ON_ALFRESCO:true}
+      alfresco-lock:
+        enabled: ${VAULT_ALFRESCO_USE_LOCK:false}
+        ttl-seconds: ${VAULT_ALFRESCO_LOCK_TTL_SECONDS:120}
+        lifetime: ${VAULT_ALFRESCO_LOCK_LIFETIME:PERSISTENT}
       delete-node:
         api-enabled: ${VAULT_DELETE_NODE_API_ENABLED:false}
         restore-on-alfresco: ${VAULT_DELETE_NODE_RESTORE_ON_ALFRESCO:true}
