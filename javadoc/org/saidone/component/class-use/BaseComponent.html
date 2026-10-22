@@ -150,28 +150,15 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Class</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>class&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../../repository/EncryptedGridFsRepositoryImpl.html" class="type-name-link" title="class in org.saidone.repository">EncryptedGridFsRepositoryImpl</a></code></div>
+<div class="col-second even-row-color"><code><a href="../../repository/EncryptedMongoNodeRepositoryImpl.html" class="type-name-link" title="class in org.saidone.repository">EncryptedMongoNodeRepositoryImpl</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">GridFS repository that transparently encrypts content before it is persisted
- and decrypts it when retrieved.</div>
-</div>
-<div class="col-first odd-row-color"><code>class&nbsp;</code></div>
-<div class="col-second odd-row-color"><code><a href="../../repository/EncryptedMongoNodeRepositoryImpl.html" class="type-name-link" title="class in org.saidone.repository">EncryptedMongoNodeRepositoryImpl</a></code></div>
-<div class="col-last odd-row-color">
 <div class="block">Repository implementation that encrypts <a href="../../model/entity/NodeEntity.html" title="class in org.saidone.model.entity"><code>NodeEntity</code></a> data before
  persisting it to MongoDB and decrypts it on retrieval.</div>
-</div>
-<div class="col-first even-row-color"><code>class&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../../repository/EncryptedS3RepositoryImpl.html" class="type-name-link" title="class in org.saidone.repository">EncryptedS3RepositoryImpl</a></code></div>
-<div class="col-last even-row-color">
-<div class="block"><a href="../../repository/S3RepositoryImpl.html" title="class in org.saidone.repository"><code>S3RepositoryImpl</code></a> variant that transparently encrypts data before
- uploading to S3 and decrypts it when retrieved, if marked as encrypted.</div>
 </div>
 <div class="col-first odd-row-color"><code>class&nbsp;</code></div>
 <div class="col-second odd-row-color"><code><a href="../../repository/GridFsRepositoryImpl.html" class="type-name-link" title="class in org.saidone.repository">GridFsRepositoryImpl</a></code></div>
 <div class="col-last odd-row-color">
-<div class="block">Repository implementation for the management of files in MongoDB's GridFS
- without encryption support.</div>
+<div class="block">Repository implementation for the management of files in MongoDB's GridFS.</div>
 </div>
 <div class="col-first even-row-color"><code>class&nbsp;</code></div>
 <div class="col-second even-row-color"><code><a href="../../repository/MongoNodeRepositoryImpl.html" class="type-name-link" title="class in org.saidone.repository">MongoNodeRepositoryImpl</a></code></div>
@@ -291,8 +278,14 @@ loadScripts(document, 'script');</script>
 <div class="block">Writes ANV v1 payloads and selects decryption parameters exclusively from their headers.</div>
 </div>
 <div class="col-first even-row-color"><code>class&nbsp;</code></div>
-<div class="col-second even-row-color"><code><a href="../../service/crypto/KeyServiceImpl.html" class="type-name-link" title="class in org.saidone.service.crypto">KeyServiceImpl</a></code></div>
+<div class="col-second even-row-color"><code><a href="../../service/crypto/ContentEncryptionService.html" class="type-name-link" title="class in org.saidone.service.crypto">ContentEncryptionService</a></code></div>
 <div class="col-last even-row-color">
+<div class="block">Applies content encryption for every storage backend, so that repositories
+ only store and retrieve bytes.</div>
+</div>
+<div class="col-first odd-row-color"><code>class&nbsp;</code></div>
+<div class="col-second odd-row-color"><code><a href="../../service/crypto/KeyServiceImpl.html" class="type-name-link" title="class in org.saidone.service.crypto">KeyServiceImpl</a></code></div>
+<div class="col-last odd-row-color">
 <div class="block">Default <a href="../../service/crypto/KeyService.html" title="interface in org.saidone.service.crypto"><code>KeyService</code></a> implementation that re-encrypts node content and
  metadata by delegating node retrieval to <a href="../../service/NodeService.html" title="interface in org.saidone.service"><code>NodeService</code></a> and content
  handling to <a href="../../service/content/ContentService.html" title="interface in org.saidone.service.content"><code>ContentService</code></a>.</div>

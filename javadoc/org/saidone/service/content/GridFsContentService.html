@@ -141,7 +141,7 @@ implements <a href="ContentService.html" title="interface in org.saidone.service
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;inputStream)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Archives the content of the given node by saving the content stream into a GridFS repository
- with associated metadata.</div>
+ with associated metadata, encrypted when content encryption is enabled.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#computeHash(java.lang.String,java.lang.String)" class="member-name-link">computeHash</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId,
@@ -204,9 +204,10 @@ implements <a href="ContentService.html" title="interface in org.saidone.service
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">archiveNodeContent</span><wbr><span class="parameters">(org.alfresco.core.model.Node&nbsp;node,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;inputStream)</span></div>
 <div class="block">Archives the content of the given node by saving the content stream into a GridFS repository
- with associated metadata. The input stream is wrapped in a <a href="../../misc/AnvDigestInputStream.html" title="class in org.saidone.misc"><code>AnvDigestInputStream</code></a> to
- compute a checksum using the configured algorithm during the save operation. After saving, the
- method updates the file metadata with both the algorithm name and the computed value.</div>
+ with associated metadata, encrypted when content encryption is enabled. The input stream is
+ wrapped in a <a href="../../misc/AnvDigestInputStream.html" title="class in org.saidone.misc"><code>AnvDigestInputStream</code></a> to compute a checksum of the original content using
+ the configured algorithm during the save operation. After saving, the method updates the file
+ metadata with both the algorithm name and the computed value.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="ContentService.html#archiveNodeContent(org.alfresco.core.model.Node,java.io.InputStream)">archiveNodeContent</a></code>&nbsp;in interface&nbsp;<code><a href="ContentService.html" title="interface in org.saidone.service.content">ContentService</a></code></dd>
@@ -268,7 +269,9 @@ implements <a href="ContentService.html" title="interface in org.saidone.service
 <h3>computeHash</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">computeHash</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;algorithm)</span></div>
-<div class="block">Computes the checksum of a node's content stored in GridFS using the provided algorithm.</div>
+<div class="block">Computes the checksum of a node's content stored in GridFS using the provided algorithm.
+ Plain content is hashed by MongoDB; encrypted content is streamed and hashed after
+ decryption, so the checksum always refers to the original content.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="ContentService.html#computeHash(java.lang.String,java.lang.String)">computeHash</a></code>&nbsp;in interface&nbsp;<code><a href="ContentService.html" title="interface in org.saidone.service.content">ContentService</a></code></dd>
@@ -277,6 +280,8 @@ implements <a href="ContentService.html" title="interface in org.saidone.service
 <dd><code>algorithm</code> - name of the hash algorithm</dd>
 <dt>Returns:</dt>
 <dd>the resulting hash string</dd>
+<dt>Throws:</dt>
+<dd><code><a href="../../exception/NodeNotFoundOnVaultException.html" title="class in org.saidone.exception">NodeNotFoundOnVaultException</a></code> - if the node content cannot be found</dd>
 </dl>
 </section>
 </li>

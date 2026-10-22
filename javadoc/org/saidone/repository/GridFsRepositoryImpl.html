@@ -96,18 +96,15 @@ loadScripts(document, 'script');</script>
 <dt>All Implemented Interfaces:</dt>
 <dd><code><a href="GridFsRepository.html" title="interface in org.saidone.repository">GridFsRepository</a></code>, <code>org.springframework.beans.factory.Aware</code>, <code>org.springframework.context.ApplicationContextAware</code></dd>
 </dl>
-<dl class="notes">
-<dt>Direct Known Subclasses:</dt>
-<dd><code><a href="EncryptedGridFsRepositoryImpl.html" title="class in org.saidone.repository">EncryptedGridFsRepositoryImpl</a></code></dd>
-</dl>
 <hr>
 <div class="type-signature"><span class="annotations">@Repository
-@ConditionalOnExpression("${application.service.vault.encryption.content.enabled}.equals(false) and \'${application.service.vault.storage.impl}\'.equals(\'gridfs\')")
+@ConditionalOnExpression("\'${application.service.vault.storage.impl}\'.equals(\'gridfs\')")
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">GridFsRepositoryImpl</span>
 <span class="extends-implements">extends <a href="../component/BaseComponent.html" title="class in org.saidone.component">BaseComponent</a>
 implements <a href="GridFsRepository.html" title="interface in org.saidone.repository">GridFsRepository</a></span></div>
-<div class="block">Repository implementation for the management of files in MongoDB's GridFS
- without encryption support.
+<div class="block">Repository implementation for the management of files in MongoDB's GridFS.
+ Files are stored as given: content encryption is applied by the content
+ service.
  <p>
  Implements the <a href="GridFsRepository.html" title="interface in org.saidone.repository"><code>GridFsRepository</code></a> interface, enabling file storage,
  retrieval, metadata updates and file deletion in the GridFS storage system.
@@ -132,9 +129,7 @@ implements <a href="GridFsRepository.html" title="interface in org.saidone.repos
    the hash algorithm selectable at runtime.</li>
  </ul>
  <p>
- This implementation is registered in the Spring context only when the
- property <code>application.service.vault.encryption.content.enabled</code> is set to
- <code>false</code> <strong>and</strong>
+ This implementation is registered in the Spring context only when
  <code>application.service.vault.storage.impl</code> equals <code>"gridfs"</code>.
  <p>
  Extends <a href="../component/BaseComponent.html" title="class in org.saidone.component"><code>BaseComponent</code></a> to inherit standardized

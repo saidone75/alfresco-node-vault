@@ -48,7 +48,7 @@ loadScripts(document, 'script');</script>
 <li>
 <p>Detail:</p>
 <ul>
-<li><a href="#field-detail">Field</a></li>
+<li>Field</li>
 <li><a href="#constructor-detail">Constr</a></li>
 <li><a href="#method-detail">Method</a></li>
 </ul>
@@ -66,7 +66,7 @@ loadScripts(document, 'script');</script>
 </ul>
 <ul class="sub-nav-list">
 <li>Detail:&nbsp;</li>
-<li><a href="#field-detail">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor-detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method-detail">Method</a></li>
 </ul>
@@ -94,13 +94,9 @@ loadScripts(document, 'script');</script>
 <dt>All Implemented Interfaces:</dt>
 <dd><code><a href="OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></code></dd>
 </dl>
-<dl class="notes">
-<dt>Direct Known Subclasses:</dt>
-<dd><code><a href="EncryptedOzoneRepositoryImpl.html" title="class in org.saidone.repository">EncryptedOzoneRepositoryImpl</a></code></dd>
-</dl>
 <hr>
 <div class="type-signature"><span class="annotations">@Service
-@ConditionalOnExpression("\'${application.service.vault.storage.impl}\' == \'ozone\' and \'${application.service.vault.encryption.content.enabled:false}\' == \'false\'")
+@ConditionalOnExpression("\'${application.service.vault.storage.impl}\' == \'ozone\'")
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">OzoneRepositoryImpl</span>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a>
 implements <a href="OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></span></div>
@@ -108,8 +104,7 @@ implements <a href="OzoneRepository.html" title="interface in org.saidone.reposi
  client <code>OzoneBucket</code>. The class exposes basic methods to upload and download
  objects using a provided <code>OzoneBucket</code> instance.
  <p>
- The bean is created only when <code>application.service.vault.encryption.content.enabled</code>
- is set to <code>false</code> or omitted and <code>application.service.vault.storage.impl</code>
+ The bean is created only when <code>application.service.vault.storage.impl</code>
  equals <code>"ozone"</code>.</div>
 </section>
 <section class="summary">
@@ -118,17 +113,6 @@ implements <a href="OzoneRepository.html" title="interface in org.saidone.reposi
 <li>
 <section class="field-summary" id="field-summary">
 <h2>Field Summary</h2>
-<div class="caption"><span>Fields</span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Field</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>protected final org.apache.hadoop.ozone.client.OzoneBucket</code></div>
-<div class="col-second even-row-color"><code><a href="#bucket" class="member-name-link">bucket</a></code></div>
-<div class="col-last even-row-color">
-<div class="block">Ozone bucket used to perform the requests.</div>
-</div>
-</div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-org.saidone.repository.OzoneRepository">Fields inherited from interface&nbsp;org.saidone.repository.<a href="OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></h3>
 <code><a href="OzoneRepository.html#PLAINTEXT_LENGTH">PLAINTEXT_LENGTH</a></code></div>
@@ -164,29 +148,20 @@ implements <a href="OzoneRepository.html" title="interface in org.saidone.reposi
 <div class="block">Deletes the object stored for the given node id.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getObject(java.lang.String,org.apache.hadoop.ozone.client.OzoneKeyDetails)" class="member-name-link">getObject</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId,
- org.apache.hadoop.ozone.client.OzoneKeyDetails&nbsp;details)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getObject(java.lang.String)" class="member-name-link">getObject</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Retrieves an object from Ozone previously stored for the given node id.</div>
+<div class="block">Retrieves the stored bytes of an object previously stored for the given node id.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.apache.hadoop.ozone.client.OzoneKeyDetails</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getObjectDetails(java.lang.String)" class="member-name-link">getObjectDetails</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Retrieves the object metadata for the given node id.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#prepareContent(java.io.InputStream,java.util.Map)" class="member-name-link">prepareContent</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;content,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the stream of the bytes to store for the given content, encrypted
- when content encryption is enabled, and records in <code>metadata</code> how
- they are stored.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#putObject(java.lang.String,java.nio.file.Path,java.util.Map)" class="member-name-link">putObject</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#putObject(java.lang.String,java.nio.file.Path,java.util.Map)" class="member-name-link">putObject</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Path.html" title="class or interface in java.nio.file" class="external-link">Path</a>&nbsp;content,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Uploads a node's content to the configured Ozone bucket using the node id as
  object key.</div>
 </div>
@@ -202,22 +177,6 @@ implements <a href="OzoneRepository.html" title="interface in org.saidone.reposi
 </section>
 <section class="details">
 <ul class="details-list">
-<!-- ============ FIELD DETAIL =========== -->
-<li>
-<section class="field-details" id="field-detail">
-<h2>Field Details</h2>
-<ul class="member-list">
-<li>
-<section class="detail" id="bucket">
-<h3>bucket</h3>
-<div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type">org.apache.hadoop.ozone.client.OzoneBucket</span>&nbsp;<span class="element-name">bucket</span></div>
-<div class="block">Ozone bucket used to perform the requests. Its replication policy is used
- when uploading objects.</div>
-</section>
-</li>
-</ul>
-</section>
-</li>
 <!-- ========= CONSTRUCTOR DETAIL ======== -->
 <li>
 <section class="constructor-details" id="constructor-detail">
@@ -238,27 +197,6 @@ implements <a href="OzoneRepository.html" title="interface in org.saidone.reposi
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="prepareContent(java.io.InputStream,java.util.Map)">
-<h3>prepareContent</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></span>&nbsp;<span class="element-name">prepareContent</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;content,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata)</span></div>
-<div class="block">Returns the stream of the bytes to store for the given content, encrypted
- when content encryption is enabled, and records in <code>metadata</code> how
- they are stored. The caller writes this stream to the file then passed to
- <a href="OzoneRepository.html#putObject(java.lang.String,java.nio.file.Path,java.util.Map)"><code>OzoneRepository.putObject(java.lang.String, java.nio.file.Path, java.util.Map&lt;java.lang.String, java.lang.String&gt;)</code></a>, so plain content never reaches the disk when
- encryption is enabled.</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="OzoneRepository.html#prepareContent(java.io.InputStream,java.util.Map)">prepareContent</a></code>&nbsp;in interface&nbsp;<code><a href="OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></code></dd>
-<dt>Parameters:</dt>
-<dd><code>content</code> - the original content; closing the returned stream closes it</dd>
-<dd><code>metadata</code> - object metadata, updated with the storage details</dd>
-<dt>Returns:</dt>
-<dd>the stream of the bytes to store</dd>
-</dl>
-</section>
-</li>
-<li>
 <section class="detail" id="putObject(java.lang.String,java.nio.file.Path,java.util.Map)">
 <h3>putObject</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">putObject</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId,
@@ -272,7 +210,7 @@ implements <a href="OzoneRepository.html" title="interface in org.saidone.reposi
 <dd><code><a href="OzoneRepository.html#putObject(java.lang.String,java.nio.file.Path,java.util.Map)">putObject</a></code>&nbsp;in interface&nbsp;<code><a href="OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></code></dd>
 <dt>Parameters:</dt>
 <dd><code>nodeId</code> - identifier of the node / object key</dd>
-<dd><code>content</code> - file holding the bytes to store, as returned by <a href="OzoneRepository.html#prepareContent(java.io.InputStream,java.util.Map)"><code>OzoneRepository.prepareContent(java.io.InputStream, java.util.Map&lt;java.lang.String, java.lang.String&gt;)</code></a></dd>
+<dd><code>content</code> - file holding the bytes to store</dd>
 <dd><code>metadata</code> - object metadata to store alongside the binary content</dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if the content cannot be stored</dd>
@@ -280,20 +218,18 @@ implements <a href="OzoneRepository.html" title="interface in org.saidone.reposi
 </section>
 </li>
 <li>
-<section class="detail" id="getObject(java.lang.String,org.apache.hadoop.ozone.client.OzoneKeyDetails)">
+<section class="detail" id="getObject(java.lang.String)">
 <h3>getObject</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></span>&nbsp;<span class="element-name">getObject</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId,
- org.apache.hadoop.ozone.client.OzoneKeyDetails&nbsp;details)</span>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></span>&nbsp;<span class="element-name">getObject</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId)</span>
                       throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
-<div class="block">Retrieves an object from Ozone previously stored for the given node id.</div>
+<div class="block">Retrieves the stored bytes of an object previously stored for the given node id.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="OzoneRepository.html#getObject(java.lang.String,org.apache.hadoop.ozone.client.OzoneKeyDetails)">getObject</a></code>&nbsp;in interface&nbsp;<code><a href="OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></code></dd>
+<dd><code><a href="OzoneRepository.html#getObject(java.lang.String)">getObject</a></code>&nbsp;in interface&nbsp;<code><a href="OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></code></dd>
 <dt>Parameters:</dt>
 <dd><code>nodeId</code> - identifier of the node / object key</dd>
-<dd><code>details</code> - stored object metadata used to determine whether to decrypt</dd>
 <dt>Returns:</dt>
-<dd>an <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link"><code>InputStream</code></a> for the object's content; the caller must close it</dd>
+<dd>an <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link"><code>InputStream</code></a> for the object's stored bytes; the caller must close it</dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if the content cannot be retrieved</dd>
 </dl>

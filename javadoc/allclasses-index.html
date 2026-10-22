@@ -165,41 +165,31 @@ loadScripts(document, 'script');</script>
 <div class="block">Utility class providing methods for casting collections to specific generic
  types.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="org/saidone/service/content/ContentService.html" title="interface in org.saidone.service.content">ContentService</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="org/saidone/service/crypto/ContentEncryptionService.html" title="class in org.saidone.service.crypto">ContentEncryptionService</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
+<div class="block">Applies content encryption for every storage backend, so that repositories
+ only store and retrieve bytes.</div>
+</div>
+<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="org/saidone/service/content/ContentService.html" title="interface in org.saidone.service.content">ContentService</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab1">
 <div class="block">Abstraction over the persistence mechanism used to store node content.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="org/saidone/model/dto/CorruptedNodeDto.html" title="class in org.saidone.model.dto">CorruptedNodeDto</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="org/saidone/model/dto/CorruptedNodeDto.html" title="class in org.saidone.model.dto">CorruptedNodeDto</a></div>
+<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Tracks nodes that failed integrity checks and may require remediation/retry.</div>
 </div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab1"><a href="org/saidone/service/crypto/CryptoService.html" title="interface in org.saidone.service.crypto">CryptoService</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab1">
+<div class="col-first even-row-color all-classes-table all-classes-table-tab1"><a href="org/saidone/service/crypto/CryptoService.html" title="interface in org.saidone.service.crypto">CryptoService</a></div>
+<div class="col-last even-row-color all-classes-table all-classes-table-tab1">
 <div class="block">Abstraction for stream based symmetric encryption and decryption services.</div>
 </div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="org/saidone/monitor/CustomMetrics.html" title="class in org.saidone.monitor">CustomMetrics</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
-<div class="block">Registers and exposes application specific metrics using Micrometer.</div>
-</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="org/saidone/repository/EncryptedGridFsRepositoryImpl.html" title="class in org.saidone.repository">EncryptedGridFsRepositoryImpl</a></div>
+<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="org/saidone/monitor/CustomMetrics.html" title="class in org.saidone.monitor">CustomMetrics</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
-<div class="block">GridFS repository that transparently encrypts content before it is persisted
- and decrypts it when retrieved.</div>
+<div class="block">Registers and exposes application specific metrics using Micrometer.</div>
 </div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="org/saidone/repository/EncryptedMongoNodeRepositoryImpl.html" title="class in org.saidone.repository">EncryptedMongoNodeRepositoryImpl</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab2">
 <div class="block">Repository implementation that encrypts <a href="org/saidone/model/entity/NodeEntity.html" title="class in org.saidone.model.entity"><code>NodeEntity</code></a> data before
  persisting it to MongoDB and decrypts it on retrieval.</div>
-</div>
-<div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="org/saidone/repository/EncryptedOzoneRepositoryImpl.html" title="class in org.saidone.repository">EncryptedOzoneRepositoryImpl</a></div>
-<div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
-<div class="block"><a href="org/saidone/repository/OzoneRepositoryImpl.html" title="class in org.saidone.repository"><code>OzoneRepositoryImpl</code></a> variant that transparently encrypts data before
- uploading to Ozone and decrypts it when retrieved, if marked as encrypted.</div>
-</div>
-<div class="col-first even-row-color all-classes-table all-classes-table-tab2"><a href="org/saidone/repository/EncryptedS3RepositoryImpl.html" title="class in org.saidone.repository">EncryptedS3RepositoryImpl</a></div>
-<div class="col-last even-row-color all-classes-table all-classes-table-tab2">
-<div class="block"><a href="org/saidone/repository/S3RepositoryImpl.html" title="class in org.saidone.repository"><code>S3RepositoryImpl</code></a> variant that transparently encrypts data before
- uploading to S3 and decrypts it when retrieved, if marked as encrypted.</div>
 </div>
 <div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="org/saidone/config/EncryptionConfig.html" title="class in org.saidone.config">EncryptionConfig</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
@@ -244,8 +234,7 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="col-first odd-row-color all-classes-table all-classes-table-tab2"><a href="org/saidone/repository/GridFsRepositoryImpl.html" title="class in org.saidone.repository">GridFsRepositoryImpl</a></div>
 <div class="col-last odd-row-color all-classes-table all-classes-table-tab2">
-<div class="block">Repository implementation for the management of files in MongoDB's GridFS
- without encryption support.</div>
+<div class="block">Repository implementation for the management of files in MongoDB's GridFS.</div>
 </div>
 <div class="col-first even-row-color all-classes-table all-classes-table-tab5"><a href="org/saidone/exception/HashesMismatchException.html" title="class in org.saidone.exception">HashesMismatchException</a></div>
 <div class="col-last even-row-color all-classes-table all-classes-table-tab5">

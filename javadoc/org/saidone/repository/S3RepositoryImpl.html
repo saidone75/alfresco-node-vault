@@ -40,7 +40,7 @@ loadScripts(document, 'script');</script>
 <p>Summary:</p>
 <ul>
 <li>Nested</li>
-<li><a href="#field-summary">Field</a></li>
+<li>Field</li>
 <li><a href="#constructor-summary">Constr</a></li>
 <li><a href="#method-summary">Method</a></li>
 </ul>
@@ -48,7 +48,7 @@ loadScripts(document, 'script');</script>
 <li>
 <p>Detail:</p>
 <ul>
-<li><a href="#field-detail">Field</a></li>
+<li>Field</li>
 <li><a href="#constructor-detail">Constr</a></li>
 <li><a href="#method-detail">Method</a></li>
 </ul>
@@ -60,13 +60,13 @@ loadScripts(document, 'script');</script>
 <ul class="sub-nav-list">
 <li>Summary:&nbsp;</li>
 <li>Nested&nbsp;|&nbsp;</li>
-<li><a href="#field-summary">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor-summary">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method-summary">Method</a></li>
 </ul>
 <ul class="sub-nav-list">
 <li>Detail:&nbsp;</li>
-<li><a href="#field-detail">Field</a>&nbsp;|&nbsp;</li>
+<li>Field&nbsp;|&nbsp;</li>
 <li><a href="#constructor-detail">Constr</a>&nbsp;|&nbsp;</li>
 <li><a href="#method-detail">Method</a></li>
 </ul>
@@ -96,13 +96,9 @@ loadScripts(document, 'script');</script>
 <dt>All Implemented Interfaces:</dt>
 <dd><code><a href="S3Repository.html" title="interface in org.saidone.repository">S3Repository</a></code>, <code>org.springframework.beans.factory.Aware</code>, <code>org.springframework.context.ApplicationContextAware</code></dd>
 </dl>
-<dl class="notes">
-<dt>Direct Known Subclasses:</dt>
-<dd><code><a href="EncryptedS3RepositoryImpl.html" title="class in org.saidone.repository">EncryptedS3RepositoryImpl</a></code></dd>
-</dl>
 <hr>
 <div class="type-signature"><span class="annotations">@Service
-@ConditionalOnExpression("${application.service.vault.encryption.content.enabled}.equals(false) and \'${application.service.vault.storage.impl}\'.equals(\'s3\')")
+@ConditionalOnExpression("\'${application.service.vault.storage.impl}\'.equals(\'s3\')")
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">S3RepositoryImpl</span>
 <span class="extends-implements">extends <a href="../component/BaseComponent.html" title="class in org.saidone.component">BaseComponent</a>
 implements <a href="S3Repository.html" title="interface in org.saidone.repository">S3Repository</a></span></div>
@@ -110,29 +106,11 @@ implements <a href="S3Repository.html" title="interface in org.saidone.repositor
  <code>S3Client</code>. The class exposes basic methods to upload and download
  objects using a provided <code>S3Client</code> instance.
  <p>
- The bean is created only when <code>application.service.vault.encryption.content.enabled</code>
- is set to <code>false</code> and <code>application.service.vault.storage.impl</code>
+ The bean is created only when <code>application.service.vault.storage.impl</code>
  equals <code>"s3"</code>.</div>
 </section>
 <section class="summary">
 <ul class="summary-list">
-<!-- =========== FIELD SUMMARY =========== -->
-<li>
-<section class="field-summary" id="field-summary">
-<h2>Field Summary</h2>
-<div class="caption"><span>Fields</span></div>
-<div class="summary-table three-column-summary">
-<div class="table-header col-first">Modifier and Type</div>
-<div class="table-header col-second">Field</div>
-<div class="table-header col-last">Description</div>
-<div class="col-first even-row-color"><code>protected final software.amazon.awssdk.services.s3.S3Client</code></div>
-<div class="col-second even-row-color"><code><a href="#s3Client" class="member-name-link">s3Client</a></code></div>
-<div class="col-last even-row-color">
-<div class="block">AWS S3 client used to perform the requests.</div>
-</div>
-</div>
-</section>
-</li>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
 <li>
 <section class="constructor-summary" id="constructor-summary">
@@ -157,25 +135,12 @@ implements <a href="S3Repository.html" title="interface in org.saidone.repositor
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>software.amazon.awssdk.core.ResponseInputStream<wbr>&lt;software.amazon.awssdk.services.s3.model.GetObjectResponse&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getObject(java.lang.String,java.lang.String)" class="member-name-link">getObject</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Retrieves the object content for the given node id using the underlying
+<div class="block">Retrieves the stored bytes for the given node id using the underlying
  <code>S3Client</code>.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected software.amazon.awssdk.core.ResponseInputStream<wbr>&lt;software.amazon.awssdk.services.s3.model.GetObjectResponse&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getObjectStream(java.lang.String,java.lang.String)" class="member-name-link">getObjectStream</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Retrieves the raw object content for the given node id, exposing the
- object metadata through <code>ResponseInputStream.response()</code>.</div>
-</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#prepareContent(java.io.InputStream,java.util.HashMap)" class="member-name-link">prepareContent</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;content,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns the provided content unchanged: plain content is stored as is.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)" class="member-name-link">putObject</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
@@ -200,22 +165,6 @@ implements <a href="S3Repository.html" title="interface in org.saidone.repositor
 </section>
 <section class="details">
 <ul class="details-list">
-<!-- ============ FIELD DETAIL =========== -->
-<li>
-<section class="field-details" id="field-detail">
-<h2>Field Details</h2>
-<ul class="member-list">
-<li>
-<section class="detail" id="s3Client">
-<h3>s3Client</h3>
-<div class="member-signature"><span class="modifiers">protected final</span>&nbsp;<span class="return-type">software.amazon.awssdk.services.s3.S3Client</span>&nbsp;<span class="element-name">s3Client</span></div>
-<div class="block">AWS S3 client used to perform the requests. It is injected by Spring and
- expected to be thread-safe.</div>
-</section>
-</li>
-</ul>
-</section>
-</li>
 <!-- ========= CONSTRUCTOR DETAIL ======== -->
 <li>
 <section class="constructor-details" id="constructor-detail">
@@ -235,23 +184,6 @@ implements <a href="S3Repository.html" title="interface in org.saidone.repositor
 <section class="method-details" id="method-detail">
 <h2>Method Details</h2>
 <ul class="member-list">
-<li>
-<section class="detail" id="prepareContent(java.io.InputStream,java.util.HashMap)">
-<h3>prepareContent</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></span>&nbsp;<span class="element-name">prepareContent</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;content,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata)</span></div>
-<div class="block">Returns the provided content unchanged: plain content is stored as is.</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="S3Repository.html#prepareContent(java.io.InputStream,java.util.HashMap)">prepareContent</a></code>&nbsp;in interface&nbsp;<code><a href="S3Repository.html" title="interface in org.saidone.repository">S3Repository</a></code></dd>
-<dt>Parameters:</dt>
-<dd><code>content</code> - the original content</dd>
-<dd><code>metadata</code> - object metadata, left unchanged</dd>
-<dt>Returns:</dt>
-<dd>the provided content stream</dd>
-</dl>
-</section>
-</li>
 <li>
 <section class="detail" id="putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)">
 <h3>putObject</h3>
@@ -276,29 +208,13 @@ implements <a href="S3Repository.html" title="interface in org.saidone.repositor
 <li>
 <section class="detail" id="getObject(java.lang.String,java.lang.String)">
 <h3>getObject</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></span>&nbsp;<span class="element-name">getObject</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">software.amazon.awssdk.core.ResponseInputStream&lt;software.amazon.awssdk.services.s3.model.GetObjectResponse&gt;</span>&nbsp;<span class="element-name">getObject</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId)</span></div>
-<div class="block">Retrieves the object content for the given node id using the underlying
+<div class="block">Retrieves the stored bytes for the given node id using the underlying
  <code>S3Client</code>.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="S3Repository.html#getObject(java.lang.String,java.lang.String)">getObject</a></code>&nbsp;in interface&nbsp;<code><a href="S3Repository.html" title="interface in org.saidone.repository">S3Repository</a></code></dd>
-<dt>Parameters:</dt>
-<dd><code>bucketName</code> - bucket containing the object</dd>
-<dd><code>nodeId</code> - the node id / object key</dd>
-<dt>Returns:</dt>
-<dd>the object content stream</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="getObjectStream(java.lang.String,java.lang.String)">
-<h3>getObjectStream</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">software.amazon.awssdk.core.ResponseInputStream&lt;software.amazon.awssdk.services.s3.model.GetObjectResponse&gt;</span>&nbsp;<span class="element-name">getObjectStream</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId)</span></div>
-<div class="block">Retrieves the raw object content for the given node id, exposing the
- object metadata through <code>ResponseInputStream.response()</code>.</div>
-<dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>bucketName</code> - bucket containing the object</dd>
 <dd><code>nodeId</code> - the node id / object key</dd>

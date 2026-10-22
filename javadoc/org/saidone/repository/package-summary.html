@@ -90,54 +90,38 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Class</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="EncryptedGridFsRepositoryImpl.html" title="class in org.saidone.repository">EncryptedGridFsRepositoryImpl</a></div>
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="EncryptedMongoNodeRepositoryImpl.html" title="class in org.saidone.repository">EncryptedMongoNodeRepositoryImpl</a></div>
 <div class="col-last even-row-color class-summary class-summary-tab2">
-<div class="block">GridFS repository that transparently encrypts content before it is persisted
- and decrypts it when retrieved.</div>
-</div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="EncryptedMongoNodeRepositoryImpl.html" title="class in org.saidone.repository">EncryptedMongoNodeRepositoryImpl</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab2">
 <div class="block">Repository implementation that encrypts <a href="../model/entity/NodeEntity.html" title="class in org.saidone.model.entity"><code>NodeEntity</code></a> data before
  persisting it to MongoDB and decrypts it on retrieval.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="EncryptedOzoneRepositoryImpl.html" title="class in org.saidone.repository">EncryptedOzoneRepositoryImpl</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab2">
-<div class="block"><a href="OzoneRepositoryImpl.html" title="class in org.saidone.repository"><code>OzoneRepositoryImpl</code></a> variant that transparently encrypts data before
- uploading to Ozone and decrypts it when retrieved, if marked as encrypted.</div>
-</div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="EncryptedS3RepositoryImpl.html" title="class in org.saidone.repository">EncryptedS3RepositoryImpl</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab2">
-<div class="block"><a href="S3RepositoryImpl.html" title="class in org.saidone.repository"><code>S3RepositoryImpl</code></a> variant that transparently encrypts data before
- uploading to S3 and decrypts it when retrieved, if marked as encrypted.</div>
-</div>
-<div class="col-first even-row-color class-summary class-summary-tab1"><a href="GridFsRepository.html" title="interface in org.saidone.repository">GridFsRepository</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab1">
+<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="GridFsRepository.html" title="interface in org.saidone.repository">GridFsRepository</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab1">
 <div class="block">Abstraction for storing binary content in MongoDB's GridFS bucket.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="GridFsRepositoryImpl.html" title="class in org.saidone.repository">GridFsRepositoryImpl</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab2">
-<div class="block">Repository implementation for the management of files in MongoDB's GridFS
- without encryption support.</div>
-</div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="MongoNodeRepositoryImpl.html" title="class in org.saidone.repository">MongoNodeRepositoryImpl</a></div>
+<div class="col-first even-row-color class-summary class-summary-tab2"><a href="GridFsRepositoryImpl.html" title="class in org.saidone.repository">GridFsRepositoryImpl</a></div>
 <div class="col-last even-row-color class-summary class-summary-tab2">
+<div class="block">Repository implementation for the management of files in MongoDB's GridFS.</div>
+</div>
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="MongoNodeRepositoryImpl.html" title="class in org.saidone.repository">MongoNodeRepositoryImpl</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">
 <div class="block">Repository implementation for managing <a href="../model/entity/NodeEntity.html" title="class in org.saidone.model.entity"><code>NodeEntity</code></a> entities in MongoDB.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab1">
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab1">
 <div class="block">Abstraction over the minimal set of Ozone operations required by the vault.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab2">
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">
 <div class="block">Default <a href="OzoneRepository.html" title="interface in org.saidone.repository"><code>OzoneRepository</code></a> implementation relying on the native Ozone RPC
  client <code>OzoneBucket</code>.</div>
 </div>
-<div class="col-first odd-row-color class-summary class-summary-tab1"><a href="S3Repository.html" title="interface in org.saidone.repository">S3Repository</a></div>
-<div class="col-last odd-row-color class-summary class-summary-tab1">
+<div class="col-first even-row-color class-summary class-summary-tab1"><a href="S3Repository.html" title="interface in org.saidone.repository">S3Repository</a></div>
+<div class="col-last even-row-color class-summary class-summary-tab1">
 <div class="block">Abstraction over the minimal set of S3 operations required by the vault.</div>
 </div>
-<div class="col-first even-row-color class-summary class-summary-tab2"><a href="S3RepositoryImpl.html" title="class in org.saidone.repository">S3RepositoryImpl</a></div>
-<div class="col-last even-row-color class-summary class-summary-tab2">
+<div class="col-first odd-row-color class-summary class-summary-tab2"><a href="S3RepositoryImpl.html" title="class in org.saidone.repository">S3RepositoryImpl</a></div>
+<div class="col-last odd-row-color class-summary class-summary-tab2">
 <div class="block">Default <a href="S3Repository.html" title="interface in org.saidone.repository"><code>S3Repository</code></a> implementation relying on the AWS SDK
  <code>S3Client</code>.</div>
 </div>
