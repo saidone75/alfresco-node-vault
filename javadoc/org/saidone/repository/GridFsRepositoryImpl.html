@@ -125,8 +125,6 @@ implements <a href="GridFsRepository.html" title="interface in org.saidone.repos
    <li>Delete a file from GridFS using its <code>uuid</code> as key.</li>
    <li>Provide file content streams via <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link"><code>InputStream</code></a> for efficient
    reading of file contents.</li>
-   <li>Compute cryptographic hash values of files using MongoDB commands, with
-   the hash algorithm selectable at runtime.</li>
  </ul>
  <p>
  This implementation is registered in the Spring context only when
@@ -164,19 +162,6 @@ implements <a href="GridFsRepository.html" title="interface in org.saidone.repos
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#computeHash(com.mongodb.client.gridfs.model.GridFSFile,java.lang.String)" class="member-name-link">computeHash</a><wbr>(com.mongodb.client.gridfs.model.GridFSFile&nbsp;file,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;algorithm)</code></div>
-<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Computes the cryptographic hash of the provided GridFS file using the
- specified algorithm.</div>
-</div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#computeHash(java.lang.String,java.lang.String)" class="member-name-link">computeHash</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uuid,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;algorithm)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Computes the hash of a file identified by its UUID.</div>
-</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deleteFileById(java.lang.String)" class="member-name-link">deleteFileById</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uuid)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
@@ -339,39 +324,6 @@ implements <a href="GridFsRepository.html" title="interface in org.saidone.repos
 <dd><code>file</code> - the file retrieved from GridFS</dd>
 <dt>Returns:</dt>
 <dd>input stream positioned at the beginning of the file</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="computeHash(com.mongodb.client.gridfs.model.GridFSFile,java.lang.String)">
-<h3>computeHash</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">computeHash</span><wbr><span class="parameters">(com.mongodb.client.gridfs.model.GridFSFile&nbsp;file,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;algorithm)</span></div>
-<div class="block">Computes the cryptographic hash of the provided GridFS file using the
- specified algorithm.</div>
-<dl class="notes">
-<dt>Parameters:</dt>
-<dd><code>file</code> - the file whose hash should be calculated</dd>
-<dd><code>algorithm</code> - name of the hash algorithm supported by MongoDB</dd>
-<dt>Returns:</dt>
-<dd>the hexadecimal encoded hash value</dd>
-</dl>
-</section>
-</li>
-<li>
-<section class="detail" id="computeHash(java.lang.String,java.lang.String)">
-<h3>computeHash</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">computeHash</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;uuid,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;algorithm)</span></div>
-<div class="block">Computes the hash of a file identified by its UUID.</div>
-<dl class="notes">
-<dt>Specified by:</dt>
-<dd><code><a href="GridFsRepository.html#computeHash(java.lang.String,java.lang.String)">computeHash</a></code>&nbsp;in interface&nbsp;<code><a href="GridFsRepository.html" title="interface in org.saidone.repository">GridFsRepository</a></code></dd>
-<dt>Parameters:</dt>
-<dd><code>uuid</code> - unique identifier of the file</dd>
-<dd><code>algorithm</code> - name of the hash algorithm supported by MongoDB</dd>
-<dt>Returns:</dt>
-<dd>the hexadecimal encoded hash value</dd>
 </dl>
 </section>
 </li>

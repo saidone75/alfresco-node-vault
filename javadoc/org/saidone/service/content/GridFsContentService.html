@@ -270,8 +270,8 @@ implements <a href="ContentService.html" title="interface in org.saidone.service
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a></span>&nbsp;<span class="element-name">computeHash</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;algorithm)</span></div>
 <div class="block">Computes the checksum of a node's content stored in GridFS using the provided algorithm.
- Plain content is hashed by MongoDB; encrypted content is streamed and hashed after
- decryption, so the checksum always refers to the original content.</div>
+ Content is streamed and decrypted when needed, so the checksum always refers
+ to the original content.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code><a href="ContentService.html#computeHash(java.lang.String,java.lang.String)">computeHash</a></code>&nbsp;in interface&nbsp;<code><a href="ContentService.html" title="interface in org.saidone.service.content">ContentService</a></code></dd>

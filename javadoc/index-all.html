@@ -83,6 +83,8 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/service/notarization/AbstractNotarizationService.html#%3Cinit%3E()" class="member-name-link">AbstractNotarizationService()</a> - Constructor for class org.saidone.service.notarization.<a href="org/saidone/service/notarization/AbstractNotarizationService.html" title="class in org.saidone.service.notarization">AbstractNotarizationService</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/service/locking/AlfrescoArchiveLockService.html#acquire(java.lang.String)" class="member-name-link">acquire(String)</a> - Method in class org.saidone.service.locking.<a href="org/saidone/service/locking/AlfrescoArchiveLockService.html" title="class in org.saidone.service.locking">AlfrescoArchiveLockService</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/service/AlfrescoService.html#addAspects(java.lang.String,java.util.List)" class="member-name-link">addAspects(String, List&lt;String&gt;)</a> - Method in class org.saidone.service.<a href="org/saidone/service/AlfrescoService.html" title="class in org.saidone.service">AlfrescoService</a></dt>
 <dd>
 <div class="block">Adds aspects to a node.</div>
@@ -91,6 +93,14 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Searches archived nodes by their metadata with pagination support.</div>
 </dd>
+<dt><a href="org/saidone/service/locking/AlfrescoArchiveLockService.html" class="type-name-link" title="class in org.saidone.service.locking">AlfrescoArchiveLockService</a> - Class in <a href="org/saidone/service/locking/package-summary.html">org.saidone.service.locking</a></dt>
+<dd>
+<div class="block">Optional source-side lock; the Alfresco account must be dedicated to this application.</div>
+</dd>
+<dt><a href="org/saidone/service/locking/AlfrescoArchiveLockService.html#%3Cinit%3E()" class="member-name-link">AlfrescoArchiveLockService()</a> - Constructor for class org.saidone.service.locking.<a href="org/saidone/service/locking/AlfrescoArchiveLockService.html" title="class in org.saidone.service.locking">AlfrescoArchiveLockService</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/saidone/service/locking/AlfrescoArchiveLockService.Lease.html" class="type-name-link" title="class in org.saidone.service.locking">AlfrescoArchiveLockService.Lease</a> - Class in <a href="org/saidone/service/locking/package-summary.html">org.saidone.service.locking</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/model/alfresco/AlfrescoContentModel.html" class="type-name-link" title="interface in org.saidone.model.alfresco">AlfrescoContentModel</a> - Interface in <a href="org/saidone/model/alfresco/package-summary.html">org.saidone.model.alfresco</a></dt>
 <dd>
 <div class="block">Constants representing the standard Alfresco content model.</div>
@@ -129,7 +139,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Writes ANV v1 payloads and selects decryption parameters exclusively from their headers.</div>
 </dd>
-<dt><a href="org/saidone/service/crypto/AnvCryptoService.html#%3Cinit%3E(org.saidone.service.SecretService,org.saidone.config.EncryptionConfig)" class="member-name-link">AnvCryptoService(SecretService, EncryptionConfig)</a> - Constructor for class org.saidone.service.crypto.<a href="org/saidone/service/crypto/AnvCryptoService.html" title="class in org.saidone.service.crypto">AnvCryptoService</a></dt>
+<dt><a href="org/saidone/service/crypto/AnvCryptoService.html#%3Cinit%3E()" class="member-name-link">AnvCryptoService()</a> - Constructor for class org.saidone.service.crypto.<a href="org/saidone/service/crypto/AnvCryptoService.html" title="class in org.saidone.service.crypto">AnvCryptoService</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/misc/AnvDigestInputStream.html" class="type-name-link" title="class in org.saidone.misc">AnvDigestInputStream</a> - Class in <a href="org/saidone/misc/package-summary.html">org.saidone.misc</a></dt>
 <dd>
@@ -425,6 +435,8 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/model/alfresco/AlfrescoContentModel.html#ASP_WORKINGCOPY_LOCALNAME" class="member-name-link">ASP_WORKINGCOPY_LOCALNAME</a> - Static variable in interface org.saidone.model.alfresco.<a href="org/saidone/model/alfresco/AlfrescoContentModel.html" title="interface in org.saidone.model.alfresco">AlfrescoContentModel</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/service/locking/AlfrescoArchiveLockService.Lease.html#assertValid()" class="member-name-link">assertValid()</a> - Method in class org.saidone.service.locking.<a href="org/saidone/service/locking/AlfrescoArchiveLockService.Lease.html" title="class in org.saidone.service.locking">AlfrescoArchiveLockService.Lease</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/model/alfresco/AlfrescoContentModel.html#ASSOC_ATTACHMENTS" class="member-name-link">ASSOC_ATTACHMENTS</a> - Static variable in interface org.saidone.model.alfresco.<a href="org/saidone/model/alfresco/AlfrescoContentModel.html" title="interface in org.saidone.model.alfresco">AlfrescoContentModel</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/model/alfresco/AlfrescoContentModel.html#ASSOC_ATTACHMENTS_LOCALNAME" class="member-name-link">ASSOC_ATTACHMENTS_LOCALNAME</a> - Static variable in interface org.saidone.model.alfresco.<a href="org/saidone/model/alfresco/AlfrescoContentModel.html" title="interface in org.saidone.model.alfresco">AlfrescoContentModel</a></dt>
@@ -649,25 +661,14 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/filter/RecentlyProcessedFilter.html#cleanRecentlyProcessedNodes()" class="member-name-link">cleanRecentlyProcessedNodes()</a> - Method in class org.saidone.filter.<a href="org/saidone/filter/RecentlyProcessedFilter.html" title="class in org.saidone.filter">RecentlyProcessedFilter</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/service/locking/AlfrescoArchiveLockService.Lease.html#close()" class="member-name-link">close()</a> - Method in class org.saidone.service.locking.<a href="org/saidone/service/locking/AlfrescoArchiveLockService.Lease.html" title="class in org.saidone.service.locking">AlfrescoArchiveLockService.Lease</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/utils/SecureTemporaryFile.html#close()" class="member-name-link">close()</a> - Method in class org.saidone.utils.<a href="org/saidone/utils/SecureTemporaryFile.html" title="class in org.saidone.utils">SecureTemporaryFile</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/model/alfresco/AlfrescoContentModel.html#CM_PREFIX" class="member-name-link">CM_PREFIX</a> - Static variable in interface org.saidone.model.alfresco.<a href="org/saidone/model/alfresco/AlfrescoContentModel.html" title="interface in org.saidone.model.alfresco">AlfrescoContentModel</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/model/alfresco/AlfrescoContentModel.html#CM_URI" class="member-name-link">CM_URI</a> - Static variable in interface org.saidone.model.alfresco.<a href="org/saidone/model/alfresco/AlfrescoContentModel.html" title="interface in org.saidone.model.alfresco">AlfrescoContentModel</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="org/saidone/repository/GridFsRepositoryImpl.html#computeHash(com.mongodb.client.gridfs.model.GridFSFile,java.lang.String)" class="member-name-link">computeHash(GridFSFile, String)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/GridFsRepositoryImpl.html" title="class in org.saidone.repository">GridFsRepositoryImpl</a></dt>
-<dd>
-<div class="block">Computes the cryptographic hash of the provided GridFS file using the
- specified algorithm.</div>
-</dd>
-<dt><a href="org/saidone/repository/GridFsRepository.html#computeHash(java.lang.String,java.lang.String)" class="member-name-link">computeHash(String, String)</a> - Method in interface org.saidone.repository.<a href="org/saidone/repository/GridFsRepository.html" title="interface in org.saidone.repository">GridFsRepository</a></dt>
-<dd>
-<div class="block">Calculates the cryptographic hash of a stored file.</div>
-</dd>
-<dt><a href="org/saidone/repository/GridFsRepositoryImpl.html#computeHash(java.lang.String,java.lang.String)" class="member-name-link">computeHash(String, String)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/GridFsRepositoryImpl.html" title="class in org.saidone.repository">GridFsRepositoryImpl</a></dt>
-<dd>
-<div class="block">Computes the hash of a file identified by its UUID.</div>
-</dd>
 <dt><a href="org/saidone/service/AlfrescoService.html#computeHash(java.lang.String,java.lang.String)" class="member-name-link">computeHash(String, String)</a> - Method in class org.saidone.service.<a href="org/saidone/service/AlfrescoService.html" title="class in org.saidone.service">AlfrescoService</a></dt>
 <dd>
 <div class="block">Computes a cryptographic hash of the content for the specified node using the provided algorithm.</div>
@@ -767,6 +768,10 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/saidone/service/crypto/CryptoService.html#decryptText(java.lang.String)" class="member-name-link">decryptText(String)</a> - Method in interface org.saidone.service.crypto.<a href="org/saidone/service/crypto/CryptoService.html" title="interface in org.saidone.service.crypto">CryptoService</a></dt>
 <dd>
 <div class="block">Decrypts a Base64 encoded encrypted text value.</div>
+</dd>
+<dt><a href="org/saidone/service/locking/AlfrescoArchiveLockService.Lease.html#delete(java.util.function.BooleanSupplier)" class="member-name-link">delete(BooleanSupplier)</a> - Method in class org.saidone.service.locking.<a href="org/saidone/service/locking/AlfrescoArchiveLockService.Lease.html" title="class in org.saidone.service.locking">AlfrescoArchiveLockService.Lease</a></dt>
+<dd>
+<div class="block">Refresh immediately before deleting; serialize deletion with background renewal.</div>
 </dd>
 <dt><a href="org/saidone/repository/MongoNodeRepositoryImpl.html#delete(org.saidone.model.entity.NodeEntity)" class="member-name-link">delete(NodeEntity)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/MongoNodeRepositoryImpl.html" title="class in org.saidone.repository">MongoNodeRepositoryImpl</a></dt>
 <dt><a href="org/saidone/monitor/VaultOperationMetrics.Operation.html#DELETE" class="member-name-link">DELETE</a> - Enum constant in enum class org.saidone.monitor.<a href="org/saidone/monitor/VaultOperationMetrics.Operation.html" title="enum class in org.saidone.monitor">VaultOperationMetrics.Operation</a></dt>
@@ -1306,6 +1311,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Initializes the AlfrescoService component after dependency injection.</div>
 </dd>
+<dt><a href="org/saidone/service/locking/AlfrescoArchiveLockService.html#init()" class="member-name-link">init()</a> - Method in class org.saidone.service.locking.<a href="org/saidone/service/locking/AlfrescoArchiveLockService.html" title="class in org.saidone.service.locking">AlfrescoArchiveLockService</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/service/notarization/EthereumService.html#init()" class="member-name-link">init()</a> - Method in class org.saidone.service.notarization.<a href="org/saidone/service/notarization/EthereumService.html" title="class in org.saidone.service.notarization">EthereumService</a></dt>
 <dd>
 <div class="block">Initializes the Web3j client and credentials after dependency injection.</div>
@@ -1401,6 +1408,8 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:L">L</h2>
 <dl class="index">
+<dt><a href="org/saidone/service/locking/AlfrescoArchiveLockService.Lease.html#%3Cinit%3E()" class="member-name-link">Lease()</a> - Constructor for class org.saidone.service.locking.<a href="org/saidone/service/locking/AlfrescoArchiveLockService.Lease.html" title="class in org.saidone.service.locking">AlfrescoArchiveLockService.Lease</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/config/LockingProperties.html" class="type-name-link" title="class in org.saidone.config">LockingProperties</a> - Record Class in <a href="org/saidone/config/package-summary.html">org.saidone.config</a></dt>
 <dd>
 <div class="block">Configuration shared by all instances coordinating operations in the same vault.</div>
@@ -2610,12 +2619,18 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/service/content/S3ContentService.html#stop()" class="member-name-link">stop()</a> - Method in class org.saidone.service.content.<a href="org/saidone/service/content/S3ContentService.html" title="class in org.saidone.service.content">S3ContentService</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/service/locking/AlfrescoArchiveLockService.html#stop()" class="member-name-link">stop()</a> - Method in class org.saidone.service.locking.<a href="org/saidone/service/locking/AlfrescoArchiveLockService.html" title="class in org.saidone.service.locking">AlfrescoArchiveLockService</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/service/notarization/EthereumService.html#stop()" class="member-name-link">stop()</a> - Method in class org.saidone.service.notarization.<a href="org/saidone/service/notarization/EthereumService.html" title="class in org.saidone.service.notarization">EthereumService</a></dt>
 <dd>
 <div class="block">Shuts down the Web3j client before the bean is destroyed.</div>
 </dd>
 <dt><a href="org/saidone/config/ShedLockConfig.html#stopRenewalScheduler()" class="member-name-link">stopRenewalScheduler()</a> - Method in class org.saidone.config.<a href="org/saidone/config/ShedLockConfig.html" title="class in org.saidone.config">ShedLockConfig</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/service/locking/AlfrescoArchiveLockService.Lease.html#stripLockMetadata(org.alfresco.core.model.Node)" class="member-name-link">stripLockMetadata(Node)</a> - Method in class org.saidone.service.locking.<a href="org/saidone/service/locking/AlfrescoArchiveLockService.Lease.html" title="class in org.saidone.service.locking">AlfrescoArchiveLockService.Lease</a></dt>
+<dd>
+<div class="block">Our temporary lock must not be restored later as part of the archived metadata.</div>
+</dd>
 <dt><a href="org/saidone/monitor/VaultOperationMetrics.Outcome.html#SUCCESS" class="member-name-link">SUCCESS</a> - Enum constant in enum class org.saidone.monitor.<a href="org/saidone/monitor/VaultOperationMetrics.Outcome.html" title="enum class in org.saidone.monitor">VaultOperationMetrics.Outcome</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/model/dto/SystemSearchRequestDto.html" class="type-name-link" title="class in org.saidone.model.dto">SystemSearchRequestDto</a> - Class in <a href="org/saidone/model/dto/package-summary.html">org.saidone.model.dto</a></dt>
