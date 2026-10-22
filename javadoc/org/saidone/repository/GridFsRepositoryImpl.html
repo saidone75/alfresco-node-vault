@@ -188,7 +188,7 @@ implements <a href="GridFsRepository.html" title="interface in org.saidone.repos
 <div class="block">Retrieves a file descriptor by UUID.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getFileContent(com.mongodb.client.gridfs.model.GridFSFile)" class="member-name-link">getFileContent</a><wbr>(com.mongodb.client.gridfs.model.GridFSFile&nbsp;file)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getFileContent(com.mongodb.client.gridfs.model.GridFSFile)" class="member-name-link">getFileContent</a><wbr>(@NonNull com.mongodb.client.gridfs.model.GridFSFile&nbsp;file)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns an input stream for the given GridFS file.</div>
 </div>
@@ -331,14 +331,14 @@ implements <a href="GridFsRepository.html" title="interface in org.saidone.repos
 <li>
 <section class="detail" id="getFileContent(com.mongodb.client.gridfs.model.GridFSFile)">
 <h3>getFileContent</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></span>&nbsp;<span class="element-name">getFileContent</span><wbr><span class="parameters">(com.mongodb.client.gridfs.model.GridFSFile&nbsp;file)</span></div>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></span>&nbsp;<span class="element-name">getFileContent</span><wbr><span class="parameters">(@NonNull
+ @NonNull com.mongodb.client.gridfs.model.GridFSFile&nbsp;file)</span></div>
 <div class="block">Returns an input stream for the given GridFS file.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>file</code> - the file retrieved from GridFS</dd>
 <dt>Returns:</dt>
-<dd>input stream positioned at the beginning of the file or
- <code>null</code> if <code>file</code> is <code>null</code></dd>
+<dd>input stream positioned at the beginning of the file</dd>
 </dl>
 </section>
 </li>
