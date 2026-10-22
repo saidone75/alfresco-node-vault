@@ -17,6 +17,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Breaking:** unversioned encrypted payloads are no longer supported. Export with the previous application before upgrading and reimport, or recreate disposable data. ANV v1 requires 12-byte nonces and bounded KDF costs.
 - Archiving uses a configurable fixed delay (ten seconds by default) in dev and Docker profiles; other profiles retain cron scheduling. Both modes share the distributed job lock.
 - Concurrent synchronous operations on the same node return `409 Conflict` across cooperating instances. Background jobs skip busy nodes; bulk key rotation logs busy nodes and continues. Integrity checks on busy nodes count as check errors without marking content as corrupted.
+- Archiving always checks that the size of the content received matches the size reported by Alfresco, rolling back on mismatch.
+- Before deleting on Alfresco a node already in the vault, its Alfresco content is always compared with the checksum recorded in the vault, regardless of `VAULT_DOUBLE_CHECK`.
 
 ### Fixed
 - Development PostgreSQL 18 volume mount uses `/var/lib/postgresql`; Alfresco waits for the database healthcheck before starting.

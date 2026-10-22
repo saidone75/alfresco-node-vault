@@ -81,13 +81,13 @@ public class VaultService extends BaseComponent {
      * <p>
      * Retrieves the node and its content from Alfresco, stores metadata and
      * binaries through the configured services with checksum information,
-     * optionally verifies the checksum and finally deletes the source node
-     * from Alfresco.
+     * optionally double checks the stored copy and finally deletes the source
+     * node from Alfresco.
      * </p>
      * <p>
      * A node already stored in the vault is never overwritten: only the
      * optional deletion on Alfresco is performed, after verifying that the
-     * Alfresco content still matches the vault copy when double check is enabled.
+     * Alfresco content still matches the checksum of the vault copy.
      * </p>
      *
      * @param nodeId the ID of the node to archive
@@ -110,8 +110,8 @@ public class VaultService extends BaseComponent {
             if (!alfrescoService.nodeExists(nodeId)) {
                 throw new NodeNotFoundOnAlfrescoException(nodeId);
             }
-            // do not delete the node on Alfresco if its content differs from the vault copy
-            if (deleteOnAlfresco && doubleCheck) doubleCheck(nodeId);
+            // Always verify an existing vault copy before deleting, since Alfresco content may have changed since it was stored.
+            if (deleteOnAlfresco) verifyAlfrescoContent(nodeId);
         }
         if (deleteOnAlfresco) deleteNodeOnAlfresco(nodeId);
         return archivedBytes;
@@ -122,7 +122,7 @@ public class VaultService extends BaseComponent {
      * persisted data on failure.
      *
      * @param nodeId the ID of the node to store
-     * @return original content size in bytes after successful storage and optional verification
+     * @return original content size in bytes after successful storage and verification
      * @throws NodeNotFoundOnAlfrescoException if the node is not found in Alfresco
      * @throws VaultException                  if any error occurs during storage
      */
@@ -134,8 +134,13 @@ public class VaultService extends BaseComponent {
                     nodeId,
                     node.getContent().getSizeInBytes());
             contentService.archiveNodeContent(node, nodeContentInputStream);
+            // A truncated download would otherwise be stored with a consistent checksum.
+            if (nodeContentInputStream.getBytesRead() != node.getContent().getSizeInBytes()) {
+                throw new VaultException(String.format("Content size mismatch for node %s: expected %d bytes, received %d",
+                        nodeId, node.getContent().getSizeInBytes(), nodeContentInputStream.getBytesRead()));
+            }
             val nodeWrapper = new NodeWrapperDto(node);
-            // record the content key version so that key rotation can find the node even when metadata is not encrypted
+            // Record the content key version so that key rotation can find the node even when metadata is not encrypted.
             val contentInfo = contentService.getNodeContentInfo(nodeId);
             if (contentInfo.isEncrypted()) {
                 nodeWrapper.setKeyVersion(contentInfo.getKeyVersion());
@@ -326,7 +331,7 @@ public class VaultService extends BaseComponent {
     private <T> T withOperationMetrics(Operation operation, Supplier<T> action) {
         if (!operationMetrics.isEnabled()) return action.get();
         val startedAt = System.nanoTime();
-        Outcome outcome = Outcome.ERROR;
+        var outcome = Outcome.ERROR;
         try {
             val result = action.get();
             outcome = Outcome.SUCCESS;
@@ -358,6 +363,33 @@ public class VaultService extends BaseComponent {
             if (alfrescoHash.equals(vaultHash)) {
                 log.debug("Digest check passed for node: {}", nodeId);
             } else {
+                throw new HashesMismatchException(alfrescoHash, vaultHash);
+            }
+        } catch (Exception e) {
+            throw new VaultException(String.format("Error while checking hashes: %s", e.getMessage()));
+        }
+    }
+
+    /**
+     * Verifies that the current Alfresco content matches the checksum recorded
+     * when the vault copy was stored, downloading only from Alfresco. Content
+     * stored without a recorded checksum falls back to {@link #doubleCheck(String)}.
+     *
+     * @param nodeId the unique identifier of the node whose content will be checked
+     * @throws VaultException if the Alfresco content differs from the vault copy or cannot be read
+     */
+    private void verifyAlfrescoContent(String nodeId) {
+        val contentInfo = contentService.getNodeContentInfo(nodeId);
+        val algorithm = contentInfo.getContentHashAlgorithm();
+        val vaultHash = contentInfo.getContentHash();
+        if (algorithm == null || vaultHash == null) {
+            doubleCheck(nodeId);
+            return;
+        }
+        log.debug("Comparing Alfresco content with stored {} checksum for node: {}", algorithm, nodeId);
+        try {
+            val alfrescoHash = alfrescoService.computeHash(nodeId, algorithm);
+            if (!alfrescoHash.equals(vaultHash)) {
                 throw new HashesMismatchException(alfrescoHash, vaultHash);
             }
         } catch (Exception e) {
