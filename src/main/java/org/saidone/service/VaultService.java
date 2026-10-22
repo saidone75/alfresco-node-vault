@@ -87,7 +87,9 @@ public class VaultService extends BaseComponent {
      * <p>
      * A node already stored in the vault is never overwritten: only the
      * optional deletion on Alfresco is performed, after verifying that the
-     * Alfresco content still matches the checksum of the vault copy.
+     * Alfresco content still matches the checksum of the vault copy. Metadata is
+     * saved only after the optional double check, so an existing entry always
+     * refers to a copy that passed it.
      * </p>
      *
      * @param nodeId the ID of the node to archive
@@ -145,8 +147,9 @@ public class VaultService extends BaseComponent {
             if (contentInfo.isEncrypted()) {
                 nodeWrapper.setKeyVersion(contentInfo.getKeyVersion());
             }
-            nodeService.save(nodeWrapper);
+            // Check before saving metadata: once saved, the node counts as archived and is never checked again.
             if (doubleCheck) doubleCheck(nodeId);
+            nodeService.save(nodeWrapper);
             return node.getContent().getSizeInBytes();
         } catch (FeignException.NotFound e) {
             throw new NodeNotFoundOnAlfrescoException(nodeId);
@@ -181,9 +184,13 @@ public class VaultService extends BaseComponent {
      * Removes any partially persisted data for the provided node.
      * <p>
      * If an error occurs during archiving, this method is invoked to clean up
-     * both the stored binary content and the node metadata entry in the vault.
+     * both the node metadata entry and the stored binary content in the vault.
      * Any exception thrown by the underlying services is logged but otherwise
      * ignored to avoid masking the original failure.
+     * </p>
+     * <p>
+     * Each step runs on its own, so a failure in one does not skip the other.
+     * Content left behind is overwritten when the node is archived again.
      * </p>
      *
      * @param nodeId identifier of the node being rolled back
@@ -191,11 +198,16 @@ public class VaultService extends BaseComponent {
     private void rollback(String nodeId) {
         log.debug("Rollback required for node: {}", nodeId);
         try {
-            contentService.deleteNodeContent(nodeId);
             nodeService.deleteById(nodeId);
         } catch (Exception e) {
             log.trace(e.getMessage(), e);
-            log.debug("Rollback failed for node: {}", nodeId);
+            log.error("Rollback failed to delete metadata for node {}: {}", nodeId, e.getMessage());
+        }
+        try {
+            contentService.deleteNodeContent(nodeId);
+        } catch (Exception e) {
+            log.trace(e.getMessage(), e);
+            log.error("Rollback failed to delete content for node {}: {}", nodeId, e.getMessage());
         }
     }
 
