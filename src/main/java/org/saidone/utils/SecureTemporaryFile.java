@@ -20,6 +20,7 @@
 package org.saidone.utils;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.val;
 
 import java.io.IOException;
@@ -41,12 +42,15 @@ import java.util.List;
  */
 public final class SecureTemporaryFile implements AutoCloseable {
 
+    @Getter
+    @Setter
+    private static volatile Path root = Path.of(System.getProperty("java.io.tmpdir"), "anv");
     private final Path directory;
     @Getter
     private final Path path;
 
     public SecureTemporaryFile(String prefix, String suffix) throws IOException {
-        val temporaryRoot = Path.of(System.getProperty("java.io.tmpdir"));
+        val temporaryRoot = Files.createDirectories(root);
         val store = Files.getFileStore(temporaryRoot);
         FileAttribute<?> directoryPermissions;
         FileAttribute<?> filePermissions;

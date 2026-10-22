@@ -91,6 +91,7 @@ search:
   service:
     path: /alfresco/api/-default-/public/search/versions/1
 application:
+  temp-dir: ${SHARED_FILES_PATH:${java.io.tmpdir}/anv}
   metrics:
     vault-operations:
       enabled: ${VAULT_OPERATION_METRICS_ENABLED:true}
@@ -181,6 +182,9 @@ application:
           bucket: ${OZONE_BUCKET:content}
           properties:
             "[ozone.om.address]": ${OZONE_OM_ADDRESS:localhost:9862}
+            "[ozone.client.stream.buffer.size]": ${OZONE_CLIENT_BUFFER_SIZE:1MB}
+            "[ozone.client.stream.buffer.flush.size]": ${OZONE_CLIENT_BUFFER_FLUSH_SIZE:2MB}
+            "[ozone.client.stream.buffer.max.size]": ${OZONE_CLIENT_BUFFER_MAX_SIZE:4MB}
         s3:
           key: ${S3_KEY:testing}
           secret: ${S3_SECRET:testing}

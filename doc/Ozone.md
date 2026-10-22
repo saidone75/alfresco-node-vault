@@ -4,11 +4,18 @@ Set `VAULT_STORAGE_IMPL=ozone` to store content through the native Java RPC clie
 Metadata and audit data remain in MongoDB. Content encryption, checksums and key
 versions are supported. Switching backend does not migrate existing content.
 
-| Variable | Default | Purpose |
-|----------|---------|---------|
-| `OZONE_OM_ADDRESS` | `localhost:9862` | Ozone Manager RPC address |
-| `OZONE_VOLUME` | `anv` | Storage volume |
-| `OZONE_BUCKET` | `content` | Content bucket |
+| Variable                         | Default          | Purpose                                                                    |
+|----------------------------------|------------------|----------------------------------------------------------------------------|
+| `OZONE_OM_ADDRESS`               | `localhost:9862` | Ozone Manager RPC address                                                  |
+| `OZONE_VOLUME`                   | `anv`            | Storage volume                                                             |
+| `OZONE_BUCKET`                   | `content`        | Content bucket                                                             |
+| `OZONE_CLIENT_BUFFER_SIZE`       | `1MB`            | Size of the chunks sent to the datanodes                                   |
+| `OZONE_CLIENT_BUFFER_FLUSH_SIZE` | `2MB`            | Buffered data that triggers a partial flush; a multiple of the buffer size |
+| `OZONE_CLIENT_BUFFER_MAX_SIZE`   | `4MB`            | Maximum data buffered in memory per upload; a multiple of the flush size   |
+
+The client buffer defaults favour low memory use, at most 4MB per upload in progress
+instead of the 32MB of the Ozone client defaults (`4MB`, `16MB`, `32MB`). Larger
+buffers mean fewer round trips and can speed up uploads of large files on fast networks.
 
 For an external cluster, provision the volume and bucket first. Additional Hadoop/Ozone
 settings belong under `application.service.vault.storage.ozone.properties`.
