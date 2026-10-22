@@ -50,6 +50,11 @@ spring:
   jms:
     cache:
       enabled: false
+  task:
+    scheduling:
+      pool:
+        # One thread per scheduled job, so a long or stalled job does not hold up the others.
+        size: 5
   data:
     mongodb:
       uri: ${MONGODB_URL:mongodb://localhost:27017}
@@ -129,6 +134,8 @@ application:
       permanently-delete-nodes: true
       search-batch-size: 100
       chunk-size: 8192
+      connect-timeout: ${CONNECTION_TIMEOUT:10000}
+      read-timeout: ${READ_TIMEOUT:60000}
     vault:
       hash-algorithm: ${VAULT_HASH_ALGORITHM:SHA-256}
       auth-cache-ttl: ${VAULT_AUTH_CACHE_TTL:60s}

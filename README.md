@@ -110,6 +110,8 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | ALFRESCO_BASE_PATH               | http://localhost:8080                      | Scheme, host and port of the Alfresco server                        |
 | ALFRESCO_USERNAME                | admin                                      | Alfresco user                                                       |
 | ALFRESCO_PASSWORD                | admin                                      | Password for the Alfresco user                                      |
+| CONNECTION_TIMEOUT               | 10000                                      | Connect timeout (ms) for Alfresco content streams                   |
+| READ_TIMEOUT                     | 60000                                      | Timeout (ms) of each read from an Alfresco content stream           |
 | ACTIVE_MQ_URL                    | tcp://localhost:61616                      | ActiveMQ broker URL                                                 |
 | MONGODB_URL                      | mongodb://localhost:27017                  | MongoDB connection string                                           |
 | VAULT_STORAGE_IMPL               | s3                                         | Content storage backend: s3, gridfs or ozone                          |

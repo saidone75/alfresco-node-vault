@@ -36,5 +36,7 @@ public class AlfrescoServiceConfig {
     private int searchBatchSize;
     private boolean permanentlyDeleteNodes;
     private List<String> include;
+    private int connectTimeout;
+    private int readTimeout;
 
 }
