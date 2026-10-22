@@ -20,8 +20,9 @@
 package org.saidone.repository;
 
 import org.alfresco.core.model.Node;
+import software.amazon.awssdk.core.ResponseInputStream;
+import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.HashMap;
 
@@ -32,19 +33,6 @@ import java.util.HashMap;
 public interface S3Repository {
 
     /**
-     * Returns the stream of the bytes to store for the given content, encrypted
-     * when content encryption is enabled, and records in {@code metadata} how
-     * they are stored. The caller writes this stream to the file then passed to
-     * {@link #putObject}, so plain content never reaches the disk when
-     * encryption is enabled.
-     *
-     * @param content  the original content; closing the returned stream closes it
-     * @param metadata object metadata, updated with the storage details
-     * @return the stream of the bytes to store
-     */
-    InputStream prepareContent(InputStream content, HashMap<String, String> metadata);
-
-    /**
      * Uploads a node's content to the specified S3 bucket using the node id as
      * object key.
      *
@@ -52,20 +40,21 @@ public interface S3Repository {
      * @param node        node whose identifier will be used as the object key
      * @param metadata    optional object metadata to store alongside the binary
      *                    content
-     * @param content     file holding the bytes to store, as returned by
-     *                    {@link #prepareContent}; it is streamed from disk with
-     *                    its exact length, so the content is never buffered in
-     *                    memory
+     * @param content     file holding the bytes to store; it is streamed from
+     *                    disk with its exact length, so the content is never
+     *                    buffered in memory
      */
     void putObject(String bucketName, Node node, HashMap<String, String> metadata, Path content);
 
     /**
-     * Retrieves an object from S3 previously stored for the given node id.
+     * Retrieves the stored bytes of an object previously stored for the given
+     * node id.
      *
      * @param bucketName the bucket where the object resides
      * @param nodeId     identifier of the node / object key
-     * @return an {@link InputStream} for the object's content
+     * @return the object's stored bytes, with its metadata available through
+     * {@link ResponseInputStream#response()}
      */
-    InputStream getObject(String bucketName, String nodeId);
+    ResponseInputStream<GetObjectResponse> getObject(String bucketName, String nodeId);
 
 }

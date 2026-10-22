@@ -43,8 +43,9 @@ import java.io.InputStream;
 import java.util.Map;
 
 /**
- * Repository implementation for the management of files in MongoDB's GridFS
- * without encryption support.
+ * Repository implementation for the management of files in MongoDB's GridFS.
+ * Files are stored as given: content encryption is applied by the content
+ * service.
  * <p>
  * Implements the {@link GridFsRepository} interface, enabling file storage,
  * retrieval, metadata updates and file deletion in the GridFS storage system.
@@ -69,9 +70,7 @@ import java.util.Map;
  *   the hash algorithm selectable at runtime.</li>
  * </ul>
  * <p>
- * This implementation is registered in the Spring context only when the
- * property {@code application.service.vault.encryption.content.enabled} is set to
- * {@code false} <strong>and</strong>
+ * This implementation is registered in the Spring context only when
  * {@code application.service.vault.storage.impl} equals {@code "gridfs"}.
  * <p>
  * Extends {@link org.saidone.component.BaseComponent} to inherit standardized
@@ -81,9 +80,7 @@ import java.util.Map;
  * Spring container for all MongoDB operations.
  */
 @Repository
-@ConditionalOnExpression(
-        "${application.service.vault.encryption.content.enabled}.equals(false) and '${application.service.vault.storage.impl}'.equals('gridfs')"
-)
+@ConditionalOnExpression("'${application.service.vault.storage.impl}'.equals('gridfs')")
 @RequiredArgsConstructor
 @Slf4j
 public class GridFsRepositoryImpl extends BaseComponent implements GridFsRepository {

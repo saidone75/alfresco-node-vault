@@ -19,6 +19,7 @@
 
 package org.saidone.service.content;
 
+import com.mongodb.client.gridfs.model.GridFSFile;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -31,12 +32,14 @@ import org.saidone.model.MetadataKeys;
 import org.saidone.model.dto.NodeContentInfoDto;
 import org.saidone.model.dto.NodeContentStreamDto;
 import org.saidone.repository.GridFsRepositoryImpl;
+import org.saidone.service.crypto.ContentEncryptionService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashMap;
 
 /**
@@ -57,16 +60,15 @@ public class GridFsContentService extends BaseComponent implements ContentServic
     @Value("${application.service.vault.hash-algorithm}")
     private String checksumAlgorithm;
 
-    @Value("${application.service.vault.encryption.content.enabled}")
-    private boolean encryptionEnabled;
-
     private final GridFsRepositoryImpl gridFsRepository;
+    private final ContentEncryptionService contentEncryptionService;
 
     /**
      * Archives the content of the given node by saving the content stream into a GridFS repository
-     * with associated metadata. The input stream is wrapped in a {@link AnvDigestInputStream} to
-     * compute a checksum using the configured algorithm during the save operation. After saving, the
-     * method updates the file metadata with both the algorithm name and the computed value.
+     * with associated metadata, encrypted when content encryption is enabled. The input stream is
+     * wrapped in a {@link AnvDigestInputStream} to compute a checksum of the original content using
+     * the configured algorithm during the save operation. After saving, the method updates the file
+     * metadata with both the algorithm name and the computed value.
      *
      * @param node        the node whose content is to be archived
      * @param inputStream the input stream of the node's content to be saved and checksummed
@@ -74,15 +76,18 @@ public class GridFsContentService extends BaseComponent implements ContentServic
     @Override
     @SneakyThrows
     public void archiveNodeContent(Node node, InputStream inputStream) {
-        try (val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
+        try (inputStream;
+             val digestInputStream = new AnvDigestInputStream(inputStream, checksumAlgorithm)) {
             val metadata = new HashMap<String, String>();
             metadata.put(MetadataKeys.UUID, node.getId());
             metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
-            gridFsRepository.saveFile(
-                    digestInputStream,
-                    node.getName(),
-                    node.getContent().getMimeType(),
-                    metadata);
+            try (val stored = contentEncryptionService.toStoredContent(digestInputStream, metadata)) {
+                gridFsRepository.saveFile(
+                        stored,
+                        node.getName(),
+                        node.getContent().getMimeType(),
+                        metadata);
+            }
             val hash = digestInputStream.getHash();
             log.trace("{}: {}", checksumAlgorithm, hash);
             metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
@@ -112,7 +117,7 @@ public class GridFsContentService extends BaseComponent implements ContentServic
             nodeContent.setContentType(gridFSFile.getMetadata().getString(MetadataKeys.CONTENT_TYPE));
         }
         nodeContent.setLength(gridFSFile.getLength());
-        nodeContent.setContentStream(gridFsRepository.getFileContent(gridFSFile));
+        nodeContent.setContentStream(readContent(gridFSFile));
         return nodeContent;
     }
 
@@ -164,14 +169,44 @@ public class GridFsContentService extends BaseComponent implements ContentServic
 
     /**
      * Computes the checksum of a node's content stored in GridFS using the provided algorithm.
+     * Plain content is hashed by MongoDB; encrypted content is streamed and hashed after
+     * decryption, so the checksum always refers to the original content.
      *
      * @param nodeId    identifier of the node
      * @param algorithm name of the hash algorithm
      * @return the resulting hash string
+     * @throws NodeNotFoundOnVaultException if the node content cannot be found
      */
     @Override
+    @SneakyThrows
     public String computeHash(String nodeId, String algorithm) {
-        return gridFsRepository.computeHash(nodeId, algorithm);
+        val gridFSFile = gridFsRepository.findFileById(nodeId);
+        if (gridFSFile == null) {
+            throw new NodeNotFoundOnVaultException(nodeId);
+        }
+        if (!isEncrypted(gridFSFile)) {
+            return gridFsRepository.computeHash(nodeId, algorithm);
+        }
+        try (val digestInputStream = new AnvDigestInputStream(readContent(gridFSFile), algorithm)) {
+            digestInputStream.transferTo(OutputStream.nullOutputStream());
+            return digestInputStream.getHash();
+        }
+    }
+
+    /**
+     * Reads the original content of a stored file, decrypting it when its
+     * metadata marks it as encrypted.
+     *
+     * @param gridFSFile the stored file
+     * @return the original content stream
+     */
+    private InputStream readContent(GridFSFile gridFSFile) {
+        return contentEncryptionService.fromStoredContent(gridFsRepository.getFileContent(gridFSFile), isEncrypted(gridFSFile));
+    }
+
+    private static boolean isEncrypted(GridFSFile gridFSFile) {
+        val metadata = gridFSFile.getMetadata();
+        return metadata != null && Boolean.parseBoolean(metadata.getString(MetadataKeys.ENCRYPTED));
     }
 
 }

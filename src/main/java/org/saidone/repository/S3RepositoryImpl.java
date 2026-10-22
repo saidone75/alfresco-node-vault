@@ -33,7 +33,6 @@ import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
-import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.HashMap;
 
@@ -42,14 +41,11 @@ import java.util.HashMap;
  * {@link S3Client}. The class exposes basic methods to upload and download
  * objects using a provided {@code S3Client} instance.
  * <p>
- * The bean is created only when {@code application.service.vault.encryption.content.enabled}
- * is set to {@code false} and {@code application.service.vault.storage.impl}
+ * The bean is created only when {@code application.service.vault.storage.impl}
  * equals {@code "s3"}.
  */
 @Service
-@ConditionalOnExpression(
-        "${application.service.vault.encryption.content.enabled}.equals(false) and '${application.service.vault.storage.impl}'.equals('s3')"
-)
+@ConditionalOnExpression("'${application.service.vault.storage.impl}'.equals('s3')")
 @RequiredArgsConstructor
 @Slf4j
 public class S3RepositoryImpl extends BaseComponent implements S3Repository {
@@ -58,19 +54,7 @@ public class S3RepositoryImpl extends BaseComponent implements S3Repository {
      * AWS S3 client used to perform the requests. It is injected by Spring and
      * expected to be thread-safe.
      */
-    protected final S3Client s3Client;
-
-    /**
-     * Returns the provided content unchanged: plain content is stored as is.
-     *
-     * @param content  the original content
-     * @param metadata object metadata, left unchanged
-     * @return the provided content stream
-     */
-    @Override
-    public InputStream prepareContent(InputStream content, HashMap<String, String> metadata) {
-        return content;
-    }
+    private final S3Client s3Client;
 
     /**
      * Uploads the provided file as an object to S3. The node id is used as
@@ -95,27 +79,15 @@ public class S3RepositoryImpl extends BaseComponent implements S3Repository {
     }
 
     /**
-     * Retrieves the object content for the given node id using the underlying
+     * Retrieves the stored bytes for the given node id using the underlying
      * {@link S3Client}.
-     *
-     * @param bucketName bucket containing the object
-     * @param nodeId     the node id / object key
-     * @return the object content stream
-     */
-    @Override
-    public InputStream getObject(String bucketName, String nodeId) {
-        return getObjectStream(bucketName, nodeId);
-    }
-
-    /**
-     * Retrieves the raw object content for the given node id, exposing the
-     * object metadata through {@link ResponseInputStream#response()}.
      *
      * @param bucketName bucket containing the object
      * @param nodeId     the node id / object key
      * @return the object content stream along with its response metadata
      */
-    protected ResponseInputStream<GetObjectResponse> getObjectStream(String bucketName, String nodeId) {
+    @Override
+    public ResponseInputStream<GetObjectResponse> getObject(String bucketName, String nodeId) {
         return s3Client.getObject(GetObjectRequest.builder()
                 .bucket(bucketName).key(nodeId).build());
     }
