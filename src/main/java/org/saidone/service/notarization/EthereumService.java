@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.config.EthereumConfig;
 import org.saidone.exception.NotarizationException;
+import org.saidone.exception.NotarizationUnavailableException;
 import org.saidone.service.NodeService;
 import org.saidone.service.locking.VaultOperationCoordinator;
 import org.saidone.service.content.ContentService;
@@ -146,7 +147,7 @@ public class EthereumService extends AbstractNotarizationService {
             }
         } catch (IOException e) {
             log.trace(e.getMessage(), e);
-            throw new NotarizationException(String.format("Error fetching transaction %s", txHash));
+            throw new NotarizationUnavailableException(String.format("Error fetching transaction %s", txHash));
         }
     }
 
