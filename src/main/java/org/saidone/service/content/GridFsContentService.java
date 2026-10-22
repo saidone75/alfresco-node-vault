@@ -107,10 +107,7 @@ public class GridFsContentService extends BaseComponent implements ContentServic
      */
     @Override
     public NodeContentStreamDto getNodeContent(String nodeId) {
-        val gridFSFile = gridFsRepository.findFileById(nodeId);
-        if (gridFSFile == null) {
-            throw new NodeNotFoundOnVaultException(nodeId);
-        }
+        val gridFSFile = findFile(nodeId);
         val nodeContent = new NodeContentStreamDto();
         nodeContent.setFileName(gridFSFile.getFilename());
         if (gridFSFile.getMetadata() != null && gridFSFile.getMetadata().containsKey(MetadataKeys.CONTENT_TYPE)) {
@@ -130,10 +127,7 @@ public class GridFsContentService extends BaseComponent implements ContentServic
      */
     @Override
     public NodeContentInfoDto getNodeContentInfo(String nodeId) {
-        val gridFSFile = gridFsRepository.findFileById(nodeId);
-        if (gridFSFile == null) {
-            throw new NodeNotFoundOnVaultException(nodeId);
-        }
+        val gridFSFile = findFile(nodeId);
         val info = new NodeContentInfoDto();
         info.setContentId(nodeId);
         info.setFileName(gridFSFile.getFilename());
@@ -180,10 +174,7 @@ public class GridFsContentService extends BaseComponent implements ContentServic
     @Override
     @SneakyThrows
     public String computeHash(String nodeId, String algorithm) {
-        val gridFSFile = gridFsRepository.findFileById(nodeId);
-        if (gridFSFile == null) {
-            throw new NodeNotFoundOnVaultException(nodeId);
-        }
+        val gridFSFile = findFile(nodeId);
         if (!isEncrypted(gridFSFile)) {
             return gridFsRepository.computeHash(nodeId, algorithm);
         }
@@ -191,6 +182,21 @@ public class GridFsContentService extends BaseComponent implements ContentServic
             digestInputStream.transferTo(OutputStream.nullOutputStream());
             return digestInputStream.getHash();
         }
+    }
+
+    /**
+     * Finds the stored file of a node.
+     *
+     * @param nodeId identifier of the node
+     * @return the stored file, never {@code null}
+     * @throws NodeNotFoundOnVaultException if the node content cannot be found
+     */
+    private GridFSFile findFile(String nodeId) {
+        val gridFSFile = gridFsRepository.findFileById(nodeId);
+        if (gridFSFile == null) {
+            throw new NodeNotFoundOnVaultException(nodeId);
+        }
+        return gridFSFile;
     }
 
     /**

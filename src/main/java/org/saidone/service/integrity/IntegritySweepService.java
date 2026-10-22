@@ -24,7 +24,9 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
+import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.exception.NotarizationException;
+import org.saidone.exception.NotarizationUnavailableException;
 import org.saidone.exception.NodeOperationInProgressException;
 import org.saidone.model.dto.CorruptedNodeDto;
 import org.saidone.model.dto.IntegritySweepRunDto;
@@ -175,37 +177,80 @@ public class IntegritySweepService extends BaseComponent {
 
     private void processNodes(IntegritySweepRunDto run, List<NodeWrapperDto> nodes) {
         for (val node : nodes) {
-            run.setScanned(run.getScanned() + 1);
             checkNodeIntegrity(run, node);
         }
     }
 
     /**
      * Executes notarization verification for a single node and updates run counters.
+     * <p>
+     * Only evidence about the node itself marks it as corrupted: a hash mismatch,
+     * missing notarization data, or content missing from the storage while its
+     * metadata is still there. Failures to perform the check, such as an
+     * unreachable notarization backend, storage or database, are counted as
+     * errors and leave any previous verdict unchanged. Nodes deleted from the
+     * vault while the sweep runs are skipped.
+     * </p>
      *
      * @param run  the currently active sweep run accumulator
      * @param node the node to verify
      */
     private void checkNodeIntegrity(IntegritySweepRunDto run, NodeWrapperDto node) {
+        val nodeId = node.getId();
         try {
-            notarizationService.get().checkNotarization(node.getId());
+            notarizationService.get().checkNotarization(nodeId);
+            run.setScanned(run.getScanned() + 1);
             run.setPassed(run.getPassed() + 1);
-            clearCorruptedNode(node.getId());
+            clearCorruptedNode(nodeId);
         } catch (NodeOperationInProgressException e) {
-            // Contention is a transient check error, not evidence of corrupted content.
+            run.setScanned(run.getScanned() + 1);
             run.setErrors(run.getErrors() + 1);
-            log.info("Integrity check skipped for busy node {}", node.getId());
+            log.info("Integrity check skipped for busy node {}", nodeId);
+        } catch (NotarizationUnavailableException e) {
+            markError(run, nodeId, e);
         } catch (NotarizationException e) {
-            run.setFailed(run.getFailed() + 1);
-            run.getFailedNodeIds().add(node.getId());
-            markCorruptedNode(node.getId(), e.getMessage(), run.getId());
-            log.warn("Integrity check failed for node {}: {}", node.getId(), e.getMessage());
+            markFailed(run, nodeId, e.getMessage());
+        } catch (NodeNotFoundOnVaultException e) {
+            checkMissingNode(run, nodeId);
         } catch (Exception e) {
-            run.setErrors(run.getErrors() + 1);
-            run.getFailedNodeIds().add(node.getId());
-            markCorruptedNode(node.getId(), e.getClass().getSimpleName(), run.getId());
-            log.error("Unexpected error during integrity check for node {}", node.getId(), e);
+            markError(run, nodeId, e);
         }
+    }
+
+    /**
+     * Handles a node not found in the vault: a node whose metadata is gone was
+     * deleted while the sweep ran and is skipped, while metadata without
+     * content means the content was lost.
+     */
+    private void checkMissingNode(IntegritySweepRunDto run, String nodeId) {
+        boolean metadataExists;
+        try {
+            metadataExists = nodeService.existsById(nodeId);
+        } catch (Exception e) {
+            markError(run, nodeId, e);
+            return;
+        }
+        if (metadataExists) {
+            markFailed(run, nodeId, "Content not found in storage");
+        } else {
+            clearCorruptedNode(nodeId);
+            log.debug("Node {} was deleted from the vault during the integrity sweep", nodeId);
+        }
+    }
+
+    private void markFailed(IntegritySweepRunDto run, String nodeId, String reason) {
+        run.setScanned(run.getScanned() + 1);
+        run.setFailed(run.getFailed() + 1);
+        run.getFailedNodeIds().add(nodeId);
+        markCorruptedNode(nodeId, reason, run.getId());
+        log.warn("Integrity check failed for node {}: {}", nodeId, reason);
+    }
+
+    private void markError(IntegritySweepRunDto run, String nodeId, Exception e) {
+        run.setScanned(run.getScanned() + 1);
+        run.setErrors(run.getErrors() + 1);
+        log.error("Integrity check not performed for node {}: {}", nodeId, e.getMessage());
+        log.trace(e.getMessage(), e);
     }
 
     private void markCorruptedNode(String nodeId, String reason, String runId) {

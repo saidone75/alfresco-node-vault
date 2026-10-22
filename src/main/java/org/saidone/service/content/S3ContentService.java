@@ -197,6 +197,9 @@ public class S3ContentService extends BaseComponent implements ContentService {
                 dis.transferTo(OutputStream.nullOutputStream());
                 return dis.getHash();
             }
+        } catch (NoSuchKeyException e) {
+            // A missing object is told apart from S3 failures, which say nothing about the content.
+            throw new NodeNotFoundOnVaultException(nodeId);
         } catch (S3Exception e) {
             log.error(e.getMessage());
             throw new VaultException(nodeId);
