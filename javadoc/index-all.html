@@ -1021,30 +1021,6 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Retrieves a node wrapper by its identifier.</div>
 </dd>
-<dt><a href="org/saidone/repository/MongoNodeRepositoryImpl.html#findByKv(int)" class="member-name-link">findByKv(int)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/MongoNodeRepositoryImpl.html" title="class in org.saidone.repository">MongoNodeRepositoryImpl</a></dt>
-<dd>
-<div class="block">Retrieves node wrappers by encryption key version.</div>
-</dd>
-<dt><a href="org/saidone/service/MongoNodeService.html#findByKv(int)" class="member-name-link">findByKv(int)</a> - Method in class org.saidone.service.<a href="org/saidone/service/MongoNodeService.html" title="class in org.saidone.service">MongoNodeService</a></dt>
-<dd>
-<div class="block">Retrieves all node wrappers associated with the specified encryption key version.</div>
-</dd>
-<dt><a href="org/saidone/service/NodeService.html#findByKv(int)" class="member-name-link">findByKv(int)</a> - Method in interface org.saidone.service.<a href="org/saidone/service/NodeService.html" title="interface in org.saidone.service">NodeService</a></dt>
-<dd>
-<div class="block">Retrieves all node wrappers associated with the specified encryption key version.</div>
-</dd>
-<dt><a href="org/saidone/repository/MongoNodeRepositoryImpl.html#findByNtx(java.lang.String)" class="member-name-link">findByNtx(String)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/MongoNodeRepositoryImpl.html" title="class in org.saidone.repository">MongoNodeRepositoryImpl</a></dt>
-<dd>
-<div class="block">Retrieves node wrappers by notarization transaction ID.</div>
-</dd>
-<dt><a href="org/saidone/service/MongoNodeService.html#findByNtx(java.lang.String)" class="member-name-link">findByNtx(String)</a> - Method in class org.saidone.service.<a href="org/saidone/service/MongoNodeService.html" title="class in org.saidone.service">MongoNodeService</a></dt>
-<dd>
-<div class="block">Retrieves all node wrappers having the given notarization transaction ID.</div>
-</dd>
-<dt><a href="org/saidone/service/NodeService.html#findByNtx(java.lang.String)" class="member-name-link">findByNtx(String)</a> - Method in interface org.saidone.service.<a href="org/saidone/service/NodeService.html" title="interface in org.saidone.service">NodeService</a></dt>
-<dd>
-<div class="block">Retrieves all node wrappers having the given notarization transaction ID.</div>
-</dd>
 <dt><a href="org/saidone/service/integrity/IntegritySweepService.html#findCorruptedNodes(org.springframework.data.domain.Pageable)" class="member-name-link">findCorruptedNodes(Pageable)</a> - Method in class org.saidone.service.integrity.<a href="org/saidone/service/integrity/IntegritySweepService.html" title="class in org.saidone.service.integrity">IntegritySweepService</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/service/audit/AuditService.html#findEntries(java.lang.String,java.time.Instant,java.time.Instant,org.springframework.data.domain.Pageable)" class="member-name-link">findEntries(String, Instant, Instant, Pageable)</a> - Method in interface org.saidone.service.audit.<a href="org/saidone/service/audit/AuditService.html" title="interface in org.saidone.service.audit">AuditService</a></dt>
@@ -1062,6 +1038,32 @@ loadScripts(document, 'script');</script>
 <dt><a href="org/saidone/repository/GridFsRepositoryImpl.html#findFileById(java.lang.String)" class="member-name-link">findFileById(String)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/GridFsRepositoryImpl.html" title="class in org.saidone.repository">GridFsRepositoryImpl</a></dt>
 <dd>
 <div class="block">Retrieves a file descriptor by UUID.</div>
+</dd>
+<dt><a href="org/saidone/service/MongoNodeService.html#findIdsByKv(int)" class="member-name-link">findIdsByKv(int)</a> - Method in class org.saidone.service.<a href="org/saidone/service/MongoNodeService.html" title="class in org.saidone.service">MongoNodeService</a></dt>
+<dd>
+<div class="block">Retrieves the IDs of all nodes associated with the specified encryption key version.</div>
+</dd>
+<dt><a href="org/saidone/service/NodeService.html#findIdsByKv(int)" class="member-name-link">findIdsByKv(int)</a> - Method in interface org.saidone.service.<a href="org/saidone/service/NodeService.html" title="interface in org.saidone.service">NodeService</a></dt>
+<dd>
+<div class="block">Retrieves the IDs of all nodes associated with the specified encryption key version.</div>
+</dd>
+<dt><a href="org/saidone/repository/MongoNodeRepositoryImpl.html#findIdsByKv(int,java.lang.String,int)" class="member-name-link">findIdsByKv(int, String, int)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/MongoNodeRepositoryImpl.html" title="class in org.saidone.repository">MongoNodeRepositoryImpl</a></dt>
+<dd>
+<div class="block">Retrieves a page of node IDs by encryption key version, in ascending ID
+ order.</div>
+</dd>
+<dt><a href="org/saidone/service/MongoNodeService.html#findIdsByNtx(java.lang.String)" class="member-name-link">findIdsByNtx(String)</a> - Method in class org.saidone.service.<a href="org/saidone/service/MongoNodeService.html" title="class in org.saidone.service">MongoNodeService</a></dt>
+<dd>
+<div class="block">Retrieves the IDs of all nodes having the given notarization transaction ID.</div>
+</dd>
+<dt><a href="org/saidone/service/NodeService.html#findIdsByNtx(java.lang.String)" class="member-name-link">findIdsByNtx(String)</a> - Method in interface org.saidone.service.<a href="org/saidone/service/NodeService.html" title="interface in org.saidone.service">NodeService</a></dt>
+<dd>
+<div class="block">Retrieves the IDs of all nodes having the given notarization transaction ID.</div>
+</dd>
+<dt><a href="org/saidone/repository/MongoNodeRepositoryImpl.html#findIdsByNtx(java.lang.String,java.lang.String,int)" class="member-name-link">findIdsByNtx(String, String, int)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/MongoNodeRepositoryImpl.html" title="class in org.saidone.repository">MongoNodeRepositoryImpl</a></dt>
+<dd>
+<div class="block">Retrieves a page of node IDs by notarization transaction ID, in ascending
+ ID order.</div>
 </dd>
 <dt><a href="org/saidone/repository/EncryptedMongoNodeRepositoryImpl.html#findNotarized(org.springframework.data.domain.Pageable)" class="member-name-link">findNotarized(Pageable)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/EncryptedMongoNodeRepositoryImpl.html" title="class in org.saidone.repository">EncryptedMongoNodeRepositoryImpl</a></dt>
 <dd>
@@ -2418,18 +2420,18 @@ loadScripts(document, 'script');</script>
 <div class="block">Uploads a node's content to the configured Ozone bucket using the node id as
  object key.</div>
 </dd>
-<dt><a href="org/saidone/repository/EncryptedS3RepositoryImpl.html#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.io.InputStream)" class="member-name-link">putObject(String, Node, HashMap&lt;String, String&gt;, InputStream)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/EncryptedS3RepositoryImpl.html" title="class in org.saidone.repository">EncryptedS3RepositoryImpl</a></dt>
+<dt><a href="org/saidone/repository/EncryptedS3RepositoryImpl.html#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)" class="member-name-link">putObject(String, Node, HashMap&lt;String, String&gt;, Path)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/EncryptedS3RepositoryImpl.html" title="class in org.saidone.repository">EncryptedS3RepositoryImpl</a></dt>
 <dd>
-<div class="block">Encrypts the provided content stream and stores it in S3.</div>
+<div class="block">Encrypts the provided file and stores it in S3.</div>
 </dd>
-<dt><a href="org/saidone/repository/S3Repository.html#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.io.InputStream)" class="member-name-link">putObject(String, Node, HashMap&lt;String, String&gt;, InputStream)</a> - Method in interface org.saidone.repository.<a href="org/saidone/repository/S3Repository.html" title="interface in org.saidone.repository">S3Repository</a></dt>
+<dt><a href="org/saidone/repository/S3Repository.html#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)" class="member-name-link">putObject(String, Node, HashMap&lt;String, String&gt;, Path)</a> - Method in interface org.saidone.repository.<a href="org/saidone/repository/S3Repository.html" title="interface in org.saidone.repository">S3Repository</a></dt>
 <dd>
 <div class="block">Uploads a node's content to the specified S3 bucket using the node id as
  object key.</div>
 </dd>
-<dt><a href="org/saidone/repository/S3RepositoryImpl.html#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.io.InputStream)" class="member-name-link">putObject(String, Node, HashMap&lt;String, String&gt;, InputStream)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/S3RepositoryImpl.html" title="class in org.saidone.repository">S3RepositoryImpl</a></dt>
+<dt><a href="org/saidone/repository/S3RepositoryImpl.html#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)" class="member-name-link">putObject(String, Node, HashMap&lt;String, String&gt;, Path)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/S3RepositoryImpl.html" title="class in org.saidone.repository">S3RepositoryImpl</a></dt>
 <dd>
-<div class="block">Uploads the provided stream as an object to S3.</div>
+<div class="block">Uploads the provided file as an object to S3.</div>
 </dd>
 </dl>
 <h2 class="title" id="I:R">R</h2>

@@ -209,7 +209,9 @@ loadScripts(document, 'script');</script>
  <p>
  A node already stored in the vault is never overwritten: only the
  optional deletion on Alfresco is performed, after verifying that the
- Alfresco content still matches the checksum of the vault copy.
+ Alfresco content still matches the checksum of the vault copy. Metadata is
+ saved only after the optional double check, so an existing entry always
+ refers to a copy that passed it.
  </p></div>
 <dl class="notes">
 <dt>Parameters:</dt>

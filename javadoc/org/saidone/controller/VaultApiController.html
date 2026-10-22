@@ -179,7 +179,7 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the metadata of a node stored in the vault.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;org.springframework.core.io.InputStreamResource&gt;</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.http.ResponseEntity<wbr>&lt;reactor.core.publisher.Flux&lt;org.springframework.core.io.buffer.DataBuffer&gt;&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getNodeContent(java.lang.String,java.lang.String,boolean)" class="member-name-link">getNodeContent</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;auth,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId,
  boolean&nbsp;attachment)</code></div>
@@ -349,7 +349,7 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="getNodeContent(java.lang.String,java.lang.String,boolean)">
 <h3>getNodeContent</h3>
 <div class="member-signature"><span class="annotations">@GetMapping("/nodes/{nodeId}/content")
-</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;org.springframework.core.io.InputStreamResource&gt;</span>&nbsp;<span class="element-name">getNodeContent</span><wbr><span class="parameters">(@RequestHeader(value="Authorization",required=false)
+</span><span class="modifiers">public</span>&nbsp;<span class="return-type">org.springframework.http.ResponseEntity&lt;reactor.core.publisher.Flux&lt;org.springframework.core.io.buffer.DataBuffer&gt;&gt;</span>&nbsp;<span class="element-name">getNodeContent</span><wbr><span class="parameters">(@RequestHeader(value="Authorization",required=false)
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;auth,
  @PathVariable
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId,
@@ -362,7 +362,7 @@ loadScripts(document, 'script');</script>
 <dd><code>nodeId</code> - identifier of the node</dd>
 <dd><code>attachment</code> - <code>true</code> if the content should be sent as a download attachment</dd>
 <dt>Returns:</dt>
-<dd>the streamed content wrapped as an <code>InputStreamResource</code></dd>
+<dd>the streamed content</dd>
 </dl>
 </section>
 </li>

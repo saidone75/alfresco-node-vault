@@ -226,15 +226,21 @@ R&gt;<br>R</code></div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html" title="class or interface in java.util" class="external-link">Optional</a><wbr>&lt;<a href="../model/entity/NodeEntity.html" title="class in org.saidone.model.entity">NodeEntity</a>&gt;</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#findById(java.lang.String)" class="member-name-link">findById</a><wbr>(@NonNull <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;id)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"></div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="../model/entity/NodeEntity.html" title="class in org.saidone.model.entity">NodeEntity</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#findByKv(int)" class="member-name-link">findByKv</a><wbr>(int&nbsp;kv)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#findIdsByKv(int,java.lang.String,int)" class="member-name-link">findIdsByKv</a><wbr>(int&nbsp;kv,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;afterId,
+ int&nbsp;limit)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Retrieves node wrappers by encryption key version.</div>
+<div class="block">Retrieves a page of node IDs by encryption key version, in ascending ID
+ order.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="../model/entity/NodeEntity.html" title="class in org.saidone.model.entity">NodeEntity</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#findByNtx(java.lang.String)" class="member-name-link">findByNtx</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;ntx)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#findIdsByNtx(java.lang.String,java.lang.String,int)" class="member-name-link">findIdsByNtx</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;ntx,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;afterId,
+ int&nbsp;limit)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Retrieves node wrappers by notarization transaction ID.</div>
+<div class="block">Retrieves a page of node IDs by notarization transaction ID, in ascending
+ ID order.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>org.springframework.data.domain.Page<wbr>&lt;<a href="../model/entity/NodeEntity.html" title="class in org.saidone.model.entity">NodeEntity</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#findNotarized(org.springframework.data.domain.Pageable)" class="member-name-link">findNotarized</a><wbr>(org.springframework.data.domain.Pageable&nbsp;pageable)</code></div>
@@ -545,29 +551,38 @@ R&gt;</span>&nbsp;<span class="return-type">R</span>&nbsp;<span class="element-n
 </section>
 </li>
 <li>
-<section class="detail" id="findByNtx(java.lang.String)">
-<h3>findByNtx</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../model/entity/NodeEntity.html" title="class in org.saidone.model.entity">NodeEntity</a>&gt;</span>&nbsp;<span class="element-name">findByNtx</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;ntx)</span></div>
-<div class="block">Retrieves node wrappers by notarization transaction ID. A <code>null</code> value
- matches nodes without a transaction ID.</div>
+<section class="detail" id="findIdsByNtx(java.lang.String,java.lang.String,int)">
+<h3>findIdsByNtx</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">findIdsByNtx</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;ntx,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;afterId,
+ int&nbsp;limit)</span></div>
+<div class="block">Retrieves a page of node IDs by notarization transaction ID, in ascending
+ ID order. A <code>null</code> value matches nodes without a transaction ID.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>ntx</code> - the transaction ID to filter by</dd>
+<dd><code>afterId</code> - only IDs greater than this one are returned; <code>null</code> to start from the first</dd>
+<dd><code>limit</code> - maximum number of IDs to return</dd>
 <dt>Returns:</dt>
-<dd>list of matching nodes</dd>
+<dd>the matching node IDs</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="findByKv(int)">
-<h3>findByKv</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="../model/entity/NodeEntity.html" title="class in org.saidone.model.entity">NodeEntity</a>&gt;</span>&nbsp;<span class="element-name">findByKv</span><wbr><span class="parameters">(int&nbsp;kv)</span></div>
-<div class="block">Retrieves node wrappers by encryption key version.</div>
+<section class="detail" id="findIdsByKv(int,java.lang.String,int)">
+<h3>findIdsByKv</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">findIdsByKv</span><wbr><span class="parameters">(int&nbsp;kv,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;afterId,
+ int&nbsp;limit)</span></div>
+<div class="block">Retrieves a page of node IDs by encryption key version, in ascending ID
+ order.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>kv</code> - the encryption key version to filter by</dd>
+<dd><code>afterId</code> - only IDs greater than this one are returned; <code>null</code> to start from the first</dd>
+<dd><code>limit</code> - maximum number of IDs to return</dd>
 <dt>Returns:</dt>
-<dd>list of nodes encrypted with the specified key version</dd>
+<dd>the IDs of nodes encrypted with the specified key version</dd>
 </dl>
 </section>
 </li>

@@ -146,15 +146,15 @@ loadScripts(document, 'script');</script>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Retrieves a node wrapper by its identifier.</div>
 </div>
-<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Iterable.html" title="class or interface in java.lang" class="external-link">Iterable</a><wbr>&lt;<a href="../model/dto/NodeWrapperDto.html" title="class in org.saidone.model.dto">NodeWrapperDto</a>&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findByKv(int)" class="member-name-link">findByKv</a><wbr>(int&nbsp;kv)</code></div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Iterable.html" title="class or interface in java.lang" class="external-link">Iterable</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findIdsByKv(int)" class="member-name-link">findIdsByKv</a><wbr>(int&nbsp;kv)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Retrieves all node wrappers associated with the specified encryption key version.</div>
+<div class="block">Retrieves the IDs of all nodes associated with the specified encryption key version.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Iterable.html" title="class or interface in java.lang" class="external-link">Iterable</a><wbr>&lt;<a href="../model/dto/NodeWrapperDto.html" title="class in org.saidone.model.dto">NodeWrapperDto</a>&gt;</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findByNtx(java.lang.String)" class="member-name-link">findByNtx</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;ntx)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Iterable.html" title="class or interface in java.lang" class="external-link">Iterable</a><wbr>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findIdsByNtx(java.lang.String)" class="member-name-link">findIdsByNtx</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;ntx)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Retrieves all node wrappers having the given notarization transaction ID.</div>
+<div class="block">Retrieves the IDs of all nodes having the given notarization transaction ID.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>org.springframework.data.domain.Page<wbr>&lt;<a href="../model/dto/NodeWrapperDto.html" title="class in org.saidone.model.dto">NodeWrapperDto</a>&gt;</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#findNotarized(org.springframework.data.domain.Pageable)" class="member-name-link">findNotarized</a><wbr>(org.springframework.data.domain.Pageable&nbsp;pageable)</code></div>
@@ -303,30 +303,34 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="findByNtx(java.lang.String)">
-<h3>findByNtx</h3>
-<div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Iterable.html" title="class or interface in java.lang" class="external-link">Iterable</a>&lt;<a href="../model/dto/NodeWrapperDto.html" title="class in org.saidone.model.dto">NodeWrapperDto</a>&gt;</span>&nbsp;<span class="element-name">findByNtx</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;ntx)</span></div>
-<div class="block">Retrieves all node wrappers having the given notarization transaction ID.
+<section class="detail" id="findIdsByNtx(java.lang.String)">
+<h3>findIdsByNtx</h3>
+<div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Iterable.html" title="class or interface in java.lang" class="external-link">Iterable</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">findIdsByNtx</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;ntx)</span></div>
+<div class="block">Retrieves the IDs of all nodes having the given notarization transaction ID.
  A <code>null</code> transaction ID is used to select nodes that have not yet
- been notarized.</div>
+ been notarized.
+ <p>IDs are loaded lazily, one page at a time, so memory use does not grow
+ with the number of matching nodes.</p></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>ntx</code> - the notarization transaction ID to filter by</dd>
 <dt>Returns:</dt>
-<dd>iterable collection of <a href="../model/dto/NodeWrapperDto.html" title="class in org.saidone.model.dto"><code>NodeWrapperDto</code></a></dd>
+<dd>the matching node IDs, in ascending order</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="findByKv(int)">
-<h3>findByKv</h3>
-<div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Iterable.html" title="class or interface in java.lang" class="external-link">Iterable</a>&lt;<a href="../model/dto/NodeWrapperDto.html" title="class in org.saidone.model.dto">NodeWrapperDto</a>&gt;</span>&nbsp;<span class="element-name">findByKv</span><wbr><span class="parameters">(int&nbsp;kv)</span></div>
-<div class="block">Retrieves all node wrappers associated with the specified encryption key version.</div>
+<section class="detail" id="findIdsByKv(int)">
+<h3>findIdsByKv</h3>
+<div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Iterable.html" title="class or interface in java.lang" class="external-link">Iterable</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;</span>&nbsp;<span class="element-name">findIdsByKv</span><wbr><span class="parameters">(int&nbsp;kv)</span></div>
+<div class="block">Retrieves the IDs of all nodes associated with the specified encryption key version.
+ <p>IDs are loaded lazily, one page at a time, so memory use does not grow
+ with the number of matching nodes.</p></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>kv</code> - the encryption key version to filter by</dd>
 <dt>Returns:</dt>
-<dd>iterable collection of <a href="../model/dto/NodeWrapperDto.html" title="class in org.saidone.model.dto"><code>NodeWrapperDto</code></a></dd>
+<dd>the matching node IDs, in ascending order</dd>
 </dl>
 </section>
 </li>
