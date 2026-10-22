@@ -48,11 +48,7 @@ import java.util.Map;
 @ConditionalOnExpression("'${application.service.vault.storage.impl}' == 'ozone' and '${application.service.vault.encryption.content.enabled:false}' == 'true'")
 public class EncryptedOzoneRepositoryImpl extends OzoneRepositoryImpl {
 
-    /** Provides encryption keys used for securing Ozone objects. */
     private final SecretService secretService;
-    /**
-     * Service used to perform stream encryption and decryption.
-     */
     private final CryptoService cryptoService;
 
     /**

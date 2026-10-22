@@ -47,8 +47,7 @@ public class ShedLockConfig {
     });
 
     @Bean
-    public LockProvider lockProvider(MongoClient mongoClient,
-                                    @Value("${spring.data.mongodb.database}") String database) {
+    public LockProvider lockProvider(MongoClient mongoClient, @Value("${spring.data.mongodb.database}") String database) {
         return new KeepAliveLockProvider(new MongoLockProvider(mongoClient.getDatabase(database)), renewalScheduler);
     }
 

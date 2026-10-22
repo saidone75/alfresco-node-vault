@@ -45,9 +45,7 @@ import java.util.List;
 @Service
 public class MongoNodeService extends BaseComponent implements NodeService {
 
-    /** Repository used for persisting and retrieving node metadata. */
     private final MongoNodeRepositoryImpl mongoNodeRepository;
-    /** Mapper used to translate between DTO and persistence entity. */
     private final NodeMapper nodeMapper;
 
     /**

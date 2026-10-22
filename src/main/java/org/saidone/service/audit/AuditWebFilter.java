@@ -56,7 +56,6 @@ import java.util.HashMap;
 @Slf4j
 public class AuditWebFilter extends BaseComponent implements WebFilter {
 
-    /** Service used to persist {@link AuditEntryDto} instances. */
     private final AuditServiceImpl auditService;
 
     /**

@@ -49,10 +49,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class NodeNotarizationJob extends BaseComponent {
 
-    /** Service used to query nodes that require notarization. */
     private final NodeService nodeService;
-
-    /** Service responsible for notarization and transaction id persistence. */
     private final NotarizationService notarizationService;
     private final VaultOperationCoordinator operationCoordinator;
 

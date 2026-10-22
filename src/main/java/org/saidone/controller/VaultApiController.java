@@ -78,36 +78,12 @@ import java.util.concurrent.CompletableFuture;
 @Tag(name = "Vault API", description = "Vault operations")
 public class VaultApiController extends BaseComponent {
 
-    /**
-     * Service used to verify Basic authentication credentials.
-     */
     private final AuthenticationService authenticationService;
-    /**
-     * Provides high level vault operations.
-     */
     private final VaultService vaultService;
-    /**
-     * Service responsible for interacting with nodes.
-     */
     private final NodeService nodeService;
-    /**
-     * Service responsible for retrieving binary content.
-     */
     private final ContentService contentService;
-    /**
-     * Handles notarization requests for archived nodes.
-     */
     private final Optional<NotarizationService> notarizationService;
-
-    /**
-     * Manages encryption key rotation for node content and metadata. Empty when
-     * neither content nor metadata encryption is enabled.
-     */
     private final Optional<KeyService> keyService;
-
-    /**
-     * Service responsible for integrity sweep executions.
-     */
     private final IntegritySweepService integritySweepService;
 
     /**

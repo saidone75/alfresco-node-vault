@@ -27,20 +27,14 @@ import java.util.List;
 
 /**
  * Configuration properties used to access the Alfresco repository.
- * <p>
- * These values configure how nodes are fetched and deleted when
- * interacting with Alfresco.
  */
 @Configuration
 @ConfigurationProperties(prefix = "application.service.alfresco")
 @Data
 public class AlfrescoServiceConfig {
 
-    /** Number of nodes retrieved per REST request. */
     private int searchBatchSize;
-    /** Whether nodes should be removed from Alfresco instead of archived. */
     private boolean permanentlyDeleteNodes;
-    /** List of additional properties to include in the Alfresco query. */
     private List<String> include;
 
 }
