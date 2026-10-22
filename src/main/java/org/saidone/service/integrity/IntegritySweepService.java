@@ -65,13 +65,9 @@ import java.util.stream.Collectors;
 @Slf4j
 public class IntegritySweepService extends BaseComponent {
 
-    /** Service used to page and retrieve notarized nodes from the vault. */
     private final NodeService nodeService;
-    /** Service used to validate notarization data for each scanned node, absent when notarization is disabled. */
     private final Optional<NotarizationService> notarizationService;
-    /** MongoDB access used to persist and query integrity sweep run metadata. */
     private final MongoTemplate mongoTemplate;
-    /** Metrics collector for reporting completed sweep run statistics. */
     private final IntegritySweepMetrics metrics;
     private final VaultOperationCoordinator operationCoordinator;
 

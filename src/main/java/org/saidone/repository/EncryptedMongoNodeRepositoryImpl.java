@@ -49,9 +49,7 @@ import java.util.Optional;
 @ConditionalOnProperty(name = "application.service.vault.encryption.metadata.enabled", havingValue = "true")
 public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
 
-    /** Provides encryption material for node metadata. */
     private final SecretService secretService;
-    /** Service used to encrypt and decrypt node JSON. */
     private final CryptoService cryptoService;
 
     /**

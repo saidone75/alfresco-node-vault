@@ -89,7 +89,7 @@ public class AnvCryptoService extends AbstractCryptoService {
         if (secret == null || secret.getVersion() != h.keyVersion()) throw new IllegalArgumentException("Required Vault secret version is unavailable");
         val algorithm = h.cipher() == 1 ? "AES" : "ChaCha20";
         val key = deriveSecretKey(secret, algorithm, h.salt(), h.kdf()).getLeft();
-        // BC supports incremental processing for both algorithms without buffering a whole GCM document
+        // BC supports incremental processing for both algorithms without buffering a whole GCM document.
         val cipher = Cipher.getInstance(h.cipher() == 1 ? "AES/GCM/NoPadding" : "ChaCha20-Poly1305", PROVIDER);
         if (h.cipher() == 1) cipher.init(mode, key, new GCMParameterSpec(128, h.nonce()));
         else cipher.init(mode, key, new IvParameterSpec(h.nonce()));
@@ -113,7 +113,7 @@ public class AnvCryptoService extends AbstractCryptoService {
         TransformStream(InputStream source, Cipher cipher) {
             this.source = source;
             this.cipher = cipher;
-            // allow for a pending block/tag as well as the next input chunk.
+            // Allow for a pending block/tag as well as the next input chunk.
             output = new byte[Math.max(input.length, cipher.getOutputSize(input.length)) + Math.max(16, cipher.getBlockSize())];
         }
 

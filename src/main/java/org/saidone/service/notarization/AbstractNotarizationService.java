@@ -45,10 +45,7 @@ import org.springframework.beans.factory.annotation.Value;
 @Slf4j
 public abstract class AbstractNotarizationService extends BaseComponent implements NotarizationService {
 
-    /** Service used to access nodes and their metadata. */
     private final NodeService nodeService;
-
-    /** Service providing access to node content for hashing. */
     private final ContentService contentService;
     private final VaultOperationCoordinator operationCoordinator;
 
