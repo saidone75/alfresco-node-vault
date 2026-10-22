@@ -32,6 +32,19 @@ import java.util.HashMap;
 public interface S3Repository {
 
     /**
+     * Returns the stream of the bytes to store for the given content, encrypted
+     * when content encryption is enabled, and records in {@code metadata} how
+     * they are stored. The caller writes this stream to the file then passed to
+     * {@link #putObject}, so plain content never reaches the disk when
+     * encryption is enabled.
+     *
+     * @param content  the original content; closing the returned stream closes it
+     * @param metadata object metadata, updated with the storage details
+     * @return the stream of the bytes to store
+     */
+    InputStream prepareContent(InputStream content, HashMap<String, String> metadata);
+
+    /**
      * Uploads a node's content to the specified S3 bucket using the node id as
      * object key.
      *
@@ -39,9 +52,10 @@ public interface S3Repository {
      * @param node        node whose identifier will be used as the object key
      * @param metadata    optional object metadata to store alongside the binary
      *                    content
-     * @param content     file holding the content to store; it is streamed from
-     *                    disk with its exact length, so the content is never
-     *                    buffered in memory
+     * @param content     file holding the bytes to store, as returned by
+     *                    {@link #prepareContent}; it is streamed from disk with
+     *                    its exact length, so the content is never buffered in
+     *                    memory
      */
     void putObject(String bucketName, Node node, HashMap<String, String> metadata, Path content);
 

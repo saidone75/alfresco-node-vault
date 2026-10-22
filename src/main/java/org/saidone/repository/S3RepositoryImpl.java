@@ -61,6 +61,18 @@ public class S3RepositoryImpl extends BaseComponent implements S3Repository {
     protected final S3Client s3Client;
 
     /**
+     * Returns the provided content unchanged: plain content is stored as is.
+     *
+     * @param content  the original content
+     * @param metadata object metadata, left unchanged
+     * @return the provided content stream
+     */
+    @Override
+    public InputStream prepareContent(InputStream content, HashMap<String, String> metadata) {
+        return content;
+    }
+
+    /**
      * Uploads the provided file as an object to S3. The node id is used as
      * the object key.
      *

@@ -26,13 +26,11 @@ import org.apache.hadoop.ozone.client.OzoneKeyDetails;
 import org.saidone.model.MetadataKeys;
 import org.saidone.service.SecretService;
 import org.saidone.service.crypto.CryptoService;
-import org.saidone.utils.SecureTemporaryFile;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
 import java.util.Map;
 
 /**
@@ -66,32 +64,19 @@ public class EncryptedOzoneRepositoryImpl extends OzoneRepositoryImpl {
     }
 
     /**
-     * Encrypts the provided content stream and stores it in Ozone. The object's
-     * metadata is updated to mark it as encrypted before delegating to the
-     * shared upload operation.
+     * Returns the encrypted stream of the provided content and marks the
+     * object's metadata as encrypted with the current key version.
      *
-     * @param nodeId   identifier of the node / object key
-     * @param length   content length before encryption, in bytes
-     * @param metadata object metadata to associate with the stored content
-     * @param content  content stream to encrypt and upload
-     * @throws IOException if the content cannot be stored
+     * @param content  the original content
+     * @param metadata object metadata, updated with the encryption details
+     * @return the encrypted content stream
      */
     @Override
-    public void putObject(String nodeId, long length, Map<String, String> metadata, InputStream content) throws IOException {
+    public InputStream prepareContent(InputStream content, Map<String, String> metadata) {
         val secret = secretService.getSecret();
         metadata.put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString());
         metadata.put(MetadataKeys.KEY_VERSION, Integer.toString(secret.getVersion()));
-        metadata.put(PLAINTEXT_LENGTH, Long.toString(length));
-        // Ozone requires the ciphertext length, including encryption overhead, before writing.
-        try (val temporary = new SecureTemporaryFile("ozone-encrypted-", ".bin")) {
-            try (val encrypted = cryptoService.encrypt(content, secret);
-                 val output = Files.newOutputStream(temporary.getPath())) {
-                encrypted.transferTo(output);
-            }
-            try (val source = Files.newInputStream(temporary.getPath())) {
-                writeObject(nodeId, Files.size(temporary.getPath()), metadata, source);
-            }
-        }
+        return cryptoService.encrypt(content, secret);
     }
 
     /**
