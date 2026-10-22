@@ -19,6 +19,7 @@
 
 package org.saidone.misc;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.FilterInputStream;
@@ -37,6 +38,7 @@ public class ProgressTrackingInputStream extends FilterInputStream {
 
     private final String nodeId;
     private final long contentLength;
+    @Getter
     private long bytesRead = 0;
     private int lastLoggedPercentage = 0;
 

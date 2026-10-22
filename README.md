@@ -127,7 +127,7 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | ARCHIVING_JOB_QUERY              | TYPE:'cm:content' AND ASPECT:'anv:archive' | Query for selecting documents to be archived                        |
 | VAULT_OPERATION_METRICS_ENABLED | true                                       | Export operation counters, duration histograms and archived bytes |
 | VAULT_HASH_ALGORITHM             | SHA-256                                    | Hash stored as content metadata in GridFS, S3 or Ozone             |
-| VAULT_DOUBLE_CHECK               | true                                       | Verify content integrity before removing a document from Alfresco |
+| VAULT_DOUBLE_CHECK               | true                                       | Download the archived document again from Alfresco and the vault and compare their hashes |
 | VAULT_DELETE_ON_ALFRESCO         | true                                       | Delete the document from Alfresco after archiving                         |
 | VAULT_DELETE_NODE_API_ENABLED    | false                                      | Enable the delete node API                                          |
 | VAULT_AUTH_CACHE_TTL             | 60s                                        | Cache duration of successful API authentications                    |
