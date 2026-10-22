@@ -20,20 +20,15 @@
 package org.saidone.utils;
 
 import lombok.Getter;
-import lombok.Setter;
 import lombok.val;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.attribute.AclEntry;
-import java.nio.file.attribute.AclEntryFlag;
-import java.nio.file.attribute.AclEntryPermission;
-import java.nio.file.attribute.AclEntryType;
-import java.nio.file.attribute.FileAttribute;
-import java.nio.file.attribute.PosixFilePermissions;
+import java.nio.file.attribute.*;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Temporary file in a private directory, with permissions applied atomically at creation.
@@ -42,15 +37,21 @@ import java.util.List;
  */
 public final class SecureTemporaryFile implements AutoCloseable {
 
-    @Getter
-    @Setter
-    private static volatile Path root = Path.of(System.getProperty("java.io.tmpdir"), "anv");
+    private static final AtomicReference<Path> ROOT = new AtomicReference<>(Path.of(System.getProperty("java.io.tmpdir"), "anv"));
     private final Path directory;
     @Getter
     private final Path path;
 
+    public static Path getRoot() {
+        return ROOT.get();
+    }
+
+    public static void setRoot(Path newRoot) {
+        ROOT.set(newRoot);
+    }
+
     public SecureTemporaryFile(String prefix, String suffix) throws IOException {
-        val temporaryRoot = Files.createDirectories(root);
+        val temporaryRoot = Files.createDirectories(ROOT.get());
         val store = Files.getFileStore(temporaryRoot);
         FileAttribute<?> directoryPermissions;
         FileAttribute<?> filePermissions;
