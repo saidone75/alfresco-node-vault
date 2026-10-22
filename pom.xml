@@ -50,6 +50,8 @@
         <awssdk.version>2.56.0</awssdk.version>
         <asm.version>9.11.1</asm.version>
         <shedlock.version>7.10.1</shedlock.version>
+        <okhttp.version>5.5.0</okhttp.version>
+        <okio.version>3.18.1</okio.version>
         <tests>none()</tests>
         <vault.storage.impl>s3</vault.storage.impl>
         <sonar.organization>saidone75</sonar.organization>
@@ -127,17 +129,23 @@
             <dependency>
                 <groupId>com.squareup.okio</groupId>
                 <artifactId>okio</artifactId>
-                <version>3.16.4</version>
+                <version>${okio.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okio</groupId>
                 <artifactId>okio-jvm</artifactId>
-                <version>3.16.4</version>
+                <version>${okio.version}</version>
             </dependency>
+            <!-- Both OkHttp artifacts are managed: web3j depends on okhttp, Ozone's OpenTelemetry exporter on okhttp-jvm. -->
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
-                <version>5.3.2</version>
+                <version>${okhttp.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>okhttp-jvm</artifactId>
+                <version>${okhttp.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.google.errorprone</groupId>
@@ -275,7 +283,6 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp-jvm</artifactId>
-            <version>5.5.0</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
