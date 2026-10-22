@@ -67,8 +67,6 @@ import java.util.Map;
  *   <li>Delete a file from GridFS using its {@code uuid} as key.</li>
  *   <li>Provide file content streams via {@link InputStream} for efficient
  *   reading of file contents.</li>
- *   <li>Compute cryptographic hash values of files using MongoDB commands, with
- *   the hash algorithm selectable at runtime.</li>
  * </ul>
  * <p>
  * This implementation is registered in the Spring context only when
@@ -199,32 +197,6 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
     @SneakyThrows
     public InputStream getFileContent(@NonNull GridFSFile file) {
         return gridFsOperations.getResource(file).getInputStream();
-    }
-
-    /**
-     * Computes the cryptographic hash of the provided GridFS file using the
-     * specified algorithm.
-     *
-     * @param file      the file whose hash should be calculated
-     * @param algorithm name of the hash algorithm supported by MongoDB
-     * @return the hexadecimal encoded hash value
-     */
-    protected String computeHash(GridFSFile file, String algorithm) {
-        val command = new Document(String.format("file%s", algorithm.toLowerCase()), file.getId()).append("root", "fs");
-        val result = mongoTemplate.executeCommand(command);
-        return result.getString(algorithm.toLowerCase());
-    }
-
-    /**
-     * Computes the hash of a file identified by its UUID.
-     *
-     * @param uuid      unique identifier of the file
-     * @param algorithm name of the hash algorithm supported by MongoDB
-     * @return the hexadecimal encoded hash value
-     */
-    @Override
-    public String computeHash(String uuid, String algorithm) {
-        return computeHash(findFileById(uuid), algorithm);
     }
 
 }

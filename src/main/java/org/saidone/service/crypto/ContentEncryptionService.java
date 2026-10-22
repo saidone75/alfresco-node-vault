@@ -43,6 +43,7 @@ import java.util.Optional;
  */
 @Service
 @RequiredArgsConstructor
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class ContentEncryptionService extends BaseComponent {
 
     private final Optional<SecretService> secretService;

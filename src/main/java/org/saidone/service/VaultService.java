@@ -38,6 +38,7 @@ import org.saidone.monitor.VaultOperationMetrics.Operation;
 import org.saidone.monitor.VaultOperationMetrics.Outcome;
 import org.saidone.service.content.ContentService;
 import org.saidone.service.locking.VaultOperationCoordinator;
+import org.saidone.service.locking.AlfrescoArchiveLockService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -61,6 +62,7 @@ public class VaultService extends BaseComponent {
     private final ContentService contentService;
     private final VaultOperationCoordinator operationCoordinator;
     private final VaultOperationMetrics operationMetrics;
+    private final AlfrescoArchiveLockService alfrescoArchiveLockService;
 
     @Value("${application.service.vault.double-check}")
     private boolean doubleCheck;
@@ -74,7 +76,8 @@ public class VaultService extends BaseComponent {
     @Value("${application.service.vault.delete-node.delete-on-alfresco}")
     private boolean deleteOnAlfrescoOnDelete;
 
-    private static final String DOUBLE_CHECK_ALGORITHM = "MD5";
+    @Value("${application.service.vault.hash-algorithm:SHA-256}")
+    private String checksumAlgorithm;
 
     /**
      * Archives a node by its ID.
@@ -103,10 +106,16 @@ public class VaultService extends BaseComponent {
     }
 
     private long doArchiveNode(String nodeId) {
+        try (val sourceLock = alfrescoArchiveLockService.acquire(nodeId)) {
+            return doArchiveNode(nodeId, sourceLock);
+        }
+    }
+
+    private long doArchiveNode(String nodeId, AlfrescoArchiveLockService.Lease sourceLock) {
         long archivedBytes = 0;
         log.info("Archiving node: {}", nodeId);
         if (!nodeService.existsById(nodeId)) {
-            archivedBytes = storeNode(nodeId);
+            archivedBytes = storeNode(nodeId, sourceLock);
         } else {
             log.info("Node {} is already in the vault, skipping storage", nodeId);
             if (!alfrescoService.nodeExists(nodeId)) {
@@ -115,7 +124,8 @@ public class VaultService extends BaseComponent {
             // Always verify an existing vault copy before deleting, since Alfresco content may have changed since it was stored.
             if (deleteOnAlfresco) verifyAlfrescoContent(nodeId);
         }
-        if (deleteOnAlfresco) deleteNodeOnAlfresco(nodeId);
+        sourceLock.assertValid();
+        if (deleteOnAlfresco) sourceLock.delete(() -> deleteNodeOnAlfresco(nodeId));
         return archivedBytes;
     }
 
@@ -128,9 +138,10 @@ public class VaultService extends BaseComponent {
      * @throws NodeNotFoundOnAlfrescoException if the node is not found in Alfresco
      * @throws VaultException                  if any error occurs during storage
      */
-    private long storeNode(String nodeId) {
+    private long storeNode(String nodeId, AlfrescoArchiveLockService.Lease sourceLock) {
         try {
             val node = alfrescoService.getNode(nodeId);
+            sourceLock.stripLockMetadata(node);
             val nodeContentInputStream = new ProgressTrackingInputStream(
                     alfrescoService.getNodeContent(nodeId),
                     nodeId,
@@ -149,6 +160,7 @@ public class VaultService extends BaseComponent {
             }
             // Check before saving metadata: once saved, the node counts as archived and is never checked again.
             if (doubleCheck) doubleCheck(nodeId);
+            sourceLock.assertValid();
             nodeService.save(nodeWrapper);
             return node.getContent().getSizeInBytes();
         } catch (FeignException.NotFound e) {
@@ -171,12 +183,14 @@ public class VaultService extends BaseComponent {
      *
      * @param nodeId the ID of the archived node
      */
-    private void deleteNodeOnAlfresco(String nodeId) {
+    private boolean deleteNodeOnAlfresco(String nodeId) {
         try {
             alfrescoService.deleteNode(nodeId);
+            return true;
         } catch (Exception e) {
             log.trace(e.getMessage(), e);
             log.error("Node {} archived but not deleted on Alfresco: {}", nodeId, e.getMessage());
+            return false;
         }
     }
 
@@ -368,10 +382,10 @@ public class VaultService extends BaseComponent {
      * @throws VaultException          if any error occurs during hash calculation or comparison
      */
     public void doubleCheck(String nodeId) {
-        log.debug("Comparing {} hashes for node: {}", DOUBLE_CHECK_ALGORITHM, nodeId);
+        log.debug("Comparing {} hashes for node: {}", checksumAlgorithm, nodeId);
         try {
-            val alfrescoHash = alfrescoService.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
-            val vaultHash = contentService.computeHash(nodeId, DOUBLE_CHECK_ALGORITHM);
+            val alfrescoHash = alfrescoService.computeHash(nodeId, checksumAlgorithm);
+            val vaultHash = contentService.computeHash(nodeId, checksumAlgorithm);
             if (alfrescoHash.equals(vaultHash)) {
                 log.debug("Digest check passed for node: {}", nodeId);
             } else {

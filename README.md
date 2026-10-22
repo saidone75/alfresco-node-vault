@@ -132,6 +132,9 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | VAULT_HASH_ALGORITHM              | SHA-256                                    | Hash stored as content metadata in GridFS, S3 or Ozone                                    |
 | VAULT_DOUBLE_CHECK                | true                                       | Download the archived document again from Alfresco and the vault and compare their hashes |
 | VAULT_DELETE_ON_ALFRESCO          | true                                       | Delete the document from Alfresco after archiving                                         |
+| VAULT_ALFRESCO_USE_LOCK           | false                                      | Lock the source in Alfresco throughout archiving, verification and deletion               |
+| VAULT_ALFRESCO_LOCK_TTL_SECONDS   | 120                                        | Source lock TTL (minimum 30 seconds), renewed every third of the TTL                      |
+| VAULT_ALFRESCO_LOCK_LIFETIME      | PERSISTENT                                 | Source lock lifetime: PERSISTENT or EPHEMERAL                                             |
 | VAULT_DELETE_NODE_API_ENABLED     | false                                      | Enable the delete node API                                                                |
 | VAULT_AUTH_CACHE_TTL              | 60s                                        | Cache duration of successful API authentications                                          |
 | VAULT_ENCRYPT_CONTENT             | false                                      | Enable binary content encryption (S3, GridFS, Ozone)                                      |
@@ -149,6 +152,9 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | INTEGRITY_SWEEP_BATCH_SIZE        | 200                                        | Number of notarized documents processed per sweep page                                    |
 | ETH_RPC_URL                       | http://localhost:8545                      | Ethereum RPC endpoint                                                                     |
 | ETH_PRIVATE_KEY                   | 4f3edf983ac636a65a842ce7c78d9aa7...        | Private key used to sign transactions                                                     |
+
+Transfer checksums verify document integrity before source deletion, not for cryptographic purposes.
+`VAULT_HASH_ALGORITHM` defaults to SHA-256 and also applies to optional blockchain notarization.
 
 The Ozone development stack runs without authentication. Secured clusters require
 Hadoop/Ozone security configuration and a Kerberos identity; see [Ozone configuration](doc/Ozone.md).
@@ -233,6 +239,10 @@ On Windows, `vault.bat` starts S3; use `mvn test -Ps3`.
 
 ShedLock with MongoDB coordinates node operations and background jobs across instances.
 See [concurrency](doc/Concurrency.md) for configuration and limitations.
+
+Set `VAULT_ALFRESCO_USE_LOCK=true` to lock the source in Alfresco throughout archiving and deletion.
+Locks default to `PERSISTENT`, with a renewed 120-second TTL.
+Use a dedicated Alfresco account, since the lock owner can still modify the document.
 
 ## Docker configuration
 

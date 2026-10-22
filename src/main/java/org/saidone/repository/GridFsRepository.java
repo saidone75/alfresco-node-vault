@@ -26,8 +26,7 @@ import java.util.Map;
 
 /**
  * Abstraction for storing binary content in MongoDB's GridFS bucket. Provides
- * basic CRUD operations along with helper methods for metadata management and
- * hash calculation.
+ * basic CRUD operations along with helper methods for metadata management.
  */
 public interface GridFsRepository {
 
@@ -63,14 +62,5 @@ public interface GridFsRepository {
      * @param uuid identifier of the file
      */
     void deleteFileById(String uuid);
-
-    /**
-     * Calculates the cryptographic hash of a stored file.
-     *
-     * @param uuid      identifier of the file
-     * @param algorithm name of the hash algorithm (e.g. MD5 or SHA-256)
-     * @return the hexadecimal encoded hash value
-     */
-    String computeHash(String uuid, String algorithm);
 
 }
