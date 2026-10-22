@@ -21,6 +21,7 @@ package org.saidone.repository;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
 import jakarta.annotation.PostConstruct;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -193,15 +194,11 @@ public class GridFsRepositoryImpl extends BaseComponent implements GridFsReposit
      * Returns an input stream for the given GridFS file.
      *
      * @param file the file retrieved from GridFS
-     * @return input stream positioned at the beginning of the file or
-     * {@code null} if {@code file} is {@code null}
+     * @return input stream positioned at the beginning of the file
      */
     @SneakyThrows
-    public InputStream getFileContent(GridFSFile file) {
-        if (file != null) {
-            return gridFsOperations.getResource(file).getInputStream();
-        }
-        return null;
+    public InputStream getFileContent(@NonNull GridFSFile file) {
+        return gridFsOperations.getResource(file).getInputStream();
     }
 
     /**
