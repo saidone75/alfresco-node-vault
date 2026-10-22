@@ -19,6 +19,8 @@
 
 package org.saidone.service.crypto;
 
+import lombok.Value;
+import lombok.experimental.Accessors;
 import lombok.val;
 
 import org.saidone.service.crypto.AbstractCryptoService.Kdf;
@@ -28,7 +30,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 
 /** ANV v1 binary header. All integers are big-endian; the complete encoding is AEAD AAD. */
-record EncryptedPayloadHeader(int cipher, int keyVersion, Kdf kdf, byte[] salt, byte[] nonce) {
+@Value
+@Accessors(fluent = true)
+class EncryptedPayloadHeader {
+    int cipher;
+    int keyVersion;
+    Kdf kdf;
+    byte[] salt;
+    byte[] nonce;
+
     private static final byte[] MAGIC = {(byte) 0x89, 'A', 'N', 'V'};
     static final int MAX_HEADER_BYTES = 4096;
 
@@ -146,5 +156,10 @@ record EncryptedPayloadHeader(int cipher, int keyVersion, Kdf kdf, byte[] salt, 
         return input.readNBytes(length);
     }
 
-    record Decoded(EncryptedPayloadHeader header, byte[] bytes) { }
+    @Value
+    @Accessors(fluent = true)
+    static class Decoded {
+        EncryptedPayloadHeader header;
+        byte[] bytes;
+    }
 }
