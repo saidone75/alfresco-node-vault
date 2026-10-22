@@ -93,13 +93,15 @@ public class S3ContentService extends BaseComponent implements ContentService {
     @Override
     @SneakyThrows
     public void archiveNodeContent(Node node, InputStream inputStream) {
-        try (val tempFile = new SecureTemporaryFile("s3-upload-", ".bin");
-             val dis = new AnvDigestInputStream(inputStream, checksumAlgorithm);
-             val fos = Files.newOutputStream(tempFile.getPath());
-             val fis = Files.newInputStream(tempFile.getPath())) {
-            dis.transferTo(fos);
-            fos.flush();
-            val checksum = dis.getHash();
+        // The source stream is a resource too, so it is closed even if the temporary file cannot be created.
+        try (inputStream;
+             val tempFile = new SecureTemporaryFile("s3-upload-", ".bin")) {
+            String checksum;
+            try (val dis = new AnvDigestInputStream(inputStream, checksumAlgorithm);
+                 val fos = Files.newOutputStream(tempFile.getPath())) {
+                dis.transferTo(fos);
+                checksum = dis.getHash();
+            }
             log.trace("{}: {}", checksumAlgorithm, checksum);
             val metadata = new HashMap<String, String>();
             metadata.put(MetadataKeys.UUID, node.getId());
@@ -107,7 +109,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
             metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
             metadata.put(MetadataKeys.CHECKSUM_ALGORITHM, checksumAlgorithm);
             metadata.put(MetadataKeys.CHECKSUM_VALUE, checksum);
-            s3Repository.putObject(s3Config.getBucket(), node, metadata, fis);
+            s3Repository.putObject(s3Config.getBucket(), node, metadata, tempFile.getPath());
         }
     }
 

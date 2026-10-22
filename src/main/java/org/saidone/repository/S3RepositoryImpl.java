@@ -28,13 +28,13 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.http.ContentStreamProvider;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectResponse;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.HashMap;
 
 /**
@@ -61,23 +61,25 @@ public class S3RepositoryImpl extends BaseComponent implements S3Repository {
     protected final S3Client s3Client;
 
     /**
-     * Uploads the provided stream as an object to S3. The node id is used as
+     * Uploads the provided file as an object to S3. The node id is used as
      * the object key.
      *
-     * @param bucketName  destination bucket
-     * @param node        node whose id acts as the key
-     * @param metadata    optional object metadata to associate with the stored
-     *                    content
-     * @param inputStream stream of the content to store
+     * @param bucketName destination bucket
+     * @param node       node whose id acts as the key
+     * @param metadata   optional object metadata to associate with the stored
+     *                   content
+     * @param content    file holding the content to store
      */
     @Override
-    public void putObject(String bucketName, Node node, HashMap<String, String> metadata, InputStream inputStream) {
+    public void putObject(String bucketName, Node node, HashMap<String, String> metadata, Path content) {
         val putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucketName)
                 .key(node.getId())
+                .contentType(node.getContent().getMimeType())
                 .metadata(metadata)
                 .build();
-        s3Client.putObject(putObjectRequest, RequestBody.fromContentProvider(ContentStreamProvider.fromInputStream(inputStream), node.getContent().getMimeType()));
+        // A file body has a known length and can be re-read on retries, so the SDK never buffers it in memory.
+        s3Client.putObject(putObjectRequest, RequestBody.fromFile(content));
     }
 
     /**

@@ -22,6 +22,7 @@ package org.saidone.repository;
 import org.alfresco.core.model.Node;
 
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.HashMap;
 
 /**
@@ -38,9 +39,11 @@ public interface S3Repository {
      * @param node        node whose identifier will be used as the object key
      * @param metadata    optional object metadata to store alongside the binary
      *                    content
-     * @param inputStream the stream providing the content to store
+     * @param content     file holding the content to store; it is streamed from
+     *                    disk with its exact length, so the content is never
+     *                    buffered in memory
      */
-    void putObject(String bucketName, Node node, HashMap<String, String> metadata, InputStream inputStream);
+    void putObject(String bucketName, Node node, HashMap<String, String> metadata, Path content);
 
     /**
      * Retrieves an object from S3 previously stored for the given node id.
