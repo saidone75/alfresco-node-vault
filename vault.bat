@@ -1,103 +1,114 @@
-@ECHO OFF
-SETLOCAL
+@echo off
+setlocal
 
-SET VOLUME_PREFIX=anv
-SET DOCKER_COMPOSE=docker-compose ^
-                    -f docker\docker-compose.yml ^
-                    -f docker\mongo\docker-compose.yml ^
-                    -f docker\hashicorp-vault\docker-compose.yml ^
-                    -f docker\motoserver\docker-compose.yml ^
-                    -f docker\ganache\docker-compose.yml ^
-                    -f docker\grafana\docker-compose.yml ^
-                    --env-file docker\.env
+REM Keep the script name: shift below also shifts %0.
+set "VAULT_SCRIPT=%~nx0"
+set "VOLUME_PREFIX=anv"
+set "VAULT_BACKEND=s3"
+set "VAULT_BACKEND_SELECTED="
+set "VAULT_NOVAULT=0"
 
-REM Check parameter
-IF "%~1"=="" (
-    echo Usage: %~nx0 {build^|build_start^|start^|stop^|purge^|tail} [novault]
-    GOTO END
+if "%~1"=="" goto usage
+set "VAULT_COMMAND=%~1"
+shift
+
+:arguments
+if "%~1"=="" goto validate
+if "%~1"=="--s3" (
+    if defined VAULT_BACKEND_SELECTED goto usage
+    set "VAULT_BACKEND_SELECTED=1"
+    set "VAULT_BACKEND=s3"
+) else if "%~1"=="--gridfs" (
+    if defined VAULT_BACKEND_SELECTED goto usage
+    set "VAULT_BACKEND_SELECTED=1"
+    set "VAULT_BACKEND=gridfs"
+) else if "%~1"=="--ozone" (
+    if defined VAULT_BACKEND_SELECTED goto usage
+    set "VAULT_BACKEND_SELECTED=1"
+    set "VAULT_BACKEND=ozone"
+) else if "%~1"=="novault" (
+    set "VAULT_NOVAULT=1"
+) else (
+    goto usage
 )
+shift
+goto arguments
 
-IF /I "%~1"=="build" (
-    CALL :build
-    GOTO END
-)
+:validate
+for %%C in (build build_start start stop purge tail) do if "%VAULT_COMMAND%"=="%%C" goto launch
+goto usage
 
-IF /I "%~1"=="build_start" (
-    CALL :down
-    CALL :build
-    CALL :start %2
-    CALL :tail
-    GOTO END
-)
+:launch
+set "VAULT_COMPOSE=docker compose --env-file docker/.env -f docker/docker-compose.yml -f docker/mongo/docker-compose.yml -f docker/hashicorp-vault/docker-compose.yml -f docker/ganache/docker-compose.yml -f docker/grafana/docker-compose.yml"
+if "%VAULT_BACKEND%"=="s3" set "VAULT_COMPOSE=%VAULT_COMPOSE% -f docker/motoserver/docker-compose.yml -f docker/storage-s3.yml"
+if "%VAULT_BACKEND%"=="gridfs" set "VAULT_COMPOSE=%VAULT_COMPOSE% -f docker/storage-gridfs.yml"
+if "%VAULT_BACKEND%"=="ozone" set "VAULT_COMPOSE=%VAULT_COMPOSE% -f docker/ozone/docker-compose.yml -f docker/ozone/vault.yml"
+pushd "%~dp0"
+if errorlevel 1 exit /b 1
+goto command_%VAULT_COMMAND%
 
-IF /I "%~1"=="start" (
-    CALL :start %2
-    CALL :tail
-    GOTO END
-)
+:command_build
+call :build
+goto finish
 
-IF /I "%~1"=="stop" (
-    CALL :down
-    GOTO END
-)
+:command_build_start
+%VAULT_COMPOSE% down
+if errorlevel 1 goto finish
+call :build
+if errorlevel 1 goto finish
+call :start
+if errorlevel 1 goto finish
+%VAULT_COMPOSE% logs -f
+goto finish
 
-IF /I "%~1"=="purge" (
-    CALL :down
-    CALL :purge
-    GOTO END
-)
+:command_start
+call :start
+if errorlevel 1 goto finish
+%VAULT_COMPOSE% logs -f
+goto finish
 
-IF /I "%~1"=="tail" (
-    CALL :tail
-    GOTO END
-)
+:command_stop
+%VAULT_COMPOSE% down --remove-orphans
+goto finish
 
-REM If no command matches
-echo Usage: %~nx0 {build|build_start|start|stop|purge|tail} [novault]
+:command_purge
+call :purge
+goto finish
 
-:END
-ENDLOCAL
-EXIT /B %ERRORLEVEL%
+:command_tail
+%VAULT_COMPOSE% logs -f
+goto finish
 
-:start
-REM Create volumes
-docker volume create %VOLUME_PREFIX%-acs-volume
-docker volume create %VOLUME_PREFIX%-postgres-volume
-docker volume create %VOLUME_PREFIX%-ass-volume
-docker volume create %VOLUME_PREFIX%-mongo-volume
-docker volume create %VOLUME_PREFIX%-grafana-volume
-
-echo %ENV_FILE_PATH%
-IF /I "%~1"=="novault" (
-    %DOCKER_COMPOSE% ^
-    up --build -d --scale anv-vault=0
-) ELSE (
-    %DOCKER_COMPOSE% ^
-    up --build -d
-)
-EXIT /B 0
-
-:down
-if exist "docker\docker-compose.yml" (
-    %DOCKER_COMPOSE% ^
-    down
-)
-EXIT /B 0
+:finish
+set "VAULT_EXIT_CODE=%ERRORLEVEL%"
+popd
+endlocal & exit /b %VAULT_EXIT_CODE%
 
 :build
-%DOCKER_COMPOSE% build anv-vault
-EXIT /B 0
+%VAULT_COMPOSE% build anv-vault
+exit /b
 
-:tail
-%DOCKER_COMPOSE% ^
-logs -f
-EXIT /B 0
+:start
+for %%V in (acs postgres ass mongo grafana) do (
+    docker volume create "%VOLUME_PREFIX%-%%V-volume"
+    if errorlevel 1 exit /b 1
+)
+if "%VAULT_NOVAULT%"=="1" (
+    %VAULT_COMPOSE% up --build -d --scale anv-vault=0
+) else (
+    %VAULT_COMPOSE% up --build -d
+)
+exit /b
 
 :purge
-docker volume rm -f %VOLUME_PREFIX%-acs-volume
-docker volume rm -f %VOLUME_PREFIX%-postgres-volume
-docker volume rm -f %VOLUME_PREFIX%-ass-volume
-docker volume rm -f %VOLUME_PREFIX%-mongo-volume
-docker volume rm -f %VOLUME_PREFIX%-grafana-volume
-docker volume rm -f %VOLUME_PREFIX%-algorand-volume
-EXIT /B 0
+%VAULT_COMPOSE% down --volumes
+if errorlevel 1 exit /b
+for %%V in (acs postgres ass mongo grafana) do (
+    docker volume rm -f "%VOLUME_PREFIX%-%%V-volume"
+    if errorlevel 1 exit /b 1
+)
+exit /b 0
+
+:usage
+echo Usage: %VAULT_SCRIPT% {build^|build_start^|start^|stop^|purge^|tail} [--s3^|--gridfs^|--ozone] [novault] 1>&2
+endlocal & exit /b 2
