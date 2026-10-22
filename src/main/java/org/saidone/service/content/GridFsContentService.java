@@ -163,8 +163,8 @@ public class GridFsContentService extends BaseComponent implements ContentServic
 
     /**
      * Computes the checksum of a node's content stored in GridFS using the provided algorithm.
-     * Plain content is hashed by MongoDB; encrypted content is streamed and hashed after
-     * decryption, so the checksum always refers to the original content.
+     * Content is streamed and decrypted when needed, so the checksum always refers
+     * to the original content.
      *
      * @param nodeId    identifier of the node
      * @param algorithm name of the hash algorithm
@@ -175,10 +175,8 @@ public class GridFsContentService extends BaseComponent implements ContentServic
     @SneakyThrows
     public String computeHash(String nodeId, String algorithm) {
         val gridFSFile = findFile(nodeId);
-        if (!isEncrypted(gridFSFile)) {
-            return gridFsRepository.computeHash(nodeId, algorithm);
-        }
-        try (val digestInputStream = new AnvDigestInputStream(readContent(gridFSFile), algorithm)) {
+        try (val content = readContent(gridFSFile);
+             val digestInputStream = new AnvDigestInputStream(content, algorithm)) {
             digestInputStream.transferTo(OutputStream.nullOutputStream());
             return digestInputStream.getHash();
         }
