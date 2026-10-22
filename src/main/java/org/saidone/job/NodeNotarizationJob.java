@@ -69,11 +69,11 @@ public class NodeNotarizationJob extends BaseComponent {
      * logged and do not stop processing of the remaining nodes.
      */
     private void doNotarize() {
-        for (val node : nodeService.findByNtx(null)) {
+        for (val nodeId : nodeService.findIdsByNtx(null)) {
             try {
-                notarizationService.notarizeNode(node.getId());
+                notarizationService.notarizeNode(nodeId);
             } catch (NodeOperationInProgressException e) {
-                log.info("Skipping busy node {}; notarization can be retried on a later run", node.getId());
+                log.info("Skipping busy node {}; notarization can be retried on a later run", nodeId);
             } catch (Exception e) {
                 log.warn(e.getMessage(), e);
             }

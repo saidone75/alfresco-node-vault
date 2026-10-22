@@ -303,26 +303,41 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
     }
 
     /**
-     * Retrieves node wrappers by notarization transaction ID. A {@code null} value
-     * matches nodes without a transaction ID.
+     * Retrieves a page of node IDs by notarization transaction ID, in ascending
+     * ID order. A {@code null} value matches nodes without a transaction ID.
      *
-     * @param ntx the transaction ID to filter by
-     * @return list of matching nodes
+     * @param ntx     the transaction ID to filter by
+     * @param afterId only IDs greater than this one are returned; {@code null} to start from the first
+     * @param limit   maximum number of IDs to return
+     * @return the matching node IDs
      */
-    public List<NodeEntity> findByNtx(String ntx) {
-        val query = new Query(Criteria.where(MetadataKeys.NOTARIZATION_TRANSACTION_ID).is(ntx));
-        return mongoOperations.find(query, NodeEntity.class);
+    public List<String> findIdsByNtx(String ntx, String afterId, int limit) {
+        return findIds(Criteria.where(MetadataKeys.NOTARIZATION_TRANSACTION_ID).is(ntx), afterId, limit);
     }
 
     /**
-     * Retrieves node wrappers by encryption key version.
+     * Retrieves a page of node IDs by encryption key version, in ascending ID
+     * order.
      *
-     * @param kv the encryption key version to filter by
-     * @return list of nodes encrypted with the specified key version
+     * @param kv      the encryption key version to filter by
+     * @param afterId only IDs greater than this one are returned; {@code null} to start from the first
+     * @param limit   maximum number of IDs to return
+     * @return the IDs of nodes encrypted with the specified key version
      */
-    public List<NodeEntity> findByKv(int kv) {
-        val query = new Query(Criteria.where(MetadataKeys.KEY_VERSION).is(kv));
-        return mongoOperations.find(query, NodeEntity.class);
+    public List<String> findIdsByKv(int kv, String afterId, int limit) {
+        return findIds(Criteria.where(MetadataKeys.KEY_VERSION).is(kv), afterId, limit);
+    }
+
+    /**
+     * Retrieves a page of IDs of the nodes matching the given criteria, loading
+     * only the {@code _id} field of each document.
+     */
+    private List<String> findIds(Criteria criteria, String afterId, int limit) {
+        val query = new Query(afterId == null ? criteria : new Criteria().andOperator(criteria, Criteria.where("_id").gt(afterId)))
+                .with(Sort.by(Sort.Direction.ASC, "_id"))
+                .limit(limit);
+        query.fields().include("_id");
+        return mongoOperations.find(query, NodeEntity.class).stream().map(NodeEntity::getId).toList();
     }
 
     /**

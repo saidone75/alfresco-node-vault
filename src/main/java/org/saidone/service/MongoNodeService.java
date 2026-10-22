@@ -33,7 +33,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Iterator;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.function.BiFunction;
 
 /**
  * Default {@link NodeService} implementation that persists node metadata using
@@ -47,6 +50,8 @@ public class MongoNodeService extends BaseComponent implements NodeService {
 
     private final MongoNodeRepositoryImpl mongoNodeRepository;
     private final NodeMapper nodeMapper;
+
+    private static final int ID_PAGE_SIZE = 1000;
 
     /**
      * {@inheritDoc}
@@ -127,16 +132,49 @@ public class MongoNodeService extends BaseComponent implements NodeService {
      * {@inheritDoc}
      */
     @Override
-    public Iterable<NodeWrapperDto> findByNtx(String ntx) {
-        return nodeMapper.toDtoList(mongoNodeRepository.findByNtx(ntx));
+    public Iterable<String> findIdsByNtx(String ntx) {
+        return pagedIds((afterId, limit) -> mongoNodeRepository.findIdsByNtx(ntx, afterId, limit));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Iterable<NodeWrapperDto> findByKv(int kv) {
-        return nodeMapper.toDtoList(mongoNodeRepository.findByKv(kv));
+    public Iterable<String> findIdsByKv(int kv) {
+        return pagedIds((afterId, limit) -> mongoNodeRepository.findIdsByKv(kv, afterId, limit));
+    }
+
+    /**
+     * Returns an iterable that loads IDs one page at a time, resuming each page
+     * after the last ID of the previous one. Paging by ID rather than by offset
+     * keeps working while the iterated nodes stop matching the query, as they
+     * do once notarized or re-encrypted.
+     *
+     * @param pageLoader loads up to {@code limit} IDs greater than {@code afterId}
+     * @return the lazily loaded IDs
+     */
+    private static Iterable<String> pagedIds(BiFunction<String, Integer, List<String>> pageLoader) {
+        return () -> new Iterator<>() {
+            private List<String> page = List.of();
+            private int index;
+            private boolean lastPage;
+
+            @Override
+            public boolean hasNext() {
+                if (index < page.size()) return true;
+                if (lastPage) return false;
+                page = pageLoader.apply(page.isEmpty() ? null : page.getLast(), ID_PAGE_SIZE);
+                index = 0;
+                lastPage = page.size() < ID_PAGE_SIZE;
+                return !page.isEmpty();
+            }
+
+            @Override
+            public String next() {
+                if (!hasNext()) throw new NoSuchElementException();
+                return page.get(index++);
+            }
+        };
     }
 
     /**

@@ -110,12 +110,11 @@ public class KeyServiceImpl extends BaseComponent implements KeyService {
      */
     @Override
     public void updateKeys(int sourceVersion) {
-        val nodes = nodeService.findByKv(sourceVersion);
-        nodes.forEach(node -> {
+        nodeService.findIdsByKv(sourceVersion).forEach(nodeId -> {
             try {
-                updateKey(node.getId());
+                updateKey(nodeId);
             } catch (NodeOperationInProgressException e) {
-                log.warn("Skipping key update for busy node {}; retry the bulk update to include it", node.getId());
+                log.warn("Skipping key update for busy node {}; retry the bulk update to include it", nodeId);
             }
         });
     }
