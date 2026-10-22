@@ -216,9 +216,10 @@ implements <a href="ContentService.html" title="interface in org.saidone.service
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;inputStream)</span></div>
 <div class="block">Saves the content stream of the given node to S3.
  <p>
- The method computes the checksum while copying the payload to a temporary file,
- then uploads that file with Alfresco metadata (UUID, file name, MIME type,
- checksum algorithm and checksum value).
+ The method computes the checksum of the original content while writing the
+ bytes to store, encrypted when content encryption is enabled, to a temporary
+ file, then uploads that file with Alfresco metadata (UUID, file name, MIME
+ type, checksum algorithm and checksum value).
  </p></div>
 <dl class="notes">
 <dt>Specified by:</dt>

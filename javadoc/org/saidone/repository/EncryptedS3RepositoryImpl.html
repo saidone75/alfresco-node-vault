@@ -157,20 +157,19 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Retrieves the object content from S3.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)" class="member-name-link">putObject</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
- org.alfresco.core.model.Node&nbsp;node,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Path.html" title="class or interface in java.nio.file" class="external-link">Path</a>&nbsp;content)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#prepareContent(java.io.InputStream,java.util.HashMap)" class="member-name-link">prepareContent</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;content,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Encrypts the provided file and stores it in S3.</div>
+<div class="block">Returns the encrypted stream of the provided content and marks the
+ object's metadata as encrypted with the current key version.</div>
 </div>
 </div>
 </div>
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.saidone.repository.S3RepositoryImpl">Methods inherited from class&nbsp;org.saidone.repository.<a href="S3RepositoryImpl.html" title="class in org.saidone.repository">S3RepositoryImpl</a></h3>
-<code><a href="S3RepositoryImpl.html#getObjectStream(java.lang.String,java.lang.String)">getObjectStream</a></code></div>
+<code><a href="S3RepositoryImpl.html#getObjectStream(java.lang.String,java.lang.String)">getObjectStream</a>, <a href="S3RepositoryImpl.html#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)">putObject</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.saidone.component.BaseComponent">Methods inherited from class&nbsp;org.saidone.component.<a href="../component/BaseComponent.html" title="class in org.saidone.component">BaseComponent</a></h3>
 <code><a href="../component/BaseComponent.html#init()">init</a>, <a href="../component/BaseComponent.html#setApplicationContext(org.springframework.context.ApplicationContext)">setApplicationContext</a>, <a href="../component/BaseComponent.html#shutDown(int)">shutDown</a>, <a href="../component/BaseComponent.html#stop()">stop</a></code></div>
@@ -213,26 +212,22 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)">
-<h3>putObject</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">putObject</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
- org.alfresco.core.model.Node&nbsp;node,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Path.html" title="class or interface in java.nio.file" class="external-link">Path</a>&nbsp;content)</span></div>
-<div class="block">Encrypts the provided file and stores it in S3. The object's metadata is
- updated to mark it as encrypted before delegating to the parent
- implementation.</div>
+<section class="detail" id="prepareContent(java.io.InputStream,java.util.HashMap)">
+<h3>prepareContent</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></span>&nbsp;<span class="element-name">prepareContent</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;content,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata)</span></div>
+<div class="block">Returns the encrypted stream of the provided content and marks the
+ object's metadata as encrypted with the current key version.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="S3Repository.html#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)">putObject</a></code>&nbsp;in interface&nbsp;<code><a href="S3Repository.html" title="interface in org.saidone.repository">S3Repository</a></code></dd>
+<dd><code><a href="S3Repository.html#prepareContent(java.io.InputStream,java.util.HashMap)">prepareContent</a></code>&nbsp;in interface&nbsp;<code><a href="S3Repository.html" title="interface in org.saidone.repository">S3Repository</a></code></dd>
 <dt>Overrides:</dt>
-<dd><code><a href="S3RepositoryImpl.html#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)">putObject</a></code>&nbsp;in class&nbsp;<code><a href="S3RepositoryImpl.html" title="class in org.saidone.repository">S3RepositoryImpl</a></code></dd>
+<dd><code><a href="S3RepositoryImpl.html#prepareContent(java.io.InputStream,java.util.HashMap)">prepareContent</a></code>&nbsp;in class&nbsp;<code><a href="S3RepositoryImpl.html" title="class in org.saidone.repository">S3RepositoryImpl</a></code></dd>
 <dt>Parameters:</dt>
-<dd><code>bucketName</code> - destination bucket</dd>
-<dd><code>node</code> - node whose id acts as the key</dd>
-<dd><code>metadata</code> - optional object metadata to associate with the stored
-                   object</dd>
-<dd><code>content</code> - file holding the content to encrypt and upload</dd>
+<dd><code>content</code> - the original content</dd>
+<dd><code>metadata</code> - object metadata, updated with the encryption details</dd>
+<dt>Returns:</dt>
+<dd>the encrypted content stream</dd>
 </dl>
 </section>
 </li>

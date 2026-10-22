@@ -158,20 +158,19 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Retrieves the object content from Ozone.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#putObject(java.lang.String,long,java.util.Map,java.io.InputStream)" class="member-name-link">putObject</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId,
- long&nbsp;length,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;content)</code></div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#prepareContent(java.io.InputStream,java.util.Map)" class="member-name-link">prepareContent</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;content,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Encrypts the provided content stream and stores it in Ozone.</div>
+<div class="block">Returns the encrypted stream of the provided content and marks the
+ object's metadata as encrypted with the current key version.</div>
 </div>
 </div>
 </div>
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-org.saidone.repository.OzoneRepositoryImpl">Methods inherited from class&nbsp;org.saidone.repository.<a href="OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></h3>
-<code><a href="OzoneRepositoryImpl.html#deleteObject(java.lang.String)">deleteObject</a>, <a href="OzoneRepositoryImpl.html#getObjectDetails(java.lang.String)">getObjectDetails</a>, <a href="OzoneRepositoryImpl.html#writeObject(java.lang.String,long,java.util.Map,java.io.InputStream)">writeObject</a></code></div>
+<code><a href="OzoneRepositoryImpl.html#deleteObject(java.lang.String)">deleteObject</a>, <a href="OzoneRepositoryImpl.html#getObjectDetails(java.lang.String)">getObjectDetails</a>, <a href="OzoneRepositoryImpl.html#putObject(java.lang.String,java.nio.file.Path,java.util.Map)">putObject</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
@@ -211,28 +210,22 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="putObject(java.lang.String,long,java.util.Map,java.io.InputStream)">
-<h3>putObject</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">putObject</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId,
- long&nbsp;length,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;content)</span>
-               throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
-<div class="block">Encrypts the provided content stream and stores it in Ozone. The object's
- metadata is updated to mark it as encrypted before delegating to the
- shared upload operation.</div>
+<section class="detail" id="prepareContent(java.io.InputStream,java.util.Map)">
+<h3>prepareContent</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></span>&nbsp;<span class="element-name">prepareContent</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;content,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html" title="class or interface in java.util" class="external-link">Map</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata)</span></div>
+<div class="block">Returns the encrypted stream of the provided content and marks the
+ object's metadata as encrypted with the current key version.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
-<dd><code><a href="OzoneRepository.html#putObject(java.lang.String,long,java.util.Map,java.io.InputStream)">putObject</a></code>&nbsp;in interface&nbsp;<code><a href="OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></code></dd>
+<dd><code><a href="OzoneRepository.html#prepareContent(java.io.InputStream,java.util.Map)">prepareContent</a></code>&nbsp;in interface&nbsp;<code><a href="OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></code></dd>
 <dt>Overrides:</dt>
-<dd><code><a href="OzoneRepositoryImpl.html#putObject(java.lang.String,long,java.util.Map,java.io.InputStream)">putObject</a></code>&nbsp;in class&nbsp;<code><a href="OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></code></dd>
+<dd><code><a href="OzoneRepositoryImpl.html#prepareContent(java.io.InputStream,java.util.Map)">prepareContent</a></code>&nbsp;in class&nbsp;<code><a href="OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></code></dd>
 <dt>Parameters:</dt>
-<dd><code>nodeId</code> - identifier of the node / object key</dd>
-<dd><code>length</code> - content length before encryption, in bytes</dd>
-<dd><code>metadata</code> - object metadata to associate with the stored content</dd>
-<dd><code>content</code> - content stream to encrypt and upload</dd>
-<dt>Throws:</dt>
-<dd><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></code> - if the content cannot be stored</dd>
+<dd><code>content</code> - the original content</dd>
+<dd><code>metadata</code> - object metadata, updated with the encryption details</dd>
+<dt>Returns:</dt>
+<dd>the encrypted content stream</dd>
 </dl>
 </section>
 </li>

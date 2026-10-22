@@ -115,12 +115,20 @@ loadScripts(document, 'script');</script>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Retrieves an object from S3 previously stored for the given node id.</div>
 </div>
-<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)" class="member-name-link">putObject</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#prepareContent(java.io.InputStream,java.util.HashMap)" class="member-name-link">prepareContent</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;content,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="block">Returns the stream of the bytes to store for the given content, encrypted
+ when content encryption is enabled, and records in <code>metadata</code> how
+ they are stored.</div>
+</div>
+<div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code>void</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)" class="member-name-link">putObject</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
  org.alfresco.core.model.Node&nbsp;node,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Path.html" title="class or interface in java.nio.file" class="external-link">Path</a>&nbsp;content)</code></div>
-<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
+<div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
 <div class="block">Uploads a node's content to the specified S3 bucket using the node id as
  object key.</div>
 </div>
@@ -139,6 +147,25 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
+<section class="detail" id="prepareContent(java.io.InputStream,java.util.HashMap)">
+<h3>prepareContent</h3>
+<div class="member-signature"><span class="return-type"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a></span>&nbsp;<span class="element-name">prepareContent</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link">InputStream</a>&nbsp;content,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/HashMap.html" title="class or interface in java.util" class="external-link">HashMap</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;metadata)</span></div>
+<div class="block">Returns the stream of the bytes to store for the given content, encrypted
+ when content encryption is enabled, and records in <code>metadata</code> how
+ they are stored. The caller writes this stream to the file then passed to
+ <a href="#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)"><code>putObject(java.lang.String, org.alfresco.core.model.Node, java.util.HashMap&lt;java.lang.String, java.lang.String&gt;, java.nio.file.Path)</code></a>, so plain content never reaches the disk when
+ encryption is enabled.</div>
+<dl class="notes">
+<dt>Parameters:</dt>
+<dd><code>content</code> - the original content; closing the returned stream closes it</dd>
+<dd><code>metadata</code> - object metadata, updated with the storage details</dd>
+<dt>Returns:</dt>
+<dd>the stream of the bytes to store</dd>
+</dl>
+</section>
+</li>
+<li>
 <section class="detail" id="putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)">
 <h3>putObject</h3>
 <div class="member-signature"><span class="return-type">void</span>&nbsp;<span class="element-name">putObject</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;bucketName,
@@ -153,9 +180,10 @@ loadScripts(document, 'script');</script>
 <dd><code>node</code> - node whose identifier will be used as the object key</dd>
 <dd><code>metadata</code> - optional object metadata to store alongside the binary
                     content</dd>
-<dd><code>content</code> - file holding the content to store; it is streamed from
-                    disk with its exact length, so the content is never
-                    buffered in memory</dd>
+<dd><code>content</code> - file holding the bytes to store, as returned by
+                    <a href="#prepareContent(java.io.InputStream,java.util.HashMap)"><code>prepareContent(java.io.InputStream, java.util.HashMap&lt;java.lang.String, java.lang.String&gt;)</code></a>; it is streamed from disk with
+                    its exact length, so the content is never buffered in
+                    memory</dd>
 </dl>
 </section>
 </li>

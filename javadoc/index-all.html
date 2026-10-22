@@ -1796,6 +1796,38 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Metadata field recording the original content length, before encryption.</div>
 </dd>
+<dt><a href="org/saidone/repository/EncryptedS3RepositoryImpl.html#prepareContent(java.io.InputStream,java.util.HashMap)" class="member-name-link">prepareContent(InputStream, HashMap&lt;String, String&gt;)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/EncryptedS3RepositoryImpl.html" title="class in org.saidone.repository">EncryptedS3RepositoryImpl</a></dt>
+<dd>
+<div class="block">Returns the encrypted stream of the provided content and marks the
+ object's metadata as encrypted with the current key version.</div>
+</dd>
+<dt><a href="org/saidone/repository/S3Repository.html#prepareContent(java.io.InputStream,java.util.HashMap)" class="member-name-link">prepareContent(InputStream, HashMap&lt;String, String&gt;)</a> - Method in interface org.saidone.repository.<a href="org/saidone/repository/S3Repository.html" title="interface in org.saidone.repository">S3Repository</a></dt>
+<dd>
+<div class="block">Returns the stream of the bytes to store for the given content, encrypted
+ when content encryption is enabled, and records in <code>metadata</code> how
+ they are stored.</div>
+</dd>
+<dt><a href="org/saidone/repository/S3RepositoryImpl.html#prepareContent(java.io.InputStream,java.util.HashMap)" class="member-name-link">prepareContent(InputStream, HashMap&lt;String, String&gt;)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/S3RepositoryImpl.html" title="class in org.saidone.repository">S3RepositoryImpl</a></dt>
+<dd>
+<div class="block">Returns the provided content unchanged: plain content is stored as is.</div>
+</dd>
+<dt><a href="org/saidone/repository/EncryptedOzoneRepositoryImpl.html#prepareContent(java.io.InputStream,java.util.Map)" class="member-name-link">prepareContent(InputStream, Map&lt;String, String&gt;)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/EncryptedOzoneRepositoryImpl.html" title="class in org.saidone.repository">EncryptedOzoneRepositoryImpl</a></dt>
+<dd>
+<div class="block">Returns the encrypted stream of the provided content and marks the
+ object's metadata as encrypted with the current key version.</div>
+</dd>
+<dt><a href="org/saidone/repository/OzoneRepository.html#prepareContent(java.io.InputStream,java.util.Map)" class="member-name-link">prepareContent(InputStream, Map&lt;String, String&gt;)</a> - Method in interface org.saidone.repository.<a href="org/saidone/repository/OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></dt>
+<dd>
+<div class="block">Returns the stream of the bytes to store for the given content, encrypted
+ when content encryption is enabled, and records in <code>metadata</code> how
+ they are stored.</div>
+</dd>
+<dt><a href="org/saidone/repository/OzoneRepositoryImpl.html#prepareContent(java.io.InputStream,java.util.Map)" class="member-name-link">prepareContent(InputStream, Map&lt;String, String&gt;)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></dt>
+<dd>
+<div class="block">Returns the stream of the bytes to store for the given content, encrypted
+ when content encryption is enabled, and records in <code>metadata</code> how
+ they are stored.</div>
+</dd>
 <dt><a href="org/saidone/misc/ProgressTrackingInputStream.html" class="type-name-link" title="class in org.saidone.misc">ProgressTrackingInputStream</a> - Class in <a href="org/saidone/misc/package-summary.html">org.saidone.misc</a></dt>
 <dd>
 <div class="block"><a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html" title="class or interface in java.io" class="external-link"><code>InputStream</code></a> wrapper that logs read progress for debugging purposes.</div>
@@ -2406,23 +2438,15 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Sends a zero-value transaction containing the given hash as data.</div>
 </dd>
-<dt><a href="org/saidone/repository/EncryptedOzoneRepositoryImpl.html#putObject(java.lang.String,long,java.util.Map,java.io.InputStream)" class="member-name-link">putObject(String, long, Map&lt;String, String&gt;, InputStream)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/EncryptedOzoneRepositoryImpl.html" title="class in org.saidone.repository">EncryptedOzoneRepositoryImpl</a></dt>
-<dd>
-<div class="block">Encrypts the provided content stream and stores it in Ozone.</div>
-</dd>
-<dt><a href="org/saidone/repository/OzoneRepository.html#putObject(java.lang.String,long,java.util.Map,java.io.InputStream)" class="member-name-link">putObject(String, long, Map&lt;String, String&gt;, InputStream)</a> - Method in interface org.saidone.repository.<a href="org/saidone/repository/OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></dt>
+<dt><a href="org/saidone/repository/OzoneRepository.html#putObject(java.lang.String,java.nio.file.Path,java.util.Map)" class="member-name-link">putObject(String, Path, Map&lt;String, String&gt;)</a> - Method in interface org.saidone.repository.<a href="org/saidone/repository/OzoneRepository.html" title="interface in org.saidone.repository">OzoneRepository</a></dt>
 <dd>
 <div class="block">Uploads a node's content to the configured Ozone bucket using the node id as
  object key.</div>
 </dd>
-<dt><a href="org/saidone/repository/OzoneRepositoryImpl.html#putObject(java.lang.String,long,java.util.Map,java.io.InputStream)" class="member-name-link">putObject(String, long, Map&lt;String, String&gt;, InputStream)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></dt>
+<dt><a href="org/saidone/repository/OzoneRepositoryImpl.html#putObject(java.lang.String,java.nio.file.Path,java.util.Map)" class="member-name-link">putObject(String, Path, Map&lt;String, String&gt;)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></dt>
 <dd>
 <div class="block">Uploads a node's content to the configured Ozone bucket using the node id as
  object key.</div>
-</dd>
-<dt><a href="org/saidone/repository/EncryptedS3RepositoryImpl.html#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)" class="member-name-link">putObject(String, Node, HashMap&lt;String, String&gt;, Path)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/EncryptedS3RepositoryImpl.html" title="class in org.saidone.repository">EncryptedS3RepositoryImpl</a></dt>
-<dd>
-<div class="block">Encrypts the provided file and stores it in S3.</div>
 </dd>
 <dt><a href="org/saidone/repository/S3Repository.html#putObject(java.lang.String,org.alfresco.core.model.Node,java.util.HashMap,java.nio.file.Path)" class="member-name-link">putObject(String, Node, HashMap&lt;String, String&gt;, Path)</a> - Method in interface org.saidone.repository.<a href="org/saidone/repository/S3Repository.html" title="interface in org.saidone.repository">S3Repository</a></dt>
 <dd>
@@ -2928,11 +2952,6 @@ the order they are declared.</div>
 <dt><a href="org/saidone/misc/ProgressTrackingOutputStream.html#write(int)" class="member-name-link">write(int)</a> - Method in class org.saidone.misc.<a href="org/saidone/misc/ProgressTrackingOutputStream.html" title="class in org.saidone.misc">ProgressTrackingOutputStream</a></dt>
 <dd>
 <div class="block">Writes a single byte and updates the write progress.</div>
-</dd>
-<dt><a href="org/saidone/repository/OzoneRepositoryImpl.html#writeObject(java.lang.String,long,java.util.Map,java.io.InputStream)" class="member-name-link">writeObject(String, long, Map&lt;String, String&gt;, InputStream)</a> - Method in class org.saidone.repository.<a href="org/saidone/repository/OzoneRepositoryImpl.html" title="class in org.saidone.repository">OzoneRepositoryImpl</a></dt>
-<dd>
-<div class="block">Uploads the provided stream as an object to Ozone, preserving the supplied
- metadata.</div>
 </dd>
 </dl>
 <a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:J">J</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a><span class="vertical-separator">|</span><a href="constant-values.html">Constant&nbsp;Field&nbsp;Values</a><span class="vertical-separator">|</span><a href="serialized-form.html">Serialized&nbsp;Form</a></main>

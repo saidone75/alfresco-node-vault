@@ -105,8 +105,9 @@ loadScripts(document, 'script');</script>
 implements <a href="ContentService.html" title="interface in org.saidone.service.content">ContentService</a></span></div>
 <div class="block"><a href="ContentService.html" title="interface in org.saidone.service.content"><code>ContentService</code></a> implementation that stores node binaries in Apache Ozone.
  <p>
- During archival the content stream is written to a temporary file so the checksum can
- be computed before uploading. The resulting hash and other metadata are persisted as
+ During archival the content stream is written to a temporary file, encrypted when
+ content encryption is enabled, so the checksum of the original content and the
+ stored length are known before uploading. The resulting hash and other metadata are persisted as
  Ozone key metadata. Retrieval operations return <a href="../../model/dto/NodeContentStreamDto.html" title="class in org.saidone.model.dto"><code>NodeContentStreamDto</code></a> and
  <a href="../../model/dto/NodeContentInfoDto.html" title="class in org.saidone.model.dto"><code>NodeContentInfoDto</code></a> descriptors built from stored key details and content streams.
  </p>
