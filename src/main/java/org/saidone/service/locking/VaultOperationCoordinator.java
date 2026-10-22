@@ -33,7 +33,9 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.util.function.Supplier;
 
-/** Coordinates node mutations and background jobs through the shared MongoDB lock provider. */
+/**
+ * Coordinates node mutations and background jobs through the shared MongoDB lock provider.
+ */
 @Component
 @RequiredArgsConstructor
 @Slf4j
@@ -42,12 +44,16 @@ public class VaultOperationCoordinator {
     private final LockProvider lockProvider;
     private final LockingProperties properties;
 
-    /** Rejects concurrent operations on the same node, irrespective of operation type. */
+    /**
+     * Rejects concurrent operations on the same node, irrespective of operation type.
+     */
     public <T> T withNodeLock(String nodeId, Supplier<T> action) {
-        val configuration = new LockConfiguration(ClockProvider.now(), "node:" + nodeId,
-                properties.nodeLockAtMostFor(), Duration.ZERO);
-        val lock = lockProvider.lock(configuration)
-                .orElseThrow(() -> new NodeOperationInProgressException(nodeId));
+        val configuration = new LockConfiguration(
+                ClockProvider.now(),
+                String.format("node:%s", nodeId),
+                properties.nodeLockAtMostFor(),
+                Duration.ZERO);
+        val lock = lockProvider.lock(configuration).orElseThrow(() -> new NodeOperationInProgressException(nodeId));
         return execute(lock, action);
     }
 
@@ -58,10 +64,15 @@ public class VaultOperationCoordinator {
         });
     }
 
-    /** Returns null when the job is already locked; skipped runs are not queued. */
+    /**
+     * Returns null when the job is already locked; skipped runs are not queued.
+     */
     public <T> T runJob(String name, Supplier<T> action) {
-        val configuration = new LockConfiguration(ClockProvider.now(), "job:" + name,
-                properties.jobLockAtMostFor(), properties.jobLockAtLeastFor());
+        val configuration = new LockConfiguration(
+                ClockProvider.now(),
+                String.format("job:%s", name),
+                properties.jobLockAtMostFor(),
+                properties.jobLockAtLeastFor());
         val lock = lockProvider.lock(configuration);
         if (lock.isEmpty()) {
             log.info("Skipping job {} because its lock is already held", name);
@@ -78,8 +89,8 @@ public class VaultOperationCoordinator {
     }
 
     private <T> T execute(SimpleLock lock, Supplier<T> action) {
-        // try-with-resources preserves the action's failure if releasing the lock also fails.
-        try (val acquired = new AcquiredLock(lock)) {
+        // Try-with-resources preserves the action's failure if releasing the lock also fails.
+        try (val ignored = new AcquiredLock(lock)) {
             return action.get();
         }
     }
