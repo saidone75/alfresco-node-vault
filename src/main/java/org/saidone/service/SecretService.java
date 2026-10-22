@@ -24,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.EncryptionConfig;
+import org.saidone.exception.VaultException;
 import org.saidone.service.crypto.Secret;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.stereotype.Service;
@@ -43,9 +44,9 @@ import java.util.concurrent.ExecutionException;
  * from one configured secret path. Consumers can request either the latest secret version
  * or a specific version.</p>
  *
- * <p>When an error occurs while waiting for the asynchronous Vault call, methods in this class
- * log the exception, restore the interrupted status for {@link InterruptedException}, and return
- * {@code null} to indicate the secret could not be retrieved.</p>
+ * <p>When the secret cannot be retrieved, methods in this class throw a {@link VaultException}
+ * carrying the cause; the interrupted status is restored only when the waiting thread was
+ * actually interrupted.</p>
  *
  * <p>The bean is active when at least one of
  * {@code application.service.vault.encryption.content.enabled} or
@@ -87,44 +88,40 @@ public class SecretService extends BaseComponent {
      * <p>This is a convenience method equivalent to calling {@link #getSecret(Integer)}
      * with {@code null}.</p>
      *
-     * @return the latest {@link Secret}, or {@code null} when retrieval fails
+     * @return the latest {@link Secret}
+     * @throws VaultException if the secret cannot be retrieved
      */
     public Secret getSecret() {
-        try {
-            return getSecretAsync(null).get();
-        } catch (ExecutionException | InterruptedException e) {
-            log.error(e.getMessage());
-            log.trace(e.getMessage(), e);
-            Thread.currentThread().interrupt();
-        }
-        return null;
+        return getSecret(null);
     }
 
     /**
      * Retrieves a secret from Vault for a specific version or for the latest version.
      *
      * @param version the version number to retrieve; {@code null} loads the latest version
-     * @return a {@link Secret} containing secret bytes and metadata version, or {@code null}
-     *         if retrieval fails
+     * @return a {@link Secret} containing secret bytes and metadata version
+     * @throws VaultException if the secret cannot be retrieved
      */
     public Secret getSecret(Integer version) {
+        val description = version == null ? "latest secret" : String.format("secret v.%d", version);
         try {
             return getSecretAsync(version).get();
-        } catch (ExecutionException | InterruptedException e) {
-            log.error(e.getMessage());
-            log.trace(e.getMessage(), e);
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
+            throw new VaultException(String.format("Interrupted while retrieving %s from Vault", description), e);
+        } catch (ExecutionException e) {
+            log.trace(e.getMessage(), e);
+            throw new VaultException(String.format("Unable to retrieve %s from Vault: %s", description, e.getCause().getMessage()), e.getCause());
         }
-        return null;
     }
 
     /**
      * Asynchronously fetches and maps a secret from Vault.
      *
      * @param version secret version to retrieve; {@code null} for the latest version
-     * @return a future that resolves to a {@link Secret} built from Vault response data
-     * @throws RuntimeException when Vault returns no payload/metadata for the requested version
-     *                          or when the configured secret key is absent in the payload
+     * @return a future that resolves to a {@link Secret} built from Vault response data, or
+     *         completes with an {@link IllegalStateException} when Vault returns no payload or
+     *         metadata for the requested version, or the configured secret key is absent
      */
     private CompletableFuture<Secret> getSecretAsync(Integer version) {
         return CompletableFuture.supplyAsync(() -> {
@@ -132,12 +129,17 @@ public class SecretService extends BaseComponent {
                     vaultVersionedKeyValueOperations.get(properties.getVaultSecretPath()) :
                     vaultVersionedKeyValueOperations.get(properties.getVaultSecretPath(), Versioned.Version.from(version));
             if (response != null && response.getData() != null && response.getMetadata() != null) {
+                val value = ((Map<?, ?>) response.getData()).get(properties.getVaultSecretKey());
+                if (value == null) {
+                    throw new IllegalStateException(String.format("Key %s not found in secret %s",
+                            properties.getVaultSecretKey(), properties.getVaultSecretPath()));
+                }
                 return Secret.builder()
                         .version(response.getMetadata().getVersion().getVersion())
-                        .data(((Map<?, ?>) response.getData()).get(properties.getVaultSecretKey()).toString().getBytes(StandardCharsets.UTF_8))
+                        .data(value.toString().getBytes(StandardCharsets.UTF_8))
                         .build();
             } else {
-                throw new RuntimeException("Unable to retrieve secret from vault");
+                throw new IllegalStateException(String.format("No data found in secret %s", properties.getVaultSecretPath()));
             }
         });
     }
