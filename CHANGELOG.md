@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- Optional Alfresco node locking during archive, verification and deletion with `VAULT_ALFRESCO_USE_LOCK=true`; requires a dedicated Alfresco account and does not provide a cross-system transaction.
 - ANV v1 encrypted payloads with a versioned, authenticated binary header recording cipher, KDF parameters, logical key reference, Vault key version, salt and nonce; content and metadata remain readable after changing write settings.
 - Prometheus counters for archive, restore and delete outcomes, duration histograms and successfully archived content bytes, with a dedicated Grafana dashboard row; disable these metrics with `VAULT_OPERATION_METRICS_ENABLED=false`. Internal restore steps count only as part of delete, and archive retries do not increase byte counts.
 - Selectable Zulu, GraalVM Community or IBM Semeru/OpenJ9 Docker JVM runtimes via `VAULT_JVM_RUNTIME` in `docker/.env`.
@@ -14,6 +15,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - MongoDB-backed ShedLock coordination for node archiving, restore, deletion, key rotation, notarization and notarization checks, plus shared locks for archiving jobs, notarization jobs and manual or scheduled integrity sweeps. Node and job leases default to two minutes, with periodic renewal and configurable durations.
 
 ### Changed
+- S3 uploads stream staged files instead of buffering entire contents in memory; content encryption runs during staging and uses a single temporary file.
+- Temporary files use a dedicated directory cleaned at startup; each application instance must have its own directory.
+- Notarization and bulk key rotation retrieve node IDs in pages instead of loading all matching nodes at once.
+- Ozone client write buffers are configurable through `OZONE_CLIENT_BUFFER_SIZE`, `OZONE_CLIENT_BUFFER_FLUSH_SIZE` and `OZONE_CLIENT_BUFFER_MAX_SIZE`, defaulting to 1, 2 and 4 MB.
+- Vault secrets are read directly without submitting blocking calls to the common pool and immediately waiting for them; retrieval failures preserve their causes in `VaultException`.
+- Content services consistently use property-based backend selection; the encrypted metadata repository is explicitly marked as primary, and the path filter's API dependency is final.
 - **Breaking:** unversioned encrypted payloads are no longer supported. Export with the previous application before upgrading and reimport, or recreate disposable data. ANV v1 requires 12-byte nonces and bounded KDF costs.
 - Archiving uses a configurable fixed delay (ten seconds by default) in dev and Docker profiles; other profiles retain cron scheduling. Both modes share the distributed job lock.
 - Concurrent synchronous operations on the same node return `409 Conflict` across cooperating instances. Background jobs skip busy nodes; bulk key rotation logs busy nodes and continues. Integrity checks on busy nodes count as check errors without marking content as corrupted.
@@ -21,6 +28,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Before deleting on Alfresco a node already in the vault, its Alfresco content is always compared with the checksum recorded in the vault, regardless of `VAULT_DOUBLE_CHECK`.
 
 ### Fixed
+- Content restore closes source streams even when connection setup fails, closes HTTP response streams and disconnects connections after uploads.
+- Event deduplication atomically checks and updates node expiry; cleanup cannot remove entries renewed concurrently.
+- GridFS content hashes are computed by streaming original content bytes, including decryption when required; archive verification uses the checksum algorithm recorded with the content.
+- Integrity sweeps distinguish evidence of corrupted content from unavailable backends and other check errors, preserving previous verdicts on operational failures and skipping nodes deleted during a sweep.
+- Content download streams are released through the reactive response lifecycle; Alfresco content connections have configurable connect and read timeouts.
+- Vault metadata is saved only after optional archive double-check verification succeeds.
+- Startup with both content and metadata encryption disabled no longer requires crypto beans.
 - Development PostgreSQL 18 volume mount uses `/var/lib/postgresql`; Alfresco waits for the database healthcheck before starting.
 - Restore path creation resolves existing folders directly after a name conflict, without relying on paginated child listings. Other Alfresco errors are propagated, and files with conflicting names are rejected.
 
