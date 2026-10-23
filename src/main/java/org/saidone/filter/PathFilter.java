@@ -62,7 +62,7 @@ import java.util.regex.Pattern;
 @Slf4j
 public class PathFilter extends AbstractEventFilter {
 
-    private NodesApi nodesApi;
+    private final NodesApi nodesApi;
     private String path;
     private Pattern pathPattern;
 
