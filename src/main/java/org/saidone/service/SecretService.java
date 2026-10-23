@@ -34,8 +34,6 @@ import org.springframework.vault.support.Versioned;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Service responsible for reading encryption secrets from HashiCorp Vault.
@@ -45,8 +43,7 @@ import java.util.concurrent.ExecutionException;
  * or a specific version.</p>
  *
  * <p>When the secret cannot be retrieved, methods in this class throw a {@link VaultException}
- * carrying the cause; the interrupted status is restored only when the waiting thread was
- * actually interrupted.</p>
+ * carrying the cause. The service does not clear the calling thread's interrupted status.</p>
  *
  * <p>The bean is active when at least one of
  * {@code application.service.vault.encryption.content.enabled} or
@@ -104,27 +101,11 @@ public class SecretService extends BaseComponent {
      */
     public Secret getSecret(Integer version) {
         val description = version == null ? "latest secret" : String.format("secret v.%d", version);
-        try {
-            return getSecretAsync(version).get();
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-            throw new VaultException(String.format("Interrupted while retrieving %s from Vault", description), e);
-        } catch (ExecutionException e) {
-            log.trace(e.getMessage(), e);
-            throw new VaultException(String.format("Unable to retrieve %s from Vault: %s", description, e.getCause().getMessage()), e.getCause());
+        if (Thread.currentThread().isInterrupted()) {
+            throw new VaultException(String.format("Interrupted while retrieving %s from Vault", description),
+                    new InterruptedException("Calling thread is interrupted"));
         }
-    }
-
-    /**
-     * Asynchronously fetches and maps a secret from Vault.
-     *
-     * @param version secret version to retrieve; {@code null} for the latest version
-     * @return a future that resolves to a {@link Secret} built from Vault response data, or
-     *         completes with an {@link IllegalStateException} when Vault returns no payload or
-     *         metadata for the requested version, or the configured secret key is absent
-     */
-    private CompletableFuture<Secret> getSecretAsync(Integer version) {
-        return CompletableFuture.supplyAsync(() -> {
+        try {
             val response = version == null ?
                     vaultVersionedKeyValueOperations.get(properties.getVaultSecretPath()) :
                     vaultVersionedKeyValueOperations.get(properties.getVaultSecretPath(), Versioned.Version.from(version));
@@ -141,7 +122,10 @@ public class SecretService extends BaseComponent {
             } else {
                 throw new IllegalStateException(String.format("No data found in secret %s", properties.getVaultSecretPath()));
             }
-        });
+        } catch (RuntimeException e) {
+            log.trace(e.getMessage(), e);
+            throw new VaultException(String.format("Unable to retrieve %s from Vault: %s", description, e.getMessage()), e);
+        }
     }
 
 }
