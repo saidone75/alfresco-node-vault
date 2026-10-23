@@ -99,7 +99,8 @@ loadScripts(document, 'script');</script>
 <hr>
 <div class="type-signature"><span class="annotations">@Service
 @ConfigurationProperties(prefix="application.service.vault.storage")
-@ConditionalOnExpression("\'${application.service.vault.storage.impl:}\' == \'s3\'")
+@ConditionalOnProperty(name="application.service.vault.storage.impl",
+                       havingValue="s3")
 </span><span class="modifiers">public class </span><span class="element-name type-name-label">S3ContentService</span>
 <span class="extends-implements">extends <a href="../../component/BaseComponent.html" title="class in org.saidone.component">BaseComponent</a>
 implements <a href="ContentService.html" title="interface in org.saidone.service.content">ContentService</a></span></div>
