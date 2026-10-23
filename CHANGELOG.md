@@ -32,7 +32,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Event deduplication atomically checks and updates node expiry; cleanup cannot remove entries renewed concurrently.
 - GridFS content hashes are computed by streaming original content bytes, including decryption when required; archive verification uses the checksum algorithm recorded with the content.
 - Integrity sweeps distinguish evidence of corrupted content from unavailable backends and other check errors, preserving previous verdicts on operational failures and skipping nodes deleted during a sweep.
-- Content download streams are released through the reactive response lifecycle; Alfresco content connections have configurable connect and read timeouts.
+- Content download streams open only when the reactive reader subscribes and are released on completion, cancellation or error, preventing leaks on early cancellation; Alfresco content connections have configurable connect and read timeouts.
+- Ozone smoke tests use 256 MiB data containers to avoid space reservation failures on the tmpfs DataNode volume.
 - Vault metadata is saved only after optional archive double-check verification succeeds.
 - Startup with both content and metadata encryption disabled no longer requires crypto beans.
 - Development PostgreSQL 18 volume mount uses `/var/lib/postgresql`; Alfresco waits for the database healthcheck before starting.

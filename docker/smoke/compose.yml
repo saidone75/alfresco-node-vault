@@ -1,6 +1,10 @@
 # Requires Docker Compose 2.24.4+ for !override. No host ports or external volumes.
 name: anv-smoke
 
+# Limit Ozone data containers to 256 MiB to fit the smoke-test tmpfs.
+x-ozone-env: &smoke-ozone-env
+  OZONE-SITE.XML_ozone.scm.container.size: 256MB
+
 x-runner: &runner
   image: babashka/babashka:1.12.213
   entrypoint: ["bb", "/smoke/smoke.clj"]
@@ -116,6 +120,7 @@ services:
     extends:
       file: ../ozone/docker-compose.yml
       service: ozone-scm
+    environment: *smoke-ozone-env
     volumes: !override []
     tmpfs:
       - /data
@@ -125,6 +130,7 @@ services:
     extends:
       file: ../ozone/docker-compose.yml
       service: ozone-om
+    environment: *smoke-ozone-env
     volumes: !override []
     tmpfs:
       - /data
@@ -134,6 +140,7 @@ services:
     extends:
       file: ../ozone/docker-compose.yml
       service: ozone-datanode
+    environment: *smoke-ozone-env
     volumes: !override []
     tmpfs:
       - /data
