@@ -32,6 +32,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * An event filter for Alfresco repository events that ensures each node is processed
@@ -50,7 +51,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * The filter periodically cleans its tracking map to remove expired node entries using the
  * {@link #cleanRecentlyProcessedNodes()} scheduled method, minimizing memory usage.
  * <p>
- * Thread safety is ensured by the use of a {@link ConcurrentHashMap}.
+ * Eligibility checks and expiry updates are atomic per node. Cleanup removes an
+ * expired entry only if its observed expiry has not changed.
  * Logging is provided for skipped and removed nodes for debugging and traceability.
  * <p>
  * This filter is typically used in event processing chains to enforce de-duplication logic on node events.
@@ -77,26 +79,29 @@ public class RecentlyProcessedFilter extends AbstractEventFilter {
     @Override
     public boolean test(RepoEvent<DataAttributes<Resource>> repoEvent) {
         val nodeId = ((NodeResource) repoEvent.getData().getResource()).getId();
-        if (!recentlyProcessedNodes.containsKey(nodeId) ||
-                (recentlyProcessedNodes.get(nodeId) != null &&
-                        (System.currentTimeMillis() >= recentlyProcessedNodes.get(nodeId)))) {
-            /* process node */
-            recentlyProcessedNodes.put(nodeId, System.currentTimeMillis() + threshold);
-            return true;
-        } else {
-            /* skip */
+        val accepted = new AtomicBoolean(false);
+        recentlyProcessedNodes.compute(nodeId, (id, expiresAt) -> {
+            val now = System.currentTimeMillis();
+            if (expiresAt == null || now >= expiresAt) {
+                accepted.set(true);
+                return now + threshold;
+            }
+            return expiresAt;
+        });
+        if (!accepted.get()) {
             log.warn("Node {} was recently processed, skipping...", nodeId);
-            return false;
         }
+        return accepted.get();
     }
 
     @Scheduled(fixedDelay = 5 * 60 * 1000)
     public void cleanRecentlyProcessedNodes() {
-        recentlyProcessedNodes.entrySet().stream().filter(e -> e.getValue() < System.currentTimeMillis())
-                .forEach(e -> {
-                    log.debug("Removing node {} from recentlyProcessedNodes", e.getKey());
-                    recentlyProcessedNodes.remove(e.getKey());
-                });
+        val now = System.currentTimeMillis();
+        recentlyProcessedNodes.forEach((nodeId, expiresAt) -> {
+            if (expiresAt <= now && recentlyProcessedNodes.remove(nodeId, expiresAt)) {
+                log.debug("Removing node {} from recentlyProcessedNodes", nodeId);
+            }
+        });
     }
 
 }
