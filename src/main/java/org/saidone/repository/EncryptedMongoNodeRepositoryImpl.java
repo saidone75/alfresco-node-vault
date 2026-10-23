@@ -26,6 +26,7 @@ import org.saidone.model.entity.NodeEntity;
 import org.saidone.service.SecretService;
 import org.saidone.service.crypto.CryptoService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoOperations;
@@ -46,6 +47,7 @@ import java.util.Optional;
  * {@code true} in the application properties.</p>
  */
 @Repository
+@Primary
 @ConditionalOnProperty(name = "application.service.vault.encryption.metadata.enabled", havingValue = "true")
 public class EncryptedMongoNodeRepositoryImpl extends MongoNodeRepositoryImpl {
 
