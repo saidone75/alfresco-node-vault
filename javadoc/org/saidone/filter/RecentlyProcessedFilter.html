@@ -117,7 +117,8 @@ loadScripts(document, 'script');</script>
  The filter periodically cleans its tracking map to remove expired node entries using the
  <a href="#cleanRecentlyProcessedNodes()"><code>cleanRecentlyProcessedNodes()</code></a> scheduled method, minimizing memory usage.
  <p>
- Thread safety is ensured by the use of a <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/concurrent/ConcurrentHashMap.html" title="class or interface in java.util.concurrent" class="external-link"><code>ConcurrentHashMap</code></a>.
+ Eligibility checks and expiry updates are atomic per node. Cleanup removes an
+ expired entry only if its observed expiry has not changed.
  Logging is provided for skipped and removed nodes for debugging and traceability.
  <p>
  This filter is typically used in event processing chains to enforce de-duplication logic on node events.</div>
