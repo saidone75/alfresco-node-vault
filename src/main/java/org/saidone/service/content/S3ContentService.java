@@ -37,7 +37,7 @@ import org.saidone.repository.S3Repository;
 import org.saidone.service.crypto.ContentEncryptionService;
 import org.saidone.utils.SecureTemporaryFile;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -69,7 +69,7 @@ import java.util.HashMap;
 @RequiredArgsConstructor
 @Slf4j
 @ConfigurationProperties(prefix = "application.service.vault.storage")
-@ConditionalOnExpression("'${application.service.vault.storage.impl:}' == 's3'")
+@ConditionalOnProperty(name = "application.service.vault.storage.impl", havingValue = "s3")
 public class S3ContentService extends BaseComponent implements ContentService {
 
     @Value("${application.service.vault.hash-algorithm}")
