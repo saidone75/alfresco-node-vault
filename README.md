@@ -120,6 +120,9 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | S3_KEY                            | testing                                    | Key for S3 authentication                                                                 |
 | S3_SECRET                         | testing                                    | Secret for S3 authentication                                                              |
 | OZONE_OM_ADDRESS                  | localhost:9862                             | Ozone Manager RPC address (ozone-om:9862 in the Docker stack)                             |
+| OZONE_CLIENT_BUFFER_SIZE          | 1MB                                        | Ozone client stream buffer size                                                           |
+| OZONE_CLIENT_BUFFER_FLUSH_SIZE    | 2MB                                        | Ozone client stream buffer flush threshold                                                |
+| OZONE_CLIENT_BUFFER_MAX_SIZE      | 4MB                                        | Maximum Ozone client stream buffer size                                                   |
 | NODE_LOCK_CLEANUP_ENABLED         | true                                       | Remove node locks expired for at least one hour                                           |
 | NODE_LOCK_CLEANUP_CRON_EXPRESSION | 0 0 * * * ?                                | Node lock cleanup cron (hourly by default)                                                |
 | EVENT_HANDLER_ENABLED             | false                                      | Event based archive behaviour switch                                                      |
@@ -155,6 +158,16 @@ Global configuration is stored in `application.yml`. The main parameters are:
 
 Transfer checksums verify document integrity before source deletion, not for cryptographic purposes.
 `VAULT_HASH_ALGORITHM` defaults to SHA-256 and also applies to optional blockchain notarization.
+Archive verification uses the checksum algorithm recorded with the stored content.
+
+Archiving checks content size and, with `VAULT_DOUBLE_CHECK=true`, hashes before saving metadata;
+verification failures trigger rollback. Existing vault copies are always verified before source deletion.
+
+S3 and Ozone stage uploads, with optional encryption, in temporary files; allow space for concurrent
+uploads in `SHARED_FILES_PATH`. `READ_TIMEOUT` applies per read, not per transfer.
+
+Integrity sweeps distinguish corrupted nodes from operational errors, which preserve previous verdicts;
+nodes deleted during a sweep are skipped. See [Integrity Sweep](doc/IntegritySweep.md).
 
 The Ozone development stack runs without authentication. Secured clusters require
 Hadoop/Ozone security configuration and a Kerberos identity; see [Ozone configuration](doc/Ozone.md).
@@ -258,6 +271,7 @@ Key variables include:
 - `ACS_IMAGE` – Alfresco Content Services image name
 - `MONGO_IMAGE` – MongoDB image name
 - `HASHICORP_VAULT_IMAGE` – HashiCorp Vault image name
+- `VAULT_JVM_RUNTIME` – `zulu` (default), `graalvm` or `semeru`; rebuild the vault image after changing it
 
 For local development you may rely on the defaults, while in
 production you will likely point to hardened images or custom deployments.
