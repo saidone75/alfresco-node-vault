@@ -63,7 +63,6 @@ import org.springframework.web.util.HtmlUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.scheduler.Schedulers;
 
-import java.io.IOException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -80,6 +79,7 @@ import java.util.concurrent.CompletableFuture;
 @RequestMapping("/api/v1/vault")
 @RequiredArgsConstructor
 @Slf4j
+@SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 @Tag(name = "Vault API", description = "Vault operations")
 public class VaultApiController extends BaseComponent {
 
@@ -303,29 +303,21 @@ public class VaultApiController extends BaseComponent {
 
         log.debug("Streaming node content for node: {}", nodeId);
 
-        val nodeContent = contentService.getNodeContent(nodeId);
-        val contentStream = nodeContent.getContentStream();
-        try {
-            val headers = new HttpHeaders();
-            headers.setContentType(Strings.isNotBlank(nodeContent.getContentType())
-                    ? MediaType.parseMediaType(nodeContent.getContentType())
-                    : MediaType.APPLICATION_OCTET_STREAM);
-            if (attachment) {
-                headers.setContentDispositionFormData("attachment", nodeContent.getFileName());
-            }
-            val body = DataBufferUtils.readInputStream(() -> contentStream, DefaultDataBufferFactory.sharedInstance, CONTENT_BUFFER_SIZE)
-                    .subscribeOn(Schedulers.boundedElastic());
-            return ResponseEntity.ok()
-                    .headers(headers)
-                    .body(body);
-        } catch (RuntimeException e) {
-            try {
-                contentStream.close();
-            } catch (IOException closeError) {
-                e.addSuppressed(closeError);
-            }
-            throw e;
+        val nodeContentInfo = contentService.getNodeContentInfo(nodeId);
+        val headers = new HttpHeaders();
+        headers.setContentType(Strings.isNotBlank(nodeContentInfo.getContentType())
+                ? MediaType.parseMediaType(nodeContentInfo.getContentType())
+                : MediaType.APPLICATION_OCTET_STREAM);
+        if (attachment) {
+            headers.setContentDispositionFormData("attachment", nodeContentInfo.getFileName());
         }
+        val body = DataBufferUtils.readInputStream(
+                        () -> contentService.getNodeContent(nodeId).getContentStream(),
+                        DefaultDataBufferFactory.sharedInstance, CONTENT_BUFFER_SIZE)
+                .subscribeOn(Schedulers.boundedElastic());
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(body);
     }
 
     /**
