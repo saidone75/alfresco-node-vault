@@ -214,10 +214,15 @@ public class AlfrescoService extends BaseComponent {
     private HttpURLConnection openContentConnection(String nodeId) throws IOException {
         val url = URI.create(String.format("%s%s/nodes/%s/content", contentServiceUrl, contentServicePath, nodeId)).toURL();
         val conn = (HttpURLConnection) url.openConnection();
-        conn.setConnectTimeout(config.getConnectTimeout());
-        conn.setReadTimeout(config.getReadTimeout());
-        conn.setRequestProperty(HttpHeaders.AUTHORIZATION, basicAuth);
-        return conn;
+        try {
+            conn.setConnectTimeout(config.getConnectTimeout());
+            conn.setReadTimeout(config.getReadTimeout());
+            conn.setRequestProperty(HttpHeaders.AUTHORIZATION, basicAuth);
+            return conn;
+        } catch (RuntimeException e) {
+            conn.disconnect();
+            throw e;
+        }
     }
 
     /**
@@ -325,24 +330,31 @@ public class AlfrescoService extends BaseComponent {
      */
     @SneakyThrows
     public void restoreNodeContent(String nodeId, NodeContentStreamDto nodeContentStream) {
-        val conn = openContentConnection(nodeId);
-        conn.setRequestMethod(HttpMethod.PUT.name());
-        conn.setDoOutput(true);
-        conn.setRequestProperty(HttpHeaders.AUTHORIZATION, basicAuth);
-        conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, nodeContentStream.getContentType());
-        conn.setChunkedStreamingMode(chunkSize);
+        try (val is = nodeContentStream.getContentStream()) {
+            val conn = openContentConnection(nodeId);
+            try {
+                conn.setRequestMethod(HttpMethod.PUT.name());
+                conn.setDoOutput(true);
+                conn.setRequestProperty(HttpHeaders.CONTENT_TYPE, nodeContentStream.getContentType());
+                conn.setChunkedStreamingMode(chunkSize);
 
-        try (val is = nodeContentStream.getContentStream();
-             val os = new ProgressTrackingOutputStream(conn.getOutputStream(), nodeId, nodeContentStream.getLength())) {
-            is.transferTo(os);
-        }
+                try (val os = new ProgressTrackingOutputStream(conn.getOutputStream(), nodeId, nodeContentStream.getLength())) {
+                    is.transferTo(os);
+                }
 
-        int responseCode = conn.getResponseCode();
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            log.debug("Upload completed successfully for node: {}", nodeId);
-        } else {
-            log.error("Failed to upload content for node {} with HTTP status: {}", nodeId, responseCode);
-            throw new VaultException(String.format("Failed to upload content for node %s with HTTP status: %d", nodeId, responseCode));
+                int responseCode = conn.getResponseCode();
+                try (val ignored = responseCode >= HttpURLConnection.HTTP_BAD_REQUEST
+                        ? conn.getErrorStream() : conn.getInputStream()) {
+                    if (responseCode == HttpURLConnection.HTTP_OK) {
+                        log.debug("Upload completed successfully for node: {}", nodeId);
+                    } else {
+                        log.error("Failed to upload content for node {} with HTTP status: {}", nodeId, responseCode);
+                        throw new VaultException(String.format("Failed to upload content for node %s with HTTP status: %d", nodeId, responseCode));
+                    }
+                }
+            } finally {
+                conn.disconnect();
+            }
         }
     }
 
