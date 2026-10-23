@@ -136,8 +136,8 @@ services:
   anv-vault:
     image: anv:latest
     container_name: anv-vault
-    mem_limit: 512m
-    memswap_limit: 512m
+    mem_limit: 1G
+    memswap_limit: 1G
     build:
       dockerfile: ./docker/Dockerfile.vault
       target: ${VAULT_JVM_RUNTIME:-zulu}
