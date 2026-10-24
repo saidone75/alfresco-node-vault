@@ -612,7 +612,7 @@ public class VaultApiController extends BaseComponent {
                     @Parameter(name = "keyVersion", description = "Version of the encryption key to update", required = true, in = ParameterIn.QUERY)
             },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Update required",
+                    @ApiResponse(responseCode = "202", description = "Update accepted",
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "400", description = "Invalid request",
                             content = @Content),
@@ -645,7 +645,7 @@ public class VaultApiController extends BaseComponent {
                 log.error("Error while updating keys for version {}", keyVersion, e);
             }
         }, taskExecutor);
-        return ResponseEntity.ok()
+        return ResponseEntity.accepted()
                 .contentType(MediaType.TEXT_PLAIN)
                 .body("Update required.");
     }
