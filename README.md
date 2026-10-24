@@ -88,7 +88,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Passwords securely stored in a secret engine
 - [REST API](doc/RestApi.md) with Alfresco proxy support and metadata search
 - Engineered for flexibility and bespoke integrations
-- No installation or changes required within Alfresco
+- No Alfresco changes beyond installing the minimal [ANV content model](#alfresco-setup)
 - Prometheus monitoring support for metrics and health checks, including [vault operation metrics](doc/Metrics.md)
 - Custom upload and download methods
 - Minimal memory footprint
@@ -100,6 +100,14 @@ Pull requests are welcome!
 ## Architecture
 
 ![Architecture](images/architecture.png)
+
+## Alfresco setup
+
+Copy [anv-content-model.xml](docker/model/anv-content-model.xml) and
+[anv-model-context.xml](docker/model/anv-model-context.xml) to
+`<TOMCAT_DIR>/shared/classes/alfresco/extension/` and restart Alfresco. Already included in the Docker stack.
+
+Use `anv:archive` to select documents for scheduled or event-driven archiving; API archiving does not require it.
 
 ## Application global config
 
