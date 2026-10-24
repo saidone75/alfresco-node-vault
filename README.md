@@ -297,8 +297,8 @@ Key variables include:
 
 The development stack runs HashiCorp Vault in nonpersistent dev mode. Restarting it loses
 all secret versions. On the next ANV startup with encryption enabled, development provisioning
-can create a fresh initial secret; it cannot recover lost keys. Documents
-encrypted with rotated versions become unreadable even if MongoDB and content storage retain
+can create a fresh initial secret; it cannot recover lost keys. Previously encrypted
+documents become unreadable even if MongoDB and content storage retain
 them. Use a persistent Vault deployment and retain required key versions for durable encrypted archives.
 
 For local development you may rely on the defaults, while in
@@ -318,6 +318,8 @@ be distinguished from a new installation. Sensitive byte buffers are cleared aft
 
 Manage rotations in HashiCorp Vault, then use the update-key APIs to re-encrypt documents.
 Retain previous versions while documents or backups need them.
+Follow the [rotation and retention procedure](doc/Encryption.md#key-rotation-and-retention)
+before changing Vault retention or retiring versions.
 
 ## Run
 
