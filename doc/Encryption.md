@@ -202,6 +202,8 @@ and [EncryptedPayloadHeader.java](../src/main/java/org/saidone/service/crypto/En
 
 Use persistent Vault KV v2 storage. Review rotation needs annually and rotate on suspected exposure
 or organizational requirements; ANV does not schedule rotations.
+Runtime credentials require `read` on both the configured KV v2 data and metadata paths;
+key updates read the latest version from metadata without fetching the secret value.
 
 1. Before rotating, verify recoverable backups and inspect retention:
    ```bash

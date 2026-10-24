@@ -35,6 +35,7 @@ import org.springframework.web.client.HttpStatusCodeException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
@@ -189,6 +190,33 @@ public class SecretService extends BaseComponent {
             }
         } catch (RuntimeException e) {
             throw sanitizedFailure(String.format("Unable to retrieve %s from Vault", description), e);
+        }
+    }
+
+    /** Returns the latest usable version from Vault metadata. */
+    public int getLatestSecretVersion() {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new VaultException("Interrupted while retrieving secret metadata from Vault",
+                    new InterruptedException("Calling thread is interrupted"));
+        }
+        try {
+            val response = vaultVersionedKeyValueOperations.opsForKeyValueMetadata()
+                    .get(properties.getVaultSecretPath());
+            if (response == null || response.getCurrentVersion() < 1) {
+                throw new IllegalStateException("No current secret version found");
+            }
+            val version = response.getCurrentVersion();
+            val metadata = response.getVersions().stream()
+                    .filter(entry -> entry.getVersion().getVersion() == version)
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Current version metadata not found"));
+            val deletionTime = metadata.getDeletedAt();
+            if (metadata.isDestroyed() || (deletionTime != null && !deletionTime.isAfter(Instant.now()))) {
+                throw new IllegalStateException("Current secret version is deleted or destroyed");
+            }
+            return version;
+        } catch (RuntimeException e) {
+            throw sanitizedFailure("Unable to retrieve latest secret version from Vault metadata", e);
         }
     }
 
