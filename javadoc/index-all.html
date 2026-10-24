@@ -590,7 +590,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Service responsible for validating Basic authentication headers.</div>
 </dd>
-<dt><a href="org/saidone/service/AuthenticationService.html#%3Cinit%3E(org.saidone.service.AlfrescoService,java.time.Duration)" class="member-name-link">AuthenticationService(AlfrescoService, Duration)</a> - Constructor for class org.saidone.service.<a href="org/saidone/service/AuthenticationService.html" title="class in org.saidone.service">AuthenticationService</a></dt>
+<dt><a href="org/saidone/service/AuthenticationService.html#%3Cinit%3E(org.saidone.service.AlfrescoService,java.time.Duration,java.util.List)" class="member-name-link">AuthenticationService(AlfrescoService, Duration, List&lt;String&gt;)</a> - Constructor for class org.saidone.service.<a href="org/saidone/service/AuthenticationService.html" title="class in org.saidone.service">AuthenticationService</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/config/MongoDBConfig.html#autoIndexCreation()" class="member-name-link">autoIndexCreation()</a> - Method in class org.saidone.config.<a href="org/saidone/config/MongoDBConfig.html" title="class in org.saidone.config">MongoDBConfig</a></dt>
 <dd>&nbsp;</dd>
@@ -612,6 +612,10 @@ loadScripts(document, 'script');</script>
 </dl>
 <h2 class="title" id="I:C">C</h2>
 <dl class="index">
+<dt><a href="org/saidone/service/AuthenticationService.html#canRead(java.lang.String)" class="member-name-link">canRead(String)</a> - Method in class org.saidone.service.<a href="org/saidone/service/AuthenticationService.html" title="class in org.saidone.service">AuthenticationService</a></dt>
+<dd>
+<div class="block">Allows administrators and members of the configured Alfresco readers groups.</div>
+</dd>
 <dt><a href="org/saidone/utils/CastUtils.html#castToListOfObjects(java.lang.Object,java.lang.Class)" class="member-name-link">castToListOfObjects(Object, Class&lt;T&gt;)</a> - Method in class org.saidone.utils.<a href="org/saidone/utils/CastUtils.html" title="class in org.saidone.utils">CastUtils</a></dt>
 <dd>
 <div class="block">Casts an object to a <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link"><code>List</code></a> containing elements of the requested type.</div>
@@ -661,6 +665,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/filter/RecentlyProcessedFilter.html#cleanRecentlyProcessedNodes()" class="member-name-link">cleanRecentlyProcessedNodes()</a> - Method in class org.saidone.filter.<a href="org/saidone/filter/RecentlyProcessedFilter.html" title="class in org.saidone.filter">RecentlyProcessedFilter</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/service/crypto/Secret.html#close()" class="member-name-link">close()</a> - Method in class org.saidone.service.crypto.<a href="org/saidone/service/crypto/Secret.html" title="class in org.saidone.service.crypto">Secret</a></dt>
+<dd>
+<div class="block">Clears the owned buffer; safe to call repeatedly.</div>
+</dd>
 <dt><a href="org/saidone/service/locking/AlfrescoArchiveLockService.Lease.html#close()" class="member-name-link">close()</a> - Method in class org.saidone.service.locking.<a href="org/saidone/service/locking/AlfrescoArchiveLockService.Lease.html" title="class in org.saidone.service.locking">AlfrescoArchiveLockService.Lease</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/utils/SecureTemporaryFile.html#close()" class="member-name-link">close()</a> - Method in class org.saidone.utils.<a href="org/saidone/utils/SecureTemporaryFile.html" title="class in org.saidone.utils">SecureTemporaryFile</a></dt>
@@ -1129,6 +1137,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Lists integrity sweep runs with pagination.</div>
 </dd>
+<dt><a href="org/saidone/service/SecretService.html#getLatestSecretVersion()" class="member-name-link">getLatestSecretVersion()</a> - Method in class org.saidone.service.<a href="org/saidone/service/SecretService.html" title="class in org.saidone.service">SecretService</a></dt>
+<dd>
+<div class="block">Returns the latest usable version from Vault metadata.</div>
+</dd>
 <dt><a href="org/saidone/model/dto/NodeWrapperDto.html#getNode()" class="member-name-link">getNode()</a> - Method in class org.saidone.model.dto.<a href="org/saidone/model/dto/NodeWrapperDto.html" title="class in org.saidone.model.dto">NodeWrapperDto</a></dt>
 <dd>
 <div class="block">Deserializes the JSON stored in <code>NodeWrapperDto.nodeJson</code> back into an
@@ -1367,6 +1379,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/gateway/predicate/IsOnVaultPredicate.Config.html" class="type-name-link" title="class in org.saidone.gateway.predicate">IsOnVaultPredicate.Config</a> - Class in <a href="org/saidone/gateway/predicate/package-summary.html">org.saidone.gateway.predicate</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/service/AlfrescoService.html#isVaultReader(java.lang.String,java.lang.String,java.util.Set)" class="member-name-link">isVaultReader(String, String, Set&lt;String&gt;)</a> - Method in class org.saidone.service.<a href="org/saidone/service/AlfrescoService.html" title="class in org.saidone.service">AlfrescoService</a></dt>
+<dd>
+<div class="block">Authenticates the user and allows administrators or members of any readers group.</div>
+</dd>
 </dl>
 <h2 class="title" id="I:J">J</h2>
 <dl class="index">
@@ -2573,6 +2589,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/service/crypto/Secret.html#%3Cinit%3E()" class="member-name-link">Secret()</a> - Constructor for class org.saidone.service.crypto.<a href="org/saidone/service/crypto/Secret.html" title="class in org.saidone.service.crypto">Secret</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/service/crypto/Secret.SecretBuilder.html" class="type-name-link" title="class in org.saidone.service.crypto">Secret.SecretBuilder</a> - Class in <a href="org/saidone/service/crypto/package-summary.html">org.saidone.service.crypto</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/saidone/service/crypto/Secret.SecretBuilder.html#%3Cinit%3E()" class="member-name-link">SecretBuilder()</a> - Constructor for class org.saidone.service.crypto.<a href="org/saidone/service/crypto/Secret.SecretBuilder.html" title="class in org.saidone.service.crypto">Secret.SecretBuilder</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/service/SecretService.html" class="type-name-link" title="class in org.saidone.service">SecretService</a> - Class in <a href="org/saidone/service/package-summary.html">org.saidone.service</a></dt>
 <dd>
 <div class="block">Service responsible for reading encryption secrets from HashiCorp Vault.</div>
@@ -2697,6 +2717,8 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns a string representation of this record class.</div>
 </dd>
+<dt><a href="org/saidone/service/crypto/Secret.SecretBuilder.html#toString()" class="member-name-link">toString()</a> - Method in class org.saidone.service.crypto.<a href="org/saidone/service/crypto/Secret.SecretBuilder.html" title="class in org.saidone.service.crypto">Secret.SecretBuilder</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/service/audit/AuditEntryKeys.html#TYPE" class="member-name-link">TYPE</a> - Static variable in interface org.saidone.service.audit.<a href="org/saidone/service/audit/AuditEntryKeys.html" title="interface in org.saidone.service.audit">AuditEntryKeys</a></dt>
 <dd>
 <div class="block">Field name for the entry type.</div>
@@ -2800,7 +2822,7 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/controller/VaultApiController.html#updateKey(java.lang.String,java.lang.String)" class="member-name-link">updateKey(String, String)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/VaultApiController.html" title="class in org.saidone.controller">VaultApiController</a></dt>
 <dd>
-<div class="block">Updates the encryption key for a node.</div>
+<div class="block">Re-encrypts a node with the latest existing Vault key version when needed.</div>
 </dd>
 <dt><a href="org/saidone/service/crypto/KeyService.html#updateKeys(int)" class="member-name-link">updateKeys(int)</a> - Method in interface org.saidone.service.crypto.<a href="org/saidone/service/crypto/KeyService.html" title="interface in org.saidone.service.crypto">KeyService</a></dt>
 <dd>

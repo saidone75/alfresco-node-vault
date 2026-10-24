@@ -103,8 +103,7 @@ loadScripts(document, 'script');</script>
 <div class="block">Service responsible for validating Basic authentication headers.
  <p>
  The provided credentials are decoded and checked against Alfresco via
- <a href="AlfrescoService.html" title="class in org.saidone.service"><code>AlfrescoService</code></a> to verify that the user has administrative
- privileges.
+ <a href="AlfrescoService.html" title="class in org.saidone.service"><code>AlfrescoService</code></a> to verify administrative privileges or vault reader access.
  </p>
  <p>
  Successful checks are cached for a configurable time, keyed by a hash of the
@@ -122,8 +121,9 @@ loadScripts(document, 'script');</script>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.saidone.service.AlfrescoService,java.time.Duration)" class="member-name-link">AuthenticationService</a><wbr>(<a href="AlfrescoService.html" title="class in org.saidone.service">AlfrescoService</a>&nbsp;alfrescoService,
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;authCacheTtl)</code></div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(org.saidone.service.AlfrescoService,java.time.Duration,java.util.List)" class="member-name-link">AuthenticationService</a><wbr>(<a href="AlfrescoService.html" title="class in org.saidone.service">AlfrescoService</a>&nbsp;alfrescoService,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;authCacheTtl,
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;readersGroups)</code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 </div>
 </section>
@@ -140,8 +140,13 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isAuthorized(java.lang.String)" class="member-name-link">isAuthorized</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;authHeader)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#canRead(java.lang.String)" class="member-name-link">canRead</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;authHeader)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
+<div class="block">Allows administrators and members of the configured Alfresco readers groups.</div>
+</div>
+<div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>boolean</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#isAuthorized(java.lang.String)" class="member-name-link">isAuthorized</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;authHeader)</code></div>
+<div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Determines whether the given HTTP Authorization header contains valid
  Basic credentials for an Alfresco administrator.</div>
 </div>
@@ -166,11 +171,13 @@ loadScripts(document, 'script');</script>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(org.saidone.service.AlfrescoService,java.time.Duration)">
+<section class="detail" id="&lt;init&gt;(org.saidone.service.AlfrescoService,java.time.Duration,java.util.List)">
 <h3>AuthenticationService</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">AuthenticationService</span><wbr><span class="parameters">(<a href="AlfrescoService.html" title="class in org.saidone.service">AlfrescoService</a>&nbsp;alfrescoService,
  @Value("${application.service.vault.auth-cache-ttl:60s}")
- <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;authCacheTtl)</span></div>
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/time/Duration.html" title="class or interface in java.time" class="external-link">Duration</a>&nbsp;authCacheTtl,
+ @Value("${application.service.vault.readers-groups:GROUP_ANV_READERS}")
+ <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html" title="class or interface in java.util" class="external-link">List</a>&lt;<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&gt;&nbsp;readersGroups)</span></div>
 </section>
 </li>
 </ul>
@@ -194,6 +201,13 @@ loadScripts(document, 'script');</script>
 <dd><code>true</code> if the credentials are valid and belong to an admin;
  <code>false</code> otherwise</dd>
 </dl>
+</section>
+</li>
+<li>
+<section class="detail" id="canRead(java.lang.String)">
+<h3>canRead</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">boolean</span>&nbsp;<span class="element-name">canRead</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;authHeader)</span></div>
+<div class="block">Allows administrators and members of the configured Alfresco readers groups.</div>
 </section>
 </li>
 </ul>

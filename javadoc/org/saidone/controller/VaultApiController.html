@@ -224,7 +224,7 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#updateKey(java.lang.String,java.lang.String)" class="member-name-link">updateKey</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;auth,
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Updates the encryption key for a node.</div>
+<div class="block">Re-encrypts a node with the latest existing Vault key version when needed.</div>
 </div>
 </div>
 </div>
@@ -461,7 +461,7 @@ loadScripts(document, 'script');</script>
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;auth,
  @PathVariable
  <a href="https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>&nbsp;nodeId)</span></div>
-<div class="block">Updates the encryption key for a node.</div>
+<div class="block">Re-encrypts a node with the latest existing Vault key version when needed.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>auth</code> - optional Basic authentication header</dd>
@@ -484,7 +484,7 @@ loadScripts(document, 'script');</script>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>auth</code> - optional Basic authentication header</dd>
-<dd><code>keyVersion</code> - version of the outdated encryption key</dd>
+<dd><code>keyVersion</code> - positive source key version identifying the nodes to re-encrypt</dd>
 <dt>Returns:</dt>
 <dd>a confirmation message, or 403 when encryption is disabled</dd>
 </dl>
