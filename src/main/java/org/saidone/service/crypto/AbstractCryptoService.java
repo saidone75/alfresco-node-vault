@@ -39,6 +39,7 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.ByteArrayInputStream;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -85,7 +86,11 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
      * @return a pair containing the derived key and the version number
      */
     private Pair<SecretKeySpec, Integer> derivePbkdf2SecretKey(Secret secret, String algorithm, byte[] salt, Kdf kdf) {
-        val password = new String(secret.getData(), StandardCharsets.UTF_8).toCharArray();
+        val decoded = StandardCharsets.UTF_8.decode(ByteBuffer.wrap(secret.getData()));
+        val characters = decoded.array();
+        val password = decoded.remaining() == characters.length
+                ? characters
+                : Arrays.copyOfRange(characters, decoded.position(), decoded.limit());
         try {
             val spec = new PBEKeySpec(password, salt, kdf.pbkdf2.getIterations(), 256);
             try {
@@ -103,6 +108,9 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
             throw new IllegalStateException("Unable to derive secret key", e);
         } finally {
             Arrays.fill(password, '\0');
+            if (password != characters) {
+                Arrays.fill(characters, '\0');
+            }
         }
     }
 
