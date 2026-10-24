@@ -21,6 +21,7 @@ package org.saidone.service.crypto;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.Arrays;
 
@@ -44,7 +45,16 @@ public class Secret implements AutoCloseable {
     /**
      * Raw secret bytes retrieved from Vault.
      */
+    @ToString.Exclude
     private byte[] data;
+
+    @SuppressWarnings("unused")
+    public static class SecretBuilder {
+        @Override
+        public String toString() {
+            return "Secret.SecretBuilder()";
+        }
+    }
 
     /** Clears the owned buffer; safe to call repeatedly. The version remains available. */
     @Override

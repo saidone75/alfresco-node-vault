@@ -31,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.vault.core.VaultTemplate;
 import org.springframework.vault.core.VaultVersionedKeyValueOperations;
 import org.springframework.vault.support.Versioned;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
@@ -46,8 +47,8 @@ import java.util.Map;
  * from one configured secret path. Consumers can request either the latest secret version
  * or a specific version.</p>
  *
- * <p>When the secret cannot be retrieved, methods in this class throw a {@link VaultException}
- * carrying the cause. The service does not clear the calling thread's interrupted status.</p>
+ * <p>Retrieval failures throw a {@link VaultException} without exposing Vault responses.
+ * The thread's interrupted status is preserved.</p>
  *
  * <p>The bean is active when at least one of
  * {@code application.service.vault.encryption.content.enabled} or
@@ -77,14 +78,14 @@ public class SecretService extends BaseComponent {
     @Override
     public void init() {
         super.init();
-        vaultVersionedKeyValueOperations = vaultTemplate.opsForVersionedKeyValue(properties.getVaultSecretKvMount());
-        val health = vaultTemplate.opsForSys().health();
-        if (!health.isInitialized()) {
-            log.error("Unable to start {}", this.getClass().getSimpleName());
-            super.shutDown(1);
-        }
         Secret secret = null;
         try {
+            vaultVersionedKeyValueOperations = vaultTemplate.opsForVersionedKeyValue(properties.getVaultSecretKvMount());
+            val health = vaultTemplate.opsForSys().health();
+            if (!health.isInitialized()) {
+                log.error("Unable to start {}", this.getClass().getSimpleName());
+                super.shutDown(1);
+            }
             if (properties.isInitializeSecretOnStartup()) {
                 initializeSecretIfAbsent();
             }
@@ -93,7 +94,7 @@ public class SecretService extends BaseComponent {
                 throw new VaultException("The configured encryption secret is empty");
             }
         } catch (RuntimeException e) {
-            throw new VaultException("""
+            throw sanitizedFailure("""
                     Cannot start with encryption enabled: the configured Vault encryption secret \
                     is missing, empty or unreadable. Check Vault configuration and permissions; \
                     provision the secret explicitly for a new installation or restore the required versions \
@@ -187,9 +188,18 @@ public class SecretService extends BaseComponent {
                 throw new IllegalStateException(String.format("No data found in secret %s", properties.getVaultSecretPath()));
             }
         } catch (RuntimeException e) {
-            log.trace(e.getMessage(), e);
-            throw new VaultException(String.format("Unable to retrieve %s from Vault: %s", description, e.getMessage()), e);
+            throw sanitizedFailure(String.format("Unable to retrieve %s from Vault", description), e);
         }
+    }
+
+    private VaultException sanitizedFailure(String message, RuntimeException failure) {
+        val http = failure instanceof HttpStatusCodeException statusFailure
+                ? statusFailure
+                : failure.getCause() instanceof HttpStatusCodeException statusCause ? statusCause : null;
+        val details = http == null
+                ? failure.getClass().getSimpleName()
+                : String.format("%s, HTTP %d", failure.getClass().getSimpleName(), http.getStatusCode().value());
+        return new VaultException(String.format("%s [%s]", message, details));
     }
 
 }
