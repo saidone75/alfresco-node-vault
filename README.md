@@ -282,6 +282,11 @@ Key variables include:
 - `HASHICORP_VAULT_IMAGE` – HashiCorp Vault image name
 - `VAULT_JVM_RUNTIME` – `zulu` (default), `graalvm` or `semeru`; rebuild the vault image after changing it
 
+The development stack runs HashiCorp Vault in nonpersistent dev mode. Restarting it loses
+all secret versions; the provisioner recreates only the initial development secret. Documents
+encrypted with rotated versions become unreadable even if MongoDB and content storage retain
+them. Use a persistent Vault deployment and retain required key versions for durable encrypted archives.
+
 For local development you may rely on the defaults, while in
 production you will likely point to hardened images or custom deployments.
 
