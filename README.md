@@ -142,12 +142,14 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | VAULT_OPERATION_METRICS_ENABLED   | true                                       | Export operation counters, duration histograms and archived bytes                         |
 | VAULT_HASH_ALGORITHM              | SHA-256                                    | Hash stored as content metadata in GridFS, S3 or Ozone                                    |
 | VAULT_DOUBLE_CHECK                | true                                       | Download the archived document again from Alfresco and the vault and compare their hashes |
-| VAULT_DELETE_ON_ALFRESCO          | true                                       | Delete the document from Alfresco after archiving                                         |
+| VAULT_DELETE_ON_ALFRESCO          | true                                       | Delete the document from Alfresco after archiving (permanent by default)                                         |
 | VAULT_ALFRESCO_USE_LOCK           | false                                      | Lock the source in Alfresco throughout archiving, verification and deletion               |
 | VAULT_ALFRESCO_LOCK_TTL_SECONDS   | 120                                        | Source lock TTL (minimum 30 seconds), renewed every third of the TTL                      |
 | VAULT_ALFRESCO_LOCK_LIFETIME      | PERSISTENT                                 | Source lock lifetime: PERSISTENT or EPHEMERAL                                             |
 | VAULT_DELETE_NODE_API_ENABLED     | false                                      | Enable the delete node API                                                                |
 | VAULT_READERS_GROUPS               | GROUP_ANV_READERS                           | Comma-separated Alfresco group IDs; membership in any group grants read access; administrators always have access |
+| VAULT_DELETE_NODE_RESTORE_ON_ALFRESCO | true                                  | Restore a missing Alfresco copy before deleting from the vault                            |
+| VAULT_DELETE_NODE_DELETE_ON_ALFRESCO | true                                    | Move that restored copy to the Alfresco trash before deleting from the vault              |
 | VAULT_AUTH_CACHE_TTL              | 60s                                        | Cache duration of successful API authentications                                          |
 | VAULT_ENCRYPT_CONTENT             | false                                      | Enable binary content encryption (S3, GridFS, Ozone)                                      |
 | VAULT_ENCRYPT_METADATA            | false                                      | Enable document metadata encryption in MongoDB                                            |
@@ -168,6 +170,11 @@ Global configuration is stored in `application.yml`. The main parameters are:
 Transfer checksums verify document integrity before source deletion, not for cryptographic purposes.
 `VAULT_HASH_ALGORITHM` defaults to SHA-256 and also applies to optional blockchain notarization.
 Archive verification uses the checksum algorithm recorded with the stored content.
+
+Archiving deletes the Alfresco source permanently by default (`VAULT_DELETE_ON_ALFRESCO=true` and
+`application.service.alfresco.permanently-delete-nodes=true`). Set the latter to `false` to use the trash,
+or `VAULT_DELETE_ON_ALFRESCO=false` to retain the source. The separate
+[delete node API](doc/RestApi.md#deleting-archived-documents) removes content and metadata from the vault.
 
 Archiving checks content size and, with `VAULT_DOUBLE_CHECK=true`, hashes before saving metadata;
 verification failures trigger rollback. Existing vault copies are always verified before source deletion.

@@ -78,6 +78,21 @@ Operations on the same node share a MongoDB-backed ShedLock lock across cooperat
 Synchronous requests return `409` if the lock is unavailable. Asynchronous requests report later
 conflicts in worker logs. See [concurrency](Concurrency.md) for lease durations and recovery limitations.
 
+## Deleting archived documents
+
+`DELETE /api/v1/vault/nodes/{nodeId}` requires administrator credentials and
+`VAULT_DELETE_NODE_API_ENABLED=true` (default `false`). It removes vault content and metadata.
+
+If neither the original Alfresco node nor its recorded restored copy exists, the default behavior
+first restores the document without permissions, then moves the new copy to the Alfresco trash.
+`VAULT_DELETE_NODE_RESTORE_ON_ALFRESCO` and `VAULT_DELETE_NODE_DELETE_ON_ALFRESCO` control these steps
+(both default `true`). If either Alfresco copy already exists, both steps are skipped and that copy is retained.
+Set both flags to `false` to delete only from the vault. Disabling restore alone can make deletion fail
+when the original node is missing.
+
+These flags are separate from archive-time deletion, which permanently deletes the Alfresco source
+by default (`VAULT_DELETE_ON_ALFRESCO=true`, `application.service.alfresco.permanently-delete-nodes=true`).
+
 ## Advanced search example
 
 `POST /api/v1/vault/advanced-search` searches the archived nodes by their metadata; the meaning of each criterion is
