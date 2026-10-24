@@ -83,7 +83,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - GridFS, [S3](doc/S3.md) or [Apache Ozone](doc/Ozone.md) storage for document content
 - [REST API](doc/RestApi.md) with Alfresco proxy support and metadata search
 - Advanced metadata search with filters and wildcards
-- Custom upload and download methods
+- Streaming document uploads and downloads
 - Engineered for flexibility and bespoke integrations
 - No Alfresco changes beyond installing the minimal [ANV content model](#alfresco-setup)
 - Secure and decoupled design that suits zero trust environments
@@ -95,7 +95,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Optional blockchain document notarization to provide verifiable evidence of integrity
 - Scheduled and on-demand [integrity sweeps](doc/IntegritySweep.md) to verify notarized documents
 - Audit trail with configurable retention
-- Prometheus monitoring support for metrics and health checks, including [vault operation metrics](doc/Metrics.md)
+- Health checks and Prometheus metrics, including [archive, restore and delete metrics](doc/Metrics.md)
 - Minimal memory footprint
 - Three selectable Docker JVM runtimes: Azul Zulu, GraalVM Community and IBM Semeru/OpenJ9
 - Robust, enterprise-grade reliability and performance
