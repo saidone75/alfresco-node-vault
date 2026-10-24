@@ -55,8 +55,9 @@ The script spins up the following services using Docker Compose:
 
 To rebuild and restart the selected development stack, run
 `./vault.sh build_start --s3` (or `--gridfs` / `--ozone`).
-The legacy `update-vault.sh` and `update-vault.bat` scripts use only the base
-Compose file and do not preserve the complete backend configuration.
+To rebuild and recreate only the running vault, use `./update-vault.sh` or `update-vault.bat`.
+These scripts reuse the Compose configuration recorded on the container, preserving the selected
+backend and leaving other services running. They do nothing if `anv-vault` is not running.
 
 ## Configuration
 
