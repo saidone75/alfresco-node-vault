@@ -162,6 +162,7 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | VAULT_ENCRYPTION_KV_MOUNT         | secret                                     | Vault secret engine mount path                                                            |
 | VAULT_ENCRYPTION_SECRET_PATH      | AlfrescoNodeVault                          | Path of encryption secret in Vault secret engine                                          |
 | VAULT_ENCRYPTION_SECRET_KEY       | anv.secret                                 | Key name of encryption secret                                                             |
+| VAULT_ENCRYPTION_INITIALIZE_SECRET_ON_STARTUP | false (true in development Compose) | Allow first-install secret generation when encryption is enabled |
 | AUDIT_TTL_DAYS                    | 60                                         | Retention of audit entries in days                                                        |
 | NOTARIZATION_ENABLED              | true                                       | Enable notarization service                                                               |
 | NOTARIZATION_JOB_ENABLED          | false                                      | Document notarization job switch                                                          |
@@ -295,12 +296,28 @@ Key variables include:
 - `VAULT_JVM_RUNTIME` – `zulu` (default), `graalvm` or `semeru`; rebuild the vault image after changing it
 
 The development stack runs HashiCorp Vault in nonpersistent dev mode. Restarting it loses
-all secret versions; the provisioner recreates only the initial development secret. Documents
+all secret versions. On the next ANV startup with encryption enabled, development provisioning
+can create a fresh initial secret; it cannot recover lost keys. Documents
 encrypted with rotated versions become unreadable even if MongoDB and content storage retain
 them. Use a persistent Vault deployment and retain required key versions for durable encrypted archives.
 
 For local development you may rely on the defaults, while in
 production you will likely point to hardened images or custom deployments.
+
+## Encryption secret provisioning
+
+With encryption enabled, ANV requires a readable, nonempty secret at startup.
+For a new installation, set `VAULT_ENCRYPTION_INITIALIZE_SECRET_ON_STARTUP=true`
+(default: `false`, enabled in development Compose). ANV generates 32 random bytes,
+stored as Base64 text, only when both data and metadata are absent. CAS 0 prevents
+overwriting an existing secret; other Vault errors stop startup.
+
+Provisioning requires `read` and `create` on the configured KV v2 data path and `read`
+on its metadata path. Disable it after initial setup: an empty or incorrect path cannot
+be distinguished from a new installation. Sensitive byte buffers are cleared after use.
+
+Manage rotations in HashiCorp Vault, then use the update-key APIs to re-encrypt documents.
+Retain previous versions while documents or backups need them.
 
 ## Run
 

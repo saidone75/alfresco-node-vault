@@ -33,6 +33,10 @@ import org.springframework.vault.core.VaultVersionedKeyValueOperations;
 import org.springframework.vault.support.Versioned;
 
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -66,7 +70,9 @@ public class SecretService extends BaseComponent {
      *
      * <p>This method prepares the {@link VaultVersionedKeyValueOperations} instance bound to
      * the configured KV mount and checks the Vault system health endpoint. If Vault is reported
-     * as not initialized, startup is aborted through {@link #shutDown(int)}.</p>
+     * as not initialized, startup is aborted through {@link #shutDown(int)}.
+     * The latest encryption secret must also be readable and nonempty; otherwise bean
+     * initialization fails. Bytes read for this check are cleared before returning.</p>
      */
     @Override
     public void init() {
@@ -76,6 +82,64 @@ public class SecretService extends BaseComponent {
         if (!health.isInitialized()) {
             log.error("Unable to start {}", this.getClass().getSimpleName());
             super.shutDown(1);
+        }
+        Secret secret = null;
+        try {
+            if (properties.isInitializeSecretOnStartup()) {
+                initializeSecretIfAbsent();
+            }
+            secret = getSecret();
+            if (secret.getData() == null || secret.getData().length == 0) {
+                throw new VaultException("The configured encryption secret is empty");
+            }
+        } catch (RuntimeException e) {
+            throw new VaultException("""
+                    Cannot start with encryption enabled: the configured Vault encryption secret \
+                    is missing, empty or unreadable. Check Vault configuration and permissions; \
+                    provision the secret explicitly for a new installation or restore the required versions \
+                    for an existing archive.""", e);
+        } finally {
+            if (secret != null && secret.getData() != null) {
+                Arrays.fill(secret.getData(), (byte) 0);
+            }
+        }
+    }
+
+    private void initializeSecretIfAbsent() {
+        val path = properties.getVaultSecretPath();
+        if (vaultVersionedKeyValueOperations.get(path) != null) {
+            return;
+        }
+        if (vaultVersionedKeyValueOperations.opsForKeyValueMetadata().get(path) != null) {
+            // Another instance may have provisioned between the data and metadata reads.
+            if (vaultVersionedKeyValueOperations.get(path) != null) {
+                return;
+            }
+            throw new VaultException("Encryption secret has existing Vault metadata; restore its required versions");
+        }
+        val random = new byte[32];
+        byte[] encoded = null;
+        val data = new HashMap<String, Object>();
+        try {
+            new SecureRandom().nextBytes(random);
+            encoded = Base64.getEncoder().encode(random);
+            data.put(properties.getVaultSecretKey(), new String(encoded, StandardCharsets.US_ASCII));
+            try {
+                vaultVersionedKeyValueOperations.put(path, Versioned.create(data, Versioned.Version.from(0)));
+            } catch (org.springframework.vault.VaultException e) {
+                // Only a CAS conflict permits rereading the concurrent creator's secret.
+                if (!(e.getCause() instanceof org.springframework.web.client.HttpStatusCodeException http)
+                        || http.getStatusCode().value() != 400
+                        || !http.getResponseBodyAsString().contains("check-and-set parameter did not match")) {
+                    throw e;
+                }
+            }
+        } finally {
+            Arrays.fill(random, (byte) 0);
+            if (encoded != null) {
+                Arrays.fill(encoded, (byte) 0);
+            }
+            data.clear();
         }
     }
 
