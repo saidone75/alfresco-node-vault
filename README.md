@@ -183,7 +183,7 @@ Hadoop/Ozone security configuration and a Kerberos identity; see [Ozone configur
 
 ## Build
 
-Java and Maven are required. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions.
+Java 21 or later and Maven are required. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions.
 
 `mvn package -DskipTests -Dlicense.skip=true`
 
@@ -287,11 +287,25 @@ production you will likely point to hardened images or custom deployments.
 
 ## Run
 
-```
+Use Java 21 or later. Start Alfresco, MongoDB, ActiveMQ and the selected content backend first;
+Ethereum is needed when notarization is enabled (the default). For local infrastructure, use
+`./vault.sh start novault` (or `vault.bat start novault` on Windows).
+
+```bash
 cd anv
 java -jar anv-VERSION.jar
 # Replace VERSION with the version in the generated filename.
 ```
+
+The application listens on port `8086` and uses the `dev` profile by default; override it with
+`SPRING_PROFILES_ACTIVE`. Configure service endpoints and credentials in `config/application.yml`
+or through the documented environment variables. The default `spring.config.import: vault://`
+also requires HashiCorp Vault when encryption is disabled; configure its address and authentication
+under `spring.cloud.vault`.
+
+All `/actuator/**` endpoints use separate Basic credentials, defaulting to `admin` / `admin`.
+Configure them with `management.security.basic-auth.username` and `.password`; these are independent
+of Alfresco API credentials.
 
 ## REST API
 
