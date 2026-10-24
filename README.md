@@ -81,16 +81,21 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Scheduled or on-demand archiving
 - MongoDB storage for document metadata and the audit trail
 - GridFS, [S3](doc/S3.md) or [Apache Ozone](doc/Ozone.md) storage for document content
-- Optional blockchain document notarization to provide verifiable evidence of integrity
-- Scheduled and on-demand [integrity sweeps](doc/IntegritySweep.md) to verify notarized documents
-- Secure and decoupled design that suits zero trust environments
-- Optional [strong encryption](doc/Encryption.md) for both content and metadata
-- Passwords securely stored in a secret engine
 - [REST API](doc/RestApi.md) with Alfresco proxy support and metadata search
+- Advanced metadata search with filters and wildcards
+- Custom upload and download methods
 - Engineered for flexibility and bespoke integrations
 - No Alfresco changes beyond installing the minimal [ANV content model](#alfresco-setup)
+- Secure and decoupled design that suits zero trust environments
+- Optional [strong encryption](doc/Encryption.md) for both content and metadata
+- Encryption key rotation for individual documents or entire archives
+- Passwords securely stored in a secret engine
+- Optional Alfresco locking during archiving
+- Distributed operation locks and checksum verification
+- Optional blockchain document notarization to provide verifiable evidence of integrity
+- Scheduled and on-demand [integrity sweeps](doc/IntegritySweep.md) to verify notarized documents
+- Audit trail with configurable retention
 - Prometheus monitoring support for metrics and health checks, including [vault operation metrics](doc/Metrics.md)
-- Custom upload and download methods
 - Minimal memory footprint
 - Three selectable Docker JVM runtimes: Azul Zulu, GraalVM Community and IBM Semeru/OpenJ9
 - Robust, enterprise-grade reliability and performance
@@ -209,7 +214,7 @@ The script creates an `anv/` directory containing the versioned `anv-<version>.j
 
 ## Testing
 
-For a containerized check of archiving, downloading and restoring on S3 and GridFS, with and without encryption,
+For a containerized check of archiving, downloading and restoring on S3, GridFS and Ozone, with and without encryption,
 run `./smoke-tests.sh` (Linux/macOS) or `smoke-tests.bat` (Windows).
 S3 is the default; use `--s3`, `--gridfs` or `--ozone` to select a backend, or `--all` to test all three.
 These [end-to-end smoke tests](doc/SmokeTest.md) check content hashes and restore retries in an isolated Docker stack.
@@ -347,8 +352,8 @@ Alfresco proxy and the common conventions.
 
 - **Enabling encryption** on a vault that already holds data is supported: existing content and metadata stay
   readable and newly archived documents are encrypted, but existing documents are not re-encrypted.
-- **Disabling encryption** when encrypted data is already stored is not supported: encrypted content would be returned
-  as is and encrypted metadata could not be read.
+- **Disabling encryption:** plaintext content remains readable. Encrypted content requires an available crypto
+  service; otherwise reads fail. Encrypted metadata cannot be read with metadata encryption disabled.
 - **Encryption format:** encrypted content and metadata use the versioned ANV v1 format with an authenticated header.
   Cipher and KDF settings can change for new writes; existing payloads retain their own parameters.
   The previous unversioned encrypted format is not supported. Export with the previous application before upgrading
