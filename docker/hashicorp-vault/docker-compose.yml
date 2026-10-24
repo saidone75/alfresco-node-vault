@@ -15,15 +15,13 @@ services:
         }
     cap_add:
       - IPC_LOCK
-  anv-hashicorp-vault-provisioner:
-    image: ${HASHICORP_VAULT_IMAGE}:${HASHICORP_VAULT_IMAGE_VERSION}
-    container_name: anv-hashicorp-vault-provisioner
+    healthcheck:
+      test: ["CMD", "vault", "status", "-address=http://127.0.0.1:8200"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+      start_period: 5s
+  anv-vault:
     depends_on:
-      - anv-hashicorp-vault
-    entrypoint: >
-      sh -c "
-        export VAULT_ADDR='http://anv-hashicorp-vault:8200' && \
-        export VAULT_TOKEN='root' && \
-        sleep 5 && \
-        vault kv put secret/AlfrescoNodeVault anv.secret=vault-secret
-      "
+      anv-hashicorp-vault:
+        condition: service_healthy

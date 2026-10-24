@@ -49,7 +49,7 @@ The script spins up the following services using Docker Compose:
 - **MongoDB** with **Mongo Express** UI
 - **Moto** for AWS S3 object storage
 - **Ganache** for Ethereum blockchain simulation
-- **HashiCorp Vault** (plus a small provisioner container)
+- **HashiCorp Vault** (ANV provisions the initial secret when encryption is enabled in development Compose)
 - **Prometheus**, **Grafana** and **Nginx** for monitoring
 - **Alfresco Node Vault** application itself
 

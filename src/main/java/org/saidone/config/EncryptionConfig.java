@@ -52,6 +52,9 @@ public class EncryptionConfig {
     @Setter
     private String vaultSecretKey;
 
+    /** Explicit first-install provisioning; never replaces existing Vault history. */
+    private boolean initializeSecretOnStartup = false;
+
     /** Cipher used for new payloads: jca (AES-256-GCM) or bc (ChaCha20-Poly1305). */
     @Pattern(regexp = "jca|bc")
     private String impl = "bc";

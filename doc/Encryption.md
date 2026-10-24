@@ -198,16 +198,39 @@ or recreate disposable data. Unencrypted data is unaffected.
 Implementation: [AnvCryptoService.java](../src/main/java/org/saidone/service/crypto/AnvCryptoService.java)
 and [EncryptedPayloadHeader.java](../src/main/java/org/saidone/service/crypto/EncryptedPayloadHeader.java).
 
-## Key Rotation
+## Key Rotation and Retention
 
-The encryption secret is read from a versioned key/value secret engine (HashiCorp Vault), and every encrypted payload
-records the version of the secret used. To rotate the key:
+Use persistent Vault KV v2 storage. Review rotation needs annually and rotate on suspected exposure
+or organizational requirements; ANV does not schedule rotations.
+Runtime credentials require `read` on both the configured KV v2 data and metadata paths;
+key updates read the latest version from metadata without fetching the secret value.
 
-1. Store a new version of the secret at the configured path (`VAULT_ENCRYPTION_SECRET_PATH`, key
-   `VAULT_ENCRYPTION_SECRET_KEY`). New nodes are encrypted with the latest version, while previous versions stay
-   available for decryption.
-2. Re-encrypt the existing nodes with `POST /api/v1/vault/nodes/update-keys?keyVersion=<old version>`, or a single node
-   with `POST /api/v1/vault/nodes/{nodeId}/update-key` (see [RestApi.md](RestApi.md)).
+1. Before rotating, verify recoverable backups and inspect retention:
+   ```bash
+   vault read secret/config
+   vault kv metadata get -mount=secret AlfrescoNodeVault
+   ```
+   Adjust mount/path as configured. Ensure `max_versions` can retain all required history plus the new
+   version: exceeding it permanently destroys older versions. **Zero does not mean unlimited**;
+   the key inherits the mount setting, whose default is 10. Disable `delete_version_after` at both
+   levels and check existing scheduled deletions. See the
+   [Vault KV v2 API](https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2).
+2. Store a fresh secret with at least 256 bits of cryptographic randomness at the same mount/path/key.
+   Use compare-and-set, preserve unrelated fields and keep values out of logs and shell arguments.
+   Back up Vault with the new version and retain the required recovery material separately.
+3. Call `POST /api/v1/vault/nodes/update-keys?keyVersion=<source version>` for each version to migrate,
+   or `POST /api/v1/vault/nodes/{nodeId}/update-key` for one node. `202 Accepted` confirms submission.
+   `keyVersion` must be a positive integer identifying the source version, not the destination.
+   Bulk runs share a distributed lock; overlapping runs are skipped and logged. Do not create new
+   secret versions in Vault while a bulk is queued or running; wait for completion in the logs.
+   Check logs, retry skipped or failed nodes, and verify content and metadata readability.
+4. Retain old keys while any document, backup, snapshot or stored historical payload needs them.
+   Re-encrypting live data does not migrate backups. Before retiring a key, verify an isolated restore
+   of matching MongoDB, content storage and Vault history. If dependencies are uncertain, keep it.
+
+Restrict key deletion to Vault administrators. Restore lost keys with their original version mapping;
+creating a new secret cannot recover old documents. Docker dev Vault is ephemeral and unsuitable
+for durable archives.
 
 ## Changing the Encryption Configuration
 

@@ -159,6 +159,7 @@ application:
         vault-secret-kv-mount: ${VAULT_ENCRYPTION_KV_MOUNT:secret}
         vault-secret-path: ${VAULT_ENCRYPTION_SECRET_PATH:AlfrescoNodeVault}
         vault-secret-key: ${VAULT_ENCRYPTION_SECRET_KEY:anv.secret}
+        initialize-secret-on-startup: ${VAULT_ENCRYPTION_INITIALIZE_SECRET_ON_STARTUP:false}
         impl: bc
         jca:
           salt-length: 16

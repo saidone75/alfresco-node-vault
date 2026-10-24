@@ -21,6 +21,9 @@ package org.saidone.service.crypto;
 
 import lombok.Builder;
 import lombok.Data;
+import lombok.ToString;
+
+import java.util.Arrays;
 
 /**
  * Container for a secret value retrieved from Vault.
@@ -32,7 +35,7 @@ import lombok.Data;
  */
 @Builder
 @Data
-public class Secret {
+public class Secret implements AutoCloseable {
 
     /**
      * Version of the secret as stored in Vault metadata.
@@ -42,6 +45,23 @@ public class Secret {
     /**
      * Raw secret bytes retrieved from Vault.
      */
+    @ToString.Exclude
     private byte[] data;
+
+    @SuppressWarnings("unused")
+    public static class SecretBuilder {
+        @Override
+        public String toString() {
+            return "Secret.SecretBuilder()";
+        }
+    }
+
+    /** Clears the owned buffer; safe to call repeatedly. The version remains available. */
+    @Override
+    public void close() {
+        if (data != null) {
+            Arrays.fill(data, (byte) 0);
+        }
+    }
 
 }

@@ -49,7 +49,7 @@ public class AnvCryptoService extends AbstractCryptoService {
 
     @Override
     public InputStream encrypt(InputStream input, Secret secret) {
-        try {
+        try (secret) {
             val cipherId = switch (config.getImpl()) {
                 case "jca" -> 1;
                 case "bc" -> 2;
@@ -77,9 +77,10 @@ public class AnvCryptoService extends AbstractCryptoService {
     public InputStream decrypt(InputStream input) {
         try {
             val decoded = EncryptedPayloadHeader.read(input);
-            val secret = secrets.getSecret(decoded.header().keyVersion());
-            val cipher = initialize(Cipher.DECRYPT_MODE, decoded.header(), secret, decoded.bytes());
-            return new TransformStream(input, cipher);
+            try (val secret = secrets.getSecret(decoded.header().keyVersion())) {
+                val cipher = initialize(Cipher.DECRYPT_MODE, decoded.header(), secret, decoded.bytes());
+                return new TransformStream(input, cipher);
+            }
         } catch (IOException | GeneralSecurityException | RuntimeException e) {
             try {
                 input.close();

@@ -147,6 +147,7 @@ services:
       ACTIVE_MQ_URL: tcp://activemq:61616
       MONGODB_URL: mongodb://mongo:27017
       VAULT_URL: http://anv-hashicorp-vault:8200
+      VAULT_ENCRYPTION_INITIALIZE_SECRET_ON_STARTUP: "${VAULT_ENCRYPTION_INITIALIZE_SECRET_ON_STARTUP:-true}"
       S3_ENDPOINT: http://anv-motoserver:5000
       ETH_RPC_URL: http://anv-ganache:8545
       VAULT_READERS_GROUPS: "${VAULT_READERS_GROUPS:-GROUP_ANV_READERS}"

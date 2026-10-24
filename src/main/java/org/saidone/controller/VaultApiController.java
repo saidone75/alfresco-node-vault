@@ -550,7 +550,7 @@ public class VaultApiController extends BaseComponent {
     }
 
     /**
-     * Updates the encryption key for a node.
+     * Re-encrypts a node with the latest existing Vault key version when needed.
      *
      * @param auth   optional Basic authentication header
      * @param nodeId identifier of the node whose key should be updated
@@ -559,13 +559,13 @@ public class VaultApiController extends BaseComponent {
     @SecurityRequirement(name = "basicAuth")
     @PostMapping("/nodes/{nodeId}/update-key")
     @Operation(
-            summary = "Update encryption key",
-            description = "Update the encryption key of the specified node.",
+            summary = "Re-encrypt node",
+            description = "Re-encrypts the node with the latest existing Vault key version if outdated. Does not create or rotate secrets in Vault.",
             parameters = {
                     @Parameter(name = "nodeId", description = "Identifier of the node to update", required = true, in = ParameterIn.PATH)
             },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Encryption key updated",
+                    @ApiResponse(responseCode = "200", description = "Node re-encrypted or already up to date",
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "401", description = "Unauthorized",
                             content = @Content),
@@ -600,19 +600,22 @@ public class VaultApiController extends BaseComponent {
      * The operation runs asynchronously and returns immediately.
      *
      * @param auth       optional Basic authentication header
-     * @param keyVersion version of the outdated encryption key
+     * @param keyVersion positive source key version identifying the nodes to re-encrypt
      * @return a confirmation message, or 403 when encryption is disabled
      */
     @SecurityRequirement(name = "basicAuth")
     @PostMapping("/nodes/update-keys")
     @Operation(
             summary = "Re-encrypts nodes",
-            description = "Re-encrypts all nodes with the specified key version. The update runs asynchronously.",
+            description = """
+                    Re-encrypts nodes using the specified source key version with the latest existing Vault key. \
+                    Runs asynchronously; does not create or rotate secrets in Vault.""",
             parameters = {
-                    @Parameter(name = "keyVersion", description = "Version of the encryption key to update", required = true, in = ParameterIn.QUERY)
+                    @Parameter(name = "keyVersion", description = "Source key version of the nodes to re-encrypt", required = true, in = ParameterIn.QUERY,
+                            schema = @Schema(type = "integer", minimum = "1"))
             },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Update required",
+                    @ApiResponse(responseCode = "202", description = "Update accepted",
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "400", description = "Invalid request",
                             content = @Content),
@@ -625,7 +628,8 @@ public class VaultApiController extends BaseComponent {
             })
     public ResponseEntity<String> updateKey(
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
-            @RequestParam(name = "keyVersion") @Parameter(name = "keyVersion", description = "Version of the encryption key to update", required = true) int keyVersion) {
+            @RequestParam(name = "keyVersion") @Parameter(name = "keyVersion", description = "Source key version of the nodes to re-encrypt", required = true,
+                    schema = @Schema(type = "integer", minimum = "1")) int keyVersion) {
 
         if (!authenticationService.isAuthorized(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
@@ -635,17 +639,19 @@ public class VaultApiController extends BaseComponent {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).contentType(MediaType.TEXT_PLAIN).body(ENCRYPTION_DISABLED);
         }
 
+        if (keyVersion < 1) {
+            throw new InvalidRequestException("keyVersion must be a positive source key version");
+        }
+
         // Re-key nodes asynchronously to avoid long blocking requests
         CompletableFuture.runAsync(() -> {
             try {
-                log.info("Starting key update for version {}", keyVersion);
                 keyService.get().updateKeys(keyVersion);
-                log.info("Completed key update for version {}", keyVersion);
             } catch (Exception e) {
                 log.error("Error while updating keys for version {}", keyVersion, e);
             }
         }, taskExecutor);
-        return ResponseEntity.ok()
+        return ResponseEntity.accepted()
                 .contentType(MediaType.TEXT_PLAIN)
                 .body("Update required.");
     }
