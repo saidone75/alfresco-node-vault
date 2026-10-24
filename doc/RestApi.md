@@ -11,18 +11,43 @@ served by the application at `/swagger` (e.g. http://localhost:8086/swagger). Th
 
 ## Authentication
 
-All endpoints require HTTP Basic authentication with the credentials of an Alfresco **administrator**. Credentials are
-verified against Alfresco and successful checks are cached for `VAULT_AUTH_CACHE_TTL` (default `60s`).
+Vault APIs require HTTP Basic authentication verified against Alfresco:
+
+- **Alfresco administrators** always have access, without needing readers-group membership.
+- **Members of any configured reader group** can search archived documents (`GET /api/v1/vault/search` and
+  `POST /api/v1/vault/advanced-search`), read node metadata and download content.
+- All other APIs, including archive, restore, delete, key rotation, notarization, integrity sweeps
+  and audit, remain restricted to administrators.
+
+`VAULT_READERS_GROUPS` accepts comma-separated Alfresco group IDs (default `GROUP_ANV_READERS`,
+the Alfresco group `ANV_READERS`). Membership in **any one** of the listed groups is sufficient.
+For example: `VAULT_READERS_GROUPS=GROUP_ANV_READERS,GROUP_ARCHIVISTS`. Whitespace around IDs
+and duplicate IDs are ignored; empty lists or blank IDs are rejected at startup.
+Create the groups and assign members in Alfresco; the vault does not provision them. In Docker, set the variable in
+`docker/.env` and recreate the application container. Missing groups grant no reader access;
+administrators retain access.
+
+**The vault currently does not preserve Alfresco ACLs for document access.** Group members can consult
+all archived documents, regardless of permissions on the original Alfresco nodes. Permission metadata
+may be stored and optionally restored to Alfresco, but is not used to authorize vault reads.
+
+Successful administrator and reader checks are cached separately for `VAULT_AUTH_CACHE_TTL`
+(default `60s`). Revocations can take up to that duration to take effect; set `0s` to disable caching.
+Missing credentials, invalid credentials and insufficient privileges return `401`, following the
+existing API convention. Actuator endpoints use separate monitoring credentials.
 
 ## Alfresco proxy
 
-Requests to the Alfresco REST API for nodes that are archived in the vault are served by the vault itself, so that
-existing clients keep working without changes:
+The following Alfresco REST API requests for archived nodes are served by the vault. Clients must
+address the vault and send Basic credentials of an administrator or a member of any configured reader group:
 
 - `GET /alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}`
 - `GET /alfresco/api/-default-/public/alfresco/versions/1/nodes/{nodeId}/content`
 
-Any other request under `/alfresco/**` is forwarded to Alfresco. These routes are handled by the gateway and are not
+These two routes apply the vault access policy, including access to all archived documents for readers;
+they do not enforce original Alfresco ACLs. Alfresco tickets and nonmember user credentials do not grant vault access.
+
+Any other request under `/alfresco/**` is forwarded to Alfresco and uses Alfresco authorization. These routes are handled by the gateway and are not
 listed in the OpenAPI documentation.
 
 ## Conventions
@@ -37,7 +62,7 @@ listed in the OpenAPI documentation.
 | Status | Meaning                                                                                         |
 |--------|-------------------------------------------------------------------------------------------------|
 | `400`  | Invalid parameters or request body                                                              |
-| `401`  | Missing or invalid credentials                                                                  |
+| `401`  | Missing or invalid credentials, or insufficient privileges                                                                  |
 | `403`  | The feature is disabled by configuration                                                        |
 | `404`  | Node not found on the vault or on Alfresco                                                      |
 | `409`  | Conflicting state: another operation on the same node is in progress, node already notarized, node not notarized or hashes not matching the notarized ones |
@@ -52,6 +77,32 @@ A process interruption, a lost creation response or failed cleanup may leave a n
 Operations on the same node share a MongoDB-backed ShedLock lock across cooperating instances.
 Synchronous requests return `409` if the lock is unavailable. Asynchronous requests report later
 conflicts in worker logs. See [concurrency](Concurrency.md) for lease durations and recovery limitations.
+
+## Deleting archived documents
+
+`DELETE /api/v1/vault/nodes/{nodeId}` requires administrator credentials and
+`VAULT_DELETE_NODE_API_ENABLED=true` (default `false`). It removes vault content and metadata.
+
+If neither the original Alfresco node nor its recorded restored copy exists, the default behavior
+first restores the document without permissions, then moves the new copy to the Alfresco trash.
+`VAULT_DELETE_NODE_RESTORE_ON_ALFRESCO` and `VAULT_DELETE_NODE_DELETE_ON_ALFRESCO` control these steps
+(both default `true`). If either Alfresco copy already exists, both steps are skipped and that copy is retained.
+Set both flags to `false` to delete only from the vault. Disabling restore alone can make deletion fail
+when the original node is missing.
+
+These flags are separate from archive-time deletion, which permanently deletes the Alfresco source
+by default (`VAULT_DELETE_ON_ALFRESCO=true`, `application.service.alfresco.permanently-delete-nodes=true`).
+
+## Re-encryption
+
+The update-key APIs use the latest existing Vault secret version; they do not create or rotate secrets.
+Create the new version in Vault first, then call:
+
+- `POST /api/v1/vault/nodes/{nodeId}/update-key` to re-encrypt one outdated node; an up-to-date node is unchanged.
+- `POST /api/v1/vault/nodes/update-keys?keyVersion=<source version>` to re-encrypt nodes using that source version.
+  The bulk returns `202 Accepted`; follow completion in the logs and do not rotate secrets while it is pending or running.
+
+See [rotation and retention](Encryption.md#key-rotation-and-retention) for the operational procedure.
 
 ## Advanced search example
 

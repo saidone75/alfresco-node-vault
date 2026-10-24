@@ -66,10 +66,11 @@ public class ContentEncryptionService extends BaseComponent {
             metadata.put(MetadataKeys.ENCRYPTED, Boolean.FALSE.toString());
             return content;
         }
-        val secret = secretService.orElseThrow().getSecret();
-        metadata.put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString());
-        metadata.put(MetadataKeys.KEY_VERSION, String.valueOf(secret.getVersion()));
-        return cryptoService.orElseThrow().encrypt(content, secret);
+        try (val secret = secretService.orElseThrow().getSecret()) {
+            metadata.put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString());
+            metadata.put(MetadataKeys.KEY_VERSION, String.valueOf(secret.getVersion()));
+            return cryptoService.orElseThrow().encrypt(content, secret);
+        }
     }
 
     /**

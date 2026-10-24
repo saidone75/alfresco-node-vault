@@ -33,14 +33,16 @@ import java.time.Instant;
 import java.util.Base64;
 import java.util.HexFormat;
 import java.util.Map;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Service responsible for validating Basic authentication headers.
  * <p>
  * The provided credentials are decoded and checked against Alfresco via
- * {@link AlfrescoService} to verify that the user has administrative
- * privileges.
+ * {@link AlfrescoService} to verify administrative privileges or vault reader access.
  * </p>
  * <p>
  * Successful checks are cached for a configurable time, keyed by a hash of the
@@ -57,12 +59,19 @@ public class AuthenticationService extends BaseComponent {
     private final Map<String, Instant> authorizedHeaders = new ConcurrentHashMap<>();
 
     private final Duration authCacheTtl;
+    private final Set<String> readersGroups;
+    private final Map<String, Instant> readerHeaders = new ConcurrentHashMap<>();
 
     public AuthenticationService(
             AlfrescoService alfrescoService,
-            @Value("${application.service.vault.auth-cache-ttl:60s}") Duration authCacheTtl) {
+            @Value("${application.service.vault.auth-cache-ttl:60s}") Duration authCacheTtl,
+            @Value("${application.service.vault.readers-groups:GROUP_ANV_READERS}") List<String> readersGroups) {
         this.alfrescoService = alfrescoService;
         this.authCacheTtl = authCacheTtl;
+        if (readersGroups == null || readersGroups.isEmpty() || readersGroups.stream().anyMatch(Strings::isBlank)) {
+            throw new IllegalArgumentException("Vault readers groups must contain at least one nonblank group ID");
+        }
+        this.readersGroups = readersGroups.stream().map(String::trim).collect(Collectors.toUnmodifiableSet());
     }
 
     /**
@@ -74,33 +83,43 @@ public class AuthenticationService extends BaseComponent {
      * {@code false} otherwise
      */
     public boolean isAuthorized(String authHeader) {
+        return isAuthorized(authHeader, authorizedHeaders, false);
+    }
+
+    /** Allows administrators and members of the configured Alfresco readers groups. */
+    public boolean canRead(String authHeader) {
+        return isAuthorized(authHeader, readerHeaders, true);
+    }
+
+    private boolean isAuthorized(String authHeader, Map<String, Instant> cache, boolean reader) {
         if (Strings.isBlank(authHeader)) {
             return false;
         }
         val cacheKey = sha256(authHeader);
         val now = Instant.now();
-        val expiresAt = authorizedHeaders.get(cacheKey);
+        val expiresAt = cache.get(cacheKey);
         if (expiresAt != null && now.isBefore(expiresAt)) {
             return true;
         }
-        val authorized = checkCredentials(authHeader);
+        val authorized = checkCredentials(authHeader, reader);
         if (authorized && authCacheTtl.isPositive()) {
-            // the map only holds valid admin credentials, so a sweep on insert keeps it small
-            authorizedHeaders.values().removeIf(now::isAfter);
-            authorizedHeaders.put(cacheKey, now.plus(authCacheTtl));
+            // Only successful checks are cached, separately for each access level.
+            cache.values().removeIf(now::isAfter);
+            cache.put(cacheKey, now.plus(authCacheTtl));
         } else {
-            authorizedHeaders.remove(cacheKey);
+            cache.remove(cacheKey);
         }
         return authorized;
     }
 
     /**
-     * Verifies the Basic credentials of the given header against Alfresco.
+     * Verifies Basic credentials and the requested access level against Alfresco.
      *
      * @param authHeader the Authorization header value received from the client
-     * @return {@code true} if the credentials are valid and belong to an admin
+     * @param reader whether reader-group membership is sufficient
+     * @return whether the credentials grant the requested access
      */
-    private boolean checkCredentials(String authHeader) {
+    private boolean checkCredentials(String authHeader, boolean reader) {
         val parts = authHeader.trim().split("\\s+", 2);
         if (parts.length != 2 || !"basic".equalsIgnoreCase(parts[0])) {
             return false;
@@ -111,7 +130,9 @@ public class AuthenticationService extends BaseComponent {
             if (userIdAndPassword.length != 2) {
                 return false;
             }
-            return alfrescoService.isAdmin(userIdAndPassword[0], userIdAndPassword[1]);
+            return reader
+                    ? alfrescoService.isVaultReader(userIdAndPassword[0], userIdAndPassword[1], readersGroups)
+                    : alfrescoService.isAdmin(userIdAndPassword[0], userIdAndPassword[1]);
         } catch (IllegalArgumentException e) {
             return false;
         }

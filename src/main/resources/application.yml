@@ -138,6 +138,7 @@ application:
       connect-timeout: ${CONNECTION_TIMEOUT:10000}
       read-timeout: ${READ_TIMEOUT:60000}
     vault:
+      readers-groups: ${VAULT_READERS_GROUPS:GROUP_ANV_READERS}
       hash-algorithm: ${VAULT_HASH_ALGORITHM:SHA-256}
       auth-cache-ttl: ${VAULT_AUTH_CACHE_TTL:60s}
       double-check: ${VAULT_DOUBLE_CHECK:true}
@@ -158,7 +159,7 @@ application:
         vault-secret-kv-mount: ${VAULT_ENCRYPTION_KV_MOUNT:secret}
         vault-secret-path: ${VAULT_ENCRYPTION_SECRET_PATH:AlfrescoNodeVault}
         vault-secret-key: ${VAULT_ENCRYPTION_SECRET_KEY:anv.secret}
-        secret: ${VAULT_ENCRYPTION_SECRET:changeme}
+        initialize-secret-on-startup: ${VAULT_ENCRYPTION_INITIALIZE_SECRET_ON_STARTUP:false}
         impl: bc
         jca:
           salt-length: 16

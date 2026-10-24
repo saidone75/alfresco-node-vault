@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- Read-only access to archived document search, metadata and content for members of any configured Alfresco reader group (`VAULT_READERS_GROUPS`, a comma-separated list defaulting to `GROUP_ANV_READERS`); administrators retain full access. Original Alfresco ACLs are not enforced for vault reads.
 - Optional Alfresco node locking during archive, verification and deletion with `VAULT_ALFRESCO_USE_LOCK=true`; requires a dedicated Alfresco account and does not provide a cross-system transaction.
 - ANV v1 encrypted payloads with a versioned, authenticated binary header recording cipher, KDF parameters, logical key reference, Vault key version, salt and nonce; content and metadata remain readable after changing write settings.
 - Prometheus counters for archive, restore and delete outcomes, duration histograms and successfully archived content bytes, with a dedicated Grafana dashboard row; disable these metrics with `VAULT_OPERATION_METRICS_ENABLED=false`. Internal restore steps count only as part of delete, and archive retries do not increase byte counts.

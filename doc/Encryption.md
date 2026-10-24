@@ -2,12 +2,10 @@
 
 ## Overview
 
-This document outlines the encryption capabilities available in the Alfresco Node Vault application. The system provides two alternative encryption implementations:
+This document outlines the encryption capabilities available in the Alfresco Node Vault application. The system supports two authenticated encryption algorithms:
 
 1. **AES-256-GCM** - selected by `impl: jca`
 2. **ChaCha20-Poly1305** - selected by `impl: bc`
-
-Both implementations provide authenticated encryption with strong security guarantees but offer different performance characteristics and compatibility options.
 
 ## Configuration
 
@@ -24,8 +22,10 @@ application:
         metadata:
           # Enable/disable node metadata encryption on MongoDB
           enabled: ${VAULT_ENCRYPT_METADATA:false}
-        # Master encryption key
-        secret: ${VAULT_ENCRYPTION_SECRET:changeme}
+        # Versioned encryption secret in HashiCorp Vault KV v2
+        vault-secret-kv-mount: ${VAULT_ENCRYPTION_KV_MOUNT:secret}
+        vault-secret-path: ${VAULT_ENCRYPTION_SECRET_PATH:AlfrescoNodeVault}
+        vault-secret-key: ${VAULT_ENCRYPTION_SECRET_KEY:anv.secret}
         # Encryption implementation: 'jca' or 'bc'
         impl: bc
         jca:
@@ -56,6 +56,11 @@ application:
             iterations: 3
 ```
 
+The encryption secret is read from HashiCorp Vault KV v2 at the configured mount/path/key.
+Set `VAULT_URL` for the server address
+and configure authentication under `spring.cloud.vault` (the development configuration uses token `root`).
+The application identity needs access to the secret and its historical versions.
+
 ## Key Derivation Functions (KDFs)
 
 The system supports multiple key derivation functions for deriving encryption keys from the master secret:
@@ -66,7 +71,7 @@ The system supports multiple key derivation functions for deriving encryption ke
 
 PBKDF2 (Password-Based Key Derivation Function 2) is a widely supported KDF that applies a pseudorandom function to derive keys.
 
-- **Pros**: Widely supported, FIPS-compliant, simple parameters
+- **Pros**: Widely supported, simple parameters
 - **Cons**: More vulnerable to hardware acceleration attacks than newer alternatives
 - **Recommended Settings**:
     - iterations: 100,000 minimum (higher values increase security but reduce performance)
@@ -94,49 +99,32 @@ HKDF (HMAC-based Key Derivation Function) is designed for deriving keys from alr
 - **Cons**: Not designed for password-based key derivation
 - **Use Case**: Best when your master key is already highly random, not for password-based scenarios
 
-## Encryption Implementations
+## Encryption Algorithms
 
-### JCA Implementation (AES-GCM)
+Both algorithms use JCA APIs with an explicitly selected Bouncy Castle provider.
 
-**Configuration**: `impl: "jca"`
+| Configuration | Algorithm | Key / tag | Salt / nonce |
+|---------------|-----------|-----------|--------------|
+| `impl: jca` | AES-256-GCM | 256 / 128 bits | 16..64 / 12 bytes |
+| `impl: bc` | ChaCha20-Poly1305 | 256 / 128 bits | 16..64 / 12 bytes |
 
-Uses the Java Cryptography Architecture with AES in Galois/Counter Mode.
+The default salt length is 16 bytes. Existing ANV v1 payloads retain their own algorithm and KDF parameters.
 
-- **Algorithm**: AES-GCM with 256-bit keys and 128-bit authentication tag
-- **Pros**:
-    - Hardware acceleration on modern CPUs with AES-NI
-    - Widely supported in all Java environments
-    - FIPS-compliant
-- **Cons**:
-    - More vulnerable to timing attacks if implemented improperly
-    - Performance varies based on hardware support
-- **Recommended Settings**:
-    - salt-length: 16 bytes (128 bits)
-    - iv-length: 12 bytes (96 bits) - GCM optimal IV size
+### Notes about FIPS compliance
 
-### Bouncy Castle Implementation (ChaCha20-Poly1305)
-
-**Configuration**: `impl: "bc"`
-
-Uses the Bouncy Castle provider to implement ChaCha20-Poly1305 authenticated encryption.
-
-- **Algorithm**: ChaCha20 stream cipher with Poly1305 authenticator
-- **Pros**:
-    - Excellent performance on platforms without AES hardware acceleration
-    - More resistant to timing attacks
-    - Designed for software implementation
-- **Cons**:
-    - Requires additional Bouncy Castle provider
-    - Not FIPS-compliant in most environments
-- **Recommended Settings**:
-    - salt-length: 16 bytes (128 bits)
-    - nonce-length: 12 bytes (96 bits) - ChaCha20-Poly1305 standard
+FIPS 140 compliance depends on the deployment and is the responsibility of the integrator.
+A compliant installation requires integrating a validated module such as
+[Bouncy Castle FIPS](https://www.bouncycastle.org/download/), adapting the current code and dependencies,
+and using approved algorithms and parameters within the module's validated environment and Security Policy,
+including key derivation and random generation. Selecting `impl: jca` alone does not provide compliance; see the
+[NIST CMVP requirements](https://csrc.nist.gov/projects/cryptographic-module-validation-program/validated-modules).
 
 ## Security Considerations
 
 1. **Storage of Master Secret**:
-    - The master secret should be stored securely using environment variables or a secrets manager
-    - The system is configured by default to retrieve the master key from HashiCorp Vault
+    - Store the encryption secret in HashiCorp Vault KV v2 and retain versions needed to decrypt existing data
+    - Configure Vault authentication separately from the encryption secret
+    - `SecretService` does not cache encryption secrets, and KDFs zero their source byte buffers on the normal execution path to reduce their time in memory.
     - Never commit secrets to source control
 
 2. **Nonce/IV and Key Version Usage**:
@@ -210,16 +198,39 @@ or recreate disposable data. Unencrypted data is unaffected.
 Implementation: [AnvCryptoService.java](../src/main/java/org/saidone/service/crypto/AnvCryptoService.java)
 and [EncryptedPayloadHeader.java](../src/main/java/org/saidone/service/crypto/EncryptedPayloadHeader.java).
 
-## Key Rotation
+## Key Rotation and Retention
 
-The encryption secret is read from a versioned key/value secret engine (HashiCorp Vault), and every encrypted payload
-records the version of the secret used. To rotate the key:
+Use persistent Vault KV v2 storage. Review rotation needs annually and rotate on suspected exposure
+or organizational requirements; ANV does not schedule rotations.
+Runtime credentials require `read` on both the configured KV v2 data and metadata paths;
+key updates read the latest version from metadata without fetching the secret value.
 
-1. Store a new version of the secret at the configured path (`VAULT_ENCRYPTION_SECRET_PATH`, key
-   `VAULT_ENCRYPTION_SECRET_KEY`). New nodes are encrypted with the latest version, while previous versions stay
-   available for decryption.
-2. Re-encrypt the existing nodes with `POST /api/v1/vault/nodes/update-keys?keyVersion=<old version>`, or a single node
-   with `POST /api/v1/vault/nodes/{nodeId}/update-key` (see [RestApi.md](RestApi.md)).
+1. Before rotating, verify recoverable backups and inspect retention:
+   ```bash
+   vault read secret/config
+   vault kv metadata get -mount=secret AlfrescoNodeVault
+   ```
+   Adjust mount/path as configured. Ensure `max_versions` can retain all required history plus the new
+   version: exceeding it permanently destroys older versions. **Zero does not mean unlimited**;
+   the key inherits the mount setting, whose default is 10. Disable `delete_version_after` at both
+   levels and check existing scheduled deletions. See the
+   [Vault KV v2 API](https://developer.hashicorp.com/vault/api-docs/secret/kv/kv-v2).
+2. Store a fresh secret with at least 256 bits of cryptographic randomness at the same mount/path/key.
+   Use compare-and-set, preserve unrelated fields and keep values out of logs and shell arguments.
+   Back up Vault with the new version and retain the required recovery material separately.
+3. Call `POST /api/v1/vault/nodes/update-keys?keyVersion=<source version>` for each version to migrate,
+   or `POST /api/v1/vault/nodes/{nodeId}/update-key` for one node. `202 Accepted` confirms submission.
+   `keyVersion` must be a positive integer identifying the source version, not the destination.
+   Bulk runs share a distributed lock; overlapping runs are skipped and logged. Do not create new
+   secret versions in Vault while a bulk is queued or running; wait for completion in the logs.
+   Check logs, retry skipped or failed nodes, and verify content and metadata readability.
+4. Retain old keys while any document, backup, snapshot or stored historical payload needs them.
+   Re-encrypting live data does not migrate backups. Before retiring a key, verify an isolated restore
+   of matching MongoDB, content storage and Vault history. If dependencies are uncertain, keep it.
+
+Restrict key deletion to Vault administrators. Restore lost keys with their original version mapping;
+creating a new secret cannot recover old documents. Docker dev Vault is ephemeral and unsuitable
+for durable archives.
 
 ## Changing the Encryption Configuration
 
@@ -228,8 +239,9 @@ only in some directions once data is stored:
 
 - **Enabling encryption** is supported: existing content and metadata stay readable and new nodes are stored
   encrypted. Existing nodes are not re-encrypted.
-- **Disabling encryption** with encrypted data already stored is not supported: encrypted content would be returned as
-  is and encrypted metadata could not be read.
+- **Disabling encryption:** plaintext content remains readable. Encrypted content is still decrypted
+  if a crypto service is available; otherwise reading it fails with `IllegalStateException`.
+  Encrypted metadata cannot be read with metadata encryption disabled.
 - **Changing `impl`, KDF parameters or salt length** affects new writes only. Existing ANV v1
   payloads are decrypted using their authenticated header. Nonces must be 12 bytes.
 - Changing these settings does not migrate or re-encrypt existing data. Key rotation

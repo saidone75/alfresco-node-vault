@@ -19,7 +19,19 @@ Each sweep run stores:
 - duration
 - counters: `scanned`, `passed`, `failed`, `errors`
 
-Historical runs are available via `GET /api/v1/vault/integrity-sweeps`.
+| Counter | Meaning |
+|---------|---------|
+| `scanned` | Node checks counted as passed, failed or errors. |
+| `passed` | Verification succeeded; any previous corruption verdict is cleared. |
+| `failed` | Evidence of corruption or missing proof/content; the node is marked corrupted. |
+| `errors` | Verification could not complete, for example due to an unavailable backend or busy node; the previous verdict is preserved. |
+
+Nodes deleted from the vault during a sweep are skipped without increasing these counters.
+`COMPLETED` means the run finished, even if some checks failed or encountered errors;
+`FAILED` means a run-level exception interrupted it. Inspect the counters to assess integrity.
+
+Historical runs are available via `GET /api/v1/vault/integrity-sweeps`; current corruption verdicts
+via `GET /api/v1/vault/integrity-sweeps/corrupted-nodes`.
 
 ## Hybrid mode + controlled coverage for large notarized datasets
 

@@ -31,8 +31,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.vault.core.VaultTemplate;
 import org.springframework.vault.core.VaultVersionedKeyValueOperations;
 import org.springframework.vault.support.Versioned;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import java.nio.charset.StandardCharsets;
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.util.Arrays;
+import java.util.Base64;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -42,8 +48,8 @@ import java.util.Map;
  * from one configured secret path. Consumers can request either the latest secret version
  * or a specific version.</p>
  *
- * <p>When the secret cannot be retrieved, methods in this class throw a {@link VaultException}
- * carrying the cause. The service does not clear the calling thread's interrupted status.</p>
+ * <p>Retrieval failures throw a {@link VaultException} without exposing Vault responses.
+ * The thread's interrupted status is preserved.</p>
  *
  * <p>The bean is active when at least one of
  * {@code application.service.vault.encryption.content.enabled} or
@@ -66,16 +72,76 @@ public class SecretService extends BaseComponent {
      *
      * <p>This method prepares the {@link VaultVersionedKeyValueOperations} instance bound to
      * the configured KV mount and checks the Vault system health endpoint. If Vault is reported
-     * as not initialized, startup is aborted through {@link #shutDown(int)}.</p>
+     * as not initialized, startup is aborted through {@link #shutDown(int)}.
+     * The latest encryption secret must also be readable and nonempty; otherwise bean
+     * initialization fails. Bytes read for this check are cleared before returning.</p>
      */
     @Override
     public void init() {
         super.init();
-        vaultVersionedKeyValueOperations = vaultTemplate.opsForVersionedKeyValue(properties.getVaultSecretKvMount());
-        val health = vaultTemplate.opsForSys().health();
-        if (!health.isInitialized()) {
-            log.error("Unable to start {}", this.getClass().getSimpleName());
-            super.shutDown(1);
+        Secret secret = null;
+        try {
+            vaultVersionedKeyValueOperations = vaultTemplate.opsForVersionedKeyValue(properties.getVaultSecretKvMount());
+            val health = vaultTemplate.opsForSys().health();
+            if (!health.isInitialized()) {
+                log.error("Unable to start {}", this.getClass().getSimpleName());
+                super.shutDown(1);
+            }
+            if (properties.isInitializeSecretOnStartup()) {
+                initializeSecretIfAbsent();
+            }
+            secret = getSecret();
+            if (secret.getData() == null || secret.getData().length == 0) {
+                throw new VaultException("The configured encryption secret is empty");
+            }
+        } catch (RuntimeException e) {
+            throw sanitizedFailure("""
+                    Cannot start with encryption enabled: the configured Vault encryption secret \
+                    is missing, empty or unreadable. Check Vault configuration and permissions; \
+                    provision the secret explicitly for a new installation or restore the required versions \
+                    for an existing archive.""", e);
+        } finally {
+            if (secret != null && secret.getData() != null) {
+                Arrays.fill(secret.getData(), (byte) 0);
+            }
+        }
+    }
+
+    private void initializeSecretIfAbsent() {
+        val path = properties.getVaultSecretPath();
+        if (vaultVersionedKeyValueOperations.get(path) != null) {
+            return;
+        }
+        if (vaultVersionedKeyValueOperations.opsForKeyValueMetadata().get(path) != null) {
+            // Another instance may have provisioned between the data and metadata reads.
+            if (vaultVersionedKeyValueOperations.get(path) != null) {
+                return;
+            }
+            throw new VaultException("Encryption secret has existing Vault metadata; restore its required versions");
+        }
+        val random = new byte[32];
+        byte[] encoded = null;
+        val data = new HashMap<String, Object>();
+        try {
+            new SecureRandom().nextBytes(random);
+            encoded = Base64.getEncoder().encode(random);
+            data.put(properties.getVaultSecretKey(), new String(encoded, StandardCharsets.US_ASCII));
+            try {
+                vaultVersionedKeyValueOperations.put(path, Versioned.create(data, Versioned.Version.from(0)));
+            } catch (org.springframework.vault.VaultException e) {
+                // Only a CAS conflict permits rereading the concurrent creator's secret.
+                if (!(e.getCause() instanceof org.springframework.web.client.HttpStatusCodeException http)
+                        || http.getStatusCode().value() != 400
+                        || !http.getResponseBodyAsString().contains("check-and-set parameter did not match")) {
+                    throw e;
+                }
+            }
+        } finally {
+            Arrays.fill(random, (byte) 0);
+            if (encoded != null) {
+                Arrays.fill(encoded, (byte) 0);
+            }
+            data.clear();
         }
     }
 
@@ -123,9 +189,45 @@ public class SecretService extends BaseComponent {
                 throw new IllegalStateException(String.format("No data found in secret %s", properties.getVaultSecretPath()));
             }
         } catch (RuntimeException e) {
-            log.trace(e.getMessage(), e);
-            throw new VaultException(String.format("Unable to retrieve %s from Vault: %s", description, e.getMessage()), e);
+            throw sanitizedFailure(String.format("Unable to retrieve %s from Vault", description), e);
         }
+    }
+
+    /** Returns the latest usable version from Vault metadata. */
+    public int getLatestSecretVersion() {
+        if (Thread.currentThread().isInterrupted()) {
+            throw new VaultException("Interrupted while retrieving secret metadata from Vault",
+                    new InterruptedException("Calling thread is interrupted"));
+        }
+        try {
+            val response = vaultVersionedKeyValueOperations.opsForKeyValueMetadata()
+                    .get(properties.getVaultSecretPath());
+            if (response == null || response.getCurrentVersion() < 1) {
+                throw new IllegalStateException("No current secret version found");
+            }
+            val version = response.getCurrentVersion();
+            val metadata = response.getVersions().stream()
+                    .filter(entry -> entry.getVersion().getVersion() == version)
+                    .findFirst()
+                    .orElseThrow(() -> new IllegalStateException("Current version metadata not found"));
+            val deletionTime = metadata.getDeletedAt();
+            if (metadata.isDestroyed() || (deletionTime != null && !deletionTime.isAfter(Instant.now()))) {
+                throw new IllegalStateException("Current secret version is deleted or destroyed");
+            }
+            return version;
+        } catch (RuntimeException e) {
+            throw sanitizedFailure("Unable to retrieve latest secret version from Vault metadata", e);
+        }
+    }
+
+    private VaultException sanitizedFailure(String message, RuntimeException failure) {
+        val http = failure instanceof HttpStatusCodeException statusFailure
+                ? statusFailure
+                : failure.getCause() instanceof HttpStatusCodeException statusCause ? statusCause : null;
+        val details = http == null
+                ? failure.getClass().getSimpleName()
+                : String.format("%s, HTTP %d", failure.getClass().getSimpleName(), http.getStatusCode().value());
+        return new VaultException(String.format("%s [%s]", message, details));
     }
 
 }

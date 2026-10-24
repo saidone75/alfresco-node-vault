@@ -49,14 +49,15 @@ The script spins up the following services using Docker Compose:
 - **MongoDB** with **Mongo Express** UI
 - **Moto** for AWS S3 object storage
 - **Ganache** for Ethereum blockchain simulation
-- **HashiCorp Vault** (plus a small provisioner container)
+- **HashiCorp Vault** (ANV provisions the initial secret when encryption is enabled in development Compose)
 - **Prometheus**, **Grafana** and **Nginx** for monitoring
 - **Alfresco Node Vault** application itself
 
 To rebuild and restart the selected development stack, run
 `./vault.sh build_start --s3` (or `--gridfs` / `--ozone`).
-The legacy `update-vault.sh` and `update-vault.bat` scripts use only the base
-Compose file and do not preserve the complete backend configuration.
+To rebuild and recreate only the running vault, use `./update-vault.sh` or `update-vault.bat`.
+These scripts reuse the Compose configuration recorded on the container, preserving the selected
+backend and leaving other services running. They do nothing if `anv-vault` is not running.
 
 ## Configuration
 

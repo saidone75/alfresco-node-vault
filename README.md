@@ -81,16 +81,21 @@ and the indefinite retention of all documents in the active repository (unsustai
 - Scheduled or on-demand archiving
 - MongoDB storage for document metadata and the audit trail
 - GridFS, [S3](doc/S3.md) or [Apache Ozone](doc/Ozone.md) storage for document content
-- Optional blockchain document notarization to provide verifiable evidence of integrity
-- Scheduled and on-demand [integrity sweeps](doc/IntegritySweep.md) to verify notarized documents
+- [REST API](doc/RestApi.md) with Alfresco proxy support and metadata search
+- Advanced metadata search with filters and wildcards
+- Streaming document uploads and downloads
+- Engineered for flexibility and bespoke integrations
+- No Alfresco changes beyond installing the minimal [ANV content model](#alfresco-setup)
 - Secure and decoupled design that suits zero trust environments
 - Optional [strong encryption](doc/Encryption.md) for both content and metadata
+- Encryption key rotation for individual documents or entire archives
 - Passwords securely stored in a secret engine
-- [REST API](doc/RestApi.md) with Alfresco proxy support and metadata search
-- Engineered for flexibility and bespoke integrations
-- No installation or changes required within Alfresco
-- Prometheus monitoring support for metrics and health checks, including [vault operation metrics](doc/Metrics.md)
-- Custom upload and download methods
+- Optional Alfresco locking during archiving
+- Distributed operation locks and checksum verification
+- Optional blockchain document notarization to provide verifiable evidence of integrity
+- Scheduled and on-demand [integrity sweeps](doc/IntegritySweep.md) to verify notarized documents
+- Audit trail with configurable retention
+- Health checks and Prometheus metrics, including [archive, restore and delete metrics](doc/Metrics.md)
 - Minimal memory footprint
 - Three selectable Docker JVM runtimes: Azul Zulu, GraalVM Community and IBM Semeru/OpenJ9
 - Robust, enterprise-grade reliability and performance
@@ -100,6 +105,14 @@ Pull requests are welcome!
 ## Architecture
 
 ![Architecture](images/architecture.png)
+
+## Alfresco setup
+
+Copy [anv-content-model.xml](docker/model/anv-content-model.xml) and
+[anv-model-context.xml](docker/model/anv-model-context.xml) to
+`<TOMCAT_DIR>/shared/classes/alfresco/extension/` and restart Alfresco. Already included in the Docker stack.
+
+Use `anv:archive` to select documents for scheduled or event-driven archiving; API archiving does not require it.
 
 ## Application global config
 
@@ -134,11 +147,14 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | VAULT_OPERATION_METRICS_ENABLED   | true                                       | Export operation counters, duration histograms and archived bytes                         |
 | VAULT_HASH_ALGORITHM              | SHA-256                                    | Hash stored as content metadata in GridFS, S3 or Ozone                                    |
 | VAULT_DOUBLE_CHECK                | true                                       | Download the archived document again from Alfresco and the vault and compare their hashes |
-| VAULT_DELETE_ON_ALFRESCO          | true                                       | Delete the document from Alfresco after archiving                                         |
+| VAULT_DELETE_ON_ALFRESCO          | true                                       | Delete the document from Alfresco after archiving (permanent by default)                                         |
 | VAULT_ALFRESCO_USE_LOCK           | false                                      | Lock the source in Alfresco throughout archiving, verification and deletion               |
 | VAULT_ALFRESCO_LOCK_TTL_SECONDS   | 120                                        | Source lock TTL (minimum 30 seconds), renewed every third of the TTL                      |
 | VAULT_ALFRESCO_LOCK_LIFETIME      | PERSISTENT                                 | Source lock lifetime: PERSISTENT or EPHEMERAL                                             |
 | VAULT_DELETE_NODE_API_ENABLED     | false                                      | Enable the delete node API                                                                |
+| VAULT_READERS_GROUPS               | GROUP_ANV_READERS                           | Comma-separated Alfresco group IDs; membership in any group grants read access; administrators always have access |
+| VAULT_DELETE_NODE_RESTORE_ON_ALFRESCO | true                                  | Restore a missing Alfresco copy before deleting from the vault                            |
+| VAULT_DELETE_NODE_DELETE_ON_ALFRESCO | true                                    | Move that restored copy to the Alfresco trash before deleting from the vault              |
 | VAULT_AUTH_CACHE_TTL              | 60s                                        | Cache duration of successful API authentications                                          |
 | VAULT_ENCRYPT_CONTENT             | false                                      | Enable binary content encryption (S3, GridFS, Ozone)                                      |
 | VAULT_ENCRYPT_METADATA            | false                                      | Enable document metadata encryption in MongoDB                                            |
@@ -146,6 +162,7 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | VAULT_ENCRYPTION_KV_MOUNT         | secret                                     | Vault secret engine mount path                                                            |
 | VAULT_ENCRYPTION_SECRET_PATH      | AlfrescoNodeVault                          | Path of encryption secret in Vault secret engine                                          |
 | VAULT_ENCRYPTION_SECRET_KEY       | anv.secret                                 | Key name of encryption secret                                                             |
+| VAULT_ENCRYPTION_INITIALIZE_SECRET_ON_STARTUP | false (true in development Compose) | Allow first-install secret generation when encryption is enabled |
 | AUDIT_TTL_DAYS                    | 60                                         | Retention of audit entries in days                                                        |
 | NOTARIZATION_ENABLED              | true                                       | Enable notarization service                                                               |
 | NOTARIZATION_JOB_ENABLED          | false                                      | Document notarization job switch                                                          |
@@ -159,6 +176,11 @@ Global configuration is stored in `application.yml`. The main parameters are:
 Transfer checksums verify document integrity before source deletion, not for cryptographic purposes.
 `VAULT_HASH_ALGORITHM` defaults to SHA-256 and also applies to optional blockchain notarization.
 Archive verification uses the checksum algorithm recorded with the stored content.
+
+Archiving deletes the Alfresco source permanently by default (`VAULT_DELETE_ON_ALFRESCO=true` and
+`application.service.alfresco.permanently-delete-nodes=true`). Set the latter to `false` to use the trash,
+or `VAULT_DELETE_ON_ALFRESCO=false` to retain the source. The separate
+[delete node API](doc/RestApi.md#deleting-archived-documents) removes content and metadata from the vault.
 
 Archiving checks content size and, with `VAULT_DOUBLE_CHECK=true`, hashes before saving metadata;
 verification failures trigger rollback. Existing vault copies are always verified before source deletion.
@@ -174,7 +196,7 @@ Hadoop/Ozone security configuration and a Kerberos identity; see [Ozone configur
 
 ## Build
 
-Java and Maven are required. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions.
+Java 21 or later and Maven are required. See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions.
 
 `mvn package -DskipTests -Dlicense.skip=true`
 
@@ -193,7 +215,7 @@ The script creates an `anv/` directory containing the versioned `anv-<version>.j
 
 ## Testing
 
-For a containerized check of archiving, downloading and restoring on S3 and GridFS, with and without encryption,
+For a containerized check of archiving, downloading and restoring on S3, GridFS and Ozone, with and without encryption,
 run `./smoke-tests.sh` (Linux/macOS) or `smoke-tests.bat` (Windows).
 S3 is the default; use `--s3`, `--gridfs` or `--ozone` to select a backend, or `--all` to test all three.
 These [end-to-end smoke tests](doc/SmokeTest.md) check content hashes and restore retries in an isolated Docker stack.
@@ -273,34 +295,84 @@ Key variables include:
 - `HASHICORP_VAULT_IMAGE` – HashiCorp Vault image name
 - `VAULT_JVM_RUNTIME` – `zulu` (default), `graalvm` or `semeru`; rebuild the vault image after changing it
 
+The development stack runs HashiCorp Vault in nonpersistent dev mode. Restarting it loses
+all secret versions. On the next ANV startup with encryption enabled, development provisioning
+can create a fresh initial secret; it cannot recover lost keys. Previously encrypted
+documents become unreadable even if MongoDB and content storage retain
+them. Use a persistent Vault deployment and retain required key versions for durable encrypted archives.
+
 For local development you may rely on the defaults, while in
 production you will likely point to hardened images or custom deployments.
 
+## Encryption secret provisioning
+
+With encryption enabled, ANV requires a readable, nonempty secret at startup.
+For a new installation, set `VAULT_ENCRYPTION_INITIALIZE_SECRET_ON_STARTUP=true`
+(default: `false`, enabled in development Compose). ANV generates 32 random bytes,
+stored as Base64 text, only when both data and metadata are absent. CAS 0 prevents
+overwriting an existing secret; other Vault errors stop startup.
+
+Provisioning requires `read` and `create` on the configured KV v2 data path and `read`
+on its metadata path. Disable it after initial setup: an empty or incorrect path cannot
+be distinguished from a new installation. Sensitive byte buffers are cleared after use.
+
+Manage rotations in HashiCorp Vault, then use the update-key APIs to re-encrypt documents.
+Retain previous versions while documents or backups need them.
+Follow the [rotation and retention procedure](doc/Encryption.md#key-rotation-and-retention)
+before changing Vault retention or retiring versions.
+
 ## Run
 
-```
+Use Java 21 or later. Start Alfresco, MongoDB, ActiveMQ and the selected content backend first;
+Ethereum is needed when notarization is enabled (the default). For local infrastructure, use
+`./vault.sh start novault` (or `vault.bat start novault` on Windows).
+
+```bash
 cd anv
 java -jar anv-VERSION.jar
 # Replace VERSION with the version in the generated filename.
 ```
 
+The application listens on port `8086` and uses the `dev` profile by default; override it with
+`SPRING_PROFILES_ACTIVE`. Configure service endpoints and credentials in `config/application.yml`
+or through the documented environment variables. The default `spring.config.import: vault://`
+also requires HashiCorp Vault when encryption is disabled; configure its address and authentication
+under `spring.cloud.vault`.
+
+All `/actuator/**` endpoints use separate Basic credentials, defaulting to `admin` / `admin`.
+Configure them with `management.security.basic-auth.username` and `.password`; these are independent
+of Alfresco API credentials.
+
 ## REST API
 
-The REST API is versioned under `/api/v1` and requires Basic authentication with Alfresco administrator credentials:
+The REST API is versioned under `/api/v1` and requires HTTP Basic authentication against Alfresco.
+Alfresco administrators can use all APIs. Members of any group listed in `VAULT_READERS_GROUPS` can search and read archived metadata and content.
+The default is `GROUP_ANV_READERS` (the Alfresco group `ANV_READERS`).
+All other APIs, including audit, require administrator credentials. The API roots are:
 
 - `/api/v1/vault` to search, retrieve, archive, restore, notarize and re-encrypt documents and to run integrity sweeps
 - `/api/v1/audit` to read the audit trail
 
-Requests to the Alfresco REST API for archived documents are transparently served by the vault. The OpenAPI documentation
+The vault currently does not preserve Alfresco ACLs for document access: administrators and members of the
+configured reader groups can consult **all** archived documents, regardless of their original permissions.
+Stored permission metadata can optionally be used during restore; it is not enforced when reading from the vault.
+Create the reader groups in Alfresco and assign their members explicitly; the application does not create them.
+In Docker, set `VAULT_READERS_GROUPS` in `docker/.env` and recreate the vault to configure a comma-separated list, for example `GROUP_ANV_READERS,GROUP_ARCHIVISTS`.
+
+The two supported Alfresco proxy GET routes use the same vault reader authorization for archived documents;
+other requests are forwarded to Alfresco and use its authorization rules. The OpenAPI documentation
 served at `/swagger` provides the reference for each endpoint, while [RestApi.md](doc/RestApi.md) covers authentication, the
 Alfresco proxy and the common conventions.
 
 ## Known limitations
 
+- **ACLs:** the vault currently does not preserve Alfresco ACLs for document access. Membership in any configured reader group
+  grants access to all archived metadata and content; administrators always have access.
+
 - **Enabling encryption** on a vault that already holds data is supported: existing content and metadata stay
   readable and newly archived documents are encrypted, but existing documents are not re-encrypted.
-- **Disabling encryption** when encrypted data is already stored is not supported: encrypted content would be returned
-  as is and encrypted metadata could not be read.
+- **Disabling encryption:** plaintext content remains readable. Encrypted content requires an available crypto
+  service; otherwise reads fail. Encrypted metadata cannot be read with metadata encryption disabled.
 - **Encryption format:** encrypted content and metadata use the versioned ANV v1 format with an authenticated header.
   Cipher and KDF settings can change for new writes; existing payloads retain their own parameters.
   The previous unversioned encrypted format is not supported. Export with the previous application before upgrading

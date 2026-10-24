@@ -20,6 +20,11 @@ must be repeated to include skipped nodes. A busy integrity check counts as an
 error without marking the node as corrupted. Asynchronous API responses acknowledge
 the request; later conflicts are logged by the worker.
 
+All bulk key updates share `job:bulk-key-update`, regardless of source version.
+Overlapping runs are skipped and logged. Do not create new secret versions in HashiCorp
+Vault while a bulk is queued or running; wait for completion in the logs. This operational
+rule also applies to external administrators and automation: the ANV lock cannot block Vault writes.
+
 Archiving uses a ten-second fixed delay in the `dev` and `docker` profiles: each
 instance waits ten seconds after its run finishes (or is skipped) before trying
 again. Other profiles use the configured cron window. Select the mode with
