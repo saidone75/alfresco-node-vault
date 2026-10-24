@@ -550,7 +550,7 @@ public class VaultApiController extends BaseComponent {
     }
 
     /**
-     * Updates the encryption key for a node.
+     * Re-encrypts a node with the latest existing Vault key version when needed.
      *
      * @param auth   optional Basic authentication header
      * @param nodeId identifier of the node whose key should be updated
@@ -559,13 +559,13 @@ public class VaultApiController extends BaseComponent {
     @SecurityRequirement(name = "basicAuth")
     @PostMapping("/nodes/{nodeId}/update-key")
     @Operation(
-            summary = "Update encryption key",
-            description = "Update the encryption key of the specified node.",
+            summary = "Re-encrypt node",
+            description = "Re-encrypts the node with the latest existing Vault key version if outdated. Does not create or rotate secrets in Vault.",
             parameters = {
                     @Parameter(name = "nodeId", description = "Identifier of the node to update", required = true, in = ParameterIn.PATH)
             },
             responses = {
-                    @ApiResponse(responseCode = "200", description = "Encryption key updated",
+                    @ApiResponse(responseCode = "200", description = "Node re-encrypted or already up to date",
                             content = @Content(mediaType = "text/plain")),
                     @ApiResponse(responseCode = "401", description = "Unauthorized",
                             content = @Content),
@@ -607,7 +607,9 @@ public class VaultApiController extends BaseComponent {
     @PostMapping("/nodes/update-keys")
     @Operation(
             summary = "Re-encrypts nodes",
-            description = "Re-encrypts nodes using the specified source key version with the latest available key. The update runs asynchronously.",
+            description = """
+                    Re-encrypts nodes using the specified source key version with the latest existing Vault key. \
+                    Runs asynchronously; does not create or rotate secrets in Vault.""",
             parameters = {
                     @Parameter(name = "keyVersion", description = "Source key version of the nodes to re-encrypt", required = true, in = ParameterIn.QUERY,
                             schema = @Schema(type = "integer", minimum = "1"))

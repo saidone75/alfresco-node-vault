@@ -93,6 +93,17 @@ when the original node is missing.
 These flags are separate from archive-time deletion, which permanently deletes the Alfresco source
 by default (`VAULT_DELETE_ON_ALFRESCO=true`, `application.service.alfresco.permanently-delete-nodes=true`).
 
+## Re-encryption
+
+The update-key APIs use the latest existing Vault secret version; they do not create or rotate secrets.
+Create the new version in Vault first, then call:
+
+- `POST /api/v1/vault/nodes/{nodeId}/update-key` to re-encrypt one outdated node; an up-to-date node is unchanged.
+- `POST /api/v1/vault/nodes/update-keys?keyVersion=<source version>` to re-encrypt nodes using that source version.
+  The bulk returns `202 Accepted`; follow completion in the logs and do not rotate secrets while it is pending or running.
+
+See [rotation and retention](Encryption.md#key-rotation-and-retention) for the operational procedure.
+
 ## Advanced search example
 
 `POST /api/v1/vault/advanced-search` searches the archived nodes by their metadata; the meaning of each criterion is
