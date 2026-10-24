@@ -36,6 +36,11 @@ import org.springframework.context.annotation.Configuration;
         description = """
                 Archive, retrieve, restore and notarize Alfresco nodes.
 
+                Alfresco administrators can access all APIs. Members of any configured reader group
+                (comma-separated VAULT_READERS_GROUPS, default GROUP_ANV_READERS) can search and read archived documents.
+                Other APIs require administrator credentials. The vault currently does not preserve
+                Alfresco ACLs for document access: readers can consult all archived documents.
+
                 Paginated endpoints accept `page` (zero-based) and `size`; dates are ISO-8601 instants.
                 Operations return a plain-text confirmation and errors a plain-text description.
                 Endpoints of features disabled by configuration return `403`.
@@ -47,7 +52,7 @@ import org.springframework.context.annotation.Configuration;
         name = "basicAuth",
         type = SecuritySchemeType.HTTP,
         scheme = "basic",
-        description = "Credentials of an Alfresco administrator."
+        description = "Alfresco Basic credentials: administrators for all APIs; any configured reader group for document search, metadata and content."
 )
 @SecurityRequirement(name = "basicAuth")
 public class OpenApiConfig {

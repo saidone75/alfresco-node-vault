@@ -139,6 +139,7 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | VAULT_ALFRESCO_LOCK_TTL_SECONDS   | 120                                        | Source lock TTL (minimum 30 seconds), renewed every third of the TTL                      |
 | VAULT_ALFRESCO_LOCK_LIFETIME      | PERSISTENT                                 | Source lock lifetime: PERSISTENT or EPHEMERAL                                             |
 | VAULT_DELETE_NODE_API_ENABLED     | false                                      | Enable the delete node API                                                                |
+| VAULT_READERS_GROUPS               | GROUP_ANV_READERS                           | Comma-separated Alfresco group IDs; membership in any group grants read access; administrators always have access |
 | VAULT_AUTH_CACHE_TTL              | 60s                                        | Cache duration of successful API authentications                                          |
 | VAULT_ENCRYPT_CONTENT             | false                                      | Enable binary content encryption (S3, GridFS, Ozone)                                      |
 | VAULT_ENCRYPT_METADATA            | false                                      | Enable document metadata encryption in MongoDB                                            |
@@ -286,16 +287,29 @@ java -jar anv-VERSION.jar
 
 ## REST API
 
-The REST API is versioned under `/api/v1` and requires Basic authentication with Alfresco administrator credentials:
+The REST API is versioned under `/api/v1` and requires HTTP Basic authentication against Alfresco.
+Alfresco administrators can use all APIs. Members of any group listed in `VAULT_READERS_GROUPS` can search and read archived metadata and content.
+The default is `GROUP_ANV_READERS` (the Alfresco group `ANV_READERS`).
+All other APIs, including audit, require administrator credentials. The API roots are:
 
 - `/api/v1/vault` to search, retrieve, archive, restore, notarize and re-encrypt documents and to run integrity sweeps
 - `/api/v1/audit` to read the audit trail
 
-Requests to the Alfresco REST API for archived documents are transparently served by the vault. The OpenAPI documentation
+The vault currently does not preserve Alfresco ACLs for document access: administrators and members of the
+configured reader groups can consult **all** archived documents, regardless of their original permissions.
+Stored permission metadata can optionally be used during restore; it is not enforced when reading from the vault.
+Create the reader groups in Alfresco and assign their members explicitly; the application does not create them.
+In Docker, set `VAULT_READERS_GROUPS` in `docker/.env` and recreate the vault to configure a comma-separated list, for example `GROUP_ANV_READERS,GROUP_ARCHIVISTS`.
+
+The two supported Alfresco proxy GET routes use the same vault reader authorization for archived documents;
+other requests are forwarded to Alfresco and use its authorization rules. The OpenAPI documentation
 served at `/swagger` provides the reference for each endpoint, while [RestApi.md](doc/RestApi.md) covers authentication, the
 Alfresco proxy and the common conventions.
 
 ## Known limitations
+
+- **ACLs:** the vault currently does not preserve Alfresco ACLs for document access. Membership in any configured reader group
+  grants access to all archived metadata and content; administrators always have access.
 
 - **Enabling encryption** on a vault that already holds data is supported: existing content and metadata stay
   readable and newly archived documents are encrypted, but existing documents are not re-encrypted.

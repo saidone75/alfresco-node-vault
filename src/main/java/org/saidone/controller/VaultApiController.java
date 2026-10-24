@@ -149,7 +149,7 @@ public class VaultApiController extends BaseComponent {
             @RequestParam(required = false, defaultValue = "20") int size,
             @RequestParam(required = false, defaultValue = "ASC") Sort.Direction dir) {
 
-        if (!authenticationService.isAuthorized(auth)) {
+        if (!authenticationService.canRead(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -207,7 +207,7 @@ public class VaultApiController extends BaseComponent {
             @RequestParam(required = false, defaultValue = "20") int size,
             @RequestParam(required = false, defaultValue = "ASC") Sort.Direction dir) {
 
-        if (!authenticationService.isAuthorized(auth)) {
+        if (!authenticationService.canRead(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -256,7 +256,7 @@ public class VaultApiController extends BaseComponent {
             @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
             @PathVariable String nodeId) {
 
-        if (!authenticationService.isAuthorized(auth)) {
+        if (!authenticationService.canRead(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
@@ -297,7 +297,7 @@ public class VaultApiController extends BaseComponent {
             @PathVariable String nodeId,
             @RequestParam(required = false, defaultValue = "true") boolean attachment) {
 
-        if (!authenticationService.isAuthorized(auth)) {
+        if (!authenticationService.canRead(auth)) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 

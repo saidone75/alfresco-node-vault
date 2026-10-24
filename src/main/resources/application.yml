@@ -138,6 +138,7 @@ application:
       connect-timeout: ${CONNECTION_TIMEOUT:10000}
       read-timeout: ${READ_TIMEOUT:60000}
     vault:
+      readers-groups: ${VAULT_READERS_GROUPS:GROUP_ANV_READERS}
       hash-algorithm: ${VAULT_HASH_ALGORITHM:SHA-256}
       auth-cache-ttl: ${VAULT_AUTH_CACHE_TTL:60s}
       double-check: ${VAULT_DOUBLE_CHECK:true}

@@ -29,6 +29,7 @@ import lombok.extern.slf4j.Slf4j;
 import lombok.val;
 import org.alfresco.authentication.handler.AuthenticationApi;
 import org.alfresco.authentication.model.TicketBody;
+import org.alfresco.core.handler.GroupsApi;
 import org.alfresco.core.handler.NodesApi;
 import org.alfresco.core.handler.PeopleApi;
 import org.alfresco.core.model.*;
@@ -61,6 +62,7 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import java.util.Set;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -81,6 +83,7 @@ public class AlfrescoService extends BaseComponent {
     private final AlfrescoServiceConfig config;
     private final AuthenticationApi authenticationApi;
     private final PeopleApi peopleApi;
+    private final GroupsApi groupsApi;
     private final NodesApi nodesApi;
     private final SearchApi searchApi;
 
@@ -156,6 +159,27 @@ public class AlfrescoService extends BaseComponent {
      * @return {@code true} if the user is authenticated and has admin privileges; {@code false} otherwise
      */
     public boolean isAdmin(String userId, String password) {
+        return authenticate(userId, password) && hasAdminPrivileges(userId);
+    }
+
+    /** Authenticates the user and allows administrators or members of any readers group. */
+    public boolean isVaultReader(String userId, String password, Set<String> readersGroups) {
+        if (!authenticate(userId, password)) return false;
+        if (hasAdminPrivileges(userId)) return true;
+        int skipCount = 0;
+        while (true) {
+            val page = Objects.requireNonNull(groupsApi.listGroupMembershipsForPerson(userId, skipCount, 100, null, null, null, null).getBody()).getList();
+            val entries = Objects.requireNonNull(page.getEntries());
+            if (entries.stream().anyMatch(entry -> readersGroups.contains(entry.getEntry().getId()))) {
+                return true;
+            }
+            if (!Boolean.TRUE.equals(page.getPagination().isHasMoreItems())) return false;
+            if (entries.isEmpty()) throw new IllegalStateException("Empty Alfresco group page with more items");
+            skipCount += entries.size();
+        }
+    }
+
+    private boolean authenticate(String userId, String password) {
         val ticketBody = new TicketBody();
         ticketBody.setUserId(userId);
         ticketBody.setPassword(password);
@@ -166,6 +190,10 @@ public class AlfrescoService extends BaseComponent {
             log.debug("Authentication failed for user {}: HTTP {}", userId, e.status());
             return false;
         }
+        return true;
+    }
+
+    private boolean hasAdminPrivileges(String userId) {
         try {
             return Objects.requireNonNull(peopleApi.getPerson(userId, null).getBody()).getEntry().getCapabilities().isIsAdmin();
         } catch (Exception e) {
