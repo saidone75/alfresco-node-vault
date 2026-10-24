@@ -51,9 +51,6 @@ public class EncryptionConfig {
     /** Key name of the secret used for encryption. */
     @Setter
     private String vaultSecretKey;
-    /** Fallback secret value when Vault is not available. */
-    @Setter
-    private String secret;
 
     /** Cipher used for new payloads: jca (AES-256-GCM) or bc (ChaCha20-Poly1305). */
     @Pattern(regexp = "jca|bc")

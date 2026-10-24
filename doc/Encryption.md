@@ -2,12 +2,10 @@
 
 ## Overview
 
-This document outlines the encryption capabilities available in the Alfresco Node Vault application. The system provides two alternative encryption implementations:
+This document outlines the encryption capabilities available in the Alfresco Node Vault application. The system supports two authenticated encryption algorithms:
 
 1. **AES-256-GCM** - selected by `impl: jca`
 2. **ChaCha20-Poly1305** - selected by `impl: bc`
-
-Both implementations provide authenticated encryption with strong security guarantees but offer different performance characteristics and compatibility options.
 
 ## Configuration
 
@@ -24,8 +22,10 @@ application:
         metadata:
           # Enable/disable node metadata encryption on MongoDB
           enabled: ${VAULT_ENCRYPT_METADATA:false}
-        # Master encryption key
-        secret: ${VAULT_ENCRYPTION_SECRET:changeme}
+        # Versioned encryption secret in HashiCorp Vault KV v2
+        vault-secret-kv-mount: ${VAULT_ENCRYPTION_KV_MOUNT:secret}
+        vault-secret-path: ${VAULT_ENCRYPTION_SECRET_PATH:AlfrescoNodeVault}
+        vault-secret-key: ${VAULT_ENCRYPTION_SECRET_KEY:anv.secret}
         # Encryption implementation: 'jca' or 'bc'
         impl: bc
         jca:
@@ -56,6 +56,11 @@ application:
             iterations: 3
 ```
 
+The encryption secret is read from HashiCorp Vault KV v2 at the configured mount/path/key.
+Set `VAULT_URL` for the server address
+and configure authentication under `spring.cloud.vault` (the development configuration uses token `root`).
+The application identity needs access to the secret and its historical versions.
+
 ## Key Derivation Functions (KDFs)
 
 The system supports multiple key derivation functions for deriving encryption keys from the master secret:
@@ -66,7 +71,7 @@ The system supports multiple key derivation functions for deriving encryption ke
 
 PBKDF2 (Password-Based Key Derivation Function 2) is a widely supported KDF that applies a pseudorandom function to derive keys.
 
-- **Pros**: Widely supported, FIPS-compliant, simple parameters
+- **Pros**: Widely supported, simple parameters
 - **Cons**: More vulnerable to hardware acceleration attacks than newer alternatives
 - **Recommended Settings**:
     - iterations: 100,000 minimum (higher values increase security but reduce performance)
@@ -94,49 +99,32 @@ HKDF (HMAC-based Key Derivation Function) is designed for deriving keys from alr
 - **Cons**: Not designed for password-based key derivation
 - **Use Case**: Best when your master key is already highly random, not for password-based scenarios
 
-## Encryption Implementations
+## Encryption Algorithms
 
-### JCA Implementation (AES-GCM)
+Both algorithms use JCA APIs with an explicitly selected Bouncy Castle provider.
 
-**Configuration**: `impl: "jca"`
+| Configuration | Algorithm | Key / tag | Salt / nonce |
+|---------------|-----------|-----------|--------------|
+| `impl: jca` | AES-256-GCM | 256 / 128 bits | 16..64 / 12 bytes |
+| `impl: bc` | ChaCha20-Poly1305 | 256 / 128 bits | 16..64 / 12 bytes |
 
-Uses the Java Cryptography Architecture with AES in Galois/Counter Mode.
+The default salt length is 16 bytes. Existing ANV v1 payloads retain their own algorithm and KDF parameters.
 
-- **Algorithm**: AES-GCM with 256-bit keys and 128-bit authentication tag
-- **Pros**:
-    - Hardware acceleration on modern CPUs with AES-NI
-    - Widely supported in all Java environments
-    - FIPS-compliant
-- **Cons**:
-    - More vulnerable to timing attacks if implemented improperly
-    - Performance varies based on hardware support
-- **Recommended Settings**:
-    - salt-length: 16 bytes (128 bits)
-    - iv-length: 12 bytes (96 bits) - GCM optimal IV size
+### Notes about FIPS compliance
 
-### Bouncy Castle Implementation (ChaCha20-Poly1305)
-
-**Configuration**: `impl: "bc"`
-
-Uses the Bouncy Castle provider to implement ChaCha20-Poly1305 authenticated encryption.
-
-- **Algorithm**: ChaCha20 stream cipher with Poly1305 authenticator
-- **Pros**:
-    - Excellent performance on platforms without AES hardware acceleration
-    - More resistant to timing attacks
-    - Designed for software implementation
-- **Cons**:
-    - Requires additional Bouncy Castle provider
-    - Not FIPS-compliant in most environments
-- **Recommended Settings**:
-    - salt-length: 16 bytes (128 bits)
-    - nonce-length: 12 bytes (96 bits) - ChaCha20-Poly1305 standard
+FIPS 140 compliance depends on the deployment and is the responsibility of the integrator.
+A compliant installation requires integrating a validated module such as
+[Bouncy Castle FIPS](https://www.bouncycastle.org/download/), adapting the current code and dependencies,
+and using approved algorithms and parameters within the module's validated environment and Security Policy,
+including key derivation and random generation. Selecting `impl: jca` alone does not provide compliance; see the
+[NIST CMVP requirements](https://csrc.nist.gov/projects/cryptographic-module-validation-program/validated-modules).
 
 ## Security Considerations
 
 1. **Storage of Master Secret**:
-    - The master secret should be stored securely using environment variables or a secrets manager
-    - The system is configured by default to retrieve the master key from HashiCorp Vault
+    - Store the encryption secret in HashiCorp Vault KV v2 and retain versions needed to decrypt existing data
+    - Configure Vault authentication separately from the encryption secret
+    - `SecretService` does not cache encryption secrets, and KDFs zero their source byte buffers on the normal execution path to reduce their time in memory.
     - Never commit secrets to source control
 
 2. **Nonce/IV and Key Version Usage**:
@@ -228,8 +216,9 @@ only in some directions once data is stored:
 
 - **Enabling encryption** is supported: existing content and metadata stay readable and new nodes are stored
   encrypted. Existing nodes are not re-encrypted.
-- **Disabling encryption** with encrypted data already stored is not supported: encrypted content would be returned as
-  is and encrypted metadata could not be read.
+- **Disabling encryption:** plaintext content remains readable. Encrypted content is still decrypted
+  if a crypto service is available; otherwise reading it fails with `IllegalStateException`.
+  Encrypted metadata cannot be read with metadata encryption disabled.
 - **Changing `impl`, KDF parameters or salt length** affects new writes only. Existing ANV v1
   payloads are decrypted using their authenticated header. Nonces must be 12 bytes.
 - Changing these settings does not migrate or re-encrypt existing data. Key rotation
