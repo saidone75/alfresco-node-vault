@@ -1,4 +1,5 @@
 @startuml
+!pragma layout smetana
 !include <C4/C4_Container>
 !include <C4/C4_Component>
 
@@ -8,50 +9,64 @@ title Alfresco Node Vault
 
 System_Boundary(anv, "Alfresco Node Vault") {
   Component(anvProxy, "Proxy")
-  Component(anvApi, "REST API")
+  Component(anvApi, "REST API", "/api/v1")
   Component(anvHandler, "Event handler")
-  Component(anvJob, "Scheduled job")
-  Component(anvVault, "VaultService")
-  Component(anvCrypto, "CryptoService")
+  Component(anvJob, "Scheduled jobs", "", "Archiving, notarization, integrity sweeps and lock cleanup")
+  Component(anvVault, "VaultService", "", "Archive, download, restore and delete")
   Component(anvAlfresco, "AlfrescoService")
-  Component(anvNotarization, "NotarizationService")
-  ContainerDb(anvBlockchain, "Blockchain")
-  ContainerDb(anvMongo, "Mongo DB")
-  ContainerDb(anvGrid, "GridFS")
-  ContainerDb(anvS3, "S3")
+  Component(anvNode, "NodeService", "", "Plain or encrypted metadata")
+  Component(anvContent, "ContentService", "", "S3, GridFS or Ozone; optional content encryption")
+  Component(anvCrypto, "CryptoService", "ANV v1", "Optional metadata and content encryption")
+  Component(anvSecret, "SecretService")
+  Component(anvNotarization, "NotarizationService", "", "Optional notarization and verification")
 }
 
-note right of [anvProxy]
-Intercepts calls to Alfresco
-and serves documents from MongoDB
-if they are no longer present in Alfresco
-end note
-
-System_Boundary(acs, "Alfresco Content Service") {
-  ComponentQueue(acsQueue, "Active MQ")
+System_Boundary(acs, "Alfresco Content Services") {
+  ComponentQueue(acsQueue, "ActiveMQ")
   Component(acsApi, "REST API")
 }
 
-Rel_D(acsQueue, anvHandler, "events")
-Rel_D(anvProxy, anvApi, "")
-Rel_R(anvProxy, acsApi, "")
-Rel_D(anvApi, anvVault, "")
-Rel_D(anvHandler, anvVault, "")
-Rel_D(anvJob, anvVault, "")
-Rel_D(anvJob, anvAlfresco, "")
-Rel_D(anvVault, anvCrypto, "")
-Rel_D(anvVault, anvNotarization, "")
-Rel_D(anvNotarization, anvBlockchain, "")
-Rel_D(anvCrypto, anvMongo, "")
-Rel_D(anvCrypto, anvGrid, "")
-Rel_D(anvCrypto, anvS3, "")
-Rel_R(anvVault, anvAlfresco, "")
-Rel_R(anvAlfresco, acsApi, "")
-
+Boundary(storage, "Persistence") {
+  ContainerDb(anvMongo, "MongoDB", "", "Metadata, audit, integrity results and ShedLock leases")
+  ContainerDb(anvGrid, "GridFS")
+  ContainerDb(anvS3, "S3 / compatible")
+  ContainerDb(anvOzone, "Apache Ozone")
+}
+System_Ext(secrets, "HashiCorp Vault", "Versioned encryption secrets")
+System_Ext(blockchain, "Ethereum", "Content hash notarization")
 Component(client, "Client")
 
 Rel_D(client, anvProxy, "")
 Rel_D(client, anvApi, "")
-Rel_D(client, acsApi, "")
+Rel_R(client, acsApi, "")
+Rel_D(acsQueue, anvHandler, "events")
+Rel_D(anvProxy, anvApi, "vault content")
+Rel_R(anvProxy, acsApi, "proxy requests")
+Rel_D(anvApi, anvVault, "")
+Rel_D(anvHandler, anvVault, "")
+Rel_D(anvJob, anvVault, "archive")
+Rel_R(anvVault, anvAlfresco, "")
+Rel_R(anvAlfresco, acsApi, "read, restore, delete; optional locks")
+Rel_D(anvVault, anvNode, "metadata")
+Rel_D(anvVault, anvContent, "content")
+Rel_D(anvApi, anvNotarization, "")
+Rel_D(anvJob, anvNotarization, "notarize / verify")
+Rel_D(anvNotarization, blockchain, "")
+Rel_D(anvNotarization, anvNode, "")
+Rel_D(anvNotarization, anvContent, "")
+Rel_D(anvNode, anvMongo, "")
+Rel_D(anvContent, anvGrid, "")
+Rel_D(anvContent, anvS3, "")
+Rel_D(anvContent, anvOzone, "")
+Rel_D(anvNode, anvCrypto, "optional")
+Rel_D(anvContent, anvCrypto, "optional")
+Rel_R(anvCrypto, anvSecret, "")
+Rel_D(anvSecret, secrets, "versioned keys")
 
+legend bottom left
+  Content storage: select one of S3, GridFS or Ozone.
+  Node operations and background jobs coordinate through MongoDB-backed ShedLock leases.
+  Key rotation and integrity sweeps are available through REST APIs and maintenance services.
+  Operation and integrity metrics are exported to Prometheus / Grafana.
+endlegend
 @enduml
