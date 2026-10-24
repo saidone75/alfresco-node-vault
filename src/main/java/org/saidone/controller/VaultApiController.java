@@ -638,9 +638,7 @@ public class VaultApiController extends BaseComponent {
         // Re-key nodes asynchronously to avoid long blocking requests
         CompletableFuture.runAsync(() -> {
             try {
-                log.info("Starting key update for version {}", keyVersion);
                 keyService.get().updateKeys(keyVersion);
-                log.info("Completed key update for version {}", keyVersion);
             } catch (Exception e) {
                 log.error("Error while updating keys for version {}", keyVersion, e);
             }
