@@ -66,12 +66,14 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
      * @return a {@code Pair} containing the derived {@link javax.crypto.spec.SecretKeySpec} and an {@link Integer} representing the key version
      */
     protected Pair<SecretKeySpec, Integer> deriveSecretKey(Secret secret, String algorithm, byte[] salt, Kdf kdf) {
-        return switch (kdf.getImpl()) {
-            case "hkdf" -> deriveHkdfSecretKey(secret, algorithm, salt, kdf);
-            case "argon2" -> deriveArgon2SecretKey(secret, algorithm, salt, kdf);
-            case "pbkdf2" -> derivePbkdf2SecretKey(secret, algorithm, salt, kdf);
-            default -> throw new IllegalArgumentException("Unknown KDF");
-        };
+        try (secret) {
+            return switch (kdf.getImpl()) {
+                case "hkdf" -> deriveHkdfSecretKey(secret, algorithm, salt, kdf);
+                case "argon2" -> deriveArgon2SecretKey(secret, algorithm, salt, kdf);
+                case "pbkdf2" -> derivePbkdf2SecretKey(secret, algorithm, salt, kdf);
+                default -> throw new IllegalArgumentException("Unknown KDF");
+            };
+        }
     }
 
     /**
@@ -83,17 +85,24 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
      * @return a pair containing the derived key and the version number
      */
     private Pair<SecretKeySpec, Integer> derivePbkdf2SecretKey(Secret secret, String algorithm, byte[] salt, Kdf kdf) {
+        val password = new String(secret.getData(), StandardCharsets.UTF_8).toCharArray();
         try {
-            val spec = new PBEKeySpec(new String(secret.getData(), StandardCharsets.UTF_8).toCharArray(), salt, kdf.pbkdf2.getIterations(), 256);
-            Arrays.fill(secret.getData(), (byte) 0);
-            val skf = SecretKeyFactory.getInstance(Kdf.Pbkdf2.PBKDF2_KEY_FACTORY_ALGORITHM);
+            val spec = new PBEKeySpec(password, salt, kdf.pbkdf2.getIterations(), 256);
             try {
-                return Pair.of(new SecretKeySpec(skf.generateSecret(spec).getEncoded(), algorithm), secret.getVersion());
+                val skf = SecretKeyFactory.getInstance(Kdf.Pbkdf2.PBKDF2_KEY_FACTORY_ALGORITHM);
+                val keyBytes = skf.generateSecret(spec).getEncoded();
+                try {
+                    return Pair.of(new SecretKeySpec(keyBytes, algorithm), secret.getVersion());
+                } finally {
+                    Arrays.fill(keyBytes, (byte) 0);
+                }
             } finally {
                 spec.clearPassword();
             }
         } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new IllegalStateException("Unable to derive secret key", e);
+        } finally {
+            Arrays.fill(password, '\0');
         }
     }
 
@@ -106,13 +115,16 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
      * @return a pair containing the derived key and the version number
      */
     private Pair<SecretKeySpec, Integer> deriveHkdfSecretKey(Secret secret, String algorithm, byte[] salt, Kdf kdf) {
-        val hkdf = new HKDFBytesGenerator(new SHA256Digest());
-        val hkdfParams = new HKDFParameters(secret.getData(), salt, kdf.hkdf.getInfo().getBytes(StandardCharsets.UTF_8));
-        hkdf.init(hkdfParams);
-        byte[] keyBytes = new byte[32];
-        hkdf.generateBytes(keyBytes, 0, keyBytes.length);
-        Arrays.fill(secret.getData(), (byte) 0);
-        return Pair.of(new SecretKeySpec(keyBytes, algorithm), secret.getVersion());
+        val keyBytes = new byte[32];
+        try {
+            val hkdf = new HKDFBytesGenerator(new SHA256Digest());
+            val hkdfParams = new HKDFParameters(secret.getData(), salt, kdf.hkdf.getInfo().getBytes(StandardCharsets.UTF_8));
+            hkdf.init(hkdfParams);
+            hkdf.generateBytes(keyBytes, 0, keyBytes.length);
+            return Pair.of(new SecretKeySpec(keyBytes, algorithm), secret.getVersion());
+        } finally {
+            Arrays.fill(keyBytes, (byte) 0);
+        }
     }
 
     /**
@@ -124,18 +136,21 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
      * @return a pair containing the derived key and the version number
      */
     private Pair<SecretKeySpec, Integer> deriveArgon2SecretKey(Secret secret, String algorithm, byte[] salt, Kdf kdf) {
-        val builder = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
-                .withVersion(Argon2Parameters.ARGON2_VERSION_13)
-                .withSalt(salt)
-                .withParallelism(kdf.argon2.parallelism)
-                .withMemoryAsKB(kdf.argon2.memory)
-                .withIterations(kdf.argon2.iterations);
-        val generator = new Argon2BytesGenerator();
-        generator.init(builder.build());
-        byte[] keyBytes = new byte[32];
-        generator.generateBytes(secret.getData(), keyBytes);
-        Arrays.fill(secret.getData(), (byte) 0);
-        return Pair.of(new SecretKeySpec(keyBytes, algorithm), secret.getVersion());
+        val keyBytes = new byte[32];
+        try {
+            val builder = new Argon2Parameters.Builder(Argon2Parameters.ARGON2_id)
+                    .withVersion(Argon2Parameters.ARGON2_VERSION_13)
+                    .withSalt(salt)
+                    .withParallelism(kdf.argon2.parallelism)
+                    .withMemoryAsKB(kdf.argon2.memory)
+                    .withIterations(kdf.argon2.iterations);
+            val generator = new Argon2BytesGenerator();
+            generator.init(builder.build());
+            generator.generateBytes(secret.getData(), keyBytes);
+            return Pair.of(new SecretKeySpec(keyBytes, algorithm), secret.getVersion());
+        } finally {
+            Arrays.fill(keyBytes, (byte) 0);
+        }
     }
 
     /**
@@ -223,7 +238,8 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
      * @return Base64 encoded encrypted text
      */
     public String encryptText(String text, Secret secret) {
-        try (val is = encrypt(new AnvDigestInputStream(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))), secret)) {
+        try (secret;
+             val is = encrypt(new AnvDigestInputStream(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))), secret)) {
             return Base64.getEncoder().encodeToString(is.readAllBytes());
         } catch (Exception e) {
             throw new RuntimeException("Error during text encryption", e);

@@ -86,7 +86,7 @@ public class KeyServiceImpl extends BaseComponent implements KeyService {
     private void doUpdateKey(String nodeId) {
         val nodeWrapper = nodeService.findById(nodeId);
         val actualKeyVersion = nodeWrapper.getKeyVersion();
-        val lastKeyVersion = secretService.getSecret().getVersion();
+        val lastKeyVersion = latestKeyVersion();
         if (actualKeyVersion < lastKeyVersion) {
             log.debug("Updating encryption key from v.{} to v.{} for node {}", actualKeyVersion, lastKeyVersion, nodeId);
             nodeWrapper.setKeyVersion(lastKeyVersion);
@@ -98,6 +98,12 @@ public class KeyServiceImpl extends BaseComponent implements KeyService {
             nodeService.save(nodeWrapper);
         } else {
             log.debug("Encryption key for node {} is already up-to-date (v.{})", nodeId, actualKeyVersion);
+        }
+    }
+
+    private int latestKeyVersion() {
+        try (val secret = secretService.getSecret()) {
+            return secret.getVersion();
         }
     }
 
