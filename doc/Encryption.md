@@ -220,6 +220,7 @@ key updates read the latest version from metadata without fetching the secret va
    Back up Vault with the new version and retain the required recovery material separately.
 3. Call `POST /api/v1/vault/nodes/update-keys?keyVersion=<source version>` for each version to migrate,
    or `POST /api/v1/vault/nodes/{nodeId}/update-key` for one node. `202 Accepted` confirms submission.
+   `keyVersion` must be a positive integer identifying the source version, not the destination.
    Bulk runs share a distributed lock; overlapping runs are skipped and logged. Do not create new
    secret versions in Vault while a bulk is queued or running; wait for completion in the logs.
    Check logs, retry skipped or failed nodes, and verify content and metadata readability.
