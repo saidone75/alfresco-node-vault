@@ -17,7 +17,7 @@ Read to EOF to detect truncation, checksum errors and encrypted payload authenti
 
 Disabling compression affects subsequent writes only; existing compressed content stays readable.
 Changing the flag does not migrate archived objects. A later re-encryption rewrites content using
-the current compression setting. Applications predating compression cannot read compressed objects.
+the current compression setting.
 Back up content storage metadata with the binaries.
 
 Every binary written while enabled is compressed, including already-compressed formats;
