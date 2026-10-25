@@ -19,12 +19,12 @@ Each sweep run stores:
 - duration
 - counters: `scanned`, `passed`, `failed`, `errors`
 
-| Counter | Meaning |
-|---------|---------|
-| `scanned` | Node checks counted as passed, failed or errors. |
-| `passed` | Verification succeeded; any previous corruption verdict is cleared. |
-| `failed` | Evidence of corruption or missing proof/content; the node is marked corrupted. |
-| `errors` | Verification could not complete, for example due to an unavailable backend or busy node; the previous verdict is preserved. |
+| Counter   | Meaning                                                                                                                     |
+|-----------|-----------------------------------------------------------------------------------------------------------------------------|
+| `scanned` | Node checks counted as passed, failed or errors.                                                                            |
+| `passed`  | Verification succeeded; any previous corruption verdict is cleared.                                                         |
+| `failed`  | Evidence of corruption or missing proof/content; the node is marked corrupted.                                              |
+| `errors`  | Verification could not complete, for example due to an unavailable backend or busy node; the previous verdict is preserved. |
 
 Nodes deleted from the vault during a sweep are skipped without increasing these counters.
 `COMPLETED` means the run finished, even if some checks failed or encountered errors;

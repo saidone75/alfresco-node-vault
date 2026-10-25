@@ -119,62 +119,62 @@ Use `anv:archive` to select documents for scheduled or event-driven archiving; A
 
 Global configuration is stored in `application.yml`. The main parameters are:
 
-| Parameter/env variable            | Default value                              | Purpose                                                                                   |
-|-----------------------------------|--------------------------------------------|-------------------------------------------------------------------------------------------|
-| ALFRESCO_BASE_PATH                | http://localhost:8080                      | Scheme, host and port of the Alfresco server                                              |
-| ALFRESCO_USERNAME                 | admin                                      | Alfresco user                                                                             |
-| ALFRESCO_PASSWORD                 | admin                                      | Password for the Alfresco user                                                            |
-| CONNECTION_TIMEOUT                | 10000                                      | Connect timeout (ms) for Alfresco content streams                                         |
-| READ_TIMEOUT                      | 60000                                      | Timeout (ms) of each read from an Alfresco content stream                                 |
-| SHARED_FILES_PATH                 | ${java.io.tmpdir}/anv (/tmp/anv in Docker) | Temporary files directory; emptied at startup, one per instance                           |
-| ACTIVE_MQ_URL                     | tcp://localhost:61616                      | ActiveMQ broker URL                                                                       |
-| MONGODB_URL                       | mongodb://localhost:27017                  | MongoDB connection string                                                                 |
-| VAULT_STORAGE_IMPL                | s3                                         | Content storage backend: s3, gridfs or ozone                                              |
-| S3_ENDPOINT                       | http://localhost:5000                      | S3 object storage endpoint                                                                |
-| S3_KEY                            | testing                                    | Key for S3 authentication                                                                 |
-| S3_SECRET                         | testing                                    | Secret for S3 authentication                                                              |
-| OZONE_OM_ADDRESS                  | localhost:9862                             | Ozone Manager RPC address (ozone-om:9862 in the Docker stack)                             |
-| OZONE_CLIENT_BUFFER_SIZE          | 1MB                                        | Ozone client stream buffer size                                                           |
-| OZONE_CLIENT_BUFFER_FLUSH_SIZE    | 2MB                                        | Ozone client stream buffer flush threshold                                                |
-| OZONE_CLIENT_BUFFER_MAX_SIZE      | 4MB                                        | Maximum Ozone client stream buffer size                                                   |
-| NODE_LOCK_CLEANUP_ENABLED         | true                                       | Remove node locks expired for at least one hour                                           |
-| NODE_LOCK_CLEANUP_CRON_EXPRESSION | 0 0 * * * ?                                | Node lock cleanup cron (hourly by default)                                                |
-| EVENT_HANDLER_ENABLED             | false                                      | Event based archive behaviour switch                                                      |
-| ARCHIVING_JOB_ENABLED             | true                                       | Archiving scheduled job switch                                                            |
-| ARCHIVING_JOB_SCHEDULING_MODE     | cron (fixed-delay in dev/docker)           | Archiving schedule: cron or fixed-delay                                                   |
-| ARCHIVING_JOB_FIXED_DELAY         | 10s                                        | Delay after each archiving run in fixed-delay mode                                        |
-| ARCHIVING_JOB_CRON_EXPRESSION     | 0 0/5 2-6 * * ?                            | Scheduled job cron expression                                                             |
-| ARCHIVING_JOB_QUERY               | TYPE:'cm:content' AND ASPECT:'anv:archive' | Query for selecting documents to be archived                                              |
-| VAULT_OPERATION_METRICS_ENABLED   | true                                       | Export operation counters, duration histograms and archived bytes                         |
-| VAULT_HASH_ALGORITHM              | SHA-256                                    | Hash stored as content metadata in GridFS, S3 or Ozone                                    |
-| VAULT_DOUBLE_CHECK                | true                                       | Download the archived document again from Alfresco and the vault and compare their hashes |
-| VAULT_DELETE_ON_ALFRESCO          | true                                       | Delete the document from Alfresco after archiving (permanent by default)                                         |
-| VAULT_ALFRESCO_USE_LOCK           | false                                      | Lock the source in Alfresco throughout archiving, verification and deletion               |
-| VAULT_ALFRESCO_LOCK_TTL_SECONDS   | 120                                        | Source lock TTL (minimum 30 seconds), renewed every third of the TTL                      |
-| VAULT_ALFRESCO_LOCK_LIFETIME      | PERSISTENT                                 | Source lock lifetime: PERSISTENT or EPHEMERAL                                             |
-| VAULT_DELETE_NODE_API_ENABLED     | false                                      | Enable the delete node API                                                                |
-| VAULT_READERS_GROUPS               | GROUP_ANV_READERS                           | Comma-separated Alfresco group IDs; membership in any group grants read access; administrators always have access |
-| VAULT_DELETE_NODE_RESTORE_ON_ALFRESCO | true                                  | Restore a missing Alfresco copy before deleting from the vault                            |
-| VAULT_DELETE_NODE_DELETE_ON_ALFRESCO | true                                    | Move that restored copy to the Alfresco trash before deleting from the vault              |
-| VAULT_AUTH_CACHE_TTL              | 60s                                        | Cache duration of successful API authentications                                          |
-| VAULT_ENCRYPT_CONTENT             | false                                      | Enable binary content encryption (S3, GridFS, Ozone)                                      |
-| VAULT_ENCRYPT_METADATA            | false                                      | Enable document metadata encryption in MongoDB                                            |
-| VAULT_COMPRESS_CONTENT            | false                                      | Compress new binary content with Zstandard before optional encryption                      |
-| VAULT_COMPRESSION_LEVEL          | 3                                          | Zstandard compression level (1–9); higher levels use more CPU                              |
-| VAULT_URL                         | http://localhost:8200                      | Vault secret engine URI                                                                   |
-| VAULT_ENCRYPTION_KV_MOUNT         | secret                                     | Vault secret engine mount path                                                            |
-| VAULT_ENCRYPTION_SECRET_PATH      | AlfrescoNodeVault                          | Path of encryption secret in Vault secret engine                                          |
-| VAULT_ENCRYPTION_SECRET_KEY       | anv.secret                                 | Key name of encryption secret                                                             |
-| VAULT_ENCRYPTION_INITIALIZE_SECRET_ON_STARTUP | false (true in development Compose) | Allow first-install secret generation when encryption is enabled |
-| AUDIT_TTL_DAYS                    | 60                                         | Retention of audit entries in days                                                        |
-| NOTARIZATION_ENABLED              | true                                       | Enable notarization service                                                               |
-| NOTARIZATION_JOB_ENABLED          | false                                      | Document notarization job switch                                                          |
-| NOTARIZATION_JOB_CRON_EXPRESSION  | 0 0/5 * * * ?                              | Cron expression for notarization job                                                      |
-| INTEGRITY_SWEEP_ENABLED           | false                                      | Enable scheduled integrity sweep job                                                      |
-| INTEGRITY_SWEEP_CRON_EXPRESSION   | 0 0 2 * * ?                                | Cron expression for integrity sweep job                                                   |
-| INTEGRITY_SWEEP_BATCH_SIZE        | 200                                        | Number of notarized documents processed per sweep page                                    |
-| ETH_RPC_URL                       | http://localhost:8545                      | Ethereum RPC endpoint                                                                     |
-| ETH_PRIVATE_KEY                   | 4f3edf983ac636a65a842ce7c78d9aa7...        | Private key used to sign transactions                                                     |
+| Parameter/env variable                | Default value                              | Purpose                                                                      |
+|---------------------------------------|--------------------------------------------|------------------------------------------------------------------------------|
+| ALFRESCO_BASE_PATH                    | http://localhost:8080                      | Scheme, host and port of the Alfresco server                                 |
+| ALFRESCO_USERNAME                     | admin                                      | Alfresco user                                                                |
+| ALFRESCO_PASSWORD                     | admin                                      | Password for the Alfresco user                                               |
+| CONNECTION_TIMEOUT                    | 10000                                      | Connect timeout (ms) for Alfresco content streams                            |
+| READ_TIMEOUT                          | 60000                                      | Timeout (ms) of each read from an Alfresco content stream                    |
+| SHARED_FILES_PATH                     | ${java.io.tmpdir}/anv (/tmp/anv in Docker) | Temporary files directory; emptied at startup, one per instance              |
+| ACTIVE_MQ_URL                         | tcp://localhost:61616                      | ActiveMQ broker URL                                                          |
+| MONGODB_URL                           | mongodb://localhost:27017                  | MongoDB connection string                                                    |
+| VAULT_STORAGE_IMPL                    | s3                                         | Content storage backend: s3, gridfs or ozone                                 |
+| S3_ENDPOINT                           | http://localhost:5000                      | S3 object storage endpoint                                                   |
+| S3_KEY                                | testing                                    | Key for S3 authentication                                                    |
+| S3_SECRET                             | testing                                    | Secret for S3 authentication                                                 |
+| OZONE_OM_ADDRESS                      | localhost:9862                             | Ozone Manager RPC address (ozone-om:9862 in the Docker stack)                |
+| OZONE_CLIENT_BUFFER_SIZE              | 1MB                                        | Ozone client stream buffer size                                              |
+| OZONE_CLIENT_BUFFER_FLUSH_SIZE        | 2MB                                        | Ozone client stream buffer flush threshold                                   |
+| OZONE_CLIENT_BUFFER_MAX_SIZE          | 4MB                                        | Maximum Ozone client stream buffer size                                      |
+| NODE_LOCK_CLEANUP_ENABLED             | true                                       | Remove node locks expired for at least one hour                              |
+| NODE_LOCK_CLEANUP_CRON_EXPRESSION     | 0 0 * * * ?                                | Node lock cleanup cron (hourly by default)                                   |
+| EVENT_HANDLER_ENABLED                 | false                                      | Event based archive behaviour switch                                         |
+| ARCHIVING_JOB_ENABLED                 | true                                       | Archiving scheduled job switch                                               |
+| ARCHIVING_JOB_SCHEDULING_MODE         | cron (fixed-delay in dev/docker)           | Archiving schedule: cron or fixed-delay                                      |
+| ARCHIVING_JOB_FIXED_DELAY             | 10s                                        | Delay after each archiving run in fixed-delay mode                           |
+| ARCHIVING_JOB_CRON_EXPRESSION         | 0 0/5 2-6 * * ?                            | Scheduled job cron expression                                                |
+| ARCHIVING_JOB_QUERY                   | TYPE:'cm:content' AND ASPECT:'anv:archive' | Query for selecting documents to be archived                                 |
+| VAULT_OPERATION_METRICS_ENABLED       | true                                       | Export operation counters, duration histograms and archived bytes            |
+| VAULT_HASH_ALGORITHM                  | SHA-256                                    | Hash stored as content metadata in GridFS, S3 or Ozone                       |
+| VAULT_DOUBLE_CHECK                    | true                                       | Compare Alfresco and vault content hashes                                    |
+| VAULT_DELETE_ON_ALFRESCO              | true                                       | Delete the document from Alfresco after archiving (permanent by default)     |
+| VAULT_ALFRESCO_USE_LOCK               | false                                      | Lock the source in Alfresco throughout archiving, verification and deletion  |
+| VAULT_ALFRESCO_LOCK_TTL_SECONDS       | 120                                        | Source lock TTL (minimum 30 seconds), renewed every third of the TTL         |
+| VAULT_ALFRESCO_LOCK_LIFETIME          | PERSISTENT                                 | Source lock lifetime: PERSISTENT or EPHEMERAL                                |
+| VAULT_DELETE_NODE_API_ENABLED         | false                                      | Enable the delete node API                                                   |
+| VAULT_READERS_GROUPS                  | GROUP_ANV_READERS                          | Alfresco reader groups (comma-separated)                                     |
+| VAULT_DELETE_NODE_RESTORE_ON_ALFRESCO | true                                       | Restore a missing Alfresco copy before deleting from the vault               |
+| VAULT_DELETE_NODE_DELETE_ON_ALFRESCO  | true                                       | Move that restored copy to the Alfresco trash before deleting from the vault |
+| VAULT_AUTH_CACHE_TTL                  | 60s                                        | Cache duration of successful API authentications                             |
+| VAULT_ENCRYPT_CONTENT                 | false                                      | Enable binary content encryption (S3, GridFS, Ozone)                         |
+| VAULT_ENCRYPT_METADATA                | false                                      | Enable document metadata encryption in MongoDB                               |
+| VAULT_COMPRESS_CONTENT                | false                                      | Compress new binary content with Zstandard before optional encryption        |
+| VAULT_COMPRESSION_LEVEL               | 3                                          | Zstandard compression level (1–9); higher levels use more CPU                |
+| VAULT_URL                             | http://localhost:8200                      | Vault secret engine URI                                                      |
+| VAULT_ENCRYPTION_KV_MOUNT             | secret                                     | Vault secret engine mount path                                               |
+| VAULT_ENCRYPTION_SECRET_PATH          | AlfrescoNodeVault                          | Path of encryption secret in Vault secret engine                             |
+| VAULT_ENCRYPTION_SECRET_KEY           | anv.secret                                 | Key name of encryption secret                                                |
+| VAULT_INIT_SECRET                     | false (Docker: true)                       | Generate the initial encryption secret                                       |
+| AUDIT_TTL_DAYS                        | 60                                         | Retention of audit entries in days                                           |
+| NOTARIZATION_ENABLED                  | true                                       | Enable notarization service                                                  |
+| NOTARIZATION_JOB_ENABLED              | false                                      | Document notarization job switch                                             |
+| NOTARIZATION_JOB_CRON_EXPRESSION      | 0 0/5 * * * ?                              | Cron expression for notarization job                                         |
+| INTEGRITY_SWEEP_ENABLED               | false                                      | Enable scheduled integrity sweep job                                         |
+| INTEGRITY_SWEEP_CRON_EXPRESSION       | 0 0 2 * * ?                                | Cron expression for integrity sweep job                                      |
+| INTEGRITY_SWEEP_BATCH_SIZE            | 200                                        | Number of notarized documents processed per sweep page                       |
+| ETH_RPC_URL                           | http://localhost:8545                      | Ethereum RPC endpoint                                                        |
+| ETH_PRIVATE_KEY                       | 4f3edf983ac636a65a842ce7c78d9aa7...        | Private key used to sign transactions                                        |
 
 Transfer checksums verify document integrity before source deletion, not for cryptographic purposes.
 `VAULT_HASH_ALGORITHM` defaults to SHA-256 and also applies to optional blockchain notarization.
@@ -314,7 +314,7 @@ production you will likely point to hardened images or custom deployments.
 ## Encryption secret provisioning
 
 With encryption enabled, ANV requires a readable, nonempty secret at startup.
-For a new installation, set `VAULT_ENCRYPTION_INITIALIZE_SECRET_ON_STARTUP=true`
+For a new installation, set `VAULT_INIT_SECRET=true`
 (default: `false`, enabled in development Compose). ANV generates 32 random bytes,
 stored as Base64 text, only when both data and metadata are absent. CAS 0 prevents
 overwriting an existing secret; other Vault errors stop startup.
