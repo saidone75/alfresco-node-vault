@@ -62,6 +62,8 @@ import java.util.Map;
 @ConditionalOnExpression("('${application.service.vault.encryption.content.enabled:false}' == 'true' or '${application.service.vault.encryption.metadata.enabled:false}' == 'true')")
 public class SecretService extends BaseComponent {
 
+    private static final SecureRandom RANDOM = new SecureRandom();
+
     private final VaultTemplate vaultTemplate;
     private final EncryptionConfig properties;
 
@@ -123,7 +125,7 @@ public class SecretService extends BaseComponent {
         byte[] encoded = null;
         val data = new HashMap<String, Object>();
         try {
-            new SecureRandom().nextBytes(random);
+            RANDOM.nextBytes(random);
             encoded = Base64.getEncoder().encode(random);
             data.put(properties.getVaultSecretKey(), new String(encoded, StandardCharsets.US_ASCII));
             try {
