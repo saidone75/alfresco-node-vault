@@ -115,10 +115,10 @@ HKDF (HMAC-based Key Derivation Function) is designed for deriving keys from alr
 
 Both algorithms use JCA APIs with an explicitly selected Bouncy Castle provider.
 
-| Configuration | Algorithm | Key / tag | Salt / nonce |
-|---------------|-----------|-----------|--------------|
-| `impl: jca` | AES-256-GCM | 256 / 128 bits | 16..64 / 12 bytes |
-| `impl: bc` | ChaCha20-Poly1305 | 256 / 128 bits | 16..64 / 12 bytes |
+| Configuration | Algorithm         | Key / tag      | Salt / nonce      |
+|---------------|-------------------|----------------|-------------------|
+| `impl: jca`   | AES-256-GCM       | 256 / 128 bits | 16..64 / 12 bytes |
+| `impl: bc`    | ChaCha20-Poly1305 | 256 / 128 bits | 16..64 / 12 bytes |
 
 The default salt length is 16 bytes. Existing ANV v1 payloads retain their own algorithm and KDF parameters.
 
@@ -174,15 +174,15 @@ All newly encrypted binary content and Base64-encoded metadata use ANV v1:
 Integers are big-endian. `magic` is `89 41 4e 56`; version is `1`. Header length
 includes the seven-byte prefix and must not exceed 4096 bytes. The header body is:
 
-| Field | Encoding |
-|-------|----------|
-| Cipher ID | 1 byte: 1 = AES-256-GCM, 2 = ChaCha20-Poly1305 |
-| Logical key reference | 1 byte: 1 = configured Vault secret |
-| Vault secret version | 4 bytes, positive integer |
-| KDF ID | 1 byte: 1 = PBKDF2-HMAC-SHA256, 2 = HKDF-SHA256, 3 = Argon2id |
-| KDF parameters | Algorithm-specific encoding below |
-| Salt | 2-byte length followed by 16..64 bytes |
-| Nonce | 2-byte length followed by exactly 12 bytes |
+| Field                 | Encoding                                                      |
+|-----------------------|---------------------------------------------------------------|
+| Cipher ID             | 1 byte: 1 = AES-256-GCM, 2 = ChaCha20-Poly1305                |
+| Logical key reference | 1 byte: 1 = configured Vault secret                           |
+| Vault secret version  | 4 bytes, positive integer                                     |
+| KDF ID                | 1 byte: 1 = PBKDF2-HMAC-SHA256, 2 = HKDF-SHA256, 3 = Argon2id |
+| KDF parameters        | Algorithm-specific encoding below                             |
+| Salt                  | 2-byte length followed by 16..64 bytes                        |
+| Nonce                 | 2-byte length followed by exactly 12 bytes                    |
 
 KDF parameter encodings:
 

@@ -59,15 +59,15 @@ listed in the OpenAPI documentation.
 - Endpoints of features disabled by configuration (notarization, encryption, delete node API, advanced search with
   encrypted metadata) return `403`.
 
-| Status | Meaning                                                                                         |
-|--------|-------------------------------------------------------------------------------------------------|
-| `202`  | Asynchronous bulk key update submitted; completion and later errors are reported in worker logs |
-| `400`  | Invalid parameters or request body                                                              |
-| `401`  | Missing or invalid credentials, or insufficient privileges                                                                  |
-| `403`  | The feature is disabled by configuration                                                        |
-| `404`  | Node not found on the vault or on Alfresco                                                      |
-| `409`  | Conflicting state: another operation on the same node is in progress, node already notarized, node not notarized or hashes not matching the notarized ones |
-| `500`  | Internal server error                                                                           |
+| Status | Meaning                                              |
+|--------|------------------------------------------------------|
+| `202`  | Bulk key update submitted; see worker logs           |
+| `400`  | Invalid parameters or body                           |
+| `401`  | Invalid credentials or insufficient privileges       |
+| `403`  | Feature disabled                                     |
+| `404`  | Node not found                                       |
+| `409`  | Node busy or conflicting notarization state/checksum |
+| `500`  | Internal server error                                |
 
 ## Restore retries
 

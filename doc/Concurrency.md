@@ -34,11 +34,11 @@ Both modes acquire the same distributed job lock.
 
 ## Configuration
 
-| Environment variable | Default |
-|----------------------|---------|
-| `VAULT_NODE_LOCK_AT_MOST_FOR` | `2m` |
-| `VAULT_JOB_LOCK_AT_MOST_FOR` | `2m` |
-| `VAULT_JOB_LOCK_AT_LEAST_FOR` | `10s` |
+| Environment variable          | Default |
+|-------------------------------|---------|
+| `VAULT_NODE_LOCK_AT_MOST_FOR` | `2m`    |
+| `VAULT_JOB_LOCK_AT_MOST_FOR`  | `2m`    |
+| `VAULT_JOB_LOCK_AT_LEAST_FOR` | `10s`   |
 
 Leases renew halfway through their duration on a dedicated executor. Locks are
 released when work finishes, subject to the minimum job duration. The two-minute
