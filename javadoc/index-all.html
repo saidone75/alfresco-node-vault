@@ -51,7 +51,7 @@ loadScripts(document, 'script');</script>
 <div class="header">
 <h1>Index</h1>
 </div>
-<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:J">J</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a><span class="vertical-separator">|</span><a href="constant-values.html">Constant&nbsp;Field&nbsp;Values</a><span class="vertical-separator">|</span><a href="serialized-form.html">Serialized&nbsp;Form</a>
+<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:J">J</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<a href="#I:Z">Z</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a><span class="vertical-separator">|</span><a href="constant-values.html">Constant&nbsp;Field&nbsp;Values</a><span class="vertical-separator">|</span><a href="serialized-form.html">Serialized&nbsp;Form</a>
 <h2 class="title" id="I:A">A</h2>
 <dl class="index">
 <dt><a href="org/saidone/service/crypto/AbstractCryptoService.html" class="type-name-link" title="class in org.saidone.service.crypto">AbstractCryptoService</a> - Class in <a href="org/saidone/service/crypto/package-summary.html">org.saidone.service.crypto</a></dt>
@@ -665,6 +665,10 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/filter/RecentlyProcessedFilter.html#cleanRecentlyProcessedNodes()" class="member-name-link">cleanRecentlyProcessedNodes()</a> - Method in class org.saidone.filter.<a href="org/saidone/filter/RecentlyProcessedFilter.html" title="class in org.saidone.filter">RecentlyProcessedFilter</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/misc/ExactLengthInputStream.html#close()" class="member-name-link">close()</a> - Method in class org.saidone.misc.<a href="org/saidone/misc/ExactLengthInputStream.html" title="class in org.saidone.misc">ExactLengthInputStream</a></dt>
+<dd>&nbsp;</dd>
+<dt><a href="org/saidone/misc/ZstdCompressingInputStream.html#close()" class="member-name-link">close()</a> - Method in class org.saidone.misc.<a href="org/saidone/misc/ZstdCompressingInputStream.html" title="class in org.saidone.misc">ZstdCompressingInputStream</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/service/crypto/Secret.html#close()" class="member-name-link">close()</a> - Method in class org.saidone.service.crypto.<a href="org/saidone/service/crypto/Secret.html" title="class in org.saidone.service.crypto">Secret</a></dt>
 <dd>
 <div class="block">Clears the owned buffer; safe to call repeatedly.</div>
@@ -677,6 +681,18 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/model/alfresco/AlfrescoContentModel.html#CM_URI" class="member-name-link">CM_URI</a> - Static variable in interface org.saidone.model.alfresco.<a href="org/saidone/model/alfresco/AlfrescoContentModel.html" title="interface in org.saidone.model.alfresco">AlfrescoContentModel</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/model/MetadataKeys.html#COMPRESSION" class="member-name-link">COMPRESSION</a> - Static variable in interface org.saidone.model.<a href="org/saidone/model/MetadataKeys.html" title="interface in org.saidone.model">MetadataKeys</a></dt>
+<dd>
+<div class="block">Versioned content encoding; absent on older, uncompressed objects.</div>
+</dd>
+<dt><a href="org/saidone/controller/VaultApiController.html#compressNode(java.lang.String,java.lang.String)" class="member-name-link">compressNode(String, String)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/VaultApiController.html" title="class in org.saidone.controller">VaultApiController</a></dt>
+<dd>
+<div class="block">Placeholder for single-node content compression; does not modify stored data.</div>
+</dd>
+<dt><a href="org/saidone/controller/VaultApiController.html#compressNodes(java.lang.String)" class="member-name-link">compressNodes(String)</a> - Method in class org.saidone.controller.<a href="org/saidone/controller/VaultApiController.html" title="class in org.saidone.controller">VaultApiController</a></dt>
+<dd>
+<div class="block">Placeholder for bulk content compression; does not submit background work.</div>
+</dd>
 <dt><a href="org/saidone/service/AlfrescoService.html#computeHash(java.lang.String,java.lang.String)" class="member-name-link">computeHash(String, String)</a> - Method in class org.saidone.service.<a href="org/saidone/service/AlfrescoService.html" title="class in org.saidone.service">AlfrescoService</a></dt>
 <dd>
 <div class="block">Computes a cryptographic hash of the content for the specified node using the provided algorithm.</div>
@@ -705,9 +721,15 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">MIME type associated with the stored content.</div>
 </dd>
+<dt><a href="org/saidone/config/ContentCompressionConfig.html" class="type-name-link" title="class in org.saidone.config">ContentCompressionConfig</a> - Class in <a href="org/saidone/config/package-summary.html">org.saidone.config</a></dt>
+<dd>
+<div class="block">Controls new binary writes only; stored encoding always controls reads.</div>
+</dd>
+<dt><a href="org/saidone/config/ContentCompressionConfig.html#%3Cinit%3E()" class="member-name-link">ContentCompressionConfig()</a> - Constructor for class org.saidone.config.<a href="org/saidone/config/ContentCompressionConfig.html" title="class in org.saidone.config">ContentCompressionConfig</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/service/crypto/ContentEncryptionService.html" class="type-name-link" title="class in org.saidone.service.crypto">ContentEncryptionService</a> - Class in <a href="org/saidone/service/crypto/package-summary.html">org.saidone.service.crypto</a></dt>
 <dd>
-<div class="block">Applies content encryption for every storage backend, so that repositories
+<div class="block">Applies optional Zstandard compression before content encryption for every storage backend, so that repositories
  only store and retrieve bytes.</div>
 </dd>
 <dt><a href="org/saidone/service/crypto/ContentEncryptionService.html#%3Cinit%3E()" class="member-name-link">ContentEncryptionService()</a> - Constructor for class org.saidone.service.crypto.<a href="org/saidone/service/crypto/ContentEncryptionService.html" title="class in org.saidone.service.crypto">ContentEncryptionService</a></dt>
@@ -931,6 +953,12 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="org/saidone/behaviour/EventHandler.html#%3Cinit%3E()" class="member-name-link">EventHandler()</a> - Constructor for class org.saidone.behaviour.<a href="org/saidone/behaviour/EventHandler.html" title="class in org.saidone.behaviour">EventHandler</a></dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/misc/ExactLengthInputStream.html" class="type-name-link" title="class in org.saidone.misc">ExactLengthInputStream</a> - Class in <a href="org/saidone/misc/package-summary.html">org.saidone.misc</a></dt>
+<dd>
+<div class="block">Limits decoded output to its recorded original size and rejects truncated content at EOF.</div>
+</dd>
+<dt><a href="org/saidone/misc/ExactLengthInputStream.html#%3Cinit%3E(java.io.InputStream,long)" class="member-name-link">ExactLengthInputStream(InputStream, long)</a> - Constructor for class org.saidone.misc.<a href="org/saidone/misc/ExactLengthInputStream.html" title="class in org.saidone.misc">ExactLengthInputStream</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/model/alfresco/AlfrescoContentModel.html#EXIF_PREFIX" class="member-name-link">EXIF_PREFIX</a> - Static variable in interface org.saidone.model.alfresco.<a href="org/saidone/model/alfresco/AlfrescoContentModel.html" title="interface in org.saidone.model.alfresco">AlfrescoContentModel</a></dt>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/model/alfresco/AlfrescoContentModel.html#EXIF_URI" class="member-name-link">EXIF_URI</a> - Static variable in interface org.saidone.model.alfresco.<a href="org/saidone/model/alfresco/AlfrescoContentModel.html" title="interface in org.saidone.model.alfresco">AlfrescoContentModel</a></dt>
@@ -1087,6 +1115,10 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Returns the original content of the given stored bytes, decrypting them
  when they are encrypted.</div>
+</dd>
+<dt><a href="org/saidone/service/crypto/ContentEncryptionService.html#fromStoredContent(java.io.InputStream,java.util.Map)" class="member-name-link">fromStoredContent(InputStream, Map&lt;String, ?&gt;)</a> - Method in class org.saidone.service.crypto.<a href="org/saidone/service/crypto/ContentEncryptionService.html" title="class in org.saidone.service.crypto">ContentEncryptionService</a></dt>
+<dd>
+<div class="block">Reads according to stored metadata, independently of current compression write settings.</div>
 </dd>
 </dl>
 <h2 class="title" id="I:G">G</h2>
@@ -1725,6 +1757,10 @@ loadScripts(document, 'script');</script>
 <dd>&nbsp;</dd>
 <dt><a href="org/saidone/utils/package-summary.html">org.saidone.utils</a> - package org.saidone.utils</dt>
 <dd>&nbsp;</dd>
+<dt><a href="org/saidone/model/MetadataKeys.html#ORIGINAL_LENGTH" class="member-name-link">ORIGINAL_LENGTH</a> - Static variable in interface org.saidone.model.<a href="org/saidone/model/MetadataKeys.html" title="interface in org.saidone.model">MetadataKeys</a></dt>
+<dd>
+<div class="block">Original byte length before compression and encryption.</div>
+</dd>
 <dt><a href="org/saidone/config/OzoneConfig.html#ozoneBucket(org.apache.hadoop.ozone.client.OzoneClient)" class="member-name-link">ozoneBucket(OzoneClient)</a> - Method in class org.saidone.config.<a href="org/saidone/config/OzoneConfig.html" title="class in org.saidone.config">OzoneConfig</a></dt>
 <dd>
 <div class="block">Resolves the existing bucket and its replication configuration.</div>
@@ -2423,16 +2459,24 @@ loadScripts(document, 'script');</script>
 <h2 class="title" id="I:R">R</h2>
 <dl class="index">
 <dt><a href="org/saidone/misc/AnvDigestInputStream.html#read()" class="member-name-link">read()</a> - Method in class org.saidone.misc.<a href="org/saidone/misc/AnvDigestInputStream.html" title="class in org.saidone.misc">AnvDigestInputStream</a></dt>
+<dt><a href="org/saidone/misc/ExactLengthInputStream.html#read()" class="member-name-link">read()</a> - Method in class org.saidone.misc.<a href="org/saidone/misc/ExactLengthInputStream.html" title="class in org.saidone.misc">ExactLengthInputStream</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/misc/ProgressTrackingInputStream.html#read()" class="member-name-link">read()</a> - Method in class org.saidone.misc.<a href="org/saidone/misc/ProgressTrackingInputStream.html" title="class in org.saidone.misc">ProgressTrackingInputStream</a></dt>
 <dd>
 <div class="block">Reads a single byte from the stream and updates the progress.</div>
 </dd>
+<dt><a href="org/saidone/misc/ZstdCompressingInputStream.html#read()" class="member-name-link">read()</a> - Method in class org.saidone.misc.<a href="org/saidone/misc/ZstdCompressingInputStream.html" title="class in org.saidone.misc">ZstdCompressingInputStream</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/misc/AnvDigestInputStream.html#read(byte%5B%5D)" class="member-name-link">read(byte[])</a> - Method in class org.saidone.misc.<a href="org/saidone/misc/AnvDigestInputStream.html" title="class in org.saidone.misc">AnvDigestInputStream</a></dt>
 <dt><a href="org/saidone/misc/AnvDigestInputStream.html#read(byte%5B%5D,int,int)" class="member-name-link">read(byte[], int, int)</a> - Method in class org.saidone.misc.<a href="org/saidone/misc/AnvDigestInputStream.html" title="class in org.saidone.misc">AnvDigestInputStream</a></dt>
+<dt><a href="org/saidone/misc/ExactLengthInputStream.html#read(byte%5B%5D,int,int)" class="member-name-link">read(byte[], int, int)</a> - Method in class org.saidone.misc.<a href="org/saidone/misc/ExactLengthInputStream.html" title="class in org.saidone.misc">ExactLengthInputStream</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/misc/ProgressTrackingInputStream.html#read(byte%5B%5D,int,int)" class="member-name-link">read(byte[], int, int)</a> - Method in class org.saidone.misc.<a href="org/saidone/misc/ProgressTrackingInputStream.html" title="class in org.saidone.misc">ProgressTrackingInputStream</a></dt>
 <dd>
 <div class="block">Reads bytes into an array and updates the read progress.</div>
 </dd>
+<dt><a href="org/saidone/misc/ZstdCompressingInputStream.html#read(byte%5B%5D,int,int)" class="member-name-link">read(byte[], int, int)</a> - Method in class org.saidone.misc.<a href="org/saidone/misc/ZstdCompressingInputStream.html" title="class in org.saidone.misc">ZstdCompressingInputStream</a></dt>
+<dd>&nbsp;</dd>
 <dt><a href="org/saidone/filter/RecentlyProcessedFilter.html" class="type-name-link" title="class in org.saidone.filter">RecentlyProcessedFilter</a> - Class in <a href="org/saidone/filter/package-summary.html">org.saidone.filter</a></dt>
 <dd>
 <div class="block">An event filter for Alfresco repository events that ensures each node is processed
@@ -2707,7 +2751,7 @@ loadScripts(document, 'script');</script>
 <div class="block">Returns the node JSON, taken from the BSON document when present or from
  the JSON string otherwise (encrypted node or legacy record).</div>
 </dd>
-<dt><a href="org/saidone/service/crypto/ContentEncryptionService.html#toStoredContent(java.io.InputStream,java.util.Map)" class="member-name-link">toStoredContent(InputStream, Map&lt;String, String&gt;)</a> - Method in class org.saidone.service.crypto.<a href="org/saidone/service/crypto/ContentEncryptionService.html" title="class in org.saidone.service.crypto">ContentEncryptionService</a></dt>
+<dt><a href="org/saidone/service/crypto/ContentEncryptionService.html#toStoredContent(java.io.InputStream,java.util.Map,long)" class="member-name-link">toStoredContent(InputStream, Map&lt;String, String&gt;, long)</a> - Method in class org.saidone.service.crypto.<a href="org/saidone/service/crypto/ContentEncryptionService.html" title="class in org.saidone.service.crypto">ContentEncryptionService</a></dt>
 <dd>
 <div class="block">Returns the stream of the bytes to store for the given content, encrypted
  when content encryption is enabled, and records in <code>metadata</code>
@@ -2936,7 +2980,16 @@ the order they are declared.</div>
 <div class="block">Writes a single byte and updates the write progress.</div>
 </dd>
 </dl>
-<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:J">J</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a><span class="vertical-separator">|</span><a href="constant-values.html">Constant&nbsp;Field&nbsp;Values</a><span class="vertical-separator">|</span><a href="serialized-form.html">Serialized&nbsp;Form</a></main>
+<h2 class="title" id="I:Z">Z</h2>
+<dl class="index">
+<dt><a href="org/saidone/misc/ZstdCompressingInputStream.html" class="type-name-link" title="class in org.saidone.misc">ZstdCompressingInputStream</a> - Class in <a href="org/saidone/misc/package-summary.html">org.saidone.misc</a></dt>
+<dd>
+<div class="block">Pull-based Zstandard compression with bounded buffers and no worker thread or staging file.</div>
+</dd>
+<dt><a href="org/saidone/misc/ZstdCompressingInputStream.html#%3Cinit%3E(java.io.InputStream,int)" class="member-name-link">ZstdCompressingInputStream(InputStream, int)</a> - Constructor for class org.saidone.misc.<a href="org/saidone/misc/ZstdCompressingInputStream.html" title="class in org.saidone.misc">ZstdCompressingInputStream</a></dt>
+<dd>&nbsp;</dd>
+</dl>
+<a href="#I:A">A</a>&nbsp;<a href="#I:B">B</a>&nbsp;<a href="#I:C">C</a>&nbsp;<a href="#I:D">D</a>&nbsp;<a href="#I:E">E</a>&nbsp;<a href="#I:F">F</a>&nbsp;<a href="#I:G">G</a>&nbsp;<a href="#I:H">H</a>&nbsp;<a href="#I:I">I</a>&nbsp;<a href="#I:J">J</a>&nbsp;<a href="#I:K">K</a>&nbsp;<a href="#I:L">L</a>&nbsp;<a href="#I:M">M</a>&nbsp;<a href="#I:N">N</a>&nbsp;<a href="#I:O">O</a>&nbsp;<a href="#I:P">P</a>&nbsp;<a href="#I:R">R</a>&nbsp;<a href="#I:S">S</a>&nbsp;<a href="#I:T">T</a>&nbsp;<a href="#I:U">U</a>&nbsp;<a href="#I:V">V</a>&nbsp;<a href="#I:W">W</a>&nbsp;<a href="#I:Z">Z</a>&nbsp;<br><a href="allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="allpackages-index.html">All&nbsp;Packages</a><span class="vertical-separator">|</span><a href="constant-values.html">Constant&nbsp;Field&nbsp;Values</a><span class="vertical-separator">|</span><a href="serialized-form.html">Serialized&nbsp;Form</a></main>
 <footer role="contentinfo">
 <hr>
 <p class="legal-copy"><small>© 2025-2026 Saidone</small></p>
