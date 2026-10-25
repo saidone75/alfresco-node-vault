@@ -333,7 +333,7 @@ public class AlfrescoService extends BaseComponent {
             permissionBody.setLocallySet(node.getPermissions().getLocallySet());
             nodeBodyCreate.setPermissions(permissionBody);
         }
-        nodeBodyCreate.setDefinition(node.getDefinition());
+        // nodeBodyCreate.setDefinition(node.getDefinition());
 
         if (!nodeExists(node.getParentId())) {
             log.debug("Parent node {} does not exist anymore, checking path...", node.getParentId());

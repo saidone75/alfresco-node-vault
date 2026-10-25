@@ -124,14 +124,14 @@ application:
   service:
     alfresco:
       include:
-        - allowableOperations
-        - association
-        - isLink
-        - isFavorite
-        - isLocked
+        # - allowableOperations
+        # - association
+        # - isLink
+        # - isFavorite
+        # - isLocked
         - path
         - permissions
-        - definition
+        # - definition
       permanently-delete-nodes: true
       search-batch-size: 100
       chunk-size: 8192
