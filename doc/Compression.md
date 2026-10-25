@@ -15,6 +15,9 @@ readable as before; file signatures alone never trigger decompression. Decoding 
 Zstandard checksum and original length and limits the decoder window to 8 MiB.
 Read to EOF to detect truncation, checksum errors and encrypted payload authentication failures.
 
+With compression enabled, DEBUG logs show compression/decompression and final stream size savings,
+including encryption overhead (negative for growth, `n/a` for empty content).
+
 Disabling compression affects subsequent writes only; existing compressed content stays readable.
 Changing the flag does not migrate archived objects. A later re-encryption rewrites content using
 the current compression setting.

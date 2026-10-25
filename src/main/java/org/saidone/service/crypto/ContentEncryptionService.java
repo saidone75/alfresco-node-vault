@@ -21,6 +21,7 @@ package org.saidone.service.crypto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import lombok.extern.slf4j.Slf4j;
 import com.github.luben.zstd.ZstdInputStreamNoFinalizer;
 import org.saidone.component.BaseComponent;
 import org.saidone.config.ContentCompressionConfig;
@@ -34,6 +35,7 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Locale;
 import java.util.Optional;
 
 /**
@@ -47,6 +49,7 @@ import java.util.Optional;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
 public class ContentEncryptionService extends BaseComponent {
 
@@ -79,17 +82,19 @@ public class ContentEncryptionService extends BaseComponent {
             if (compression.isEnabled()) {
                 transformed = new ZstdCompressingInputStream(transformed, compression.getLevel());
                 metadata.put(MetadataKeys.COMPRESSION, ZSTD_V1);
+                log.debug("Compressing content with Zstandard: level {}, original size {} bytes",
+                        compression.getLevel(), originalLength);
             } else {
                 metadata.remove(MetadataKeys.COMPRESSION);
             }
             if (!encryptionEnabled) {
                 metadata.put(MetadataKeys.ENCRYPTED, Boolean.FALSE.toString());
-                return transformed;
+                return logStoredSize(transformed, originalLength);
             }
             try (val secret = secretService.orElseThrow().getSecret()) {
                 metadata.put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString());
                 metadata.put(MetadataKeys.KEY_VERSION, String.valueOf(secret.getVersion()));
-                return cryptoService.orElseThrow().encrypt(transformed, secret);
+                return logStoredSize(cryptoService.orElseThrow().encrypt(transformed, secret), originalLength);
             }
         } catch (IOException | RuntimeException e) {
             closeAfterFailure(transformed, e);
@@ -113,6 +118,9 @@ public class ContentEncryptionService extends BaseComponent {
                 decoded = decompressor;
                 decompressor.setLongMax(23);
                 decoded = new ExactLengthInputStream(decoded, length);
+                if (compression.isEnabled()) {
+                    log.debug("Decompressing Zstandard content: original size {} bytes", length);
+                }
             }
             return decoded;
         } catch (IOException | RuntimeException e) {
@@ -149,6 +157,42 @@ public class ContentEncryptionService extends BaseComponent {
         } catch (IOException closing) {
             failure.addSuppressed(closing);
         }
+    }
+
+    private InputStream logStoredSize(InputStream stored, long originalLength) {
+        if (!compression.isEnabled()) return stored;
+        return new InputStream() {
+            private long storedLength;
+            private boolean reported;
+            private final byte[] single = new byte[1];
+
+            @Override
+            public int read() throws IOException {
+                return read(single, 0, 1) < 0 ? -1 : single[0] & 0xff;
+            }
+
+            @Override
+            public int read(byte[] target, int offset, int length) throws IOException {
+                val count = stored.read(target, offset, length);
+                if (count > 0) {
+                    storedLength += count;
+                } else if (count < 0 && !reported) {
+                    reported = true;
+                    if (log.isDebugEnabled()) {
+                        val savedPercent = originalLength == 0 ? "n/a"
+                                : String.format(Locale.ROOT, "%.2f%%", 100.0 * (1.0 - (double) storedLength / originalLength));
+                        log.debug("Compressed content stream completed: original {} bytes, stored {} bytes, space saved {}",
+                                originalLength, storedLength, savedPercent);
+                    }
+                }
+                return count;
+            }
+
+            @Override
+            public void close() throws IOException {
+                stored.close();
+            }
+        };
     }
 
 }
