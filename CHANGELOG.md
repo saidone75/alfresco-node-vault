@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Added
+- Optional first-install Vault KV v2 secret provisioning with `VAULT_ENCRYPTION_INITIALIZE_SECRET_ON_STARTUP=true` (disabled by default, enabled in development Compose): generates 32 random bytes stored as Base64 only when data and metadata are absent, using CAS 0 to prevent overwrites. Encryption-enabled startup requires a readable, nonempty secret.
 - Read-only access to archived document search, metadata and content for members of any configured Alfresco reader group (`VAULT_READERS_GROUPS`, a comma-separated list defaulting to `GROUP_ANV_READERS`); administrators retain full access. Original Alfresco ACLs are not enforced for vault reads.
 - Optional Alfresco node locking during archive, verification and deletion with `VAULT_ALFRESCO_USE_LOCK=true`; requires a dedicated Alfresco account and does not provide a cross-system transaction.
 - ANV v1 encrypted payloads with a versioned, authenticated binary header recording cipher, KDF parameters, logical key reference, Vault key version, salt and nonce; content and metadata remain readable after changing write settings.
@@ -20,7 +21,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Temporary files use a dedicated directory cleaned at startup; each application instance must have its own directory.
 - Notarization and bulk key rotation retrieve node IDs in pages instead of loading all matching nodes at once.
 - Ozone client write buffers are configurable through `OZONE_CLIENT_BUFFER_SIZE`, `OZONE_CLIENT_BUFFER_FLUSH_SIZE` and `OZONE_CLIENT_BUFFER_MAX_SIZE`, defaulting to 1, 2 and 4 MB.
-- Vault secrets are read directly without submitting blocking calls to the common pool and immediately waiting for them; retrieval failures preserve their causes in `VaultException`.
+- Vault secrets are read directly without submitting blocking calls to the common pool and immediately waiting for them; retrieval failures report sanitized exception types and HTTP status codes without retaining potentially sensitive Vault responses.
+- Bulk key updates return `202 Accepted` and require a positive source `keyVersion`. All bulk runs share a distributed job lock; overlapping runs are skipped and logged. Key updates use the latest existing version from Vault metadata and do not create secret versions; rotation and retention are documented separately.
 - Content services consistently use property-based backend selection; the encrypted metadata repository is explicitly marked as primary, and the path filter's API dependency is final.
 - **Breaking:** unversioned encrypted payloads are no longer supported. Export with the previous application before upgrading and reimport, or recreate disposable data. ANV v1 requires 12-byte nonces and bounded KDF costs.
 - Archiving uses a configurable fixed delay (ten seconds by default) in dev and Docker profiles; other profiles retain cron scheduling. Both modes share the distributed job lock.
@@ -29,6 +31,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Before deleting on Alfresco a node already in the vault, its Alfresco content is always compared with the checksum recorded in the vault, regardless of `VAULT_DOUBLE_CHECK`.
 
 ### Fixed
+- Encryption secret buffers and temporary KDF key/password buffers are cleared on success and failure; PBKDF2 avoids temporary immutable password strings. Secret values are excluded from object and builder string representations.
 - Content restore closes source streams even when connection setup fails, closes HTTP response streams and disconnects connections after uploads.
 - Event deduplication atomically checks and updates node expiry; cleanup cannot remove entries renewed concurrently.
 - GridFS content hashes are computed by streaming original content bytes, including decryption when required; archive verification uses the checksum algorithm recorded with the content.
