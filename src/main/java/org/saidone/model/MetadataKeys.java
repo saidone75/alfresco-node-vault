@@ -33,6 +33,10 @@ public interface MetadataKeys {
     String CONTENT_TYPE = "ct";
     /** Flag marking content as encrypted. */
     String ENCRYPTED = "enc";
+    /** Versioned content encoding; absent on older, uncompressed objects. */
+    String COMPRESSION = "compression";
+    /** Original byte length before compression and encryption. */
+    String ORIGINAL_LENGTH = "original-length";
     // blockchain transaction id
     String NOTARIZATION_TRANSACTION_ID = "ntx";
     /**

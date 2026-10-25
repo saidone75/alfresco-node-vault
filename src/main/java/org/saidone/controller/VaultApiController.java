@@ -549,6 +549,46 @@ public class VaultApiController extends BaseComponent {
                 .body(String.format("Node %s is notarized and hashes match.", HtmlUtils.htmlEscape(nodeId)));
     }
 
+    /** Placeholder for single-node content compression; does not modify stored data. */
+    @SecurityRequirement(name = "basicAuth")
+    @PostMapping("/nodes/{nodeId}/compress")
+    @Operation(summary = "Compress node content (not implemented)",
+            description = "Reserved for single-node content compression. No data is modified.",
+            responses = {
+                    @ApiResponse(responseCode = "501", description = "Not implemented",
+                            content = @Content(mediaType = "text/plain")),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+            })
+    public ResponseEntity<String> compressNode(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth,
+            @PathVariable String nodeId) {
+        return compressionNotImplemented(auth);
+    }
+
+    /** Placeholder for bulk content compression; does not submit background work. */
+    @SecurityRequirement(name = "basicAuth")
+    @PostMapping("/nodes/compress")
+    @Operation(summary = "Compress node content in bulk (not implemented)",
+            description = "Reserved for bulk content compression. No background job is submitted and no data is modified.",
+            responses = {
+                    @ApiResponse(responseCode = "501", description = "Not implemented",
+                            content = @Content(mediaType = "text/plain")),
+                    @ApiResponse(responseCode = "401", description = "Unauthorized", content = @Content)
+            })
+    public ResponseEntity<String> compressNodes(
+            @Parameter(hidden = true) @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String auth) {
+        return compressionNotImplemented(auth);
+    }
+
+    private ResponseEntity<String> compressionNotImplemented(String auth) {
+        if (!authenticationService.isAuthorized(auth)) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED)
+                .contentType(MediaType.TEXT_PLAIN)
+                .body("Not implemented");
+    }
+
     /**
      * Re-encrypts a node with the latest existing Vault key version when needed.
      *

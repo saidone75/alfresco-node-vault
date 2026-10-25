@@ -21,7 +21,11 @@ package org.saidone.service.crypto;
 
 import lombok.RequiredArgsConstructor;
 import lombok.val;
+import com.github.luben.zstd.ZstdInputStreamNoFinalizer;
 import org.saidone.component.BaseComponent;
+import org.saidone.config.ContentCompressionConfig;
+import org.saidone.misc.ExactLengthInputStream;
+import org.saidone.misc.ZstdCompressingInputStream;
 import org.saidone.model.MetadataKeys;
 import org.saidone.service.SecretService;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,7 +37,7 @@ import java.util.Map;
 import java.util.Optional;
 
 /**
- * Applies content encryption for every storage backend, so that repositories
+ * Applies optional Zstandard compression before content encryption for every storage backend, so that repositories
  * only store and retrieve bytes.
  * <p>
  * Content is encrypted on storage when
@@ -48,6 +52,9 @@ public class ContentEncryptionService extends BaseComponent {
 
     private final Optional<SecretService> secretService;
     private final Optional<CryptoService> cryptoService;
+    private final ContentCompressionConfig compression;
+
+    private static final String ZSTD_V1 = "zstd-v1";
 
     @Value("${application.service.vault.encryption.content.enabled:false}")
     private boolean encryptionEnabled;
@@ -59,17 +66,58 @@ public class ContentEncryptionService extends BaseComponent {
      *
      * @param content  the original content; closing the returned stream closes it
      * @param metadata object metadata, updated with the encryption details
+     * @param originalLength expected original content size, before either transformation
      * @return the stream of the bytes to store
      */
-    public InputStream toStoredContent(InputStream content, Map<String, String> metadata) {
-        if (!encryptionEnabled) {
-            metadata.put(MetadataKeys.ENCRYPTED, Boolean.FALSE.toString());
-            return content;
+    public InputStream toStoredContent(InputStream content, Map<String, String> metadata, long originalLength) {
+        InputStream transformed = content;
+        try {
+            if (originalLength < 0) throw new IllegalArgumentException("Negative original content length");
+            metadata.put(MetadataKeys.ORIGINAL_LENGTH, Long.toString(originalLength));
+            // Also validates input length before a new GridFS object can replace an old one.
+            transformed = new ExactLengthInputStream(content, originalLength);
+            if (compression.isEnabled()) {
+                transformed = new ZstdCompressingInputStream(transformed, compression.getLevel());
+                metadata.put(MetadataKeys.COMPRESSION, ZSTD_V1);
+            } else {
+                metadata.remove(MetadataKeys.COMPRESSION);
+            }
+            if (!encryptionEnabled) {
+                metadata.put(MetadataKeys.ENCRYPTED, Boolean.FALSE.toString());
+                return transformed;
+            }
+            try (val secret = secretService.orElseThrow().getSecret()) {
+                metadata.put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString());
+                metadata.put(MetadataKeys.KEY_VERSION, String.valueOf(secret.getVersion()));
+                return cryptoService.orElseThrow().encrypt(transformed, secret);
+            }
+        } catch (IOException | RuntimeException e) {
+            closeAfterFailure(transformed, e);
+            throw new IllegalStateException("Unable to prepare stored content", e);
         }
-        try (val secret = secretService.orElseThrow().getSecret()) {
-            metadata.put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString());
-            metadata.put(MetadataKeys.KEY_VERSION, String.valueOf(secret.getVersion()));
-            return cryptoService.orElseThrow().encrypt(content, secret);
+    }
+
+    /** Reads according to stored metadata, independently of current compression write settings. */
+    public InputStream fromStoredContent(InputStream stored, Map<String, ?> metadata) {
+        InputStream decoded = stored;
+        try {
+            val encoding = metadata.get(MetadataKeys.COMPRESSION);
+            if (encoding != null && !ZSTD_V1.equals(encoding)) {
+                throw new IllegalArgumentException("Unsupported content compression: " + encoding);
+            }
+            decoded = fromStoredContent(stored, Boolean.parseBoolean(String.valueOf(metadata.get(MetadataKeys.ENCRYPTED))));
+            if (encoding != null) {
+                val length = Long.parseLong(String.valueOf(metadata.get(MetadataKeys.ORIGINAL_LENGTH)));
+                if (length < 0) throw new IllegalArgumentException("Negative original content length");
+                val decompressor = new ZstdInputStreamNoFinalizer(decoded);
+                decoded = decompressor;
+                decompressor.setLongMax(23);
+                decoded = new ExactLengthInputStream(decoded, length);
+            }
+            return decoded;
+        } catch (IOException | RuntimeException e) {
+            closeAfterFailure(decoded, e);
+            throw new IllegalStateException("Unable to decode stored content", e);
         }
     }
 
@@ -90,12 +138,16 @@ public class ContentEncryptionService extends BaseComponent {
                     .orElseThrow(() -> new IllegalStateException("Content is encrypted but encryption is not configured"))
                     .decrypt(stored);
         } catch (RuntimeException e) {
-            try {
-                stored.close();
-            } catch (IOException closeError) {
-                e.addSuppressed(closeError);
-            }
+            closeAfterFailure(stored, e);
             throw e;
+        }
+    }
+
+    private static void closeAfterFailure(InputStream stream, Exception failure) {
+        try {
+            stream.close();
+        } catch (IOException closing) {
+            failure.addSuppressed(closing);
         }
     }
 

@@ -25,7 +25,8 @@ roughly 12 GiB available to Docker.
 ## Checks
 
 Every backend runs two cases: content and metadata encryption both disabled,
-then both enabled. Each uses an empty file, a PDF with a non-ASCII filename
+then both enabled. Zstandard content compression is always enabled in both cases.
+Each uses an empty file, a PDF with a non-ASCII filename
 and a deterministic binary file (8 MiB by default).
 
 The suite checks upload integrity, archiving and source deletion, node metadata,

@@ -31,6 +31,7 @@ x-app: &app
     MONGODB_URL: mongodb://mongo:27017
     VAULT_URL: http://secrets:8200
     VAULT_ENCRYPTION_SECRET_PATH: AlfrescoNodeVaultSmoke
+    VAULT_COMPRESS_CONTENT: "true"
     S3_ENDPOINT: http://motoserver:5000
     ARCHIVING_JOB_ENABLED: "false"
     EVENT_HANDLER_ENABLED: "false"

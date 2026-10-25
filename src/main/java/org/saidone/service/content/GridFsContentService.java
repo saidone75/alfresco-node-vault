@@ -41,6 +41,7 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * {@link ContentService} implementation backed by MongoDB GridFS.
@@ -81,7 +82,7 @@ public class GridFsContentService extends BaseComponent implements ContentServic
             val metadata = new HashMap<String, String>();
             metadata.put(MetadataKeys.UUID, node.getId());
             metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
-            try (val stored = contentEncryptionService.toStoredContent(digestInputStream, metadata)) {
+            try (val stored = contentEncryptionService.toStoredContent(digestInputStream, metadata, node.getContent().getSizeInBytes())) {
                 gridFsRepository.saveFile(
                         stored,
                         node.getName(),
@@ -113,7 +114,8 @@ public class GridFsContentService extends BaseComponent implements ContentServic
         if (gridFSFile.getMetadata() != null && gridFSFile.getMetadata().containsKey(MetadataKeys.CONTENT_TYPE)) {
             nodeContent.setContentType(gridFSFile.getMetadata().getString(MetadataKeys.CONTENT_TYPE));
         }
-        nodeContent.setLength(gridFSFile.getLength());
+        nodeContent.setLength(gridFSFile.getMetadata() == null ? gridFSFile.getLength()
+                : Long.parseLong(gridFSFile.getMetadata().getOrDefault(MetadataKeys.ORIGINAL_LENGTH, Long.toString(gridFSFile.getLength())).toString()));
         nodeContent.setContentStream(readContent(gridFSFile));
         return nodeContent;
     }
@@ -205,12 +207,8 @@ public class GridFsContentService extends BaseComponent implements ContentServic
      * @return the original content stream
      */
     private InputStream readContent(GridFSFile gridFSFile) {
-        return contentEncryptionService.fromStoredContent(gridFsRepository.getFileContent(gridFSFile), isEncrypted(gridFSFile));
-    }
-
-    private static boolean isEncrypted(GridFSFile gridFSFile) {
-        val metadata = gridFSFile.getMetadata();
-        return metadata != null && Boolean.parseBoolean(metadata.getString(MetadataKeys.ENCRYPTED));
+        return contentEncryptionService.fromStoredContent(gridFsRepository.getFileContent(gridFSFile),
+                gridFSFile.getMetadata() == null ? Map.of() : gridFSFile.getMetadata());
     }
 
 }

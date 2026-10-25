@@ -107,6 +107,11 @@ Create the new version in Vault first, then call:
 
 See [rotation and retention](Encryption.md#key-rotation-and-retention) for the operational procedure.
 
+## Content compression
+
+`POST /api/v1/vault/nodes/{nodeId}/compress` and `POST /api/v1/vault/nodes/compress`
+are administrator-only placeholders returning `501 Not Implemented`; no data is modified.
+
 ## Advanced search example
 
 `POST /api/v1/vault/advanced-search` searches the archived nodes by their metadata; the meaning of each criterion is

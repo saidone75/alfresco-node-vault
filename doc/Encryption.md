@@ -160,6 +160,11 @@ including key derivation and random generation. Selecting `impl: jca` alone does
 
 ## Format of Encrypted Data
 
+Optional [content compression](Compression.md) runs before encryption and is reversed after
+decryption. It does not change the ANV v1 encryption header or compress node metadata.
+Content storage metadata records the compression encoding and original byte length; retain it
+alongside the stored binary when backing up or moving objects.
+
 All newly encrypted binary content and Base64-encoded metadata use ANV v1:
 
 ```text
