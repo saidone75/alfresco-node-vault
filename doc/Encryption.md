@@ -27,7 +27,7 @@ application:
         vault-secret-path: ${VAULT_ENCRYPTION_SECRET_PATH:AlfrescoNodeVault}
         vault-secret-key: ${VAULT_ENCRYPTION_SECRET_KEY:anv.secret}
         # First-install provisioning only; enabled in development Compose
-        initialize-secret-on-startup: ${VAULT_ENCRYPTION_INITIALIZE_SECRET_ON_STARTUP:false}
+        initialize-secret-on-startup: ${VAULT_INIT_SECRET:false}
         # Encryption implementation: 'jca' or 'bc'
         impl: bc
         jca:
@@ -65,7 +65,7 @@ The application identity needs `read` access to the configured KV v2 data and me
 including the historical versions required by archived data.
 
 With either encryption flag enabled, startup fails if the configured secret is missing, empty or
-unreadable. For a new installation, `VAULT_ENCRYPTION_INITIALIZE_SECRET_ON_STARTUP=true` allows
+unreadable. For a new installation, `VAULT_INIT_SECRET=true` allows
 ANV to generate 32 cryptographically random bytes stored as Base64 text. Provisioning requires
 `create` access to the data path in addition to the read permissions above. It only runs when both
 data and metadata are absent and uses CAS 0 to avoid overwriting a concurrent creator's secret.
