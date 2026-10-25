@@ -124,14 +124,14 @@ application:
   service:
     alfresco:
       include:
-        - allowableOperations
-        - association
-        - isLink
-        - isFavorite
-        - isLocked
+        # - allowableOperations
+        # - association
+        # - isLink
+        # - isFavorite
+        # - isLocked
         - path
         - permissions
-        - definition
+        # - definition
       permanently-delete-nodes: true
       search-batch-size: 100
       chunk-size: 8192
@@ -143,6 +143,9 @@ application:
       auth-cache-ttl: ${VAULT_AUTH_CACHE_TTL:60s}
       double-check: ${VAULT_DOUBLE_CHECK:true}
       delete-on-alfresco: ${VAULT_DELETE_ON_ALFRESCO:true}
+      compression:
+        enabled: ${VAULT_COMPRESS_CONTENT:false}
+        level: ${VAULT_COMPRESSION_LEVEL:3}
       alfresco-lock:
         enabled: ${VAULT_ALFRESCO_USE_LOCK:false}
         ttl-seconds: ${VAULT_ALFRESCO_LOCK_TTL_SECONDS:120}

@@ -84,6 +84,7 @@ and the indefinite retention of all documents in the active repository (unsustai
 - [REST API](doc/RestApi.md) with Alfresco proxy support and metadata search
 - Advanced metadata search with filters and wildcards
 - Streaming document uploads and downloads
+- Optional streaming [Zstandard content compression](doc/Compression.md) with transparent downloads and restores
 - Engineered for flexibility and bespoke integrations
 - No Alfresco changes beyond installing the minimal [ANV content model](#alfresco-setup)
 - Secure and decoupled design that suits zero trust environments
@@ -158,6 +159,8 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | VAULT_AUTH_CACHE_TTL              | 60s                                        | Cache duration of successful API authentications                                          |
 | VAULT_ENCRYPT_CONTENT             | false                                      | Enable binary content encryption (S3, GridFS, Ozone)                                      |
 | VAULT_ENCRYPT_METADATA            | false                                      | Enable document metadata encryption in MongoDB                                            |
+| VAULT_COMPRESS_CONTENT            | false                                      | Compress new binary content with Zstandard before optional encryption                      |
+| VAULT_COMPRESSION_LEVEL          | 3                                          | Zstandard compression level (1–9); higher levels use more CPU                              |
 | VAULT_URL                         | http://localhost:8200                      | Vault secret engine URI                                                                   |
 | VAULT_ENCRYPTION_KV_MOUNT         | secret                                     | Vault secret engine mount path                                                            |
 | VAULT_ENCRYPTION_SECRET_PATH      | AlfrescoNodeVault                          | Path of encryption secret in Vault secret engine                                          |
@@ -187,6 +190,10 @@ verification failures trigger rollback. Existing vault copies are always verifie
 
 S3 and Ozone stage uploads, with optional encryption, in temporary files; allow space for concurrent
 uploads in `SHARED_FILES_PATH`. `READ_TIMEOUT` applies per read, not per transfer.
+
+Optional [content compression](doc/Compression.md) applies to S3, GridFS and Ozone. Reads and restores
+automatically decompress stored content even after `VAULT_COMPRESS_CONTENT` is disabled;
+searchable node metadata remains unchanged.
 
 Integrity sweeps distinguish corrupted nodes from operational errors, which preserve previous verdicts;
 nodes deleted during a sweep are skipped. See [Integrity Sweep](doc/IntegritySweep.md).

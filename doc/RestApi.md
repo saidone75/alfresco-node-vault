@@ -61,6 +61,7 @@ listed in the OpenAPI documentation.
 
 | Status | Meaning                                                                                         |
 |--------|-------------------------------------------------------------------------------------------------|
+| `202`  | Asynchronous bulk key update submitted; completion and later errors are reported in worker logs |
 | `400`  | Invalid parameters or request body                                                              |
 | `401`  | Missing or invalid credentials, or insufficient privileges                                                                  |
 | `403`  | The feature is disabled by configuration                                                        |
@@ -98,11 +99,18 @@ by default (`VAULT_DELETE_ON_ALFRESCO=true`, `application.service.alfresco.perma
 The update-key APIs use the latest existing Vault secret version; they do not create or rotate secrets.
 Create the new version in Vault first, then call:
 
-- `POST /api/v1/vault/nodes/{nodeId}/update-key` to re-encrypt one outdated node; an up-to-date node is unchanged.
+- `POST /api/v1/vault/nodes/{nodeId}/update-key` to re-encrypt one outdated node synchronously (`200 OK`); an up-to-date node is unchanged.
 - `POST /api/v1/vault/nodes/update-keys?keyVersion=<source version>` to re-encrypt nodes using that source version.
-  The bulk returns `202 Accepted`; follow completion in the logs and do not rotate secrets while it is pending or running.
+  `keyVersion` must be a positive integer; invalid values return `400`. The bulk returns `202 Accepted`;
+  follow completion in the logs and do not rotate secrets while it is pending or running.
+  Overlapping bulk runs are skipped and logged; acceptance does not guarantee execution or completion.
 
 See [rotation and retention](Encryption.md#key-rotation-and-retention) for the operational procedure.
+
+## Content compression
+
+`POST /api/v1/vault/nodes/{nodeId}/compress` and `POST /api/v1/vault/nodes/compress`
+are administrator-only placeholders returning `501 Not Implemented`; no data is modified.
 
 ## Advanced search example
 

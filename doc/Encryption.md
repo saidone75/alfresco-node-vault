@@ -26,6 +26,8 @@ application:
         vault-secret-kv-mount: ${VAULT_ENCRYPTION_KV_MOUNT:secret}
         vault-secret-path: ${VAULT_ENCRYPTION_SECRET_PATH:AlfrescoNodeVault}
         vault-secret-key: ${VAULT_ENCRYPTION_SECRET_KEY:anv.secret}
+        # First-install provisioning only; enabled in development Compose
+        initialize-secret-on-startup: ${VAULT_ENCRYPTION_INITIALIZE_SECRET_ON_STARTUP:false}
         # Encryption implementation: 'jca' or 'bc'
         impl: bc
         jca:
@@ -59,7 +61,17 @@ application:
 The encryption secret is read from HashiCorp Vault KV v2 at the configured mount/path/key.
 Set `VAULT_URL` for the server address
 and configure authentication under `spring.cloud.vault` (the development configuration uses token `root`).
-The application identity needs access to the secret and its historical versions.
+The application identity needs `read` access to the configured KV v2 data and metadata paths,
+including the historical versions required by archived data.
+
+With either encryption flag enabled, startup fails if the configured secret is missing, empty or
+unreadable. For a new installation, `VAULT_ENCRYPTION_INITIALIZE_SECRET_ON_STARTUP=true` allows
+ANV to generate 32 cryptographically random bytes stored as Base64 text. Provisioning requires
+`create` access to the data path in addition to the read permissions above. It only runs when both
+data and metadata are absent and uses CAS 0 to avoid overwriting a concurrent creator's secret.
+Existing metadata without readable data requires recovery of the original versions, not replacement.
+Disable provisioning after initial setup; an incorrect empty path looks like a new installation.
+See [secret provisioning](../README.md#encryption-secret-provisioning).
 
 ## Key Derivation Functions (KDFs)
 
@@ -124,7 +136,8 @@ including key derivation and random generation. Selecting `impl: jca` alone does
 1. **Storage of Master Secret**:
     - Store the encryption secret in HashiCorp Vault KV v2 and retain versions needed to decrypt existing data
     - Configure Vault authentication separately from the encryption secret
-    - `SecretService` does not cache encryption secrets, and KDFs zero their source byte buffers on the normal execution path to reduce their time in memory.
+    - `SecretService` does not cache encryption secrets. Owned secret buffers and temporary KDF key/password buffers are cleared on success and failure; PBKDF2 avoids temporary immutable password strings. Vault client/provider objects can still retain copies, so this is not a guarantee that all secret material is erased from JVM memory.
+    - Secret values are excluded from object and builder string representations; Vault errors are sanitized without retaining response bodies in exception causes.
     - Never commit secrets to source control
 
 2. **Nonce/IV and Key Version Usage**:
@@ -146,6 +159,11 @@ including key derivation and random generation. Selecting `impl: jca` alone does
     - Cloud environments with hardware-accelerated AES
 
 ## Format of Encrypted Data
+
+Optional [content compression](Compression.md) runs before encryption and is reversed after
+decryption. It does not change the ANV v1 encryption header or compress node metadata.
+Content storage metadata records the compression encoding and original byte length; retain it
+alongside the stored binary when backing up or moving objects.
 
 All newly encrypted binary content and Base64-encoded metadata use ANV v1:
 
@@ -219,7 +237,8 @@ key updates read the latest version from metadata without fetching the secret va
    Use compare-and-set, preserve unrelated fields and keep values out of logs and shell arguments.
    Back up Vault with the new version and retain the required recovery material separately.
 3. Call `POST /api/v1/vault/nodes/update-keys?keyVersion=<source version>` for each version to migrate,
-   or `POST /api/v1/vault/nodes/{nodeId}/update-key` for one node. `202 Accepted` confirms submission.
+   or `POST /api/v1/vault/nodes/{nodeId}/update-key` for one node. Bulk requests return
+   `202 Accepted` to confirm submission; the single-node request runs synchronously and returns `200 OK`.
    `keyVersion` must be a positive integer identifying the source version, not the destination.
    Bulk runs share a distributed lock; overlapping runs are skipped and logged. Do not create new
    secret versions in Vault while a bulk is queued or running; wait for completion in the logs.
