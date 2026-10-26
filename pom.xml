@@ -50,7 +50,7 @@
         <awssdk.version>2.56.0</awssdk.version>
         <asm.version>9.11.1</asm.version>
         <shedlock.version>7.10.1</shedlock.version>
-        <okhttp.version>5.5.0</okhttp.version>
+        <okhttp.version>5.5.1</okhttp.version>
         <okio.version>3.18.1</okio.version>
         <tests>none()</tests>
         <vault.storage.impl>s3</vault.storage.impl>
