@@ -23,7 +23,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.1</version>
+        <version>4.1.2</version>
         <relativePath/>
     </parent>
     <groupId>org.saidone</groupId>
@@ -121,10 +121,11 @@
                 <artifactId>guava</artifactId>
                 <version>33.6.0-jre</version>
             </dependency>
+            <!-- Ratis' Dropwizard 3 provider requires Metrics 3; align Hadoop with it. -->
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
-                <version>4.2.40</version>
+                <version>3.2.5</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okio</groupId>
@@ -238,7 +239,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-starter-webflux-ui</artifactId>
-            <version>3.1.1</version>
+            <version>3.2.0</version>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -256,7 +257,7 @@
         <dependency>
             <groupId>com.github.luben</groupId>
             <artifactId>zstd-jni</artifactId>
-            <version>1.5.7-4</version>
+            <version>1.5.7-24</version>
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
@@ -281,7 +282,7 @@
         <dependency>
             <groupId>org.web3j</groupId>
             <artifactId>core</artifactId>
-            <version>6.0.0</version>
+            <version>6.1.0</version>
         </dependency>
         <!-- Shared by web3j and Ozone's OpenTelemetry exporter.
              OkHttp 5 requires the JVM artifact explicitly on the compile classpath. -->
