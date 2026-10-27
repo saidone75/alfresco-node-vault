@@ -27,7 +27,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Temporary files use a dedicated directory cleaned at startup; each application instance must have its own directory.
 - Notarization and bulk key rotation retrieve node IDs in pages instead of loading all matching nodes at once.
 - Ozone client write buffers are configurable through `OZONE_CLIENT_BUFFER_SIZE`, `OZONE_CLIENT_BUFFER_FLUSH_SIZE` and `OZONE_CLIENT_BUFFER_MAX_SIZE`, defaulting to 1, 2 and 4 MB.
-- Vault secrets are read directly without submitting blocking calls to the common pool and immediately waiting for them; retrieval failures report sanitized exception types and HTTP status codes without retaining potentially sensitive Vault responses.
 - Bulk key updates return `202 Accepted` and require a positive source `keyVersion`. All bulk runs share a distributed job lock; overlapping runs are skipped and logged. Key updates use the latest existing version from Vault metadata and do not create secret versions; rotation and retention are documented separately.
 - Content services consistently use property-based backend selection; the encrypted metadata repository is explicitly marked as primary, and the path filter's API dependency is final.
 - **Breaking:** unversioned encrypted payloads are no longer supported. Export with the previous application before upgrading and reimport, or recreate disposable data. ANV v1 requires 12-byte nonces and bounded KDF costs.
@@ -37,17 +36,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Before deleting on Alfresco a node already in the vault, its Alfresco content is always compared with the checksum recorded in the vault, regardless of `VAULT_DOUBLE_CHECK`.
 
 ### Fixed
-- Pinned Metrics Core to 3.2.5 for Hadoop and Ratis compatibility, fixing Ozone writes failing with a missing `ObjectNameFactory` class.
 - Encryption secret buffers and temporary KDF key/password buffers are cleared on success and failure; PBKDF2 avoids temporary immutable password strings. Secret values are excluded from object and builder string representations.
 - Content restore closes source streams even when connection setup fails, closes HTTP response streams and disconnects connections after uploads.
 - Event deduplication atomically checks and updates node expiry; cleanup cannot remove entries renewed concurrently.
 - GridFS content hashes are computed by streaming original content bytes, including decryption when required; archive verification uses the checksum algorithm recorded with the content.
 - Integrity sweeps distinguish evidence of corrupted content from unavailable backends and other check errors, preserving previous verdicts on operational failures and skipping nodes deleted during a sweep.
 - Content download streams open only when the reactive reader subscribes and are released on completion, cancellation or error, preventing leaks on early cancellation; Alfresco content connections have configurable connect and read timeouts.
-- Ozone smoke tests use 256 MiB data containers to avoid space reservation failures on the tmpfs DataNode volume.
 - Vault metadata is saved only after optional archive double-check verification succeeds.
 - Startup with both content and metadata encryption disabled no longer requires crypto beans.
-- Development PostgreSQL 18 volume mount uses `/var/lib/postgresql`; Alfresco waits for the database healthcheck before starting.
 - Restore path creation resolves existing folders directly after a name conflict, without relying on paginated child listings. Other Alfresco errors are propagated, and files with conflicting names are rejected.
 
 ## [0.9.2] - 2026-10-20
