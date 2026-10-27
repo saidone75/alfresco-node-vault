@@ -51,7 +51,7 @@
         <asm.version>9.11.1</asm.version>
         <shedlock.version>7.10.1</shedlock.version>
         <okhttp.version>5.5.1</okhttp.version>
-        <okio.version>3.18.1</okio.version>
+        <okio.version>3.18.2</okio.version>
         <tests>none()</tests>
         <vault.storage.impl>s3</vault.storage.impl>
         <sonar.organization>saidone75</sonar.organization>
@@ -124,7 +124,7 @@
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
-                <version>3.2.5</version>
+                <version>4.2.40</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okio</groupId>
@@ -165,7 +165,7 @@
             <dependency>
                 <groupId>org.codehaus.woodstox</groupId>
                 <artifactId>stax2-api</artifactId>
-                <version>4.2.1</version>
+                <version>4.3.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -175,7 +175,7 @@
             <dependency>
                 <groupId>org.apache.ratis</groupId>
                 <artifactId>ratis-thirdparty-misc</artifactId>
-                <version>1.0.11</version>
+                <version>1.1.0</version>
             </dependency>
             <dependency>
                 <groupId>com.google.re2j</groupId>
