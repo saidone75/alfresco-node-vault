@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [0.9.3] - 2026-10-27
+
 ### Added
 - Optional streaming Zstandard content compression for S3, GridFS and Ozone with `VAULT_COMPRESS_CONTENT=true` (default `false`, enabled in development Docker and smoke tests) and `VAULT_COMPRESSION_LEVEL` (default `3`, range `1–9`). Compression precedes encryption; reads, restores and checksums transparently use original bytes, even after disabling compression. Existing content and searchable node metadata remain unchanged.
 - DEBUG logs for compression, decompression and encoded stream size savings, including encryption overhead; suppressed when compression is disabled.
@@ -19,6 +21,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - MongoDB-backed ShedLock coordination for node archiving, restore, deletion, key rotation, notarization and notarization checks, plus shared locks for archiving jobs, notarization jobs and manual or scheduled integrity sweeps. Node and job leases default to two minutes, with periodic renewal and configurable durations.
 
 ### Changed
+- Updated Spring Boot to 4.1.2, springdoc-openapi to 3.2.0, web3j to 6.1.0 and zstd-jni to 1.5.7-24.
 - Alfresco node requests include only optional path and permission details; allowable operations, associations, link/favorite/lock flags and model definitions are no longer requested. Restores no longer submit model definitions from archived metadata. Existing archived metadata is unchanged.
 - S3 uploads stream staged files instead of buffering entire contents in memory; content encryption runs during staging and uses a single temporary file.
 - Temporary files use a dedicated directory cleaned at startup; each application instance must have its own directory.
@@ -34,6 +37,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Before deleting on Alfresco a node already in the vault, its Alfresco content is always compared with the checksum recorded in the vault, regardless of `VAULT_DOUBLE_CHECK`.
 
 ### Fixed
+- Pinned Metrics Core to 3.2.5 for Hadoop and Ratis compatibility, fixing Ozone writes failing with a missing `ObjectNameFactory` class.
 - Encryption secret buffers and temporary KDF key/password buffers are cleared on success and failure; PBKDF2 avoids temporary immutable password strings. Secret values are excluded from object and builder string representations.
 - Content restore closes source streams even when connection setup fails, closes HTTP response streams and disconnects connections after uploads.
 - Event deduplication atomically checks and updates node expiry; cleanup cannot remove entries renewed concurrently.
