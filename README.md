@@ -387,6 +387,8 @@ Alfresco proxy and the common conventions.
   and reimport, or recreate disposable data. Keep the configured Vault secret location and required key versions available.
 - **Advanced search** is available only when metadata encryption is disabled. Node type, mimetype, size and
   aspects are indexed; node properties only when listed in `ADVANCED_SEARCH_INDEXED_PROPERTIES`.
+  Property indexes are synchronized in the background after startup under a distributed lock;
+  all instances sharing a database must use the same property index configuration.
 
 ## Documentation
 
