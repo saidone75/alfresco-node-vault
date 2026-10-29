@@ -127,6 +127,7 @@ Global configuration is stored in `application.yml`. The main parameters are:
 | CONNECTION_TIMEOUT                    | 10000                                      | Connect timeout (ms) for Alfresco content streams                            |
 | READ_TIMEOUT                          | 60000                                      | Timeout (ms) of each read from an Alfresco content stream                    |
 | SHARED_FILES_PATH                     | ${java.io.tmpdir}/anv (/tmp/anv in Docker) | Temporary files directory; emptied at startup, one per instance              |
+| ADVANCED_SEARCH_INDEXED_PROPERTIES    | (none)                                     | Node properties indexed for the advanced search, e.g. cm:title,cm:publisher  |
 | ACTIVE_MQ_URL                         | tcp://localhost:61616                      | ActiveMQ broker URL                                                          |
 | MONGODB_URL                           | mongodb://localhost:27017                  | MongoDB connection string                                                    |
 | VAULT_STORAGE_IMPL                    | s3                                         | Content storage backend: s3, gridfs or ozone                                 |
@@ -384,7 +385,8 @@ Alfresco proxy and the common conventions.
   Cipher and KDF settings can change for new writes; existing payloads retain their own parameters.
   The previous unversioned encrypted format is not supported. Export with the previous application before upgrading
   and reimport, or recreate disposable data. Keep the configured Vault secret location and required key versions available.
-- **Advanced search** is available only when metadata encryption is disabled.
+- **Advanced search** is available only when metadata encryption is disabled. Node type, mimetype, size and
+  aspects are indexed; node properties only when listed in `ADVANCED_SEARCH_INDEXED_PROPERTIES`.
 
 ## Documentation
 

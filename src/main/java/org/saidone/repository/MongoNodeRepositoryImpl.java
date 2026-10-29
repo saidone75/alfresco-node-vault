@@ -30,11 +30,13 @@ import org.saidone.exception.InvalidRequestException;
 import org.saidone.model.MetadataKeys;
 import org.saidone.model.dto.NodeSearchRequestDto;
 import org.saidone.model.entity.NodeEntity;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.*;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationExpression;
+import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -88,12 +90,20 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
     /** Field holding the node as a BSON document. */
     private static final String NODE_DOCUMENT = "nb";
 
+    /** Name prefix of the indexes on node properties, which are managed from configuration. */
+    private static final String PROPERTY_INDEX_PREFIX = "anv_property_";
+
+    /** Node properties indexed for the advanced search, e.g. {@code cm:title}. */
+    @Value("${application.advanced-search.indexed-properties:}")
+    private List<String> indexedProperties;
+
     /**
      * {@inheritDoc}
      * <p>
      * The method verifies that the MongoDB connection is available at start-up.
      * If the connection cannot be established the application is shut down to
-     * avoid running in an inconsistent state.
+     * avoid running in an inconsistent state. It then aligns the indexes on
+     * node properties with the configuration.
      * </p>
      */
     @PostConstruct
@@ -106,6 +116,39 @@ public class MongoNodeRepositoryImpl extends BaseComponent implements MongoRepos
             log.error("Unable to start {}", this.getClass().getSimpleName());
             super.shutDown(1);
         }
+        try {
+            syncPropertyIndexes();
+        } catch (Exception e) {
+            // Missing indexes only slow down the advanced search, so they do not stop the application.
+            log.warn("Unable to update the indexes on node properties: {}", e.getMessage());
+        }
+    }
+
+    /**
+     * Creates a sparse index for each configured node property and drops the
+     * property indexes no longer configured, so that unused indexes do not take
+     * up memory.
+     */
+    private void syncPropertyIndexes() {
+        val indexOps = mongoOperations.indexOps(NodeEntity.class);
+        val properties = indexedProperties.stream().map(String::trim).filter(p -> !p.isEmpty()).distinct().toList();
+        val names = properties.stream().map(MongoNodeRepositoryImpl::propertyIndexName).toList();
+        for (val index : indexOps.getIndexInfo()) {
+            if (index.getName().startsWith(PROPERTY_INDEX_PREFIX) && !names.contains(index.getName())) {
+                indexOps.dropIndex(index.getName());
+                log.info("Dropped index {}: property no longer configured", index.getName());
+            }
+        }
+        for (val property : properties) {
+            indexOps.createIndex(new Index()
+                    .on(nodeField(String.format("properties.%s", property)), Sort.Direction.ASC)
+                    .sparse()
+                    .named(propertyIndexName(property)));
+        }
+    }
+
+    private static String propertyIndexName(String property) {
+        return String.format("%s%s", PROPERTY_INDEX_PREFIX, property);
     }
 
     /**
