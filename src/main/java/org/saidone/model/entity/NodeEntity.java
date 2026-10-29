@@ -24,6 +24,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.Document;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.CompoundIndex;
+import org.springframework.data.mongodb.core.index.CompoundIndexes;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Field;
 
@@ -39,6 +41,16 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @org.springframework.data.mongodb.core.mapping.Document(collection = "alf_node")
+@CompoundIndexes({
+        // Notarization and key rotation page node IDs by these fields.
+        @CompoundIndex(name = "ntx_id", def = "{'ntx': 1, '_id': 1}"),
+        @CompoundIndex(name = "kv_id", def = "{'kv': 1, '_id': 1}"),
+        // Advanced search; sparse, so nodes with encrypted metadata take no space.
+        @CompoundIndex(name = "node_type", def = "{'nb.nodeType': 1}", sparse = true),
+        @CompoundIndex(name = "mime_type", def = "{'nb.content.mimeType': 1}", sparse = true),
+        @CompoundIndex(name = "content_size", def = "{'nb.content.sizeInBytes': 1}", sparse = true),
+        @CompoundIndex(name = "aspect_names", def = "{'nb.aspectNames': 1}", sparse = true)
+})
 public class NodeEntity {
 
     /** Identifier of the wrapped Alfresco node. */
