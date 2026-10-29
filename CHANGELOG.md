@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+- MongoDB indexes for paged notarization and key rotation, plus advanced search by node type, mimetype, size and aspects.
+- Configurable advanced-search property indexes through `ADVANCED_SEARCH_INDEXED_PROPERTIES`; managed property indexes are created or removed at startup to match the configuration.
+
 ## [0.9.3] - 2026-10-27
 
 ### Added
