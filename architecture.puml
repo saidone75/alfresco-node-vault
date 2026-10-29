@@ -7,24 +7,29 @@ hide stereotype
 
 title Alfresco Node Vault
 
+Component(client, "Client")
+
 System_Boundary(anv, "Alfresco Node Vault") {
   Component(anvProxy, "Proxy")
   Component(anvApi, "REST API", "/api/v1")
-  Component(anvHandler, "Event handler")
   Component(anvJob, "Scheduled jobs", "", "Archiving, notarization and integrity sweeps")
+  Component(anvHandler, "Event handler")
+  Component(anvNotarization, "NotarizationService", "", "Notarization and verification")
   Component(anvVault, "VaultService", "", "Archive, download, restore and delete")
   Component(anvAlfresco, "AlfrescoService")
   Component(anvNode, "NodeService", "", "Plain or encrypted metadata")
   Component(anvContent, "ContentService", "", "S3, GridFS or Ozone")
   Component(anvCrypto, "CryptoService", "ANV v1", "Metadata and content encryption")
   Component(anvSecret, "SecretService")
-  Component(anvNotarization, "NotarizationService", "", "Notarization and verification")
 }
 
 System_Boundary(acs, "Alfresco Content Services") {
-  ComponentQueue(acsQueue, "ActiveMQ")
   Component(acsApi, "REST API")
+  ComponentQueue(acsQueue, "ActiveMQ")
 }
+
+System_Ext(blockchain, "Ethereum", "Content hash notarization")
+System_Ext(secrets, "HashiCorp Vault", "Versioned encryption secrets")
 
 Boundary(storage, "Persistence") {
   ContainerDb(anvMongo, "MongoDB", "", "Metadata and audit")
@@ -32,36 +37,48 @@ Boundary(storage, "Persistence") {
   ContainerDb(anvS3, "S3 / compatible")
   ContainerDb(anvOzone, "Apache Ozone")
 }
-System_Ext(secrets, "HashiCorp Vault", "Versioned encryption secrets")
-System_Ext(blockchain, "Ethereum", "Content hash notarization")
-Component(client, "Client")
 
+' Entry points
 Rel_D(client, anvProxy, "")
 Rel_D(client, anvApi, "")
-Rel_R(client, acsApi, "")
-Rel_D(acsQueue, anvHandler, "events")
-Rel_D(anvProxy, anvApi, "vault content")
-Rel_R(anvProxy, acsApi, "proxy requests")
+Rel_R(anvProxy, anvApi, "vault content")
+Rel_R(anvProxy, acsApi, "other requests")
+Rel_L(acsQueue, anvHandler, "events")
+
+' Services
 Rel_D(anvApi, anvVault, "")
-Rel_D(anvHandler, anvVault, "")
 Rel_D(anvJob, anvVault, "archive")
-Rel_R(anvVault, anvAlfresco, "")
-Rel_R(anvAlfresco, acsApi, "read, restore, delete; optional locks")
-Rel_D(anvVault, anvNode, "metadata")
-Rel_D(anvVault, anvContent, "content")
+Rel_D(anvHandler, anvVault, "")
 Rel_D(anvApi, anvNotarization, "")
 Rel_D(anvJob, anvNotarization, "notarize / verify")
-Rel_D(anvNotarization, blockchain, "")
+Rel_R(anvVault, anvAlfresco, "")
+Rel_U(anvAlfresco, acsApi, "read, restore, delete; optional locks")
+Rel_D(anvVault, anvNode, "metadata")
+Rel_D(anvVault, anvContent, "content")
 Rel_D(anvNotarization, anvNode, "")
 Rel_D(anvNotarization, anvContent, "")
-Rel_D(anvNode, anvMongo, "")
-Rel_D(anvContent, anvGrid, "")
-Rel_D(anvContent, anvS3, "")
-Rel_D(anvContent, anvOzone, "")
+Rel_L(anvNotarization, blockchain, "")
+
+' Encryption
 Rel_D(anvNode, anvCrypto, "optional")
 Rel_D(anvContent, anvCrypto, "optional")
 Rel_R(anvCrypto, anvSecret, "")
 Rel_D(anvSecret, secrets, "versioned keys")
+
+' Persistence
+Rel_D(anvNode, anvMongo, "")
+Rel_D(anvContent, anvGrid, "")
+Rel_D(anvContent, anvS3, "")
+Rel_D(anvContent, anvOzone, "")
+
+' Layout hints
+Lay_R(anvApi, anvJob)
+Lay_R(anvJob, anvHandler)
+Lay_R(anvNotarization, anvVault)
+Lay_R(anvNode, anvContent)
+Lay_R(anvMongo, anvGrid)
+Lay_R(anvGrid, anvS3)
+Lay_R(anvS3, anvOzone)
 
 legend bottom left
   Content storage: select one of S3, GridFS or Ozone.
