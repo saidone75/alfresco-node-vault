@@ -11,14 +11,14 @@ System_Boundary(anv, "Alfresco Node Vault") {
   Component(anvProxy, "Proxy")
   Component(anvApi, "REST API", "/api/v1")
   Component(anvHandler, "Event handler")
-  Component(anvJob, "Scheduled jobs", "", "Archiving, notarization, integrity sweeps and lock cleanup")
+  Component(anvJob, "Scheduled jobs", "", "Archiving, notarization and integrity sweeps")
   Component(anvVault, "VaultService", "", "Archive, download, restore and delete")
   Component(anvAlfresco, "AlfrescoService")
   Component(anvNode, "NodeService", "", "Plain or encrypted metadata")
-  Component(anvContent, "ContentService", "", "S3, GridFS or Ozone; optional content encryption")
-  Component(anvCrypto, "CryptoService", "ANV v1", "Optional metadata and content encryption")
+  Component(anvContent, "ContentService", "", "S3, GridFS or Ozone")
+  Component(anvCrypto, "CryptoService", "ANV v1", "Metadata and content encryption")
   Component(anvSecret, "SecretService")
-  Component(anvNotarization, "NotarizationService", "", "Optional notarization and verification")
+  Component(anvNotarization, "NotarizationService", "", "Notarization and verification")
 }
 
 System_Boundary(acs, "Alfresco Content Services") {
@@ -27,7 +27,7 @@ System_Boundary(acs, "Alfresco Content Services") {
 }
 
 Boundary(storage, "Persistence") {
-  ContainerDb(anvMongo, "MongoDB", "", "Metadata, audit, integrity results and ShedLock leases")
+  ContainerDb(anvMongo, "MongoDB", "", "Metadata and audit")
   ContainerDb(anvGrid, "GridFS")
   ContainerDb(anvS3, "S3 / compatible")
   ContainerDb(anvOzone, "Apache Ozone")
