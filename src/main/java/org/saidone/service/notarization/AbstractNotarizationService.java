@@ -33,7 +33,7 @@ import org.saidone.service.locking.VaultOperationCoordinator;
 import org.saidone.service.content.ContentService;
 import org.saidone.utils.NodeDigestUtils;
 
-import java.util.function.Function;
+import java.util.function.UnaryOperator;
 
 /**
  * Base implementation for services performing document notarization.
@@ -139,7 +139,7 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
      * @param contentHash provides the content hash for the given algorithm, so
      *                    that the content is read only once the cheaper checks pass
      */
-    private void verify(NodeWrapperDto nodeWrapper, Function<String, String> contentHash) {
+    private void verify(NodeWrapperDto nodeWrapper, UnaryOperator<String> contentHash) {
         val nodeId = nodeWrapper.getId();
         if (Strings.isBlank(nodeWrapper.getNotarizationTxId())) {
             throw new NodeNotNotarizedException(nodeId);
