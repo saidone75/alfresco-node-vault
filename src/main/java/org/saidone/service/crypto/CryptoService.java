@@ -33,10 +33,11 @@ public interface CryptoService {
      * Encrypts the provided data stream.
      *
      * @param inputStream plaintext data to encrypt
+     * @param aad         additional authenticated data, such as the node id
      * @param secret      secret material used to derive the encryption key
      * @return a stream containing the encrypted data
      */
-    InputStream encrypt(InputStream inputStream, Secret secret);
+    InputStream encrypt(InputStream inputStream, String aad, Secret secret);
 
     /**
      * Decrypts an ANV v1 encrypted data stream using its authenticated header.
@@ -44,25 +45,28 @@ public interface CryptoService {
      * and handle authentication failures. Closing early does not authenticate the payload.
      *
      * @param inputStream the encrypted data
+     * @param aad         the additional authenticated data given on encryption
      * @return a stream yielding the decrypted plaintext
      */
-    InputStream decrypt(InputStream inputStream);
+    InputStream decrypt(InputStream inputStream, String aad);
 
     /**
      * Encrypts a text value and returns the Base64 encoded result.
      *
-     * @param text   the text to encrypt
-     * @param secret secret material used to derive the encryption key
+     * @param text    the text to encrypt
+     * @param aad     additional authenticated data, such as the node id
+     * @param secret  secret material used to derive the encryption key
      * @return encrypted text encoded in Base64
      */
-    String encryptText(String text, Secret secret);
+    String encryptText(String text, String aad, Secret secret);
 
     /**
      * Decrypts a Base64 encoded encrypted text value.
      *
      * @param encryptedText the Base64 encoded encrypted text
+     * @param aad           the additional authenticated data given on encryption
      * @return the decrypted plain text
      */
-    String decryptText(String encryptedText);
+    String decryptText(String encryptedText, String aad);
 
 }

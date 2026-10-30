@@ -20,10 +20,10 @@
 package org.saidone.exception;
 
 /**
- * Thrown when the hash of a node content does not match the notarized one.
+ * Thrown when the hash of a node id, content and metadata does not match the notarized one.
  */
 public class NotarizedHashMismatchException extends NotarizationException {
-    public NotarizedHashMismatchException(String nodeId) {
-        super(String.format("Node %s is notarized but hashes do not match", nodeId));
+    public NotarizedHashMismatchException(String nodeId, String detail) {
+        super(String.format("Node %s is notarized but hashes do not match: %s", nodeId, detail));
     }
 }

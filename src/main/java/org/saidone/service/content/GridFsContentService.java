@@ -82,7 +82,7 @@ public class GridFsContentService extends BaseComponent implements ContentServic
             val metadata = new HashMap<String, String>();
             metadata.put(MetadataKeys.UUID, node.getId());
             metadata.put(MetadataKeys.CONTENT_TYPE, node.getContent().getMimeType());
-            try (val stored = contentEncryptionService.toStoredContent(digestInputStream, metadata, node.getContent().getSizeInBytes())) {
+            try (val stored = contentEncryptionService.toStoredContent(node.getId(), digestInputStream, metadata, node.getContent().getSizeInBytes())) {
                 gridFsRepository.saveFile(
                         stored,
                         node.getName(),
@@ -116,7 +116,7 @@ public class GridFsContentService extends BaseComponent implements ContentServic
         }
         nodeContent.setLength(gridFSFile.getMetadata() == null ? gridFSFile.getLength()
                 : Long.parseLong(gridFSFile.getMetadata().getOrDefault(MetadataKeys.ORIGINAL_LENGTH, Long.toString(gridFSFile.getLength())).toString()));
-        nodeContent.setContentStream(readContent(gridFSFile));
+        nodeContent.setContentStream(readContent(nodeId, gridFSFile));
         return nodeContent;
     }
 
@@ -177,7 +177,7 @@ public class GridFsContentService extends BaseComponent implements ContentServic
     @SneakyThrows
     public String computeHash(String nodeId, String algorithm) {
         val gridFSFile = findFile(nodeId);
-        try (val content = readContent(gridFSFile);
+        try (val content = readContent(nodeId, gridFSFile);
              val digestInputStream = new AnvDigestInputStream(content, algorithm)) {
             digestInputStream.transferTo(OutputStream.nullOutputStream());
             return digestInputStream.getHash();
@@ -203,11 +203,12 @@ public class GridFsContentService extends BaseComponent implements ContentServic
      * Reads the original content of a stored file, decrypting it when its
      * metadata marks it as encrypted.
      *
+     * @param nodeId     identifier of the node
      * @param gridFSFile the stored file
      * @return the original content stream
      */
-    private InputStream readContent(GridFSFile gridFSFile) {
-        return contentEncryptionService.fromStoredContent(gridFsRepository.getFileContent(gridFSFile),
+    private InputStream readContent(String nodeId, GridFSFile gridFSFile) {
+        return contentEncryptionService.fromStoredContent(nodeId, gridFsRepository.getFileContent(gridFSFile),
                 gridFSFile.getMetadata() == null ? Map.of() : gridFSFile.getMetadata());
     }
 

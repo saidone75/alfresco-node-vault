@@ -29,6 +29,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 import org.alfresco.core.model.Node;
+import org.saidone.utils.NodeDigestUtils;
 import org.springframework.data.annotation.Transient;
 
 import java.time.Instant;
@@ -73,6 +74,12 @@ public class NodeWrapperDto {
     /** JSON representation of the node. May be encrypted. */
     private String nodeJson;
 
+    /** Hash of the node metadata recorded at archive time. */
+    private String metadataHash;
+
+    /** Algorithm of {@link #metadataHash}, also used for the notarization hash. */
+    private String metadataHashAlgorithm;
+
     /** Transaction id returned from notarization, if any. */
     private String notarizationTxId;
 
@@ -91,6 +98,33 @@ public class NodeWrapperDto {
         this.id = node.getId();
         this.archiveDate = java.time.Instant.now();
         this.nodeJson = OBJECT_MAPPER.writeValueAsString(node);
+    }
+
+    /**
+     * Records the hash of the node metadata, computed with the given algorithm.
+     *
+     * @param algorithm the hash algorithm, e.g. {@code SHA-256}
+     */
+    public void recordMetadataHash(String algorithm) {
+        this.metadataHashAlgorithm = algorithm;
+        this.metadataHash = NodeDigestUtils.metadataHash(nodeJson, algorithm);
+    }
+
+    /**
+     * Computes the hash of the current node metadata with the recorded
+     * algorithm, to be compared with {@link #metadataHash}.
+     *
+     * @return the hash of the current metadata, or {@code null} if the metadata
+     * cannot be read or the algorithm is missing or unknown, so that it never
+     * matches a recorded hash
+     */
+    public String computeMetadataHash() {
+        try {
+            return NodeDigestUtils.metadataHash(nodeJson, metadataHashAlgorithm);
+        } catch (Exception e) {
+            log.trace(e.getMessage(), e);
+            return null;
+        }
     }
 
     /**
