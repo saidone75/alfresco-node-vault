@@ -33,7 +33,9 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import java.io.*;
 import java.security.GeneralSecurityException;
+import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.Objects;
 
 /** Writes ANV v1 payloads and selects decryption parameters exclusively from their headers. */
@@ -48,7 +50,7 @@ public class AnvCryptoService extends AbstractCryptoService {
     private final EncryptionConfig config;
 
     @Override
-    public InputStream encrypt(InputStream input, Secret secret) {
+    public InputStream encrypt(InputStream input, String aad, Secret secret) {
         try (secret) {
             val cipherId = switch (config.getImpl()) {
                 case "jca" -> 1;
@@ -66,7 +68,7 @@ public class AnvCryptoService extends AbstractCryptoService {
             RANDOM.nextBytes(nonce);
             val header = new EncryptedPayloadHeader(cipherId, secret.getVersion(), config.getKdf(), salt, nonce);
             val encoded = header.encode();
-            val cipher = initialize(Cipher.ENCRYPT_MODE, header, secret, encoded);
+            val cipher = initialize(Cipher.ENCRYPT_MODE, header, secret, associatedData(encoded, aad));
             return new SequenceInputStream(new ByteArrayInputStream(encoded), new TransformStream(input, cipher));
         } catch (IOException | GeneralSecurityException e) {
             throw new IllegalStateException("Unable to encrypt ANV payload", e);
@@ -74,11 +76,11 @@ public class AnvCryptoService extends AbstractCryptoService {
     }
 
     @Override
-    public InputStream decrypt(InputStream input) {
+    public InputStream decrypt(InputStream input, String aad) {
         try {
             val decoded = EncryptedPayloadHeader.read(input);
             try (val secret = secrets.getSecret(decoded.header().keyVersion())) {
-                val cipher = initialize(Cipher.DECRYPT_MODE, decoded.header(), secret, decoded.bytes());
+                val cipher = initialize(Cipher.DECRYPT_MODE, decoded.header(), secret, associatedData(decoded.bytes(), aad));
                 return new TransformStream(input, cipher);
             }
         } catch (IOException | GeneralSecurityException | RuntimeException e) {
@@ -89,6 +91,20 @@ public class AnvCryptoService extends AbstractCryptoService {
             }
             throw new IllegalStateException("Unable to decrypt ANV payload", e);
         }
+    }
+
+    /**
+     * Builds the authenticated data: the encoded header followed by the caller AAD.
+     * The header encodes its own length, so the concatenation is unambiguous.
+     */
+    private static byte[] associatedData(byte[] header, String aad) {
+        if (aad == null || aad.isEmpty()) {
+            throw new IllegalArgumentException("Additional authenticated data is required");
+        }
+        val aadBytes = aad.getBytes(StandardCharsets.UTF_8);
+        val data = Arrays.copyOf(header, header.length + aadBytes.length);
+        System.arraycopy(aadBytes, 0, data, header.length, aadBytes.length);
+        return data;
     }
 
     private Cipher initialize(int mode, EncryptedPayloadHeader header, Secret secret, byte[] aad) throws GeneralSecurityException {

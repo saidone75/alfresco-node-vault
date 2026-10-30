@@ -9,6 +9,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - MongoDB indexes for paged notarization and key rotation, plus advanced search by node type, mimetype, size and aspects.
 - Configurable advanced-search property indexes through `ADVANCED_SEARCH_INDEXED_PROPERTIES`; managed property indexes are synchronized in the background after startup under a renewable ShedLock job lock.
+- Node metadata integrity: a hash of the canonical node JSON is recorded at archive time with its algorithm, independent of key order and formatting in MongoDB.
+- Restore verification: metadata are checked against their recorded hash before anything is written to Alfresco; content is hashed while it streams to Alfresco and compared with the checksum recorded at archive time and, for notarized nodes, with the notarized hash. On mismatch the restored copy is removed and the restore fails. An unreachable notarization backend does not block restores and is logged as a warning.
+
+### Changed
+- **Breaking:** notarization covers a single hash of node id, content hash and metadata hash, so altered metadata, swapped transaction ids and content moved between nodes are detected; integrity sweeps report metadata changes explicitly. Nodes archived without a metadata hash cannot be restored or notarized, and nodes notarized on content only fail verification.
+- **Breaking:** the node id is part of the authenticated data of encrypted content and metadata, so an encrypted payload cannot be moved to another node. Content and metadata encrypted earlier can no longer be decrypted; recreate the data.
 
 ## [0.9.3] - 2026-10-27
 

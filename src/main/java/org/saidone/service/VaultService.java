@@ -30,7 +30,9 @@ import org.saidone.exception.HashesMismatchException;
 import org.saidone.exception.NodeNotFoundOnAlfrescoException;
 import org.saidone.exception.NodeNotFoundOnVaultException;
 import org.saidone.exception.NodeOperationInProgressException;
+import org.saidone.exception.NotarizationUnavailableException;
 import org.saidone.exception.VaultException;
+import org.saidone.misc.AnvDigestInputStream;
 import org.saidone.misc.ProgressTrackingInputStream;
 import org.saidone.model.dto.NodeWrapperDto;
 import org.saidone.monitor.VaultOperationMetrics;
@@ -39,9 +41,11 @@ import org.saidone.monitor.VaultOperationMetrics.Outcome;
 import org.saidone.service.content.ContentService;
 import org.saidone.service.locking.VaultOperationCoordinator;
 import org.saidone.service.locking.AlfrescoArchiveLockService;
+import org.saidone.service.notarization.NotarizationService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.function.Supplier;
 
 /**
@@ -63,6 +67,7 @@ public class VaultService extends BaseComponent {
     private final VaultOperationCoordinator operationCoordinator;
     private final VaultOperationMetrics operationMetrics;
     private final AlfrescoArchiveLockService alfrescoArchiveLockService;
+    private final Optional<NotarizationService> notarizationService;
 
     @Value("${application.service.vault.double-check}")
     private boolean doubleCheck;
@@ -153,6 +158,7 @@ public class VaultService extends BaseComponent {
                         nodeId, node.getContent().getSizeInBytes(), nodeContentInputStream.getBytesRead()));
             }
             val nodeWrapper = new NodeWrapperDto(node);
+            nodeWrapper.recordMetadataHash(checksumAlgorithm);
             // Record the content key version so that key rotation can find the node even when metadata is not encrypted.
             val contentInfo = contentService.getNodeContentInfo(nodeId);
             if (contentInfo.isEncrypted()) {
@@ -286,9 +292,14 @@ public class VaultService extends BaseComponent {
             log.info("Node {} already restored as {}", nodeId, nodeWrapper.getRestoredNodeId());
             return nodeWrapper.getRestoredNodeId();
         }
+        // Altered or corrupted metadata must not be written back to Alfresco.
+        val metadataHash = nodeWrapper.computeMetadataHash();
+        if (metadataHash == null || !metadataHash.equals(nodeWrapper.getMetadataHash())) {
+            throw new VaultException(String.format("Metadata of node %s do not match the hash recorded at archive time", nodeId));
+        }
         val newNodeId = alfrescoService.restoreNode(nodeWrapper.getNode(), restorePermissions);
         try {
-            alfrescoService.restoreNodeContent(newNodeId, contentService.getNodeContent(nodeId));
+            restoreVerifiedContent(nodeWrapper, newNodeId);
             nodeWrapper.setRestoredNodeId(newNodeId);
             nodeService.save(nodeWrapper);
         } catch (Exception e) {
@@ -301,6 +312,60 @@ public class VaultService extends BaseComponent {
             throw e;
         }
         return newNodeId;
+    }
+
+    /**
+     * Uploads the vault content of a node to its restored copy, hashing it
+     * while it streams, then checks it against the checksum recorded at archive
+     * time and, for a notarized node, against the notarized hash. The content
+     * can only be checked once uploaded, so on failure the caller removes the
+     * restored copy.
+     * <p>
+     * An unreachable notarization backend does not block the restore: the
+     * checksum has been verified and the failure is logged.
+     * </p>
+     *
+     * @param nodeWrapper the vault node, with verified metadata
+     * @param newNodeId   the identifier of the restored copy on Alfresco
+     * @throws VaultException if the content does not match its checksum or the notarized hash
+     */
+    @SneakyThrows
+    private void restoreVerifiedContent(NodeWrapperDto nodeWrapper, String newNodeId) {
+        val nodeId = nodeWrapper.getId();
+        val contentInfo = contentService.getNodeContentInfo(nodeId);
+        val checksumAlgorithm = contentInfo.getContentHashAlgorithm();
+        if (checksumAlgorithm == null || contentInfo.getContentHash() == null) {
+            throw new VaultException(String.format("No checksum recorded for the content of node %s", nodeId));
+        }
+        val notarized = notarizationService.isPresent() && nodeWrapper.getNotarizationTxId() != null;
+        val notarizationAlgorithm = nodeWrapper.getMetadataHashAlgorithm();
+        val nodeContent = contentService.getNodeContent(nodeId);
+        AnvDigestInputStream checksumDigest;
+        AnvDigestInputStream notarizationDigest;
+        try {
+            checksumDigest = new AnvDigestInputStream(nodeContent.getContentStream(), checksumAlgorithm);
+            // The notarized hash may use another algorithm, e.g. after key rotation re-archived the content.
+            notarizationDigest = notarized && !notarizationAlgorithm.equals(checksumAlgorithm)
+                    ? new AnvDigestInputStream(checksumDigest, notarizationAlgorithm)
+                    : checksumDigest;
+        } catch (Exception e) {
+            nodeContent.getContentStream().close();
+            throw e;
+        }
+        nodeContent.setContentStream(notarizationDigest);
+        alfrescoService.restoreNodeContent(newNodeId, nodeContent);
+        // A digest can be read only once, so the shared one is read a single time.
+        val contentHash = checksumDigest.getHash();
+        if (!contentHash.equals(contentInfo.getContentHash())) {
+            throw new VaultException(String.format("Content of node %s does not match the checksum recorded at archive time", nodeId));
+        }
+        if (!notarized) return;
+        try {
+            notarizationService.get().verifyNotarization(nodeWrapper,
+                    notarizationDigest == checksumDigest ? contentHash : notarizationDigest.getHash());
+        } catch (NotarizationUnavailableException e) {
+            log.warn("Notarization of node {} not verified on restore: {}", nodeId, e.getMessage());
+        }
     }
 
     /**

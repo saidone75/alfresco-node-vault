@@ -241,13 +241,14 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
     /**
      * Encrypts a plain text string and returns a Base64 encoded result.
      *
-     * @param text   The text to encrypt
-     * @param secret secret material used to derive the encryption key
+     * @param text    The text to encrypt
+     * @param aad     additional authenticated data, such as the node id
+     * @param secret  secret material used to derive the encryption key
      * @return Base64 encoded encrypted text
      */
-    public String encryptText(String text, Secret secret) {
+    public String encryptText(String text, String aad, Secret secret) {
         try (secret;
-             val is = encrypt(new AnvDigestInputStream(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))), secret)) {
+             val is = encrypt(new AnvDigestInputStream(new ByteArrayInputStream(text.getBytes(StandardCharsets.UTF_8))), aad, secret)) {
             return Base64.getEncoder().encodeToString(is.readAllBytes());
         } catch (Exception e) {
             throw new RuntimeException("Error during text encryption", e);
@@ -258,10 +259,11 @@ public abstract class AbstractCryptoService extends BaseComponent implements Cry
      * Decrypts a Base64 encoded encrypted text string
      *
      * @param encryptedText The Base64 encoded encrypted text
+     * @param aad           the additional authenticated data given on encryption
      * @return Decrypted plain text
      */
-    public String decryptText(String encryptedText) {
-        try (val is = decrypt(new ByteArrayInputStream(Base64.getDecoder().decode(encryptedText)))) {
+    public String decryptText(String encryptedText, String aad) {
+        try (val is = decrypt(new ByteArrayInputStream(Base64.getDecoder().decode(encryptedText)), aad)) {
             return new String(is.readAllBytes(), StandardCharsets.UTF_8);
         } catch (Exception e) {
             throw new RuntimeException("Error during text decryption", e);

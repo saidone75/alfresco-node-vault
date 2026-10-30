@@ -25,11 +25,15 @@ import lombok.val;
 import org.apache.logging.log4j.util.Strings;
 import org.saidone.component.BaseComponent;
 import org.saidone.exception.NodeNotNotarizedException;
+import org.saidone.exception.NotarizationException;
 import org.saidone.exception.NotarizedHashMismatchException;
+import org.saidone.model.dto.NodeWrapperDto;
 import org.saidone.service.NodeService;
 import org.saidone.service.locking.VaultOperationCoordinator;
 import org.saidone.service.content.ContentService;
-import org.springframework.beans.factory.annotation.Value;
+import org.saidone.utils.NodeDigestUtils;
+
+import java.util.function.Function;
 
 /**
  * Base implementation for services performing document notarization.
@@ -38,7 +42,11 @@ import org.springframework.beans.factory.annotation.Value;
  *   Concrete implementations only need to provide the mechanisms used to
  *   persist and read back document hashes via {@link #putHash(String, String)}
  *   and {@link #getHash(String)}. All other operations such as computing the
- *   hash of a node's content and updating the node metadata are handled here.
+ *   notarized hash and updating the node metadata are handled here.
+ * </p>
+ * <p>
+ *   The notarized hash binds the node id to the hashes of its content and
+ *   metadata, computed with the algorithm recorded with the metadata hash.
  * </p>
  */
 @RequiredArgsConstructor
@@ -48,14 +56,6 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
     private final NodeService nodeService;
     private final ContentService contentService;
     private final VaultOperationCoordinator operationCoordinator;
-
-    /**
-     * Algorithm used when computing hashes of node content. Value is read from
-     * the {@code application.service.vault.hash-algorithm} configuration
-     * property.
-     */
-    @Value("${application.service.vault.hash-algorithm}")
-    private String checksumAlgorithm;
 
     /**
      * Persists the given hash.
@@ -75,9 +75,11 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
     protected abstract String getHash(String txId);
 
     /**
-     * Computes the hash of the node content and stores it through {@link #putHash}.
+     * Computes the hash of the node id, content and metadata and stores it
+     * through {@link #putHash}.
      *
      * @param nodeId the identifier of the node to notarize
+     * @throws NotarizationException if the metadata do not match the hash recorded at archive time
      */
     public void notarizeNode(String nodeId) {
         operationCoordinator.withNodeLock(nodeId, () -> doNotarizeNode(nodeId));
@@ -89,9 +91,14 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
             log.info("Node {} is already notarized, skipping", nodeId);
             return;
         }
-        val hash = contentService.computeHash(nodeId, checksumAlgorithm);
-        val txHash = putHash(nodeId, hash);
-        nodeWrapper.setNotarizationTxId(txHash);
+        // Notarizing altered metadata would certify them, so they must still match the hash recorded at archive time.
+        val metadataHash = nodeWrapper.computeMetadataHash();
+        if (metadataHash == null || !metadataHash.equals(nodeWrapper.getMetadataHash())) {
+            throw new NotarizationException(String.format("Metadata of node %s do not match the hash recorded at archive time", nodeId));
+        }
+        val algorithm = nodeWrapper.getMetadataHashAlgorithm();
+        val hash = NodeDigestUtils.notarizationHash(nodeId, contentService.computeHash(nodeId, algorithm), metadataHash, algorithm);
+        nodeWrapper.setNotarizationTxId(putHash(nodeId, hash));
         nodeService.save(nodeWrapper);
     }
 
@@ -100,7 +107,7 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
      *
      * <p>The method retrieves the stored transaction id from the node,
      * fetches the hash back from the notarization system and compares it with
-     * the hash computed from the current content.</p>
+     * the hash computed from the current content and metadata.</p>
      *
      * @param nodeId the identifier of the node to check
      * @throws NodeNotNotarizedException     if the node is not notarized
@@ -112,14 +119,39 @@ public abstract class AbstractNotarizationService extends BaseComponent implemen
 
     private void doCheckNotarization(String nodeId) {
         log.debug("Checking notarization for node {}", nodeId);
-        val notarizationTransactionId = nodeService.findById(nodeId).getNotarizationTxId();
-        if (Strings.isBlank(notarizationTransactionId)) {
+        verify(nodeService.findById(nodeId), algorithm -> contentService.computeHash(nodeId, algorithm));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void verifyNotarization(NodeWrapperDto nodeWrapper, String contentHash) {
+        verify(nodeWrapper, algorithm -> contentHash);
+    }
+
+    /**
+     * Compares the notarized hash with the one recomputed from the current
+     * node state. Everything is recomputed: stored hashes only help to tell
+     * what changed.
+     *
+     * @param nodeWrapper the node to verify
+     * @param contentHash provides the content hash for the given algorithm, so
+     *                    that the content is read only once the cheaper checks pass
+     */
+    private void verify(NodeWrapperDto nodeWrapper, Function<String, String> contentHash) {
+        val nodeId = nodeWrapper.getId();
+        if (Strings.isBlank(nodeWrapper.getNotarizationTxId())) {
             throw new NodeNotNotarizedException(nodeId);
         }
-        val notarizedHash = getHash(notarizationTransactionId);
-        val actualHash = contentService.computeHash(nodeId, checksumAlgorithm);
-        if (!notarizedHash.equals(actualHash)) {
-            throw new NotarizedHashMismatchException(nodeId);
+        val metadataHash = nodeWrapper.computeMetadataHash();
+        if (metadataHash == null || !metadataHash.equals(nodeWrapper.getMetadataHash())) {
+            throw new NotarizedHashMismatchException(nodeId, "metadata changed since archiving");
+        }
+        val algorithm = nodeWrapper.getMetadataHashAlgorithm();
+        val actualHash = NodeDigestUtils.notarizationHash(nodeId, contentHash.apply(algorithm), metadataHash, algorithm);
+        if (!getHash(nodeWrapper.getNotarizationTxId()).equals(actualHash)) {
+            throw new NotarizedHashMismatchException(nodeId, "content, metadata or notarization data changed");
         }
     }
 

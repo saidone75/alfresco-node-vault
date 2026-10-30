@@ -83,7 +83,7 @@ public class OzoneContentService extends BaseComponent implements ContentService
             // Encrypting while writing keeps plain content off the disk and needs a single temporary file.
             try (val counter = BoundedInputStream.builder().setInputStream(inputStream).get();
                  val digest = new AnvDigestInputStream(counter, checksumAlgorithm);
-                 val stored = contentEncryptionService.toStoredContent(digest, metadata, node.getContent().getSizeInBytes());
+                 val stored = contentEncryptionService.toStoredContent(node.getId(), digest, metadata, node.getContent().getSizeInBytes());
                  val output = Files.newOutputStream(temporary.getPath())) {
                 stored.transferTo(output);
                 checksum = digest.getHash();
@@ -165,7 +165,6 @@ public class OzoneContentService extends BaseComponent implements ContentService
      * @throws IOException if the content cannot be retrieved
      */
     private InputStream readContent(String nodeId, Map<String, String> metadata) throws IOException {
-        return contentEncryptionService.fromStoredContent(ozoneRepository.getObject(nodeId),
-                metadata);
+        return contentEncryptionService.fromStoredContent(nodeId, ozoneRepository.getObject(nodeId), metadata);
     }
 }

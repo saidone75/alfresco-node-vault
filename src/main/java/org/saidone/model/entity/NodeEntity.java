@@ -82,6 +82,14 @@ public class NodeEntity {
     @Field("nj")
     private String nodeJson;
 
+    /** Hash of the node metadata recorded at archive time. */
+    @Field("mh")
+    private String metadataHash;
+
+    /** Algorithm of {@link #metadataHash}, also used for the notarization hash. */
+    @Field("mha")
+    private String metadataHashAlgorithm;
+
     /** Transaction id returned from notarization, if any. */
     @Field("ntx")
     private String notarizationTxId;

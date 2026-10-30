@@ -103,7 +103,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
             String checksum;
             // Encrypting while writing keeps plain content off the disk and needs a single temporary file.
             try (val dis = new AnvDigestInputStream(inputStream, checksumAlgorithm);
-                 val stored = contentEncryptionService.toStoredContent(dis, metadata, node.getContent().getSizeInBytes());
+                 val stored = contentEncryptionService.toStoredContent(node.getId(), dis, metadata, node.getContent().getSizeInBytes());
                  val fos = Files.newOutputStream(tempFile.getPath())) {
                 stored.transferTo(fos);
                 checksum = dis.getHash();
@@ -216,7 +216,7 @@ public class S3ContentService extends BaseComponent implements ContentService {
      */
     private InputStream readContent(String nodeId) {
         val object = s3Repository.getObject(s3Config.getBucket(), nodeId);
-        return contentEncryptionService.fromStoredContent(object, object.response().metadata());
+        return contentEncryptionService.fromStoredContent(nodeId, object, object.response().metadata());
     }
 
     /**

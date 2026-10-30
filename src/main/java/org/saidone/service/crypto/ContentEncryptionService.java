@@ -67,12 +67,13 @@ public class ContentEncryptionService extends BaseComponent {
      * when content encryption is enabled, and records in {@code metadata}
      * whether they are encrypted and with which key version.
      *
+     * @param nodeId   the node the content belongs to, bound to the encrypted payload
      * @param content  the original content; closing the returned stream closes it
      * @param metadata object metadata, updated with the encryption details
      * @param originalLength expected original content size, before either transformation
      * @return the stream of the bytes to store
      */
-    public InputStream toStoredContent(InputStream content, Map<String, String> metadata, long originalLength) {
+    public InputStream toStoredContent(String nodeId, InputStream content, Map<String, String> metadata, long originalLength) {
         InputStream transformed = content;
         try {
             if (originalLength < 0) throw new IllegalArgumentException("Negative original content length");
@@ -94,7 +95,7 @@ public class ContentEncryptionService extends BaseComponent {
             try (val secret = secretService.orElseThrow().getSecret()) {
                 metadata.put(MetadataKeys.ENCRYPTED, Boolean.TRUE.toString());
                 metadata.put(MetadataKeys.KEY_VERSION, String.valueOf(secret.getVersion()));
-                return logStoredSize(cryptoService.orElseThrow().encrypt(transformed, secret), originalLength);
+                return logStoredSize(cryptoService.orElseThrow().encrypt(transformed, nodeId, secret), originalLength);
             }
         } catch (IOException | RuntimeException e) {
             closeAfterFailure(transformed, e);
@@ -103,14 +104,14 @@ public class ContentEncryptionService extends BaseComponent {
     }
 
     /** Reads according to stored metadata, independently of current compression write settings. */
-    public InputStream fromStoredContent(InputStream stored, Map<String, ?> metadata) {
+    public InputStream fromStoredContent(String nodeId, InputStream stored, Map<String, ?> metadata) {
         InputStream decoded = stored;
         try {
             val encoding = metadata.get(MetadataKeys.COMPRESSION);
             if (encoding != null && !ZSTD_V1.equals(encoding)) {
                 throw new IllegalArgumentException("Unsupported content compression: " + encoding);
             }
-            decoded = fromStoredContent(stored, Boolean.parseBoolean(String.valueOf(metadata.get(MetadataKeys.ENCRYPTED))));
+            decoded = fromStoredContent(nodeId, stored, Boolean.parseBoolean(String.valueOf(metadata.get(MetadataKeys.ENCRYPTED))));
             if (encoding != null) {
                 val length = Long.parseLong(String.valueOf(metadata.get(MetadataKeys.ORIGINAL_LENGTH)));
                 if (length < 0) throw new IllegalArgumentException("Negative original content length");
@@ -134,17 +135,18 @@ public class ContentEncryptionService extends BaseComponent {
      * when they are encrypted. The stored stream is closed if decryption cannot
      * be set up.
      *
+     * @param nodeId    the node the content belongs to
      * @param stored    the stored bytes
      * @param encrypted whether the stored bytes are encrypted, as recorded in their metadata
      * @return the original content stream
      * @throws IllegalStateException if the content is encrypted but no encryption is configured
      */
-    public InputStream fromStoredContent(InputStream stored, boolean encrypted) {
+    public InputStream fromStoredContent(String nodeId, InputStream stored, boolean encrypted) {
         if (!encrypted) return stored;
         try {
             return cryptoService
                     .orElseThrow(() -> new IllegalStateException("Content is encrypted but encryption is not configured"))
-                    .decrypt(stored);
+                    .decrypt(stored, nodeId);
         } catch (RuntimeException e) {
             closeAfterFailure(stored, e);
             throw e;

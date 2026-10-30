@@ -19,6 +19,8 @@
 
 package org.saidone.service.notarization;
 
+import org.saidone.model.dto.NodeWrapperDto;
+
 /**
  * Contract for components able to notarize documents.
  *
@@ -48,5 +50,18 @@ public interface NotarizationService {
      *                                                     notarized or hashes do not match
      */
     void checkNotarization(String nodeId);
+
+    /**
+     * Verifies the notarization of a node against a hash of its content
+     * computed by the caller, so that the content is not read again. The
+     * caller must hold the node lock.
+     *
+     * @param nodeWrapper the node, with its metadata and notarization data
+     * @param contentHash the hash of the node content, computed with the
+     *                    algorithm recorded with the metadata hash
+     * @throws org.saidone.exception.NotarizationException if the node is not
+     *                                                     notarized or hashes do not match
+     */
+    void verifyNotarization(NodeWrapperDto nodeWrapper, String contentHash);
 
 }
