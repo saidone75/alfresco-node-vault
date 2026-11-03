@@ -46,8 +46,9 @@
     </scm>
     <properties>
         <java.version>21</java.version>
-        <spring-cloud.version>2025.1.3</spring-cloud.version>
+        <spring-cloud.version>2025.1.4</spring-cloud.version>
         <awssdk.version>2.57.7</awssdk.version>
+        <awssdk.version>2.56.0</awssdk.version>
         <asm.version>9.11.1</asm.version>
         <shedlock.version>7.10.1</shedlock.version>
         <okhttp.version>5.5.1</okhttp.version>
@@ -119,13 +120,13 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.6.0-jre</version>
+                <version>33.7.2-jre</version>
             </dependency>
             <!-- Ratis' Dropwizard 3 provider requires Metrics 3; align Hadoop with it. -->
             <dependency>
                 <groupId>io.dropwizard.metrics</groupId>
                 <artifactId>metrics-core</artifactId>
-                <version>3.2.5</version>
+                <version>4.2.40</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.okio</groupId>
