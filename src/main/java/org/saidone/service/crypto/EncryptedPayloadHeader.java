@@ -134,9 +134,9 @@ class EncryptedPayloadHeader {
                 val iterations = kdf.getPbkdf2().getIterations();
                 if (iterations < 100_000 || iterations > 10_000_000) throw new IOException("PBKDF2 iterations outside ANV v1 limits");
             }
-            case "hkdf" -> {
-                if (kdf.getHkdf().getInfo().getBytes(StandardCharsets.UTF_8).length > 1024) throw new IOException("HKDF info too long");
-            }
+            case String impl when "hkdf".equals(impl) && kdf.getHkdf().getInfo().getBytes(StandardCharsets.UTF_8).length > 1024 -> throw new IOException("HKDF info too long");
+            // Info length within limits: nothing else to check for HKDF.
+            case "hkdf" -> { }
             case "argon2" -> {
                 val a = kdf.getArgon2();
                 if (a.getMemory() < 65536 || a.getMemory() > 262144 || a.getIterations() < 3 || a.getIterations() > 10 || a.getParallelism() < 1 || a.getParallelism() > 16)
