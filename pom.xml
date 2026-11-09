@@ -120,7 +120,7 @@
             <dependency>
                 <groupId>com.google.guava</groupId>
                 <artifactId>guava</artifactId>
-                <version>33.7.2-jre</version>
+                <version>33.8.0-jre</version>
             </dependency>
             <!-- Ratis' Dropwizard 3 provider requires Metrics 3; align Hadoop with it. -->
             <dependency>
