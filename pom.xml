@@ -157,7 +157,7 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcpkix-jdk18on</artifactId>
-                <version>1.86</version>
+                <version>1.87</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
@@ -263,7 +263,7 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk18on</artifactId>
-            <version>1.86</version>
+            <version>1.87</version>
         </dependency>
         <dependency>
             <groupId>software.amazon.awssdk</groupId>
